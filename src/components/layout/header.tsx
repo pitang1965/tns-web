@@ -23,7 +23,7 @@ export function Header() {
       </div>
       {user && (
         <Avatar>
-          <AvatarImage src={user.picture} />
+          <AvatarImage src={user.picture || undefined} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       )}
