@@ -4,6 +4,7 @@ import { LoginButton } from '@/components/auth/login-button';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
 
 export function Header() {
   const { user, error, isLoading } = useUser();
@@ -12,11 +13,11 @@ export function Header() {
 
   return (
     <div className='flex items-center justify-between text-foreground bg-white dark:bg-black p-2 gap-2'>
-      <div className='flex-1'></div>
-      <p className='absolute left-1/2 transform -translate-x-1/2 font-mono text-sm'>
-        Auth0による認証・認可の実験中...
-      </p>
-      <div className='flex items-center space-x-4'>
+      <p className='text-xl ml-auto'>旅のしおり</p>
+      <div className='flex items-center space-x-4 ml-auto'>
+        <Link href='/'>ホーム</Link>
+        <Link href='/profile'>プロフィール</Link>
+        <Link href='/help'>ヘルプ</Link>
         {!user && <LoginButton />}
         {user && <LogoutButton />}
         <ModeToggle />

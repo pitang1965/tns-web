@@ -8,7 +8,7 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Next-Auth-App',
+  title: '旅のしおり',
   description: 'Auth0による認証・認可の実験',
 };
 
