@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type UserInfoProps = {
   label: string;
-  value: string | null | undefined;
+  value: string | boolean | null | undefined;
 };
 
 function UserInfo({ label, value }: UserInfoProps) {
