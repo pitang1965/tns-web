@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export function LoginButton() {
+export function LogoutButton() {
   return (
     <Button asChild>
-      <Link href='/api/auth/login'>ログイン</Link>
+      <Link href='/api/auth/logout'>ログアウト</Link>
     </Button>
   );
 }
