@@ -3,7 +3,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { LoginButton } from '@/components/auth/login-button';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/user-avatar';
 import { Navigation } from '@/components/layout/navigation';
 
 export function Header() {
@@ -20,12 +20,7 @@ export function Header() {
         {user && <LogoutButton />}
         <ModeToggle />
       </div>
-      {user && (
-        <Avatar>
-          <AvatarImage src={user.picture || undefined} />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-      )}
+      {user && <UserAvatar user={user} />}
     </div>
   );
 }
