@@ -15,7 +15,7 @@ function UserInfo({ label, value }: UserInfoProps) {
   );
 }
 
-export default function Profile() {
+export default function Account() {
   const { user, error, isLoading } = useUser();
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -24,7 +24,7 @@ export default function Profile() {
   return (
     <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
       <div>
-        <p className='text-5xl py-4'>プロフィール</p>
+        <p className='text-5xl py-4'>アカウント</p>
         {user ? (
           <div>
             <Avatar>

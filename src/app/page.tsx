@@ -18,8 +18,20 @@ export default function Home() {
       </div>
       <div className='w-1/2 flex flex-col items-center'>
         <p className='text-5xl py-4'>旅のしおり</p>
-        {!user && <p className='text-lg'>右上からログインしてください。</p>}
-        {user && <p className='text-lg'>こんにちは。{user.name}さん</p>}
+        {!user && (
+          <div>
+            <p className='text-lg'>旅行を計画するにはログインしてください。</p>
+            <p className='text-xs'>
+              続行することにより、本アプリの利用規約及びプライバシー及びCookieに関する声明に同意するものとします。
+            </p>
+          </div>
+        )}
+        {user && (
+          <div>
+            <p className='text-lg'>こんにちは。{user.name}さん</p>
+            <p className='text-lg'>旅の情報をチェックしよう。</p>
+          </div>
+        )}
       </div>
     </div>
   );
