@@ -1,6 +1,7 @@
 'use client';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LogoutButton } from '@/components/auth/logout-button';
 
 type UserInfoProps = {
   label: string;
@@ -35,6 +36,7 @@ export default function Account() {
             <UserInfo label='email' value={user.email} />
             <UserInfo label='email_verified' value={user.email_verified} />
             <UserInfo label='nickname' value={user.nickname} />
+            <LogoutButton />
           </div>
         ) : (
           <p>ログインしてください。</p>

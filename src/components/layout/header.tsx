@@ -1,7 +1,6 @@
 'use client';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { LoginButton } from '@/components/auth/login-button';
-import { LogoutButton } from '@/components/auth/logout-button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { UserAvatar } from '@/components/user-avatar';
 import { Navigation } from '@/components/layout/navigation';
@@ -23,7 +22,6 @@ export function Header() {
           <Navigation />
         </div>
         {!user && <LoginButton />}
-        {user && <LogoutButton />}
         <ModeToggle />
       </div>
       {user && <UserAvatar user={user} />}
