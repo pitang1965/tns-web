@@ -2,10 +2,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## .env.localの設定
 
+```
 AUTH0_BASE_URL='http://localhost:3000'
 AUTH0_ISSUER_BASE_URL='https://xxxxx.jp.auth0.com'
 AUTH0_CLIENT_ID='xxxxx'
 AUTH0_CLIENT_SECRET='xxxxx'
+```
 
 ## Dockerで動かす場合
 
