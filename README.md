@@ -2,12 +2,18 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## .env.localの設定
 
-```
-AUTH0_BASE_URL='http://localhost:3000'
-AUTH0_ISSUER_BASE_URL='https://xxxxx.jp.auth0.com'
-AUTH0_CLIENT_ID='xxxxx'
-AUTH0_CLIENT_SECRET='xxxxx'
-```
+* `AUTH0_SECRET`:
+  * Auth0 SDK が使用する秘密鍵。セッションの暗号化などに使用される。
+* `AUTH0_BASE_URL`:
+  * アプリケーションのベース URL。ログイン後のリダイレクト先として使用される。
+* `AUTH0_ISSUER_BASE_URL`:
+  * Auth0 テナントの URL。認証リクエストの送信先となる。
+* `AUTH0_CLIENT_ID`:
+  * Auth0 アプリケーションの識別子。認証リクエストに使用される。
+* `AUTH0_CLIENT_SECRET`:
+  * Auth0 アプリケーションの秘密鍵。トークン取得時などに使用される。
+* `NEXT_PUBLIC_AUTH0_AUDIENCE`:
+  * アクセストークンの対象となる API の識別子。この値は、NestJS バックエンドの設定と一致する必要がある。
 
 ## Dockerで動かす場合
 
