@@ -65,8 +65,7 @@ export default async function Home() {
       ) : (
         <div>
             <p className='text-lg'>こんにちは。{session?.user.name}さん</p>
-            {/* <HomeDataDisplay initialData={apiData} error={error} /> */}
-            <p>{apiData.message}</p>
+            <p>{apiData?.message}</p>
         </div>
       )}
     </div>
