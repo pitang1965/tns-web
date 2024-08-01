@@ -43,9 +43,9 @@ export function Navigation() {
         <Search className='mr-1' />
         検索
       </NavLink>
-      <NavLink href='/plan'>
+      <NavLink href='/itineraries'>
         <BookHeart className='mr-1' />
-        計画
+        旅程
       </NavLink>
       {user && (
         <NavLink href='/account'>

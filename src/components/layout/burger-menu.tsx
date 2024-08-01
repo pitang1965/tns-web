@@ -66,12 +66,12 @@ export function BurgerMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
-            href='/plan'
+            href='/itineraries'
             className='flex items-center'
-            onClick={(e) => handleItemClick(e, '/plan')}
+            onClick={(e) => handleItemClick(e, '/itineraries')}
           >
             <BookHeart className='mr-1' />
-            計画
+            旅程
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

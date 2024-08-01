@@ -42,7 +42,7 @@ export function TabBar() {
       <div className='flex justify-around py-2'>
         <TabLink href='/' icon={<Info />} label='情報' />
         <TabLink href='/search' icon={<Search />} label='検索' />
-        <TabLink href='/plan' icon={<BookHeart />} label='計画' />
+        <TabLink href='/itineraries' icon={<BookHeart />} label='旅程一覧' />
         {user && (
           <TabLink href='/account' icon={<CircleUser />} label='アカウント' />
         )}
