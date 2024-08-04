@@ -1,5 +1,3 @@
-'use client';
-
 import { TabBar } from '@/components/layout/tab-bar';
 
 export function Footer() {

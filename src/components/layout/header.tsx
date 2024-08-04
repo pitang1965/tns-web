@@ -1,4 +1,5 @@
 'use client';
+
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { LoginButton } from '@/components/auth/login-button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
