@@ -20,7 +20,6 @@ export default function Account() {
   const { user, error, isLoading } = useUser();
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
-  console.log(user);
 
   return (
     <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
