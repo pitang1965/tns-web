@@ -1,8 +1,9 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
+import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
 type PageProps = {
-  params: { id: string };
+  params: Params;
 };
 
 const ItinerariesPage: React.FC<PageProps> = ({ params }) => {
