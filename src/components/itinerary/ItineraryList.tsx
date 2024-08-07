@@ -10,8 +10,7 @@ interface Props {
 
 export const ItineraryList: React.FC<Props> = ({ itineraries }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      <h1 className='text-2xl font-bold mb-4'>旅程一覧</h1>
+    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
       {itineraries.map((itinerary) => (
         <ItineraryCard key={itinerary.id} itinerary={itinerary} />
       ))}

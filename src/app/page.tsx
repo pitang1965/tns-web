@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Head from 'next/head';
 import { getSession, Session, getAccessToken } from '@auth0/nextjs-auth0';
 
 type ApiData = {
@@ -45,29 +46,62 @@ export default async function Home() {
   }
 
   return (
-    <div className='flex flex-col items-center justify-center p-24 bg-background text-foreground'>
-      <p className='text-5xl py-4'>情報</p>
-      <Image
-        className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] mb-4'
-        src='/over40.svg'
-        alt='Over 40 Web Club Logo'
-        width={90}
-        height={90}
-        priority
-      />
-      {!session?.user ? (
-        <div>
-          <p className='text-lg'>旅行を計画するにはログインしてください。</p>
-          <p className='text-xs'>
-            続行することにより、本アプリの利用規約及びプライバシー及びCookieに関する声明に同意するものとします。
-          </p>
-        </div>
-      ) : (
-        <div>
-            <p className='text-lg'>こんにちは。{session?.user.name}さん</p>
+    <>
+      <Head>
+        <title>旅のしおり | あなたの旅行計画をサポート</title>
+        <meta
+          name='description'
+          content='旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。'
+        />
+        <meta
+          name='keywords'
+          content='旅のしおり,旅行計画,旅程管理,トラベルプランナー'
+        />
+        <meta
+          property='og:title'
+          content='旅のしおり作成 | あなたの旅行計画をサポート'
+        />
+        <meta
+          property='og:description'
+          content='旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。'
+        />
+        <meta property='og:type' content='website' />
+        <meta property='og:url' content='https://あなたのウェブサイトURL.com' />
+        <meta
+          property='og:image'
+          content='https://あなたのウェブサイトURL.com/og-image.jpg'
+        />
+      </Head>
+      <div className='flex flex-col items-center justify-center p-24 bg-background text-foreground'>
+        <h1 className='text-5xl py-4 font-bold'>旅のしおり作成</h1>
+        <Image
+          className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] mb-4'
+          src='/over40.svg'
+          alt='Over 40 Web Club Logo'
+          width={90}
+          height={90}
+          priority
+        />
+        {!session?.user ? (
+          <div>
+            <p className='text-lg'>旅行を計画するにはログインしてください。</p>
+            <p className='text-sm mt-2'>
+              旅のしおりを使って、あなたの旅行をより楽しく、効率的に計画しましょう。
+            </p>
+            <p className='text-xs mt-4'>
+              続行することにより、本アプリの利用規約及びプライバシー及びCookieに関する声明に同意するものとします。
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className='text-lg'>こんにちは、{session?.user.name}さん</p>
+            <p className='text-sm mt-2'>
+              旅のしおりを作成して、素晴らしい旅の計画を立てましょう。
+            </p>
             <p>{apiData?.message}</p>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
