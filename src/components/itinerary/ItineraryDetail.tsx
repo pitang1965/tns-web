@@ -2,6 +2,8 @@
 
 import { Itinerary } from '@/types';
 import { useEffect, useState } from 'react';
+
+// TODO: データベースからデータを取るようにする
 import { sampleItineraries } from '@/data/itineraries';
 
 interface ItineraryDetailProps {
