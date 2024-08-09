@@ -1,18 +1,16 @@
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { withPageAuthRequired, WithPageAuthRequired   } from '@auth0/nextjs-auth0';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
-import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 
 type PageProps = {
-  params: Params;
+  params: { id: string };
 };
 
-const ItinerariesPage: React.FC<PageProps> = ({ params }) => {
+function ItinerariesPage({ params }: PageProps) {
   if (!params?.id) {
     return <div>旅程が見つかりません。</div>;
   }
 
   return <ItineraryDetail id={params.id} />;
-};
+}
 
-// TODO: anyをなんとかする
-export default withPageAuthRequired(ItinerariesPage as any);
+export default withPageAuthRequired(ItinerariesPage as any, { returnTo: '/itineraries' });
