@@ -1,11 +1,11 @@
 'use client';
 
-import { Itinerary } from '@/types';
+import { Itinerary } from '@/data/types/itinerary';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 // TODO: データベースからデータを取るようにする
-import { sampleItineraries } from '@/data/itineraries';
+import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
 interface ItineraryDetailProps {
   id: string;

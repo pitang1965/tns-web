@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
-import { sampleItineraries } from '@/data/itineraries';
+import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
 export const metadata: Metadata = {
   title: '保存された旅程一覧 | あなたの旅行計画',

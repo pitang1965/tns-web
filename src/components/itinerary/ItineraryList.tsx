@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Itinerary } from '@/types';
+import { Itinerary } from '@/data/types/itinerary';
 import { ItineraryCard } from './ItineraryCard';
 import { Button } from '@/components/ui/button';
 

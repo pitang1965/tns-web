@@ -1,4 +1,4 @@
-import { Itinerary } from '@/types';
+import { Itinerary } from '../types/itinerary';
 
 export const sampleItineraries: Itinerary[] = [
   {
@@ -7,6 +7,11 @@ export const sampleItineraries: Itinerary[] = [
     startDate: '2025-03-12',
     endDate: '2025-04-05',
     description: '近畿、中国、四国、九州を巡る旅',
+    dayPlans: [],
+    transportation: {
+      type: 'CAR',
+      details: '車中泊',
+    },
   },
   {
     id: '2',
@@ -14,5 +19,10 @@ export const sampleItineraries: Itinerary[] = [
     startDate: '2024-05-18',
     endDate: '2024-05-19',
     description: '市営愛宕山 無料駐車場で車中泊',
+    dayPlans: [],
+    transportation: {
+      type: 'CAR',
+      details: '車中泊',
+    },
   },
 ];

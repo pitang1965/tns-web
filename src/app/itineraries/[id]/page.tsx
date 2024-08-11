@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
+import { Itinerary } from '@/data/types/itinerary';
 
 // TODO: データベースからデータを取るようにする
-import { sampleItineraries } from '@/data/itineraries';
+import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
 type PageProps = {
   params: { id: string };
@@ -11,8 +12,7 @@ type PageProps = {
 export const generateMetadata = async ({
   params,
 }: PageProps): Promise<Metadata> => {
-  const itinerary = sampleItineraries.find((i) => i.id === params.id);
-  const itineraryTitle = `旅程 ${params.id}`;
+  const itinerary = sampleItineraries.find((i) => i.id === params.id) as Itinerary | undefined;
 
   if (!itinerary) {
     return {
@@ -23,7 +23,7 @@ export const generateMetadata = async ({
 
   return {
     title: `${itinerary.title} | あなたの旅行計画`,
-    description: itinerary.description,
+    description: itinerary.description ?? undefined,
     keywords: '旅程詳細,旅行計画,旅のしおり,' + itinerary.title,
   };
 };
