@@ -21,5 +21,5 @@ export const TransportationBadge: React.FC<TransportationBadgeProps> = ({
 }) => {
   const { color, label } = transportationMap[type] || transportationMap.OTHER;
 
-  return <Badge className={`${color} text-white self-start`}>{label}</Badge>;
+  return <Badge className={`${color} text-white`}>{label}</Badge>;
 };
