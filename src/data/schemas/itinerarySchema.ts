@@ -29,9 +29,8 @@ const locationSchema = z.object({
 // Place schema
 const placeSchema = z.object({
   name: z.string(),
-  address: addressSchema,
-  location: locationSchema,
   type: z.enum([
+    'HOME', // 自宅
     'ATTRACTION', // 観光スポット
     'RESTAURANT', // レストラン
     'HOTEL', // ホテル
@@ -45,16 +44,19 @@ const placeSchema = z.object({
     'CONVENIENCE_SUPERMARKET', // コンビニ・スーパーマーケット
     'BATHING_FACILITY', // 入浴施設
     'COIN_LAUNDRY', // コインランドリ
+    'OTHER', // その他
   ]),
+  address: addressSchema.optional(),
+  location: locationSchema.optional(),
 });
 
 // Activity schema
 const activitySchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  startTime: z.string(),
-  endTime: z.string(),
+  title: z.string(), // 例: 昼食、観光、休憩、宿泊地到着、美術館見学、温泉入浴、◯◯さんに会う
   place: placeSchema,
+  description: z.string().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
   cost: z.number().optional(),
 });
 
@@ -71,8 +73,7 @@ const transportationSchema = z.object({
 });
 
 // Budget schema
-const
-  Schema = z.object({
+const Schema = z.object({
   total: z.number(),
   spent: z.number().default(0),
   categories: z.record(z.string(), z.number()),
