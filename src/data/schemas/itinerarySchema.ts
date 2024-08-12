@@ -34,7 +34,6 @@ const placeSchema = z.object({
     'ATTRACTION', // 観光スポット
     'RESTAURANT', // レストラン
     'HOTEL', // ホテル
-    'OTHER', // その他
     'PARKING_PAID_RV_PARK', // 駐車場 -- 有料 -- RVパーク
     'PARKING_PAID_OTHER', // 駐車場 -- 有料 -- その他
     'PARKING_FREE_SERVICE_AREA', // 駐車場 -- 無料 -- サービスエリア・パーキングエリア
