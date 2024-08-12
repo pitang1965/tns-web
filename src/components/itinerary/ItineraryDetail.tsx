@@ -3,6 +3,10 @@
 import { Itinerary } from '@/data/types/itinerary';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  TransportationBadge,
+  TransportationType,
+} from '@/components/TransportationBadge';
 
 // TODO: データベースからデータを取るようにする
 import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
@@ -39,9 +43,13 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       </div>
       <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
         <h1 className='text-5xl py-4'>{itinerary.title}</h1>
-        <p className='text-lg'>{itinerary.description}</p>
-        <p>開始日: {itinerary.startDate}</p>
-        <p>終了日: {itinerary.endDate}</p>
+        <TransportationBadge
+          type={itinerary.transportation.type as TransportationType}
+        />
+        <h2 className='text-lg'>{itinerary.description}</h2>
+        <p>
+          期間: {itinerary.startDate} ～ {itinerary.endDate}
+        </p>
       </div>
     </div>
   );
