@@ -29,11 +29,12 @@ export const sampleItineraries: Itinerary[] = [
               name: '自宅',
               type: 'HOME',
             },
+            startTime: '11:19'
           },
           {
             title: '給油&昼食',
             place: {
-              name: 'ENEOS $16 春日部SS',
+              name: 'ENEOS R16 春日部SS',
               type: 'GAS_STATION',
             },
           },
@@ -92,6 +93,7 @@ export const sampleItineraries: Itinerary[] = [
               name: '市営愛宕山 無料駐車場',
               type: 'PARKING_FREE_OTHER',
             },
+            startTime: '19:37'
           },
           {
             title: '夕食（居酒屋）',
@@ -99,6 +101,8 @@ export const sampleItineraries: Itinerary[] = [
               name: '錦',
               type: 'RESTAURANT',
             },
+            startTime: '19:57',
+            endTime: "22:08"
           },
         ],
       },

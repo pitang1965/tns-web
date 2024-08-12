@@ -8,6 +8,7 @@ import {
   TransportationType,
 } from '@/components/TransportationBadge';
 import { PlaceTypeBadge, PlaceType } from '@/components/PlaceTypeBadge';
+import { ActivityTimeDisplay } from '@/components/ActivityTimeDisplay';
 
 // TODO: データベースからデータを取るようにする
 import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
@@ -68,8 +69,14 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
               <ul className='space-y-2'>
                 {day.activities.map((activity, actIndex) => (
                   <li key={actIndex} className='bg-white p-3 rounded shadow'>
-                    <div className='font-medium'>{activity.title}</div>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className='flex'>
+                      <p className='font-medium'>{activity.title}</p>
+                      <ActivityTimeDisplay
+                        startTime={activity.startTime}
+                        endTime={activity.endTime}
+                      />
+                    </div>
+                    <div className='flex items-center gap-2 mt-1'>
                       <PlaceTypeBadge type={activity.place.type as PlaceType} />
                       {activity.place.name}
                     </div>
