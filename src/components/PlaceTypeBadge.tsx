@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 
 const placeTypeMap = {
   HOME: { color: 'bg-gray-500', label: '自宅' },
-  ATTRACTION: { color: 'bg-blue-500', label: '観光スポット' },
+  ATTRACTION: { color: 'bg-blue-500', label: '観光地' },
   RESTAURANT: { color: 'bg-red-500', label: 'レストラン' },
   HOTEL: { color: 'bg-indigo-500', label: 'ホテル' },
   PARKING_PAID_RV_PARK: { color: 'bg-yellow-500', label: '有料RVパーク' },

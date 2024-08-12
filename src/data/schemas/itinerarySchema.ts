@@ -31,7 +31,7 @@ const placeSchema = z.object({
   name: z.string(),
   type: z.enum([
     'HOME', // 自宅
-    'ATTRACTION', // 観光スポット
+    'ATTRACTION', // 観光地
     'RESTAURANT', // レストラン
     'HOTEL', // ホテル
     'PARKING_PAID_RV_PARK', // 駐車場 -- 有料 -- RVパーク
