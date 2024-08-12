@@ -19,7 +19,94 @@ export const sampleItineraries: Itinerary[] = [
     startDate: '2024-05-18',
     endDate: '2024-05-19',
     description: '市営愛宕山 無料駐車場で車中泊',
-    dayPlans: [],
+    dayPlans: [
+      {
+        date: '2024-05-18',
+        activities: [
+          {
+            title: '出発',
+            place: {
+              name: '自宅',
+              type: 'HOME',
+            },
+          },
+          {
+            title: '給油&昼食',
+            place: {
+              name: 'ENEOS $16 春日部SS',
+              type: 'GAS_STATION',
+            },
+          },
+          {
+            title: '休憩',
+            place: {
+              name: '道の駅 庄和',
+              type: 'PARKING_FREE_MICHINOEKI',
+            },
+          },
+          {
+            title: '観光地到着',
+            place: {
+              name: '町並み観光駐車場',
+              type: 'PARKING_PAID_OTHER',
+            },
+          },
+          {
+            title: '観光地',
+            place: {
+              name: '小野川',
+              type: 'ATTRACTION',
+            },
+          },
+          {
+            title: '観光地',
+            place: {
+              name: '小野川',
+              type: 'ATTRACTION',
+            },
+          },
+          {
+            title: '銭湯',
+            place: {
+              name: '金平湯',
+              type: 'BATHING_FACILITY',
+            },
+          },
+          {
+            title: '出発',
+            place: {
+              name: '町並み観光駐車場',
+              type: 'PARKING_PAID_OTHER',
+            },
+          },
+          {
+            title: '休憩',
+            place: {
+              name: '道の駅 発酵の里こうざき',
+              type: 'PARKING_FREE_MICHINOEKI',
+            },
+          },
+          {
+            title: '宿泊地到着',
+            place: {
+              name: '市営愛宕山 無料駐車場',
+              type: 'PARKING_FREE_OTHER',
+            },
+          },
+          {
+            title: '夕食（居酒屋）',
+            place: {
+              name: '錦',
+              type: 'RESTAURANT',
+            },
+          },
+        ],
+      },
+      {
+        date: '2024-05-19',
+        activities: [],
+      },
+    ],
     transportation: {
       type: 'CAR',
       details: '車中泊',
