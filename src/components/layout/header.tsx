@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
+import Link from 'next/link';
 import { LoginButton } from '@/components/auth/login-button';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { UserAvatar } from '@/components/user-avatar';
@@ -17,7 +18,7 @@ export function Header() {
       <div className='md:hidden'>
         <BurgerMenu />
       </div>
-      <p className='text-xl ml-auto'>旅のしおり</p>
+      <Link href="/" className="text-xl ml-auto cursor-pointer">旅のしおり</Link>
       <div className='flex items-center space-x-4 ml-auto'>
         <div className='hidden md:block'>
           <Navigation />
