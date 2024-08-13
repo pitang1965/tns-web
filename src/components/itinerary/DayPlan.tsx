@@ -1,9 +1,11 @@
 import { Itinerary } from '@/data/types/itinerary';
 import { ActivityItem } from './ActivityItem';
 
-type DayPlanProps =  {
-  day: Itinerary['dayPlans'][0];
-}
+type DayPlan = Itinerary['dayPlans'][number];
+
+type DayPlanProps = {
+  day: DayPlan;
+};
 
 export const DayPlan: React.FC<DayPlanProps> = ({ day }) => (
   <div className='mb-6 bg-gray-100 p-4 rounded-lg'>

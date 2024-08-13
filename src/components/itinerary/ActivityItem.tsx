@@ -2,8 +2,9 @@ import { Itinerary } from '@/data/types/itinerary';
 import { PlaceTypeBadge, PlaceType } from '@/components/PlaceTypeBadge';
 import { ActivityTimeDisplay } from '@/components/ActivityTimeDisplay';
 
+type Acitivity = Itinerary['dayPlans'][number]['activities'][number];
 type ActivityItemProps = {
-  activity: Itinerary['dayPlans'][0]['activities'][0];
+  activity: Acitivity;
 }
 
 export const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => (
