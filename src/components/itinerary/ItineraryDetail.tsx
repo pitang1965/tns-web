@@ -15,7 +15,7 @@ import { useItinerary } from '@/hooks/useItinerary';
 // TODO: データベースからデータを取るようにする
 import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
-interface ItineraryDetailProps {
+type ItineraryDetailProps = {
   id: string;
 }
 

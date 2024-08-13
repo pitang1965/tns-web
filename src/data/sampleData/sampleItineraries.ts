@@ -24,6 +24,7 @@ export const sampleItineraries: Itinerary[] = [
         date: '2024-05-18',
         activities: [
           {
+            id: '1',
             title: '出発',
             place: {
               name: '自宅',
@@ -32,6 +33,7 @@ export const sampleItineraries: Itinerary[] = [
             startTime: '11:19'
           },
           {
+            id: '2',
             title: '給油&昼食',
             place: {
               name: 'ENEOS R16 春日部SS',
@@ -39,6 +41,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '3',
             title: '休憩',
             place: {
               name: '道の駅 庄和',
@@ -46,6 +49,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '4',
             title: '観光地到着',
             place: {
               name: '町並み観光駐車場',
@@ -53,6 +57,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '5',
             title: '観光地',
             place: {
               name: '小野川',
@@ -60,6 +65,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '6',
             title: '観光地',
             place: {
               name: '小野川',
@@ -67,6 +73,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '7',
             title: '銭湯',
             place: {
               name: '金平湯',
@@ -74,6 +81,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '8',
             title: '出発',
             place: {
               name: '町並み観光駐車場',
@@ -81,6 +89,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '9',
             title: '休憩',
             place: {
               name: '道の駅 発酵の里こうざき',
@@ -88,6 +97,7 @@ export const sampleItineraries: Itinerary[] = [
             },
           },
           {
+            id: '10',
             title: '宿泊地到着',
             place: {
               name: '市営愛宕山 無料駐車場',
@@ -96,6 +106,7 @@ export const sampleItineraries: Itinerary[] = [
             startTime: '19:37'
           },
           {
+            id: '11',
             title: '夕食（居酒屋）',
             place: {
               name: '錦',
