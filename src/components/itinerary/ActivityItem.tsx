@@ -8,7 +8,7 @@ type ActivityItemProps = {
 }
 
 export const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => (
-  <li className='bg-white p-3 rounded shadow'>
+  <li className='bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50'>
     <div className='flex'>
       <p className='font-medium'>{activity.title}</p>
       <ActivityTimeDisplay

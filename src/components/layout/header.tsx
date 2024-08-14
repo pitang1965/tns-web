@@ -14,7 +14,7 @@ export function Header() {
   if (error) return <div>{error.message}</div>;
 
   return (
-    <div className='flex items-center justify-between text-foreground bg-white dark:bg-black p-2 gap-2'>
+    <div className='flex items-center justify-between text-foreground bg-background p-2 gap-2'>
       <div className='md:hidden'>
         <BurgerMenu />
       </div>

@@ -40,7 +40,7 @@ export function TabBar() {
   }
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 bg-background dark:bg-background-dark shadow-top'>
+    <nav className='fixed bottom-0 left-0 right-0 bg-background text-foreground shadow-top'>
       <div className='flex justify-around py-2'>
         <TabLink href='/' icon={<Info />} label='情報' />
         <TabLink href='/search' icon={<Search />} label='検索' />

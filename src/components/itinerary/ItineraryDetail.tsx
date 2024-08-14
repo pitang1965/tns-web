@@ -47,7 +47,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             <DayPlan key={index} day={day} />
           ))
         ) : (
-          <p className='text-center text-gray-500'>
+          <p className='text-center text-gray-600 dark:text-gray-400'>
             まだ旅程の詳細が登録されていません。「編集」ボタンから旅程を追加してください。
           </p>
         )}

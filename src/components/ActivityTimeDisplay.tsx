@@ -17,19 +17,19 @@ export const ActivityTimeDisplay: React.FC<ActivityTimeDisplayProps> = ({
   const renderTimeInfo = () => {
     if (startTime && endTime) {
       return (
-        <span className='ml-2 text-sm text-gray-600'>
+        <span className='ml-2 text-sm text-gray-600 dark:text-gray-400'>
           {formatTime(startTime)} ～ {formatTime(endTime)}
         </span>
       );
     } else if (startTime) {
       return (
-        <span className='ml-2 text-sm text-gray-600'>
+        <span className='ml-2 text-sm text-gray-600 dark:text-gray-400'>
           開始: {formatTime(startTime)}
         </span>
       );
     } else if (endTime) {
       return (
-        <span className='ml-2 text-sm text-gray-600'>
+        <span className='ml-2 text-sm text-gray-600 dark:text-gray-400'>
           終了: {formatTime(endTime)}
         </span>
       );
