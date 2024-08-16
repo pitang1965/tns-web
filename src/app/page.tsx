@@ -1,6 +1,12 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { getSession, Session, getAccessToken } from '@auth0/nextjs-auth0';
+import dynamic from 'next/dynamic';
+
+const DynamicMap = dynamic(() => import('@/components/Map'), {
+  ssr: false,
+  loading: () => <p>地図の読込中...</p>,
+});
 
 type ApiData = {
   message: string;
@@ -92,6 +98,9 @@ export default async function Home() {
             旅のしおりを作成して、素晴らしい旅の計画を立てましょう。
           </p>
           <p>{apiData?.message}</p>
+          <div className='w-full h-96 mt-4'>
+            <DynamicMap />
+          </div>
         </div>
       )}
     </div>
