@@ -12,8 +12,14 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
   * Auth0 アプリケーションの識別子。認証リクエストに使用される。
 * `AUTH0_CLIENT_SECRET`:
   * Auth0 アプリケーションの秘密鍵。トークン取得時などに使用される。
-* `NEXT_PUBLIC_AUTH0_AUDIENCE`:
-  * アクセストークンの対象となる API の識別子。この値は、NestJS バックエンドの設定と一致する必要がある。
+* `AUTH0_AUDIENCE`:
+  * API の識別子。アクセストークンの発行対象となる API を指定する。
+  * 例: `https://api.tabi-no-shiori.com`
+* `AUTH0_DOMAIN`:
+  * Auth0 テナントのドメイン。認証エンドポイントの構築に使用される。
+  * 例: `your-tenant.auth0.com`
+* `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
+  * Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
 
 ## Dockerで動かす場合
 
