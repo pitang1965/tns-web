@@ -1,4 +1,4 @@
-import { TabBar } from '@/components/layout/tab-bar';
+import { TabBar } from '@/components/layout/TabBar';
 
 export function Footer() {
   return (

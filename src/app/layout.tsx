@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 const inter = Inter({ subsets: ['latin'] });
 

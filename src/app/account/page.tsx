@@ -1,7 +1,7 @@
 'use client';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogoutButton } from '@/components/auth/logout-button';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 type UserInfoProps = {
   label: string;

@@ -2,11 +2,11 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
-import { LoginButton } from '@/components/auth/login-button';
+import { LoginButton } from '@/components/auth/LoginButton';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { UserAvatar } from '@/components/user-avatar';
-import { Navigation } from '@/components/layout/navigation';
-import { BurgerMenu } from '@/components/layout/burger-menu';
+import { UserAvatar } from '@/components/UserAvatar';
+import { Navigation } from '@/components/layout/Navigation';
+import { BurgerMenu } from '@/components/layout/BurgerMenu';
 
 export function Header() {
   const { user, error, isLoading } = useUser();
@@ -18,11 +18,14 @@ export function Header() {
       <div className='md:hidden'>
         <BurgerMenu />
       </div>
-      <Link href="/" className="text-xl ml-auto cursor-pointer">旅のしおり</Link>
+      <Link href='/' className='text-xl ml-auto cursor-pointer'>
+        旅のしおり
+      </Link>
       <div className='flex items-center space-x-4 ml-auto'>
         <div className='hidden md:block'>
           <Navigation />
         </div>
+
         {!user && <LoginButton />}
         <ModeToggle />
       </div>
