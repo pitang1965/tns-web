@@ -110,8 +110,12 @@ export const sampleItineraries: Itinerary[] = [
                 city: '銚子市',
                 town: '天王台',
                 block: '１４２３−１',
-                country: 'Japan'
-              }
+                country: 'Japan',
+              },
+              location: {
+                latitude: 35.7053506,
+                longitude: 140.849767,
+              },
             },
             description: '夜は寂しい',
             startTime: '19:37',
