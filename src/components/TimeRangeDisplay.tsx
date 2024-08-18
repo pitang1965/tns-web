@@ -1,11 +1,11 @@
 import React from 'react';
 
-type ActivityTimeDisplayProps = {
+type TimeRangeDisplayProps = {
   startTime?: string;
   endTime?: string;
 };
 
-export const ActivityTimeDisplay: React.FC<ActivityTimeDisplayProps> = ({
+export const TimeRangeDisplay: React.FC<TimeRangeDisplayProps> = ({
   startTime,
   endTime,
 }) => {

@@ -1,17 +1,17 @@
 import { Itinerary } from '@/data/types/itinerary';
 import { PlaceTypeBadge, PlaceType } from '@/components/PlaceTypeBadge';
-import { ActivityTimeDisplay } from '@/components/ActivityTimeDisplay';
+import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
 
-type Acitivity = Itinerary['dayPlans'][number]['activities'][number];
-type ActivityItemProps = {
-  activity: Acitivity;
-}
+type AcitivityType = Itinerary['dayPlans'][number]['activities'][number];
+type ActivityProps = {
+  activity: AcitivityType;
+};
 
-export const ActivityItem: React.FC<ActivityItemProps> = ({ activity }) => (
+export const Activity: React.FC<ActivityProps> = ({ activity }) => (
   <li className='bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50'>
     <div className='flex'>
       <p className='font-medium'>{activity.title}</p>
-      <ActivityTimeDisplay
+      <TimeRangeDisplay
         startTime={activity.startTime}
         endTime={activity.endTime}
       />

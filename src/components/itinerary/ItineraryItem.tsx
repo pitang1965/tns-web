@@ -4,10 +4,10 @@ import { Itinerary } from '@/data/types/itinerary';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  // CardContent,
 } from '@/components/ui/card';
 import {
   TransportationBadge,
@@ -18,7 +18,7 @@ type Props = {
   itinerary: Itinerary;
 };
 
-export const ItineraryCard: React.FC<Props> = ({ itinerary }) => {
+export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   return (
     <>
       <Card className='cursor-pointer hover:shadow-lg transition-shadow duration-300 p-2'>
@@ -44,7 +44,6 @@ export const ItineraryCard: React.FC<Props> = ({ itinerary }) => {
               </CardDescription>
               <CardDescription>{itinerary.description}</CardDescription>
             </CardHeader>
-            <CardContent>内容・・・</CardContent>
           </Link>
         </div>
       </Card>

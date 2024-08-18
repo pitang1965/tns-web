@@ -1,5 +1,5 @@
 import { Itinerary } from '@/data/types/itinerary';
-import { ActivityItem } from './ActivityItem';
+import { Activity } from './Activity';
 
 type DayPlan = Itinerary['dayPlans'][number];
 
@@ -13,7 +13,7 @@ export const DayPlan: React.FC<DayPlanProps> = ({ day }) => (
     {day.activities.length > 0 ? (
       <ul className='space-y-2'>
         {day.activities.map((activity) => (
-          <ActivityItem key={activity.id} activity={activity} />
+          <Activity key={activity.id} activity={activity} />
         ))}
       </ul>
     ) : (

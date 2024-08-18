@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Itinerary } from '@/data/types/itinerary';
-import { ItineraryCard } from './ItineraryCard';
+import { ItineraryItem } from './ItineraryItem';
 import { Button } from '@/components/ui/button';
 
 type Props = {
@@ -17,7 +17,7 @@ export const ItineraryList: React.FC<Props> = ({ itineraries }) => {
       </Button>
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
         {itineraries.map((itinerary) => (
-          <ItineraryCard key={itinerary.id} itinerary={itinerary} />
+          <ItineraryItem key={itinerary.id} itinerary={itinerary} />
         ))}
       </div>
     </div>
