@@ -12,6 +12,8 @@ export const sampleItineraries: Itinerary[] = [
       type: 'CAR',
       details: '車中泊',
     },
+    createdAt: new Date(), // 現在の日時
+    updatedAt: new Date(), // 現在の日時
   },
   {
     id: '2',
@@ -30,7 +32,7 @@ export const sampleItineraries: Itinerary[] = [
               name: '自宅',
               type: 'HOME',
             },
-            startTime: '11:19'
+            startTime: '11:19',
           },
           {
             id: '2',
@@ -102,8 +104,17 @@ export const sampleItineraries: Itinerary[] = [
             place: {
               name: '市営愛宕山 無料駐車場',
               type: 'PARKING_FREE_OTHER',
+              address: {
+                postalCode: '288-0024',
+                prefecture: '千葉県',
+                city: '銚子市',
+                town: '天王台',
+                block: '１４２３−１',
+                country: 'Japan'
+              }
             },
-            startTime: '19:37'
+            description: '夜は寂しい',
+            startTime: '19:37',
           },
           {
             id: '11',
@@ -113,7 +124,7 @@ export const sampleItineraries: Itinerary[] = [
               type: 'RESTAURANT',
             },
             startTime: '19:57',
-            endTime: "22:08"
+            endTime: '22:08',
           },
         ],
       },
@@ -126,5 +137,7 @@ export const sampleItineraries: Itinerary[] = [
       type: 'CAR',
       details: '車中泊',
     },
+    createdAt: new Date(), // 現在の日時
+    updatedAt: new Date(), // 現在の日時
   },
 ];

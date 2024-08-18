@@ -1,5 +1,5 @@
 import { Itinerary } from '@/data/types/itinerary';
-import { PlaceTypeBadge, PlaceType } from '@/components/PlaceTypeBadge';
+import { Place } from './Place';
 import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
 
 type AcitivityType = Itinerary['dayPlans'][number]['activities'][number];
@@ -16,10 +16,12 @@ export const Activity: React.FC<ActivityProps> = ({ activity }) => (
         endTime={activity.endTime}
       />
     </div>
-    <div className='flex items-center gap-2 mt-1'>
-      <PlaceTypeBadge type={activity.place.type as PlaceType} />
-      {activity.place.name}
-    </div>
+    <Place
+      name={activity.place.name}
+      type={activity.place.type}
+      address={activity.place.address}
+      location={activity.place.location}
+    />
     {activity.description && (
       <div className='text-sm mt-1'>{activity.description}</div>
     )}

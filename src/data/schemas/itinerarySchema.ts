@@ -10,10 +10,9 @@ import { z } from 'zod';
 
 // Address schema
 const addressSchema = z.object({
-  postalCode: z.string().regex(/^\d{3}-\d{4}$/), // 郵便番号 (例: 123-4567)
+  postalCode: z.string().regex(/^\d{3}-\d{4}$/).optional(), // 郵便番号 (例: 123-4567)
   prefecture: z.string(), // 都道府県 (例: 東京都)
-  city: z.string(), // 市区町村 (例: 渋谷区)
-  ward: z.string().optional(), // 区 (例: 恵比寿)
+  city: z.string(), // 市区町村、区 (例: 渋谷区)
   town: z.string(), // 町名 (例: 恵比寿南)
   block: z.string(), // 丁目、番地、号 (例: 1-2-3)
   building: z.string().optional(), // 建物名 (例: 恵比寿ガーデンプレイス)
@@ -22,8 +21,8 @@ const addressSchema = z.object({
 
 // Location schema
 const locationSchema = z.object({
-  lat: z.number(),
-  lng: z.number(),
+  latitude: z.number(), // 緯度
+  longitude: z.number(), // 経度
 });
 
 // Place schema
@@ -90,9 +89,8 @@ export const itinerarySchema = z.object({
   endDate: z.string(),
   dayPlans: z.array(dayPlanSchema),
   transportation: transportationSchema,
-  // TODO: 後で検討
-  // createdAt: z.date().default(() => new Date()),
-  // updatedAt: z.date().default(() => new Date()),
+  createdAt: z.date().default(() => new Date()),
+  updatedAt: z.date().default(() => new Date()),
 });
 
 export type ItinerarySchema = z.infer<typeof itinerarySchema>;
