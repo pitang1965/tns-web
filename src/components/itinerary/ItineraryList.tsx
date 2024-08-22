@@ -8,13 +8,9 @@ import { useRouter } from 'next/navigation';
 
 type Props = {
   itineraries: Itinerary[];
-  onAddItinerary: (newItinerary: Itinerary) => void;
 };
 
-export const ItineraryList: React.FC<Props> = ({
-  itineraries,
-  onAddItinerary,
-}) => {
+export const ItineraryList: React.FC<Props> = ({ itineraries }) => {
   const router = useRouter();
 
   const handleCreateNew = () => {
