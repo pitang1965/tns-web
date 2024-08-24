@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
-import { Itinerary } from '@/data/types/itinerary';
+import { getItineraryById } from '@/lib/api/itineraries';
 
-// TODO: データベースからデータを取るようにする
-import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
 type PageProps = {
   params: { id: string };
@@ -12,7 +10,7 @@ type PageProps = {
 export const generateMetadata = async ({
   params,
 }: PageProps): Promise<Metadata> => {
-  const itinerary = sampleItineraries.find((i) => i.id === params.id) as Itinerary | undefined;
+  const itinerary = await getItineraryById(params.id);
 
   if (!itinerary) {
     return {
