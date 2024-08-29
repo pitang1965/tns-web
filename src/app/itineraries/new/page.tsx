@@ -2,8 +2,19 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { createItineraryAction } from '@/actions/createItinerary';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function NewItineraryPage() {
   const [title, setTitle] = useState('');
@@ -11,6 +22,7 @@ export default function NewItineraryPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,46 +36,66 @@ export default function NewItineraryPage() {
       router.push(`/itineraries/${result.id}`);
     } else {
       console.error('Error creating itinerary:', result.error);
-      // エラー処理（ユーザーへの通知など）
+      toast({
+        title: '旅程の作成に失敗しました',
+        description: result.error,
+        variant: 'destructive',
+      });
     }
   };
 
   return (
-    <main className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
-      <section>
-        <h1 className='text-3xl font-bold mb-6'>新しい旅程の作成</h1>
-        <div className='flex flex-col gap-2'>
-          <form onSubmit={handleSubmit}>
-            <input
-              type='text'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder='旅程タイトル'
-              required
-            />
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder='説明（任意）'
-            />
-            <input
-              type='date'
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-              className='p-2 border rounded'
-            />
-            <input
-              type='date'
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-              className='p-2 border rounded'
-            />
-            <Button type='submit'>保存</Button>
+    <main className='container mx-auto p-4'>
+      <Card className='max-w-2xl mx-auto'>
+        <CardHeader>
+          <CardTitle>新しい旅程の作成</CardTitle>
+          <CardDescription>新しい旅程の詳細を入力してください。</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='title'>旅程タイトル</Label>
+              <Input
+                id='title'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='description'>説明</Label>
+              <Textarea
+                id='description'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder='説明（任意）'
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='startDate'>開始日</Label>
+              <Input
+                id='startDate'
+                type='date'
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='endDate'>終了日</Label>
+              <Input
+                id='endDate'
+                type='date'
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+              />
+            </div>
+            <Button type='submit' className='w-full'>保存</Button>
           </form>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </main>
   );
 }
