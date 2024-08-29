@@ -3,26 +3,27 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { createItineraryAction } from '@/actions/createItinerary';
 
 export default function NewItineraryPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch('/api/itineraries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description }),
-      });
-      if (!response.ok) throw new Error('Failed to create itinerary');
-      const data = await response.json();
-      console.log('data: ', data);
-      router.push(`/itineraries/${data.id}`);
-    } catch (error) {
-      console.error('Error creating itinerary:', error);
+    const result = await createItineraryAction(
+      title,
+      description,
+      startDate,
+      endDate
+    );
+    if (result.success) {
+      router.push(`/itineraries/${result.id}`);
+    } else {
+      console.error('Error creating itinerary:', result.error);
       // エラー処理（ユーザーへの通知など）
     }
   };
@@ -44,6 +45,20 @@ export default function NewItineraryPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder='説明（任意）'
+            />
+            <input
+              type='date'
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+              className='p-2 border rounded'
+            />
+            <input
+              type='date'
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              required
+              className='p-2 border rounded'
             />
             <Button type='submit'>保存</Button>
           </form>

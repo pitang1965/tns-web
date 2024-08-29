@@ -36,9 +36,14 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
           <Link href={`/itineraries/${itinerary.id}`} passHref>
             <CardHeader>
               <CardTitle>{itinerary.title}</CardTitle>
-              <TransportationBadge
-                type={itinerary.transportation.type as TransportationType}
-              />
+              {itinerary.transportation && (
+                <TransportationBadge
+                  type={
+                    (itinerary.transportation.type as TransportationType) ||
+                    'OTHER'
+                  }
+                />
+              )}
               <CardDescription>
                 {itinerary.startDate} - {itinerary.endDate}
               </CardDescription>
