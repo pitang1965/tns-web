@@ -1,27 +1,30 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## .env.localの設定
+## .env.local の設定
 
-* `AUTH0_SECRET`:
-  * Auth0 SDK が使用する秘密鍵。セッションの暗号化などに使用される。
-* `AUTH0_BASE_URL`:
-  * アプリケーションのベース URL。ログイン後のリダイレクト先として使用される。
-* `AUTH0_ISSUER_BASE_URL`:
-  * Auth0 テナントの URL。認証リクエストの送信先となる。
-* `AUTH0_CLIENT_ID`:
-  * Auth0 アプリケーションの識別子。認証リクエストに使用される。
-* `AUTH0_CLIENT_SECRET`:
-  * Auth0 アプリケーションの秘密鍵。トークン取得時などに使用される。
-* `AUTH0_AUDIENCE`:
-  * API の識別子。アクセストークンの発行対象となる API を指定する。
-  * 例: `https://api.tabi-no-shiori.com`
-* `AUTH0_DOMAIN`:
-  * Auth0 テナントのドメイン。認証エンドポイントの構築に使用される。
-  * 例: `your-tenant.auth0.com`
-* `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
-  * Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
+- `AUTH0_SECRET`:
+  - Auth0 SDK が使用する秘密鍵。セッションの暗号化などに使用される。
+- `AUTH0_BASE_URL`:
+  - アプリケーションのベース URL。ログイン後のリダイレクト先として使用される。
+- `AUTH0_ISSUER_BASE_URL`:
+  - Auth0 テナントの URL。認証リクエストの送信先となる。
+- `AUTH0_CLIENT_ID`:
+  - Auth0 アプリケーションの識別子。認証リクエストに使用される。
+- `AUTH0_CLIENT_SECRET`:
+  - Auth0 アプリケーションの秘密鍵。トークン取得時などに使用される。
+- `AUTH0_AUDIENCE`:
+  - API の識別子。アクセストークンの発行対象となる API を指定する。
+  - 例: `https://api.tabi-no-shiori.com`
+- `AUTH0_DOMAIN`:
+  - Auth0 テナントのドメイン。認証エンドポイントの構築に使用される。
+  - 例: `your-tenant.auth0.com`
+- `AUTH0_SCOPE'`:
+  - アプリケーションが要求する権限（スコープ）を指定する。複数のスコープはスペースで区切る。
+  - 例：`openid profile email read:shows`
+- `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
+  - Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
 
-## Dockerで動かす場合
+## Docker で動かす場合
 
 ```bash
 $ docker-compose up --build
