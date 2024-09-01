@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
 import { getItineraries } from '@/lib/itineraries';
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
 };
 
-export default async function Itineraries() {
+export default withPageAuthRequired(async function Itineraries() {
   const itineraries = await getItineraries();
 
   return (
@@ -23,4 +24,4 @@ export default async function Itineraries() {
       </section>
     </main>
   );
-}
+}, { returnTo: '/itineraries'});

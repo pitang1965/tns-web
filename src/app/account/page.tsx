@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 
@@ -16,31 +16,28 @@ function UserInfo({ label, value }: UserInfoProps) {
   );
 }
 
-export default function Account() {
+export default withPageAuthRequired(function Account() {
   const { user, error, isLoading } = useUser();
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
+  if (!user) return <div>ユーザー情報が取得できませんでした</div>
 
   return (
     <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
       <div>
         <p className='text-5xl py-4'>アカウント</p>
-        {user ? (
-          <div>
-            <Avatar>
-              <AvatarImage src={user.picture || undefined} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <UserInfo label='name' value={user.name} />
-            <UserInfo label='email' value={user.email} />
-            <UserInfo label='email_verified' value={user.email_verified} />
-            <UserInfo label='nickname' value={user.nickname} />
-            <LogoutButton />
-          </div>
-        ) : (
-          <p>ログインしてください。</p>
-        )}
+        <div>
+          <Avatar>
+            <AvatarImage src={user.picture || undefined} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <UserInfo label='name' value={user.name} />
+          <UserInfo label='email' value={user.email} />
+          <UserInfo label='email_verified' value={user.email_verified} />
+          <UserInfo label='nickname' value={user.nickname} />
+          <LogoutButton />
+        </div>
       </div>
     </div>
   );
-}
+});

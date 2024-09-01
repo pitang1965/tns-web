@@ -1,5 +1,6 @@
 'use client';
 
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Button } from '@/components/ui/button';
 import { DayPlan } from '@/components/itinerary/DayPlan';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
@@ -7,7 +8,7 @@ import { useItinerary } from '@/hooks/useItinerary';
 
 type ItineraryDetailProps = {
   id: string;
-}
+};
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const itinerary = useItinerary(id);
@@ -46,4 +47,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   );
 };
 
-export default ItineraryDetail;
+export default withPageAuthRequired(function AuthProtectedItineraryDetail(
+  props: ItineraryDetailProps
+) {
+  return <ItineraryDetail {...props} />;
+});

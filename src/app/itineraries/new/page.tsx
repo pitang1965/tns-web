@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-export default function NewItineraryPage() {
+export default withPageAuthRequired(function NewItineraryPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -98,4 +99,4 @@ export default function NewItineraryPage() {
       </Card>
     </main>
   );
-}
+});
