@@ -1,19 +1,9 @@
 'use client';
 
-import { Itinerary } from '@/data/types/itinerary';
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  TransportationBadge,
-  TransportationType,
-} from '@/components/TransportationBadge';
-
 import { DayPlan } from '@/components/itinerary/DayPlan';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useItinerary } from '@/hooks/useItinerary';
-
-// TODO: データベースからデータを取るようにする
-import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
 
 type ItineraryDetailProps = {
   id: string;
