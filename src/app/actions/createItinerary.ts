@@ -1,6 +1,6 @@
 'use server';
 
-import { createItinerary } from '@/lib/api/itineraries';
+import { createItinerary } from '@/lib/itineraries';
 import { itinerarySchema } from '@/data/schemas/itinerarySchema';
 import { v4 as uuidv4 } from 'uuid';
 
