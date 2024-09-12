@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 
 export function LogoutButton() {
   return (
-    <Button asChild>
-      <a href='/api/auth/logout'>ログアウト</a>
+    <Button onClick={() => (window.location.href = '/api/auth/logout')}>
+      ログアウト
     </Button>
   );
 }
