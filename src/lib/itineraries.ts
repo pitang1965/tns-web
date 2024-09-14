@@ -12,8 +12,11 @@ type ItinerarySummary = {
   endDate: string;
 };
 
-export async function createItinerary(newItinerary: Omit<Itinerary, 'id'>): Promise<ItinerarySummary> {
+export async function createItinerary(
+  newItinerary: Omit<Itinerary, 'id'>
+): Promise<ItinerarySummary> {
   return new Promise((resolve) => {
+    console.log('createItinerary: ', newItinerary);
     setTimeout(() => {
       const id = uuidv4(); // UUIDを使用してIDを生成
       const createdItinerary: Itinerary = {
@@ -43,9 +46,9 @@ export async function getItineraries(): Promise<Itinerary[]> {
 
 export async function getItineraryById(id: string): Promise<Itinerary | null> {
   const itineraries = await getItineraries();
+  console.log('itineraries:', itineraries);
   return itineraries.find((itinerary) => itinerary.id === id) || null;
 }
-
 
 // 他の必要なAPI関数をここに追加
 // 例: createItinerary, updateItinerary, deleteItinerary など
