@@ -23,6 +23,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
   - 例：`openid profile email read:shows`
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
   - Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
+- `MONGODB_URI`:
+  - MongoDB データベースに接続するための接続文字列。
+  - データベースのホスト、ポート、認証情報、データベース名などを含む。
 
 ## Docker で動かす場合
 
