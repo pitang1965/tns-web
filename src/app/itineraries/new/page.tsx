@@ -36,7 +36,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
     if (result.success) {
       router.push(`/itineraries/${result.id}`);
     } else {
-      console.error('Error creating itinerary:', result.error);
+      console.error('Error: creating itinerary:', result.error);
       toast({
         title: '旅程の作成に失敗しました',
         description: result.error,
