@@ -1,16 +1,40 @@
 import { useState, useEffect } from 'react';
-import { Itinerary } from '@/data/types/itinerary';
-import { sampleItineraries } from '@/data/sampleData/sampleItineraries';
+import { ItineraryClient } from '@/data/types/itinerary';
 
-export const useItinerary = (id: string) => {
-  const [itinerary, setItinerary] = useState<Itinerary | undefined>();
+type UseItineraryResult = {
+  itinerary: ItineraryClient | undefined;
+  loading: boolean;
+  error: string | null;
+};
+
+export const useItinerary = (id: string): UseItineraryResult => {
+  const [itinerary, setItinerary] = useState<ItineraryClient | undefined>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const foundItinerary = sampleItineraries.find(
-      (itinerary) => itinerary.id === id
-    );
-    setItinerary(foundItinerary);
+    const fetchItinerary = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/itineraries/${id}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error ||
+              `旅程を取得できませんでした。: ${response.status}`
+          );
+        }
+        const data = await response.json();
+        setItinerary(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '不明なエラー');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItinerary();
   }, [id]);
 
-  return itinerary;
+  return { itinerary, loading, error };
 };

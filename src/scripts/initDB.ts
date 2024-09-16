@@ -1,36 +1,46 @@
 import { MongoClient } from 'mongodb';
-import { sampleItineraries } from '../data/sampleData/sampleItineraries';
+import { sampleItineraries } from '../data/sampleData/sampleItineraries.js';
 import dotenv from 'dotenv';
 
-// 環境変数の読み込み
+console.log('Script started');
+
+// Load environment variables
 dotenv.config({ path: '.env.local' });
 
-// MongoDB接続URI（環境変数から取得）
-const uri = process.env.MONGODB_URI;
+async function initDb() {
+  console.log('Initializing database');
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error('MONGODB_URI is not defined in the environment variables.');
+  }
 
-if (!uri) {
-  throw new Error('MONGODB_URI is not defined in the environment variables.');
-}
+  console.log('Creating MongoDB client');
+  const client = new MongoClient(uri);
 
-const client = new MongoClient(uri);
-
-async function run() {
   try {
+    console.log('Connecting to MongoDB');
     await client.connect();
     console.log('Connected successfully to MongoDB');
 
-    const database = client.db('itinerary_db'); // データベース名を適切に設定
-    const itineraries = database.collection('itineraries');
+    const database = client.db('itinerary_db');
+    const collection = database.collection('itineraries');
 
-    // 既存のデータをクリア（オプション）
-    await itineraries.deleteMany({});
+    console.log('Clearing existing data');
+    await collection.deleteMany({});
 
-    // サンプルデータの挿入
-    const result = await itineraries.insertMany(sampleItineraries);
+    console.log('Inserting sample data');
+    const result = await collection.insertMany(sampleItineraries);
+
     console.log(`${result.insertedCount} documents were inserted`);
+  } catch (error) {
+    console.error('An error occurred:', error);
   } finally {
+    console.log('Closing MongoDB connection');
     await client.close();
   }
 }
 
-run().catch(console.dir);
+initDb().catch((error) => {
+  console.error('Unhandled error:', error);
+  process.exit(1);
+});

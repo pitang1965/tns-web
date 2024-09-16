@@ -1,8 +1,8 @@
 import React from 'react';
-import { Itinerary } from '@/data/types/itinerary';
+import { ItineraryDocument } from '@/data/types/itinerary';
 
 type AddressType =
-  Itinerary['dayPlans'][number]['activities'][number]['place']['address'];
+  ItineraryDocument['dayPlans'][number]['activities'][number]['place']['address'];
 
 type AddressProps = {
   address: AddressType;

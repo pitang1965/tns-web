@@ -1,6 +1,6 @@
 import { itinerarySchema } from '../schemas/itinerarySchema';
-import type { Itinerary } from '../types/itinerary';
+import type { ItineraryDocument } from '../types/itinerary';
 
-export function validateItinerary(data: unknown): Itinerary {
+export function validateItinerary(data: unknown): ItineraryDocument {
   return itinerarySchema.parse(data);
 }

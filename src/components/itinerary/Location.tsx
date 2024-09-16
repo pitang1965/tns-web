@@ -1,9 +1,9 @@
 import React from 'react';
-import { Itinerary } from '@/data/types/itinerary';
+import { ItineraryDocument } from '@/data/types/itinerary';
 import Map from '@/components/Map';
 
 type LocationType =
-  Itinerary['dayPlans'][number]['activities'][number]['place']['location'];
+  ItineraryDocument['dayPlans'][number]['activities'][number]['place']['location'];
 
 type LocationProps = {
   location: LocationType;

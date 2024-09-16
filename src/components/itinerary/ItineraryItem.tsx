@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { Itinerary } from '@/data/types/itinerary';
+import { ItineraryClient } from '@/data/types/itinerary';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,7 +17,7 @@ import {
 } from '@/components/TransportationBadge';
 
 type Props = {
-  itinerary: Itinerary;
+  itinerary: ItineraryClient;
 };
 
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {

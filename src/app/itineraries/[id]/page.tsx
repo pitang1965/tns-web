@@ -28,7 +28,7 @@ export const generateMetadata = async ({
 
 export default function ItinerariesPage({ params }: PageProps) {
   if (!params?.id) {
-    return <div>旅程が見つかりません。</div>;
+    return <div>旅程が見つかりませんね。</div>;
   }
 
   return <ItineraryDetail id={params.id} />;

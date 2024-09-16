@@ -1,8 +1,9 @@
-import { Itinerary } from '../types/itinerary';
+import { ObjectId } from 'mongodb';
+import { ItineraryDocument } from '../types/itinerary';
 
-export const sampleItineraries: Itinerary[] = [
+export const sampleItineraries: ItineraryDocument[] = [
   {
-    id: '1',
+    _id: new ObjectId(),
     title: '西日本大旅行',
     startDate: '2025-03-12',
     endDate: '2025-04-05',
@@ -16,7 +17,7 @@ export const sampleItineraries: Itinerary[] = [
     updatedAt: new Date(), // 現在の日時
   },
   {
-    id: '2',
+    _id: new ObjectId(),
     title: '水郷佐原と銚子',
     startDate: '2024-05-18',
     endDate: '2024-05-19',

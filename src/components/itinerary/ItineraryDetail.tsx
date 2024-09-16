@@ -11,10 +11,18 @@ type ItineraryDetailProps = {
 };
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
-  const itinerary = useItinerary(id);
+  const { itinerary, loading, error } = useItinerary(id);
+
+  if (loading) {
+    return <div>読み込み中...</div>;
+  }
+
+  if (error) {
+    return <div>エラーが発生しました: {error}</div>;
+  }
 
   if (!itinerary) {
-    return <div>旅程が見つかりません。</div>;
+    return <div>旅程が見つかりませんよ。</div>;
   }
 
   return (

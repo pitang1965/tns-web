@@ -2,8 +2,9 @@ import React from 'react';
 import { PlaceTypeBadge } from '@/components/PlaceTypeBadge';
 import { Address } from './Address';
 import { Location } from './Location';
-import { Itinerary } from '@/data/types/itinerary';
-type PlaceProps = Itinerary['dayPlans'][number]['activities'][number]['place'];
+import { ItineraryClient } from '@/data/types/itinerary';
+type PlaceProps =
+  ItineraryClient['dayPlans'][number]['activities'][number]['place'];
 
 export const Place: React.FC<PlaceProps> = ({
   name,

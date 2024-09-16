@@ -1,12 +1,11 @@
 import { z } from 'zod';
-
-// TODO: MongoDBは後で追加する
-// import { ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 // ObjectId validation helper
-// const objectIdSchema = z
-//   .string()
-//   .refine((id) => ObjectId.isValid(id), { message: '無効なObjectIdです' });
+const objectIdSchema = z.custom<ObjectId>(
+  (val) => val instanceof ObjectId || ObjectId.isValid(val),
+  { message: '無効なObjectIdです' }
+);
 
 // Address schema
 const addressSchema = z.object({
@@ -83,9 +82,7 @@ const Schema = z.object({
 
 // Itinerary schema
 export const itinerarySchema = z.object({
-  // TODO: MongoDBは後で追加する
-  // _id: objectIdSchema.optional(),
-  id: z.string(),
+  _id: objectIdSchema,
   title: z.string().min(1, '旅程名は必須です'),
   description: z.string().optional(),
   startDate: z.string(),
@@ -95,5 +92,3 @@ export const itinerarySchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
 });
-
-export type ItinerarySchema = z.infer<typeof itinerarySchema>;

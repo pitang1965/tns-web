@@ -1,5 +1,3 @@
-// src/lib/mongodb.ts
-
 import { MongoClient } from 'mongodb';
 
 // グローバル変数の型を適切に定義

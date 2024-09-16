@@ -1,8 +1,9 @@
-import { Itinerary } from '@/data/types/itinerary';
+import { ItineraryDocument } from '@/data/types/itinerary';
 import { Place } from './Place';
 import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
 
-type AcitivityType = Itinerary['dayPlans'][number]['activities'][number];
+type AcitivityType =
+  ItineraryDocument['dayPlans'][number]['activities'][number];
 type ActivityProps = {
   activity: AcitivityType;
 };

@@ -1,7 +1,7 @@
-import { Itinerary } from '@/data/types/itinerary';
+import { ItineraryDocument } from '@/data/types/itinerary';
 import { Activity } from './Activity';
 
-type DayPlan = Itinerary['dayPlans'][number];
+type DayPlan = ItineraryDocument['dayPlans'][number];
 
 type DayPlanProps = {
   day: DayPlan;
