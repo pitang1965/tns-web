@@ -1,17 +1,7 @@
 import { Metadata } from 'next';
-import { getSession, getAccessToken } from '@auth0/nextjs-auth0';
-import ClientHome from '@/components/ClientHome';
-
-type ApiData = {
-  message: string;
-};
-
-type SerializableSession = {
-  user?: {
-    name?: string;
-    email?: string;
-  };
-};
+import { getSession } from '@auth0/nextjs-auth0';
+import PublicHome from '@/components/PublicHome';
+import LoggedInHome from '@/components/LoggedInHome';
 
 export const metadata: Metadata = {
   title: '旅のしおり | あなたの旅行計画をサポート',
@@ -23,72 +13,21 @@ export const metadata: Metadata = {
     description:
       '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。',
     type: 'website',
-    url: 'https://あなたのウェブサイトURL.com',
+    url: 'https://tabi-no-shiori.vercel.app',
     images: [
       {
-        url: 'https://あなたのウェブサイトURL.com/og-image.jpg',
+        url: 'https://tabi-no-shiori.vercel.app/over40.svg', // TODO: 後で置き換える
       },
     ],
   },
 };
 
 export default async function Home() {
-  let serializableSession: SerializableSession | null = null;
-  let apiData: ApiData | null = null;
-  let error: string | null = null;
+  const session = await getSession();
 
-  try {
-    const fullSession = await getSession();
-
-    if (fullSession?.user) {
-      serializableSession = {
-        user: {
-          name: fullSession.user.name,
-          email: fullSession.user.email,
-        },
-      };
-    }
-
-    if (serializableSession?.user) {
-      const { accessToken } = await getAccessToken({
-        authorizationParams: {
-          audience: process.env.AUTH0_AUDIENCE,
-          scope: 'openid profile email',
-        },
-      });
-
-      const response = await fetch('http://localhost:3001/private', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      };
-
-      if (!response.ok) {
-        throw new Error(`API request failed. Status: ${response.status}`);
-      }
-
-      apiData = await response.json();
-      console.log('API Data fetched:', apiData); //
-    }
-  } catch (err: any) {
-    error = err.message;
-    console.error('Error:', err.message);
+  if (session?.user) {
+    return <LoggedInHome userName={session.user.name || 'ゲスト'} />;
+  } else {
+    return (<PublicHome />)
   }
-
-  console.log('Passing to ClientHome:', {
-    session: serializableSession,
-    apiData,
-    error,
-  }); // デバッグログ
-
-  return (
-    <ClientHome session={serializableSession} apiData={apiData} error={error} />
-  );
 }
