@@ -1,12 +1,14 @@
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
-import 'mapbox-gl/dist/mapbox-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
+import ErrorBoundary from '../components/ErrorBoundary';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -21,22 +23,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ja'>
-      <UserProvider>
-        <body className={inter.className}>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div className='flex flex-col min-h-screen bg-background text-foreground'>
-              <Header />
-              <main className='flex-1'>{children}</main>
-              <Footer />
-            </div>
-          </ThemeProvider>
-        </body>
-      </UserProvider>
+      <ErrorBoundary>
+        <UserProvider>
+          <body className={inter.className}>
+            <ThemeProvider
+              attribute='class'
+              defaultTheme='system'
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className='flex flex-col min-h-screen bg-background text-foreground'>
+                <Header />
+                <main className='flex-1'>{children}</main>
+                <Footer />
+              </div>
+            </ThemeProvider>
+          </body>
+        </UserProvider>
+      </ErrorBoundary>
     </html>
   );
 }
