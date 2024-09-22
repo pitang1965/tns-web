@@ -1,5 +1,3 @@
-'use client';
-
 import React, { ErrorInfo, ReactNode } from 'react';
 
 interface ErrorBoundaryProps {
@@ -26,10 +24,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({
-      error: error,
-      errorInfo: errorInfo,
-    });
+    // TODO: エラーログを外部サービスに送信する
     console.error('Uncaught error:', error, errorInfo);
   }
 
@@ -37,12 +32,16 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div>
-          <h1>Something went wrong.</h1>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo && this.state.errorInfo.componentStack}
-          </details>
+          <h1>問題が発生しました。ご不便をおかけして申し訳ございません。</h1>
+          {/* エラーの詳細は開発環境でのみ表示する */}
+          {process.env.NODE_ENV === 'development' && (
+            <details style={{ whiteSpace: 'pre-wrap' }}>
+              <summary>エラー詳細 (開発環境のみ)</summary>
+              {this.state.error && this.state.error.toString()}
+              <br />
+              {this.state.errorInfo?.componentStack}
+            </details>
+          )}
         </div>
       );
     }
