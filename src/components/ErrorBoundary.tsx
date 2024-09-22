@@ -1,3 +1,5 @@
+'use client';
+
 import React, { ErrorInfo, ReactNode } from 'react';
 
 interface ErrorBoundaryProps {
@@ -24,7 +26,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // TODO: エラーログを外部サービスに送信する
+    // エラーログはSentryを使用
     console.error('Uncaught error:', error, errorInfo);
   }
 
