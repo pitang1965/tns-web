@@ -1,6 +1,7 @@
 'use client';
 
 import React, { ErrorInfo, ReactNode } from 'react';
+import { logger } from '@/app/utils/logger';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -26,8 +27,9 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // エラーログはSentryを使用
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('Uncaught error:', error, errorInfo); // TODO： 最終的に削除？
+
+    logger.error(error);
   }
 
   render() {
