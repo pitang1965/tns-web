@@ -2,7 +2,7 @@ type LoggedInHomeProps = {
   userName: string;
 };
 
-export default function LoggedInHome({ userName }:LoggedInHomeProps) {
+export default function LoggedInHome({ userName }: LoggedInHomeProps) {
   return (
     <div>
       <h2>ようこそ、{userName}さん！</h2>
