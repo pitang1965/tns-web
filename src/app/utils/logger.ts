@@ -1,5 +1,3 @@
-// src/app/utils/logger.ts
-
 import * as Sentry from '@sentry/nextjs';
 
 export interface Logger {

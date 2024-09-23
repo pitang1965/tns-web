@@ -10,19 +10,22 @@ export const metadata: Metadata = {
   keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
 };
 
-export default withPageAuthRequired(async function Itineraries() {
-  const itineraries = await getItineraries();
-  // console.log('--- itineraries: ', JSON.stringify(itineraries, null, 2));
+export default withPageAuthRequired(
+  async function Itineraries() {
+    const itineraries = await getItineraries();
+    // console.log('--- itineraries: ', JSON.stringify(itineraries, null, 2));
 
-  return (
-    <main className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
-      <section>
-        <h1 className='text-3xl font-bold mb-6'>保存された旅程一覧</h1>
-        <p className='text-lg mb-8'>
-          これまでに作成した旅程を確認できます。新しい旅程を作成する場合は、「新規作成」ボタンをクリックしてください。
-        </p>
-        <ItineraryList itineraries={itineraries} />
-      </section>
-    </main>
-  );
-}, { returnTo: '/itineraries'});
+    return (
+      <main className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
+        <section>
+          <h1 className='text-3xl font-bold mb-6'>保存された旅程一覧</h1>
+          <p className='text-lg mb-8'>
+            これまでに作成した旅程を確認できます。新しい旅程を作成する場合は、「新規作成」ボタンをクリックしてください。
+          </p>
+          <ItineraryList itineraries={itineraries} />
+        </section>
+      </main>
+    );
+  },
+  { returnTo: '/itineraries' }
+);

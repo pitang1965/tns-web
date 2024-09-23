@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import { sampleItineraries } from '../data/sampleData/sampleItineraries.js';
+import { sampleItineraries } from '@/data/sampleData/sampleItineraries.js';
 import dotenv from 'dotenv';
 
 console.log('Script started');

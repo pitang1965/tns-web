@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
 import { getItineraryById } from '@/lib/itineraries';
 
-
 type PageProps = {
   params: { id: string };
 };

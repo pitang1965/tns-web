@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-db": "node --loader ts-node/esm --no-warnings --trace-warnings --trace-uncaught src/scripts/initDB.ts"
+    "init-db": "node --loader ts-node/esm --no-warnings --trace-warnings --trace-uncaught src/app/scripts/initDB.ts"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
