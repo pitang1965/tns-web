@@ -2,6 +2,7 @@
 
 import { createItinerary } from '@/lib/itineraries';
 import { ItineraryInput } from '@/data/types/itinerary';
+import { getSession } from '@auth0/nextjs-auth0';
 
 export async function createItineraryAction(
   title: string,
@@ -10,6 +11,12 @@ export async function createItineraryAction(
   endDate: string
 ) {
   try {
+    const session = await getSession();
+
+    if (!session?.user) {
+      throw new Error('認証されていません');
+    }
+
     const now = new Date();
     const newItineraryInput: ItineraryInput = {
       title,
@@ -17,7 +24,8 @@ export async function createItineraryAction(
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
       dayPlans: [],
-      // transportation フィールドを省略
+      owner: { _id: session.user.id, username: session.user.name, nickname: session.user.nickname },
+      isPublic: false,
     };
 
     const createdItinerary = await createItinerary(newItineraryInput);

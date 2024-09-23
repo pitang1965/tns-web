@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { ItineraryDocument } from '../types/itinerary';
+import { Itinerary } from '../schemas';
 
-export const sampleItineraries: ItineraryDocument[] = [
+export const sampleItineraries: Itinerary[] = [
   {
     _id: new ObjectId(),
     title: '西日本大旅行',
@@ -15,6 +15,13 @@ export const sampleItineraries: ItineraryDocument[] = [
     },
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
+    owner: {
+      _id: new ObjectId(),
+      username: 'traveler1',
+      nickname: 'world traveler',
+    },
+    isPublic: true,
+    sharedWith: [],
   },
   {
     _id: new ObjectId(),
@@ -144,5 +151,12 @@ export const sampleItineraries: ItineraryDocument[] = [
     },
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
+    owner: {
+      _id: new ObjectId(),
+      username: 'pitang1965@gmail.com',
+      nickname: 'pitang1965',
+    },
+    isPublic: true,
+    sharedWith: [],
   },
 ];
