@@ -29,7 +29,9 @@ class ErrorBoundary extends React.Component<
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo); // TODO： 最終的に削除？
 
-    logger.error(error);
+    if (process.env.NODE_ENV !== 'development') {
+      logger.error(error);
+    }
   }
 
   render() {
