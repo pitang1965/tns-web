@@ -9,7 +9,7 @@ type LocationProps = {
   location: LocationType;
 };
 
-export const Location: React.FC<LocationProps> = ({ location }) => {
+export const LocationView: React.FC<LocationProps> = ({ location }) => {
   if (!location) return '位置情報なし';
   return (
     <Map

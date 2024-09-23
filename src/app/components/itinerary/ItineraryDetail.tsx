@@ -2,7 +2,7 @@
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Button } from '@/components/ui/button';
-import { DayPlan } from '@/components/itinerary/DayPlan';
+import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useItinerary } from '@/hooks/useItinerary';
 
@@ -43,7 +43,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
         <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
         {itinerary.dayPlans.length > 0 ? (
           itinerary.dayPlans.map((day, index) => (
-            <DayPlan key={index} day={day} />
+            <DayPlanView key={index} day={day} />
           ))
         ) : (
           <p className='text-center text-gray-600 dark:text-gray-400'>

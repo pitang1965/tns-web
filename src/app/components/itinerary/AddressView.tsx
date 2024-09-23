@@ -8,7 +8,7 @@ type AddressProps = {
   address: AddressType;
 };
 
-export const Address: React.FC<AddressProps> = ({ address }) => {
+export const AddressView: React.FC<AddressProps> = ({ address }) => {
   const formatAddress = (addr: AddressType): string => {
     if (!addr) return '住所情報なし';
 

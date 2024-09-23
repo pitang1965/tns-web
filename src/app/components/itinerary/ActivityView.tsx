@@ -1,5 +1,5 @@
 import { ItineraryDocument } from '@/data/types/itinerary';
-import { Place } from './Place';
+import { PlaceView } from './PlaceView';
 import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
 
 type AcitivityType =
@@ -8,7 +8,7 @@ type ActivityProps = {
   activity: AcitivityType;
 };
 
-export const Activity: React.FC<ActivityProps> = ({ activity }) => (
+export const ActivityView: React.FC<ActivityProps> = ({ activity }) => (
   <li className='bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50'>
     <div className='flex'>
       <p className='font-medium'>{activity.title}</p>
@@ -17,7 +17,7 @@ export const Activity: React.FC<ActivityProps> = ({ activity }) => (
         endTime={activity.endTime}
       />
     </div>
-    <Place
+    <PlaceView
       name={activity.place.name}
       type={activity.place.type}
       address={activity.place.address}
