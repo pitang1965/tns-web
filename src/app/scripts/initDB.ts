@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
-import { sampleItineraries } from '@/data/sampleData/sampleItineraries.js';
+// 注意：以下では＠/data... とはできない
+import { sampleItineraries } from '../data/sampleData/sampleItineraries.js';
 import dotenv from 'dotenv';
 
 console.log('Script started');
