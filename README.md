@@ -67,3 +67,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+# ファイルの解説
+
+* components.json
+  * shadcn/uiライブラリを使用するNext.jsプロジェクトの設定ファイル
+* sentry.*.ts
+  * SentryをNext.jsアプリケーションに統合するための設定ファイル
+    * sentry.client.config.ts:このファイルはクライアントサイド（ブラウザ）でのSentryの設定を行う。
+    * ユーザーのブラウザで発生したエラーやパフォーマンスの問題を捕捉する。
+    * sentry.edge.config.ts
+      * このファイルはEdge環境（例：Vercel Edge Functions）でのSentryの設定を行う。
+      * サーバーレス関数やエッジコンピューティング環境で発生したエラーを追跡する。
+    * sentry.server.config.ts:
+      * このファイルはサーバーサイドでのSentryの設定を行う。
+      * Node.js環境で実行されるサーバーサイドのコードで発生したエラーを捕捉する。
