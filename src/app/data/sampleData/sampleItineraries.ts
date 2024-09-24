@@ -16,9 +16,9 @@ export const sampleItineraries: Itinerary[] = [
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
     owner: {
-      _id: new ObjectId(),
-      username: 'traveler1',
-      nickname: 'world traveler',
+      id: 'auth0|66372023385cdceea7050c78',
+      name: 'pitang1965@gmail.com',
+      email: 'pitang1965@gmail.com',
     },
     isPublic: true,
     sharedWith: [],
@@ -152,9 +152,9 @@ export const sampleItineraries: Itinerary[] = [
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
     owner: {
-      _id: new ObjectId(),
-      username: 'pitang1965@gmail.com',
-      nickname: 'pitang1965',
+      id: 'auth0|66372023385cdceea7050c78',
+      name: 'pitang1965@gmail.com',
+      email: 'pitang1965@gmail.com',
     },
     isPublic: true,
     sharedWith: [],

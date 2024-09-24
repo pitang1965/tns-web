@@ -6,18 +6,39 @@ import {
   ItineraryInput,
   toItineraryClient,
 } from '@/data/types/itinerary';
+import { getSession } from '@auth0/nextjs-auth0';
+
+// 認証済みユーザーのセッション情報を取得する関数
+async function getAuthenticatedUser() {
+  const session = await getSession();
+  if (!session?.user) {
+    throw new Error('認証されていません');
+  }
+  return session.user;
+}
+
+// データベース接続を取得する関数
+async function getDatabase() {
+  const client = await clientPromise;
+  return client.db('itinerary_db');
+}
 
 export async function createItinerary(
   newItinerary: ItineraryInput
 ): Promise<ItineraryClient> {
-  const client = await clientPromise;
-  const db = client.db('itinerary_db');
+  const user = await getAuthenticatedUser();
+  const db = await getDatabase();
   const now = new Date();
   const itineraryToInsert: ItineraryDocument = {
     ...newItinerary,
     _id: new ObjectId(),
     createdAt: now,
     updatedAt: now,
+    owner: {
+      id: user.sub,
+      name: user.name || '',
+      email: user.email || '',
+    },
   };
   const result = await db
     .collection<ItineraryDocument>('itineraries')
@@ -27,12 +48,12 @@ export async function createItinerary(
 }
 
 export async function getItineraries(): Promise<ItineraryClient[]> {
-  const client = await clientPromise;
-  const db = client.db('itinerary_db');
+  const user = await getAuthenticatedUser();
+  const db = await getDatabase();
 
   const itineraries = await db
     .collection<ItineraryDocument>('itineraries')
-    .find({})
+    .find({ 'owner.id': user.sub })
     .toArray();
 
   return itineraries.map(toItineraryClient);
@@ -41,8 +62,8 @@ export async function getItineraries(): Promise<ItineraryClient[]> {
 export async function getItineraryById(
   id: string
 ): Promise<ItineraryClient | null> {
-  const client = await clientPromise;
-  const db = client.db('itinerary_db');
+  const user = await getAuthenticatedUser();
+  const db = await getDatabase();
 
   try {
     console.log('id: ', id);
