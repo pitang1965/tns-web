@@ -24,7 +24,11 @@ export async function createItineraryAction(
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
       dayPlans: [],
-      owner: { _id: session.user.id, username: session.user.name, nickname: session.user.nickname },
+      owner: {
+        id: session.user.sub,
+        name: session.user.name || '',
+        email: session.user.email || '',
+      },
       isPublic: false,
     };
 
