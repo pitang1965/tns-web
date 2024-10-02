@@ -4,14 +4,14 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Button } from '@/components/ui/button';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
-import { useItinerary } from '@/hooks/useItinerary';
+import { useGetItinerary } from '@/hooks/useGetItinerary';
 
 type ItineraryDetailProps = {
   id: string;
 };
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
-  const { itinerary, loading, error } = useItinerary(id);
+  const { itinerary, loading, error } = useGetItinerary(id);
 
   if (loading) {
     return <div>読み込み中...</div>;
