@@ -14,12 +14,15 @@ import {
   TransportationBadge,
   TransportationType,
 } from '@/components/TransportationBadge';
+import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 
 type Props = {
   itinerary: ItineraryClient;
 };
 
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
+  const handleDelete = useDeleteItinerary();
+
   return (
     <Card className='flex flex-col h-full'>
       <Link
@@ -52,7 +55,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
           </Button>
           <Button
             className='flex-1 delete-itinerary'
-            onClick={() => {}}
+            onClick={handleDelete}
             variant='destructive'
           >
             削除

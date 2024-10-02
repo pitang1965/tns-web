@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
+import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
+import { useRouter } from 'next/navigation';
 
 type ItineraryDetailProps = {
   id: string;
@@ -12,6 +14,8 @@ type ItineraryDetailProps = {
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const { itinerary, loading, error } = useGetItinerary(id);
+  const handleDelete = useDeleteItinerary();
+  const router = useRouter();
 
   if (loading) {
     return <div>読み込み中...</div>;
@@ -25,12 +29,19 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     return <div>旅程が見つかりませんよ。</div>;
   }
 
+  const onDelete = async () => {
+    const deleted = await handleDelete(id);
+    if (deleted) {
+      router.push('/itineraries'); // 削除後に旅程一覧ページにリダイレクト
+    }
+  };
+
   return (
     <div className='flex flex-col gap-4 items-center w-full max-w-4xl mx-auto'>
       <div className='flex gap-2'>
         <Button onClick={() => {}}>編集</Button>
         <Button
-          onClick={() => {}}
+          onClick={onDelete}
           className='delete-itinerary'
           variant='destructive'
         >
