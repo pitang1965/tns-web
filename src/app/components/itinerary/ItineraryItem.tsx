@@ -21,7 +21,12 @@ type Props = {
 };
 
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
-  const handleDelete = useDeleteItinerary();
+  const deleteItinerary = useDeleteItinerary();
+
+  const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    deleteItinerary(itinerary.id);
+  };
 
   return (
     <Card className='flex flex-col h-full'>
