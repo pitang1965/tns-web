@@ -1,7 +1,7 @@
 'use server';
 
 import { createItinerary } from '@/lib/itineraries';
-import { ItineraryInput } from '@/data/types/itinerary';
+import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { getSession } from '@auth0/nextjs-auth0';
 
 export async function createItineraryAction(
@@ -12,13 +12,17 @@ export async function createItineraryAction(
 ) {
   try {
     const session = await getSession();
-
     if (!session?.user) {
       throw new Error('認証されていません');
     }
 
+    // Auth0のユーザー情報の存在チェック
+    if (!session.user.sub) {
+      throw new Error('ユーザーIDが見つかりません');
+    }
+
     const now = new Date();
-    const newItineraryInput: ItineraryInput = {
+    const newItineraryInput: ClientItineraryInput = {
       title,
       description,
       startDate: new Date(startDate).toISOString(),
@@ -26,10 +30,12 @@ export async function createItineraryAction(
       dayPlans: [],
       owner: {
         id: session.user.sub,
-        name: session.user.name || '',
-        email: session.user.email || '',
+        name: session.user.name ?? '',
+        email: session.user.email ?? '',
       },
       isPublic: false,
+      transportation: { type: 'OTHER' },
+      sharedWith: [],
     };
 
     const createdItinerary = await createItinerary(newItineraryInput);

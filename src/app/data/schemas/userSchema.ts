@@ -14,7 +14,7 @@ export const userSchema = z.object({
 
 export const userReferenceSchema = z.object({
   id: z.string(), // Auth0の'sub'フィールドに対応
-  name: z.string().optional(),
+  name: z.string().default(''),
   email: z.string().email(),
 });
 

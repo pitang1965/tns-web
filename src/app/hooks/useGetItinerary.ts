@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { ItineraryClient } from '@/data/types/itinerary';
+import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 type UseGetItineraryResult = {
-  itinerary: ItineraryClient | undefined;
+  itinerary: ClientItineraryDocument | undefined;
   loading: boolean;
   error: string | null;
 };
 
 export const useGetItinerary = (id: string): UseGetItineraryResult => {
-  const [itinerary, setItinerary] = useState<ItineraryClient | undefined>();
+  const [itinerary, setItinerary] = useState<
+    ClientItineraryDocument | undefined
+  >();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

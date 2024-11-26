@@ -1,8 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import {
+  clientItinerarySchema,
+  ClientItineraryInput,
+} from '@/data/schemas/itinerarySchema';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,28 +25,67 @@ import {
 } from '@/components/ui/card';
 
 export default withPageAuthRequired(function NewItineraryPage() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const { user } = useUser();
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await createItineraryAction(
-      title,
-      description,
-      startDate,
-      endDate
-    );
-    if (result.success) {
-      router.push(`/itineraries/${result.id}`);
-    } else {
-      console.error('Error: creating itinerary:', result.error);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ClientItineraryInput>({
+    resolver: zodResolver(clientItinerarySchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      isPublic: false,
+      dayPlans: [],
+      transportation: {},
+      sharedWith: [],
+      owner: {
+        id: user?.sub || '',
+        name: user?.name || '',
+        email: user?.email || '',
+      },
+    },
+  });
+  console.error('errors: ', errors);
+
+  const onSubmit = async (values: ClientItineraryInput) => {
+    // TODO: valuesで指定可能にしたい
+    console.log('Form values:', values);
+    try {
+      const result = await createItineraryAction(
+        values.title,
+        values.description,
+        values.startDate,
+        values.endDate
+      );
+      console.log('createItineraryAction result', result);
+      if (result.success) {
+        console.log('Navigation to', `/itineraries/${result.id}`);
+        router.push(`/itineraries/${result.id}`);
+      } else {
+        console.error('Error: creating itinerary:', result.error);
+        toast({
+          title: '旅程の作成に失敗しました',
+          description: result.error,
+          variant: 'destructive',
+        });
+      }
+    } catch (error: unknown) {
+      console.error('Error in onSubmit:', error);
+      let errorMessage = '未知のエラーが発生しました';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
       toast({
         title: '旅程の作成に失敗しました',
-        description: result.error,
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -50,50 +96,57 @@ export default withPageAuthRequired(function NewItineraryPage() {
       <Card className='max-w-2xl mx-auto'>
         <CardHeader>
           <CardTitle>新しい旅程の作成</CardTitle>
-          <CardDescription>新しい旅程の詳細を入力してください。</CardDescription>
+          <CardDescription>
+            新しい旅程の詳細を入力してください。
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div className='space-y-2'>
               <Label htmlFor='title'>旅程タイトル</Label>
               <Input
                 id='title'
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                {...register('title')}
                 placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
                 required
               />
+              {errors.title && <p>{errors.title.message}</p>}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='description'>説明</Label>
               <Textarea
                 id='description'
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register('description')}
                 placeholder='説明（任意）'
               />
+              {errors.description && <p>{errors.description.message}</p>}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='startDate'>開始日</Label>
               <Input
                 id='startDate'
                 type='date'
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                {...register('startDate')}
                 required
               />
+              {errors.startDate && <p>{errors.startDate.message}</p>}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='endDate'>終了日</Label>
               <Input
                 id='endDate'
                 type='date'
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                {...register('endDate')}
                 required
               />
+              {errors.endDate && <p>{errors.endDate.message}</p>}
             </div>
-            <Button type='submit' className='w-full'>保存</Button>
+            {errors.title && (
+              <p className='text-red-500'>{errors.title.message}</p>
+            )}
+            <Button type='submit' className='w-full'>
+              保存
+            </Button>
           </form>
         </CardContent>
       </Card>

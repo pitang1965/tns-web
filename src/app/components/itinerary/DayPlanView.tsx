@@ -1,7 +1,7 @@
-import { ItineraryDocument } from '@/data/types/itinerary';
+import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ActivityView } from './ActivityView';
 
-type DayPlan = ItineraryDocument['dayPlans'][number];
+type DayPlan = ServerItineraryDocument['dayPlans'][number];
 
 type DayPlanProps = {
   day: DayPlan;

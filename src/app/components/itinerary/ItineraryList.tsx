@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { ItineraryClient } from '@/data/types/itinerary';
+import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ItineraryItem } from './ItineraryItem';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 type Props = {
-  itineraries: ItineraryClient[];
+  itineraries: ClientItineraryDocument[];
 };
 
 export const ItineraryList: React.FC<Props> = ({ itineraries }) => {

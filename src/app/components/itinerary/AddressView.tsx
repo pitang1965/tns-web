@@ -1,8 +1,8 @@
 import React from 'react';
-import { ItineraryDocument } from '@/data/types/itinerary';
+import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 type AddressType =
-  ItineraryDocument['dayPlans'][number]['activities'][number]['place']['address'];
+  ServerItineraryDocument['dayPlans'][number]['activities'][number]['place']['address'];
 
 type AddressProps = {
   address: AddressType;

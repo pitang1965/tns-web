@@ -7,6 +7,7 @@ import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { useRouter } from 'next/navigation';
+import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 type ItineraryDetailProps = {
   id: string;
@@ -53,7 +54,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       <div className='w-full'>
         <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
         {itinerary.dayPlans.length > 0 ? (
-          itinerary.dayPlans.map((day, index) => (
+          itinerary.dayPlans.map((day: DayPlan, index:number) => (
             <DayPlanView key={index} day={day} />
           ))
         ) : (

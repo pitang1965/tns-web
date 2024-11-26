@@ -1,9 +1,9 @@
-import { ItineraryDocument } from '@/data/types/itinerary';
+import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PlaceView } from './PlaceView';
 import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
 
 type AcitivityType =
-  ItineraryDocument['dayPlans'][number]['activities'][number];
+  ServerItineraryDocument['dayPlans'][number]['activities'][number];
 type ActivityProps = {
   activity: AcitivityType;
 };

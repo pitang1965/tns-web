@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { Itinerary } from '../schemas';
+import { ServerItineraryDocument } from '../schemas';
 
-export const sampleItineraries: Itinerary[] = [
+export const sampleItineraries: ServerItineraryDocument[] = [
   {
-    _id: new ObjectId(),
+    _id: new ObjectId().toString(),
     title: '西日本大旅行',
     startDate: '2025-03-12',
     endDate: '2025-04-05',
@@ -24,7 +24,7 @@ export const sampleItineraries: Itinerary[] = [
     sharedWith: [],
   },
   {
-    _id: new ObjectId(),
+    _id: new ObjectId().toString(),
     title: '水郷佐原と銚子',
     startDate: '2024-05-18',
     endDate: '2024-05-19',

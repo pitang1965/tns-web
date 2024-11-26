@@ -1,11 +1,12 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithoutId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
 import {
-  ItineraryDocument,
-  ItineraryClient,
-  ItineraryInput,
-  toItineraryClient,
-} from '@/data/types/itinerary';
+  ServerItineraryDocument,
+  ServerItineraryInsertDocument,
+  ClientItineraryDocument,
+  ClientItineraryInput,
+  toClientItinerary,
+} from '@/data/schemas/itinerarySchema';
 import { getSession } from '@auth0/nextjs-auth0';
 
 // 認証済みユーザーのセッション情報を取得する関数
@@ -24,14 +25,15 @@ async function getDatabase() {
 }
 
 export async function createItinerary(
-  newItinerary: ItineraryInput
-): Promise<ItineraryClient> {
+  newItinerary: ClientItineraryInput
+): Promise<ClientItineraryDocument> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
   const now = new Date();
-  const itineraryToInsert: ItineraryDocument = {
+
+  // WithoutIdを使用して_idを除外した型を定義
+  const docToInsert: ServerItineraryInsertDocument = {
     ...newItinerary,
-    _id: new ObjectId(),
     createdAt: now,
     updatedAt: now,
     owner: {
@@ -40,28 +42,45 @@ export async function createItinerary(
       email: user.email || '',
     },
   };
-  const result = await db
-    .collection<ItineraryDocument>('itineraries')
-    .insertOne(itineraryToInsert);
 
-  return toItineraryClient(itineraryToInsert);
+  // insertOneを実行
+  const result = await db
+    .collection<ServerItineraryDocument>('itineraries')
+    .insertOne(docToInsert);
+
+  // 挿入されたドキュメントを取得
+  const insertedDoc = await db
+    .collection<ServerItineraryDocument>('itineraries')
+    .findOne({ _id: result.insertedId });
+
+  if (!insertedDoc) {
+    throw new Error('Failed to create itinerary');
+  }
+
+  return toClientItinerary(insertedDoc);
 }
 
-export async function getItineraries(): Promise<ItineraryClient[]> {
+export async function getItineraries(): Promise<ClientItineraryDocument[]> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
 
   const itineraries = await db
-    .collection<ItineraryDocument>('itineraries')
+    .collection<ServerItineraryDocument>('itineraries')
     .find({ 'owner.id': user.sub })
     .toArray();
 
-  return itineraries.map(toItineraryClient);
+  // ObjectIdを文字列に変換
+  const itinerariesWithStringId = itineraries.map((doc) => ({
+    ...doc,
+    _id: doc._id.toString(),
+  }));
+
+  return itinerariesWithStringId.map(toClientItinerary);
 }
 
 export async function getItineraryById(
   id: string
-): Promise<ItineraryClient | null> {
+): Promise<ClientItineraryDocument | null> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
 
@@ -69,8 +88,8 @@ export async function getItineraryById(
     console.log('id: ', id);
     const objectId = new ObjectId(id);
     const itinerary = await db
-      .collection<ItineraryDocument>('itineraries')
-      .findOne({ _id: objectId });
+      .collection<ServerItineraryDocument>('itineraries')
+      .findOne({ _id: objectId.toString() });
 
     if (!itinerary) {
       console.log('itinerary is null');
@@ -79,7 +98,13 @@ export async function getItineraryById(
 
     // console.log('itinerary: ', JSON.stringify(itinerary, null, 2));
 
-    return toItineraryClient(itinerary);
+    // ObjectIdを文字列に変換
+    const itineraryWithStringId = {
+      ...itinerary,
+      _id: itinerary._id.toString(),
+    };
+
+    return toClientItinerary(itineraryWithStringId);
   } catch (error) {
     console.error('Error in getItineraryById:', error);
     return null;

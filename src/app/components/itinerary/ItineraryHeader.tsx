@@ -1,11 +1,11 @@
-import { ItineraryClient } from '@/data/types/itinerary';
+import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import {
   TransportationBadge,
   TransportationType,
 } from '@/components/TransportationBadge';
 
 const getTransportationType = (
-  transportation: ItineraryClient['transportation']
+  transportation: ClientItineraryDocument['transportation']
 ): TransportationType | undefined => {
   if (transportation && 'type' in transportation) {
     return transportation.type as TransportationType;
@@ -13,7 +13,7 @@ const getTransportationType = (
   return undefined;
 };
 
-export const ItineraryHeader: React.FC<{ itinerary: ItineraryClient }> = ({
+export const ItineraryHeader: React.FC<{ itinerary: ClientItineraryDocument }> = ({
   itinerary,
 }) => {
   const transportationType = getTransportationType(itinerary.transportation);

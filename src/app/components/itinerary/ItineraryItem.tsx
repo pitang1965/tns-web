@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ItineraryClient } from '@/data/types/itinerary';
+import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,7 +17,7 @@ import {
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 
 type Props = {
-  itinerary: ItineraryClient;
+  itinerary: ClientItineraryDocument;
 };
 
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
@@ -25,7 +25,9 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
 
   const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    deleteItinerary(itinerary.id);
+    if (itinerary.id) {
+      deleteItinerary(itinerary.id);
+    }
   };
 
   return (
