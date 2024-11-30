@@ -24,6 +24,23 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
+const DEFAULT_ITINERARY = {
+  title: '',
+  description: '',
+  startDate: '',
+  endDate: '',
+  isPublic: false,
+  dayPlans: [],
+  transportation: {},
+  sharedWith: [],
+};
+
+const DEFAULT_OWNER = {
+  id: '',
+  name: '',
+  email: '',
+};
+
 export default withPageAuthRequired(function NewItineraryPage() {
   const { user } = useUser();
   const router = useRouter();
@@ -36,18 +53,11 @@ export default withPageAuthRequired(function NewItineraryPage() {
   } = useForm<ClientItineraryInput>({
     resolver: zodResolver(clientItinerarySchema),
     defaultValues: {
-      title: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      isPublic: false,
-      dayPlans: [],
-      transportation: {},
-      sharedWith: [],
+      ...DEFAULT_ITINERARY,
       owner: {
-        id: user?.sub || '',
-        name: user?.name || '',
-        email: user?.email || '',
+        id: user?.sub ?? DEFAULT_OWNER.id,
+        name: user?.name ?? DEFAULT_OWNER.name,
+        email: user?.email ?? DEFAULT_OWNER.email,
       },
     },
   });
