@@ -11,6 +11,7 @@ import {
   ClientItineraryInput,
 } from '@/data/schemas/itinerarySchema';
 import { createItineraryAction } from '@/actions/createItinerary';
+import { DayPlanForm } from '@/components/forms/DayPlanForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,6 +24,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+
+type DayPlan = {
+  date: string;
+  activities: Array<{
+    id: string;
+    title: string;
+    place: {
+      type: string;
+      name: string;
+      address: { prefecture: string };
+    };
+    description?: string;
+    startTime?: string;
+    endTime?: string;
+    cost?: number;
+  }>;
+}
 
 const DEFAULT_ITINERARY = {
   title: '',
@@ -49,6 +67,8 @@ export default withPageAuthRequired(function NewItineraryPage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ClientItineraryInput>({
     resolver: zodResolver(clientItinerarySchema),
@@ -62,6 +82,63 @@ export default withPageAuthRequired(function NewItineraryPage() {
     },
   });
   console.error('errors: ', errors);
+
+  // 日付の監視と dayPlans の自動生成
+  React.useEffect(() => {
+    const startDate = watch('startDate');
+    const endDate = watch('endDate');
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const dayCount =
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
+        1;
+
+      const newDayPlans = Array.from({ length: dayCount }, (_, index) => {
+        const currentDate = new Date(start);
+        currentDate.setDate(start.getDate() + index);
+        return {
+          date: currentDate.toISOString().split('T')[0],
+          activities: [],
+        };
+      });
+
+      setValue('dayPlans', newDayPlans);
+    }
+  }, [watch('startDate'), watch('endDate'), setValue]);
+
+  // アクティビティの追加・削除関数
+  const addActivity = (dayIndex: number) => {
+    const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
+    setValue(`dayPlans.${dayIndex}.activities`, [
+      ...currentActivities,
+      {
+        id: crypto.randomUUID(),
+        title: '',
+        place: {
+          type: 'ATTRACTION' as const,
+          name: '',
+          address: {
+            prefecture: '',
+            city: '', // 追加
+            town: '', // 追加
+            block: '', // 追加
+            country: 'Japan', // 追加
+          },
+          location: {
+            // 必要に応じて追加
+            latitude: 0,
+            longitude: 0,
+          },
+        },
+        description: '',
+        startTime: '',
+        endTime: '',
+        cost: 0,
+      },
+    ]);
+  };
 
   const onSubmit = async (values: ClientItineraryInput) => {
     // TODO: valuesで指定可能にしたい
@@ -99,6 +176,14 @@ export default withPageAuthRequired(function NewItineraryPage() {
         variant: 'destructive',
       });
     }
+  };
+
+  const removeActivity = (dayIndex: number, activityIndex: number) => {
+    const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
+    setValue(
+      `dayPlans.${dayIndex}.activities`,
+      currentActivities.filter((_, index) => index !== activityIndex)
+    );
   };
 
   return (
@@ -150,6 +235,20 @@ export default withPageAuthRequired(function NewItineraryPage() {
                 required
               />
               {errors.endDate && <p>{errors.endDate.message}</p>}
+            </div>
+            <div className='space-y-4'>
+              <h3 className='text-lg font-medium'>日程詳細</h3>
+              {watch('dayPlans')?.map((day, dayIndex) => (
+                <DayPlanForm
+                  key={day.date}
+                  day={day}
+                  dayIndex={dayIndex}
+                  register={register}
+                  addActivity={addActivity}
+                  removeActivity={removeActivity}
+                  errors={errors}
+                />
+              ))}
             </div>
             {errors.title && (
               <p className='text-red-500'>{errors.title.message}</p>
