@@ -26,7 +26,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     return <div>エラーが発生しました: {error}</div>;
   }
 
-  if (!itinerary) {
+  if (!itinerary || typeof itinerary !== 'object') {
     return <div>旅程が見つかりませんよ。</div>;
   }
 
@@ -53,7 +53,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
       <div className='w-full'>
         <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
-        {itinerary.dayPlans.length > 0 ? (
+        {itinerary.dayPlans?.length > 0 ? (
           itinerary.dayPlans.map((day: DayPlan, index:number) => (
             <DayPlanView key={index} day={day} />
           ))

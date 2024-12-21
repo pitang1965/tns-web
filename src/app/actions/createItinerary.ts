@@ -8,7 +8,8 @@ export async function createItineraryAction(
   title: string,
   description: string,
   startDate: string,
-  endDate: string
+  endDate: string,
+  dayPlans: ClientItineraryInput['dayPlans']
 ) {
   try {
     const session = await getSession();
@@ -27,7 +28,7 @@ export async function createItineraryAction(
       description,
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
-      dayPlans: [],
+      dayPlans,
       owner: {
         id: session.user.sub,
         name: session.user.name ?? '',

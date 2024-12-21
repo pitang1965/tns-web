@@ -40,7 +40,7 @@ type DayPlan = {
     endTime?: string;
     cost?: number;
   }>;
-}
+};
 
 const DEFAULT_ITINERARY = {
   title: '',
@@ -111,44 +111,51 @@ export default withPageAuthRequired(function NewItineraryPage() {
   // アクティビティの追加・削除関数
   const addActivity = (dayIndex: number) => {
     const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
-    setValue(`dayPlans.${dayIndex}.activities`, [
-      ...currentActivities,
-      {
-        id: crypto.randomUUID(),
-        title: '',
-        place: {
-          type: 'ATTRACTION' as const,
-          name: '',
-          address: {
-            prefecture: '',
-            city: '', // 追加
-            town: '', // 追加
-            block: '', // 追加
-            country: 'Japan', // 追加
+    setValue(
+      `dayPlans.${dayIndex}.activities`,
+      [
+        ...currentActivities,
+        {
+          id: crypto.randomUUID(),
+          title: '',
+          place: {
+            type: 'ATTRACTION' as const,
+            name: '',
+            address: {
+              prefecture: '',
+              city: '', // 追加
+              town: '', // 追加
+              block: '', // 追加
+              country: 'Japan', // 追加
+            },
+            location: {
+              // 必要に応じて追加
+              latitude: 0,
+              longitude: 0,
+            },
           },
-          location: {
-            // 必要に応じて追加
-            latitude: 0,
-            longitude: 0,
-          },
+          description: '',
+          startTime: '',
+          endTime: '',
+          cost: 0,
         },
-        description: '',
-        startTime: '',
-        endTime: '',
-        cost: 0,
-      },
-    ]);
+      ],
+      {
+        shouldValidate: true, // バリデーションを強制的に実行
+        shouldDirty: true, // フォームを変更済み状態にする
+      }
+    );
   };
 
   const onSubmit = async (values: ClientItineraryInput) => {
-    // TODO: valuesで指定可能にしたい
     console.log('Form values:', values);
     try {
       const result = await createItineraryAction(
         values.title,
         values.description,
         values.startDate,
-        values.endDate
+        values.endDate,
+        values.dayPlans
       );
       console.log('createItineraryAction result', result);
       if (result.success) {
@@ -197,13 +204,13 @@ export default withPageAuthRequired(function NewItineraryPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+            {' '}
             <div className='space-y-2'>
               <Label htmlFor='title'>旅程タイトル</Label>
               <Input
                 id='title'
                 {...register('title')}
                 placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
-                required
               />
               {errors.title && <p>{errors.title.message}</p>}
             </div>
@@ -250,9 +257,6 @@ export default withPageAuthRequired(function NewItineraryPage() {
                 />
               ))}
             </div>
-            {errors.title && (
-              <p className='text-red-500'>{errors.title.message}</p>
-            )}
             <Button type='submit' className='w-full'>
               保存
             </Button>
