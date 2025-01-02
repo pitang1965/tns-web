@@ -128,11 +128,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
               block: '', // 追加
               country: 'Japan', // 追加
             },
-            location: {
-              // 必要に応じて追加
-              latitude: 0,
-              longitude: 0,
-            },
+            // location は省略
           },
           description: '',
           startTime: '',
@@ -148,8 +144,17 @@ export default withPageAuthRequired(function NewItineraryPage() {
   };
 
   const onSubmit = async (values: ClientItineraryInput) => {
-    console.log('Form values:', values);
+    console.log('Starting form submission...');
+    console.log('Form values:', {
+      title: values.title,
+      description: values.description,
+      startDate: values.startDate,
+      endDate: values.endDate,
+      dayPlansLength: values.dayPlans?.length,
+      dayPlans: values.dayPlans,
+    });
     try {
+      console.log('Calling createItineraryAction...');
       const result = await createItineraryAction(
         values.title,
         values.description,

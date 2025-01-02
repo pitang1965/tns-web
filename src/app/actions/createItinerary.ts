@@ -28,7 +28,20 @@ export async function createItineraryAction(
       description,
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
-      dayPlans,
+      dayPlans: dayPlans.map((day) => ({
+        ...day,
+        activities: day.activities.map((activity) => {
+          // locationが空の場合は削除
+          const newActivity = { ...activity };
+          if (
+            newActivity.place?.location?.latitude === null &&
+            newActivity.place?.location?.longitude === null
+          ) {
+            delete newActivity.place.location;
+          }
+          return newActivity;
+        }),
+      })),
       owner: {
         id: session.user.sub,
         name: session.user.name ?? '',

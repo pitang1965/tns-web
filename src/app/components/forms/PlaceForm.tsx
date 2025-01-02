@@ -1,6 +1,6 @@
 'use client';
 
-import { UseFormRegister, Path } from 'react-hook-form';
+import { UseFormRegister, Path, useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -42,6 +42,27 @@ export function PlaceForm({
   register,
   basePath,
 }: PlaceFormProps) {
+  const {
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<ClientItineraryInput>();
+
+  const latitude = watch(
+    `${basePath}.place.location.latitude` as Path<ClientItineraryInput>
+  );
+  const longitude = watch(
+    `${basePath}.place.location.longitude` as Path<ClientItineraryInput>
+  );
+
+  const onSubmit = (data: ClientItineraryInput) => {
+    if ((latitude && !longitude) || (!latitude && longitude)) {
+      alert('緯度と経度の両方を入力するか、両方とも空欄にしてください。');
+      return;
+    }
+    // ...existing code...
+  };
+
   return (
     <div className='space-y-4'>
       <div className='space-y-2'>
