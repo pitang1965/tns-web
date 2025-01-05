@@ -156,7 +156,7 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
         <div className='grid grid-cols-2 gap-2'>
           <Input
             type='number'
-            step='0.000001'
+            step='any'
             {...register(
               `${basePath}.place.location.latitude` as Path<ClientItineraryInput>
             )}
@@ -164,7 +164,7 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
           />
           <Input
             type='number'
-            step='0.000001'
+            step='any'
             {...register(
               `${basePath}.place.location.longitude` as Path<ClientItineraryInput>
             )}
