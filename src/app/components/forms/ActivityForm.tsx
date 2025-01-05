@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { PlaceForm } from './PlaceForm';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,7 @@ type ActivityFormProps = {
   register: any; // useFormから渡される
   remove: (dayIndex: number, activityIndex: number) => void;
   errors: any;
+  onValidationError?: (hasError: boolean) => void;
 };
 
 export function ActivityForm({
@@ -21,8 +23,37 @@ export function ActivityForm({
   register,
   remove,
   errors,
+  onValidationError,
 }: ActivityFormProps) {
   const basePath = `dayPlans.${dayIndex}.activities.${activityIndex}`;
+  // エラーメッセージの取得用のヘルパー関数
+  const getFieldError = (fieldName: string) => {
+    return errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.[
+      fieldName
+    ]?.message;
+  };
+  const [customErrors, setCustomErrors] = useState<{ [key: string]: string }>(
+    {}
+  );
+
+  const setCustomError = (path: string, message: string) => {
+    setCustomErrors((prev) => {
+      const newErrors = { ...prev, [path]: message };
+      // エラーが存在する場合は親コンポーネントに通知
+      onValidationError?.(Object.keys(newErrors).length > 0);
+      return newErrors;
+    });
+  };
+
+  const clearCustomError = (path: string) => {
+    setCustomErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[path];
+      // エラーが存在する場合は親コンポーネントに通知
+      onValidationError?.(Object.keys(newErrors).length > 0);
+      return newErrors;
+    });
+  };
 
   return (
     <div className='space-y-2 p-4 border rounded-lg'>
@@ -39,22 +70,39 @@ export function ActivityForm({
       </div>
 
       <div className='space-y-2'>
-        <Label>タイトル</Label>
+        <Label
+          htmlFor='title'
+          className="after:content-['*'] after:ml-0.5 after:text-red-500"
+        >
+          タイトル
+        </Label>
         <Input
+          id='title'
           {...register(
             `dayPlans.${dayIndex}.activities.${activityIndex}.title`
           )}
-          placeholder='例: 昼食、観光、休憩'
+          placeholder='例: 出発、休憩、散策、昼食、宿泊地到着、入浴'
         />
       </div>
-
+      {getFieldError('title') && (
+          <p className='text-red-500 text-sm mt-1'>
+            {getFieldError('title')}
+          </p>
+        )}
       <PlaceForm
         dayIndex={dayIndex}
         activityIndex={activityIndex}
         register={register}
         basePath={basePath}
+        setCustomError={setCustomError}
+        clearCustomError={clearCustomError}
       />
-
+      {/* エラーメッセージの表示 */}
+      {Object.entries(customErrors).map(([path, message]) => (
+        <p key={path} className='text-red-500 text-sm'>
+          {message}
+        </p>
+      ))}
       <div className='grid grid-cols-2 gap-4'>
         <div className='space-y-2'>
           <Label>開始時間</Label>

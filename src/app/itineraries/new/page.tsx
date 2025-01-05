@@ -69,6 +69,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<ClientItineraryInput>({
     resolver: zodResolver(clientItinerarySchema),
@@ -80,13 +81,16 @@ export default withPageAuthRequired(function NewItineraryPage() {
         email: user?.email ?? DEFAULT_OWNER.email,
       },
     },
+    mode: 'onChange',
   });
-  console.error('errors: ', errors);
 
   // 日付の監視と dayPlans の自動生成
   React.useEffect(() => {
     const startDate = watch('startDate');
     const endDate = watch('endDate');
+
+    // バリデーションをトリガー
+    trigger(['startDate', 'endDate']);
 
     if (startDate && endDate) {
       const start = new Date(startDate);
@@ -154,7 +158,6 @@ export default withPageAuthRequired(function NewItineraryPage() {
       dayPlans: values.dayPlans,
     });
     try {
-      console.log('Calling createItineraryAction...');
       const result = await createItineraryAction(
         values.title,
         values.description,
@@ -204,20 +207,28 @@ export default withPageAuthRequired(function NewItineraryPage() {
         <CardHeader>
           <CardTitle>新しい旅程の作成</CardTitle>
           <CardDescription>
-            新しい旅程の詳細を入力してください。
+            新しい旅程の詳細を入力してください。* の付いた項目は入力必須です。
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-            {' '}
             <div className='space-y-2'>
-              <Label htmlFor='title'>旅程タイトル</Label>
+              <Label
+                htmlFor='title'
+                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+              >
+                旅程タイトル
+              </Label>
               <Input
                 id='title'
                 {...register('title')}
                 placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
               />
-              {errors.title && <p>{errors.title.message}</p>}
+              {errors.title && (
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.title.message}
+                </p>
+              )}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='description'>説明</Label>
@@ -226,27 +237,39 @@ export default withPageAuthRequired(function NewItineraryPage() {
                 {...register('description')}
                 placeholder='説明（任意）'
               />
-              {errors.description && <p>{errors.description.message}</p>}
+              {errors.description && (
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.description.message}
+                </p>
+              )}
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='startDate'>開始日</Label>
-              <Input
-                id='startDate'
-                type='date'
-                {...register('startDate')}
-                required
-              />
-              {errors.startDate && <p>{errors.startDate.message}</p>}
+              <Label
+                htmlFor='startDate'
+                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+              >
+                開始日
+              </Label>
+              <Input id='startDate' type='date' {...register('startDate')} />
+              {errors.startDate && (
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.startDate.message}
+                </p>
+              )}
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='endDate'>終了日</Label>
-              <Input
-                id='endDate'
-                type='date'
-                {...register('endDate')}
-                required
-              />
-              {errors.endDate && <p>{errors.endDate.message}</p>}
+              <Label
+                htmlFor='endDate'
+                className="after:content-['*'] after:ml-0.5 after:text-red-500"
+              >
+                終了日
+              </Label>
+              <Input id='endDate' type='date' {...register('endDate')} />
+              {errors.endDate && (
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.endDate.message}
+                </p>
+              )}{' '}
             </div>
             <div className='space-y-4'>
               <h3 className='text-lg font-medium'>日程詳細</h3>

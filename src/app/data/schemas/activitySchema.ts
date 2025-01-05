@@ -3,7 +3,7 @@ import { placeSchema } from './placeSchema';
 
 export const activitySchema = z.object({
   id: z.string(),
-  title: z.string().trim().min(1, "タイトルは必須です"), // 例: 昼食、観光、休憩、宿泊地到着、美術館見学、温泉入浴、◯◯さんに会う
+  title: z.string().trim().min(1, "タイトルを入力してください"), // 例: 出発、休憩、散策、昼食、宿泊地到着、入浴
   place: placeSchema,
   description: z.string().optional(),
   startTime: z.string().optional(),

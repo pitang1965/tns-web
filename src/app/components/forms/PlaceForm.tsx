@@ -1,6 +1,7 @@
 'use client';
 
-import { UseFormRegister, Path, useForm } from 'react-hook-form';
+import { useState } from "react";
+import { UseFormRegister, Path } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -34,34 +35,45 @@ type PlaceFormProps = {
   activityIndex: number;
   register: UseFormRegister<ClientItineraryInput>;
   basePath: string;
+  setCustomError: (path: string, message: string) => void;
+  clearCustomError: (path: string) => void;
 };
 
-export function PlaceForm({
-  dayIndex,
-  activityIndex,
-  register,
-  basePath,
-}: PlaceFormProps) {
-  const {
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<ClientItineraryInput>();
+export function PlaceForm({ register, basePath }: PlaceFormProps) {
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const latitude = watch(
-    `${basePath}.place.location.latitude` as Path<ClientItineraryInput>
-  );
-  const longitude = watch(
-    `${basePath}.place.location.longitude` as Path<ClientItineraryInput>
-  );
+  const validateCoordinates = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const form = e.target.form;
+    if (!form) return;
 
-  const onSubmit = (data: ClientItineraryInput) => {
-    if ((latitude && !longitude) || (!latitude && longitude)) {
-      alert('緯度と経度の両方を入力するか、両方とも空欄にしてください。');
-      return;
+    const latInput = form.querySelector(
+      `input[name="${basePath}.place.location.latitude"]`
+    ) as HTMLInputElement;
+    const lonInput = form.querySelector(
+      `input[name="${basePath}.place.location.longitude"]`
+    ) as HTMLInputElement;
+
+    if (!latInput || !lonInput) return;
+
+    const latValue = latInput.value;
+    const lonValue = lonInput.value;
+
+    if ((latValue && !lonValue) || (!latValue && lonValue)) {
+      setHasError(true);
+      setErrorMessage(
+        '緯度と経度は両方入力するか、両方とも空欄にしてください。'
+      );
+      e.target.form?.setAttribute('data-coordinate-error', 'true');
+    } else {
+      setHasError(false);
+      setErrorMessage('');
+      e.target.form?.removeAttribute('data-coordinate-error');
     }
-    // ...existing code...
   };
+
+  const latPath = `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
+  const lonPath = `${basePath}.place.location.longitude` as Path<ClientItineraryInput>;
 
   return (
     <div className='space-y-4'>
