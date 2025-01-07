@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import { UseFormRegister, Path } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,9 +37,18 @@ type PlaceFormProps = {
   basePath: string;
   setCustomError: (path: string, message: string) => void;
   clearCustomError: (path: string) => void;
+  errors: any;
 };
 
-export function PlaceForm({ register, basePath }: PlaceFormProps) {
+export function PlaceForm({
+  dayIndex,
+  activityIndex,
+  register,
+  basePath,
+  setCustomError,
+  clearCustomError,
+  errors,
+}: PlaceFormProps) {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -72,8 +81,10 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
     }
   };
 
-  const latPath = `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
-  const lonPath = `${basePath}.place.location.longitude` as Path<ClientItineraryInput>;
+  const latPath =
+    `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
+  const lonPath =
+    `${basePath}.place.location.longitude` as Path<ClientItineraryInput>;
 
   return (
     <div className='space-y-4'>
@@ -110,7 +121,7 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
       </div>
 
       <div className='space-y-2'>
-        <Label>住所（任意）</Label>
+        <Label>住所</Label>
         <div className='grid grid-cols-2 gap-2'>
           <Input
             {...register(
@@ -146,13 +157,13 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
             {...register(
               `${basePath}.place.address.building` as Path<ClientItineraryInput>
             )}
-            placeholder='建物名（任意）'
+            placeholder='建物名'
           />
         </div>
       </div>
 
       <div className='space-y-2'>
-        <Label>座標（任意）</Label>
+        <Label>座標</Label>
         <div className='grid grid-cols-2 gap-2'>
           <Input
             type='number'
@@ -162,6 +173,15 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
             )}
             placeholder='緯度'
           />
+          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+            ?.location?.latitude && (
+            <p className='text-red-500 text-sm mt-1'>
+              {
+                errors.dayPlans[dayIndex].activities[activityIndex].place
+                  .location.latitude.message
+              }
+            </p>
+          )}
           <Input
             type='number'
             step='any'
@@ -170,6 +190,15 @@ export function PlaceForm({ register, basePath }: PlaceFormProps) {
             )}
             placeholder='経度'
           />
+          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+            ?.location?.longitude && (
+            <p className='text-red-500 text-sm mt-1'>
+              {
+                errors.dayPlans[dayIndex].activities[activityIndex].place
+                  .location.longitude.message
+              }
+            </p>
+          )}
         </div>
       </div>
     </div>

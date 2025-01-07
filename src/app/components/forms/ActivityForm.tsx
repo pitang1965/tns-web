@@ -96,6 +96,7 @@ export function ActivityForm({
         basePath={basePath}
         setCustomError={setCustomError}
         clearCustomError={clearCustomError}
+        errors={errors}
       />
       {/* エラーメッセージの表示 */}
       {Object.entries(customErrors).map(([path, message]) => (

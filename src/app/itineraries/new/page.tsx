@@ -235,7 +235,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
               <Textarea
                 id='description'
                 {...register('description')}
-                placeholder='説明（任意）'
+                placeholder='説明'
               />
               {errors.description && (
                 <p className='text-red-500 text-sm mt-1'>
