@@ -172,6 +172,14 @@ export function PlaceForm({
               `${basePath}.place.location.latitude` as Path<ClientItineraryInput>
             )}
             placeholder='緯度'
+            onBlur={(e) => {
+              validateCoordinates(e);
+              if (hasError) {
+                setCustomError(latPath, errorMessage);
+              } else {
+                clearCustomError(latPath);
+              }
+            }}
           />
           {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
             ?.location?.latitude && (
@@ -189,17 +197,19 @@ export function PlaceForm({
               `${basePath}.place.location.longitude` as Path<ClientItineraryInput>
             )}
             placeholder='経度'
-          />
-          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
-            ?.location?.longitude && (
-            <p className='text-red-500 text-sm mt-1'>
-              {
-                errors.dayPlans[dayIndex].activities[activityIndex].place
-                  .location.longitude.message
+            onBlur={(e) => {
+              validateCoordinates(e);
+              if (hasError) {
+                setCustomError(lonPath, errorMessage);
+              } else {
+                clearCustomError(lonPath);
               }
-            </p>
-          )}
+            }}
+          />
         </div>
+        {hasError && (
+          <p className='text-red-500 text-sm mt-1'>{errorMessage}</p>
+        )}
       </div>
     </div>
   );

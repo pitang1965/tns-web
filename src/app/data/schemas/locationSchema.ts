@@ -10,10 +10,9 @@ export const locationSchema = z
         return isNaN(num) ? undefined : num;
       })
       .refine(
-        (val) => val === undefined || (val >= -90 && val <= 90),
+        (val) => val !== undefined && val >= -90 && val <= 90,
         '緯度は-90から90の間である必要があります'
-      )
-      .optional(),
+      ),
     longitude: z
       .string()
       .transform((val) => {
@@ -22,14 +21,18 @@ export const locationSchema = z
         return isNaN(num) ? undefined : num;
       })
       .refine(
-        (val) => val === undefined || (val >= -180 && val <= 180),
+        (val) => val !== undefined && val >= -180 && val <= 180,
         '経度は-180から180の間である必要があります'
-      )
-      .optional(),
+      ),
   })
-  .optional()
-  .transform((data) => {
-    if (!data || (!data.latitude && !data.longitude)) return undefined;
-    if (data.latitude && data.longitude) return data;
-    return undefined;
-  });
+  .refine(
+    (data) => data.latitude !== undefined && data.longitude !== undefined,
+    {
+      message: '緯度と経度の両方を入力してください',
+      path: ['latitude', 'longitude'], // エラーメッセージを両方に適用
+    }
+  )
+  .transform((data) => ({
+    latitude: data.latitude,
+    longitude: data.longitude,
+  }));
