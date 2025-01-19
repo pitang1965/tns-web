@@ -37,7 +37,7 @@ export async function createItineraryAction(
             newActivity.place?.location?.latitude === null &&
             newActivity.place?.location?.longitude === null
           ) {
-            delete newActivity.place.location;
+            newActivity.place.location = null;
           }
           return newActivity;
         }),
@@ -48,7 +48,7 @@ export async function createItineraryAction(
         email: session.user.email ?? '',
       },
       isPublic: false,
-      transportation: { type: 'OTHER' },
+      transportation: { type: 'OTHER', details: null },
       sharedWith: [],
     };
 

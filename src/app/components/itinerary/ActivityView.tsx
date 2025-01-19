@@ -13,8 +13,8 @@ export const ActivityView: React.FC<ActivityProps> = ({ activity }) => (
     <div className='flex'>
       <p className='font-medium'>{activity.title}</p>
       <TimeRangeDisplay
-        startTime={activity.startTime}
-        endTime={activity.endTime}
+        startTime={activity.startTime ?? undefined}
+        endTime={activity.endTime ?? undefined}
       />
     </div>
     <PlaceView

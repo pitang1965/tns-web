@@ -39,8 +39,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '自宅',
               type: 'HOME',
+              address: null,
+              location: null,
             },
             startTime: '11:19',
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '2',
@@ -48,7 +53,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: 'ENEOS R16 春日部SS',
               type: 'GAS_STATION',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '3',
@@ -56,7 +67,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '道の駅 庄和',
               type: 'PARKING_FREE_MICHINOEKI',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '4',
@@ -64,7 +81,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '町並み観光駐車場',
               type: 'PARKING_PAID_OTHER',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '5',
@@ -72,7 +95,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '小野川',
               type: 'ATTRACTION',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '6',
@@ -80,7 +109,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '小野川',
               type: 'ATTRACTION',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '7',
@@ -88,7 +123,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '金平湯',
               type: 'BATHING_FACILITY',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '8',
@@ -96,7 +137,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '町並み観光駐車場',
               type: 'PARKING_PAID_OTHER',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '9',
@@ -104,7 +151,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '道の駅 発酵の里こうざき',
               type: 'PARKING_FREE_MICHINOEKI',
+              address: null,
+              location: null,
             },
+            startTime: null,
+            endTime: null,
+            description: null,
+            cost: null,
           },
           {
             id: '10',
@@ -118,6 +171,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
                 city: '銚子市',
                 town: '天王台',
                 block: '１４２３−１',
+                building: null,
                 country: 'Japan',
               },
               location: {
@@ -127,6 +181,8 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             },
             description: '夜は寂しい',
             startTime: '19:37',
+            endTime: null,
+            cost: null,
           },
           {
             id: '11',
@@ -134,9 +190,13 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '錦',
               type: 'RESTAURANT',
+              address: null,
+              location: null,
             },
             startTime: '19:57',
             endTime: '22:08',
+            description: null,
+            cost: null,
           },
         ],
       },

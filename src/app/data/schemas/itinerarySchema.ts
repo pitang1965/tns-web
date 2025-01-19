@@ -17,7 +17,10 @@ const baseSchema = z.object({
   startDate: z.string().min(1, '開始日を指定してください'),
   endDate: z.string().min(1, '終了日はを指定してください'),
   dayPlans: z.array(dayPlanSchema),
-  transportation: transportationSchema.default({}),
+  transportation: transportationSchema.default({
+    type: 'OTHER',
+    details: null
+  }),
   owner: userReferenceSchema,
   isPublic: z.boolean().default(false),
   sharedWith: z.array(userReferenceSchema).default([]),
@@ -71,9 +74,6 @@ export type ServerItineraryInsertDocument = Omit<
 >;
 
 export type ClientItineraryDocument = z.infer<typeof clientItinerarySchema>;
-// 【参考】optionalの使用により問題が生じた場合は、次のように解消できる
-// type RequiredExcept<T, K extends keyof T> = Required<Omit<T, K>> & Partial<Pick<T, K>>;
-// export type ClientItineraryDocument = RequiredExcept<ClientItineraryInput, 'description' | 'transportation'>;
 
 export type ClientItineraryInput = Omit<
   ClientItineraryDocument,

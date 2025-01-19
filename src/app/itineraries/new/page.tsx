@@ -126,13 +126,15 @@ export default withPageAuthRequired(function NewItineraryPage() {
             type: 'ATTRACTION' as const,
             name: '',
             address: {
-              prefecture: '',
-              city: '', // 追加
-              town: '', // 追加
-              block: '', // 追加
-              country: 'Japan', // 追加
+              postalCode: null,
+              prefecture: null,
+              city: null,
+              town: null,
+              block: null,
+              building: null,
+              country: 'Japan',
             },
-            // location は省略
+            location: null,
           },
           description: '',
           startTime: '',

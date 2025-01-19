@@ -5,9 +5,9 @@ export const userSchema = z.object({
   _id: objectIdSchema,
   auth0Id: z.string(), // Auth0の'sub'フィールドに対応
   email: z.string().email(),
-  name: z.string().optional(), // Auth0のnameフィールド
-  nickname: z.string().optional(), // Auth0のnicknameフィールド
-  picture: z.string().url().optional(), // Auth0のpictureフィールド
+  name: z.string().nullable(), // Auth0のnameフィールド
+  nickname: z.string().nullable(), // Auth0のnicknameフィールド
+  picture: z.string().url().nullable(), // Auth0のpictureフィールド
   createdAt: z.date(),
   updatedAt: z.date(),
 });

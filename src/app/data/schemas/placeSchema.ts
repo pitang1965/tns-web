@@ -20,6 +20,6 @@ export const placeSchema = z.object({
     'COIN_LAUNDRY', // コインランドリ
     'OTHER', // その他
   ]),
-  address: addressSchema.optional(),
-  location: locationSchema.optional(),
+  address: addressSchema.nullable(),
+  location: locationSchema.nullable(),
 });
