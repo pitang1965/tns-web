@@ -1,22 +1,25 @@
 'use client';
-
+import { UseFormRegister, UseFormTrigger, FieldErrors  } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
+import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 
 type DayPlanFormProps = {
   day: { date: string; activities: any[] };
   dayIndex: number;
-  register: any;
+  register: UseFormRegister<ClientItineraryInput>;
+  trigger: UseFormTrigger<ClientItineraryInput>;
   addActivity: (dayIndex: number) => void;
   removeActivity: (dayIndex: number, activityIndex: number) => void;
-  errors: any;
+  errors: FieldErrors<ClientItineraryInput>;
 }
 
 export function DayPlanForm({
   day,
   dayIndex,
   register,
+  trigger,
   addActivity,
   removeActivity,
   errors,
@@ -34,6 +37,7 @@ export function DayPlanForm({
             dayIndex={dayIndex}
             activityIndex={activityIndex}
             register={register}
+            trigger={trigger}
             remove={removeActivity}
             errors={errors}
           />

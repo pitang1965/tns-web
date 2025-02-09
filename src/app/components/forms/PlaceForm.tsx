@@ -1,7 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { UseFormRegister, Path } from 'react-hook-form';
+import {
+  UseFormRegister,
+  UseFormTrigger,
+  Path,
+  FieldErrors,
+} from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -34,53 +38,19 @@ type PlaceFormProps = {
   dayIndex: number;
   activityIndex: number;
   register: UseFormRegister<ClientItineraryInput>;
+  trigger: UseFormTrigger<ClientItineraryInput>;
   basePath: string;
-  setCustomError: (path: string, message: string) => void;
-  clearCustomError: (path: string) => void;
-  errors: any;
+  errors: FieldErrors<ClientItineraryInput>;
 };
 
 export function PlaceForm({
   dayIndex,
   activityIndex,
   register,
+  trigger,
   basePath,
-  setCustomError,
-  clearCustomError,
   errors,
 }: PlaceFormProps) {
-  const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const validateCoordinates = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const form = e.target.form;
-    if (!form) return;
-
-    const latInput = form.querySelector(
-      `input[name="${basePath}.place.location.latitude"]`
-    ) as HTMLInputElement;
-    const lonInput = form.querySelector(
-      `input[name="${basePath}.place.location.longitude"]`
-    ) as HTMLInputElement;
-
-    if (!latInput || !lonInput) return;
-
-    const latValue = latInput.value;
-    const lonValue = lonInput.value;
-
-    if ((latValue && !lonValue) || (!latValue && lonValue)) {
-      setHasError(true);
-      setErrorMessage(
-        '緯度と経度は両方入力するか、両方とも空欄にしてください。'
-      );
-      e.target.form?.setAttribute('data-coordinate-error', 'true');
-    } else {
-      setHasError(false);
-      setErrorMessage('');
-      e.target.form?.removeAttribute('data-coordinate-error');
-    }
-  };
-
   const latPath =
     `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
   const lonPath =
@@ -164,52 +134,46 @@ export function PlaceForm({
 
       <div className='space-y-2'>
         <Label>座標</Label>
-        <div className='grid grid-cols-2 gap-2'>
-          <Input
-            type='number'
-            step='any'
-            {...register(
-              `${basePath}.place.location.latitude` as Path<ClientItineraryInput>
+        <div className='flex gap-2'>
+          <div className='flex-1'>
+            <Input
+              type='number'
+              step='any'
+              placeholder='緯度'
+              {...register(latPath, {
+                onChange: () => trigger(lonPath), // 経度
+              })}
+            />
+            {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+              ?.location?.latitude && (
+              <p className='text-red-500 text-sm mt-1'>
+                {
+                  errors.dayPlans[dayIndex].activities[activityIndex].place
+                    .location.latitude.message
+                }
+              </p>
             )}
-            placeholder='緯度'
-            onBlur={(e) => {
-              validateCoordinates(e);
-              if (hasError) {
-                setCustomError(latPath, errorMessage);
-              } else {
-                clearCustomError(latPath);
-              }
-            }}
-          />
-          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
-            ?.location?.latitude && (
-            <p className='text-red-500 text-sm mt-1'>
-              {
-                errors.dayPlans[dayIndex].activities[activityIndex].place
-                  .location.latitude.message
-              }
-            </p>
-          )}
-          <Input
-            type='number'
-            step='any'
-            {...register(
-              `${basePath}.place.location.longitude` as Path<ClientItineraryInput>
+          </div>
+          <div className='flex-1'>
+            <Input
+              type='number'
+              step='any'
+              placeholder='経度'
+              {...register(lonPath, {
+                onChange: () => trigger(latPath), // 緯度
+              })}
+            />
+            {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+              ?.location?.longitude && (
+              <p className='text-red-500 text-sm mt-1'>
+                {
+                  errors.dayPlans[dayIndex].activities[activityIndex].place
+                    .location.longitude.message
+                }
+              </p>
             )}
-            placeholder='経度'
-            onBlur={(e) => {
-              validateCoordinates(e);
-              if (hasError) {
-                setCustomError(lonPath, errorMessage);
-              } else {
-                clearCustomError(lonPath);
-              }
-            }}
-          />
+          </div>
         </div>
-        {hasError && (
-          <p className='text-red-500 text-sm mt-1'>{errorMessage}</p>
-        )}
       </div>
     </div>
   );

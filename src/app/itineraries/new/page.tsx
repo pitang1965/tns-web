@@ -12,6 +12,8 @@ import {
 } from '@/data/schemas/itinerarySchema';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { DayPlanForm } from '@/components/forms/DayPlanForm';
+import { TransportationType } from '@/components/TransportationBadge';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -49,7 +51,10 @@ const DEFAULT_ITINERARY = {
   endDate: '',
   isPublic: false,
   dayPlans: [],
-  transportation: {},
+  transportation: {
+    type: 'OTHER' as TransportationType,
+    details: null as string | null,
+  },
   sharedWith: [],
 };
 
@@ -64,25 +69,21 @@ export default withPageAuthRequired(function NewItineraryPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    trigger,
-    formState: { errors },
-  } = useForm<ClientItineraryInput>({
-    resolver: zodResolver(clientItinerarySchema),
-    defaultValues: {
-      ...DEFAULT_ITINERARY,
-      owner: {
-        id: user?.sub ?? DEFAULT_OWNER.id,
-        name: user?.name ?? DEFAULT_OWNER.name,
-        email: user?.email ?? DEFAULT_OWNER.email,
+  const { register, handleSubmit, watch, setValue, trigger, formState } =
+    useForm<ClientItineraryInput>({
+      resolver: zodResolver(clientItinerarySchema),
+      defaultValues: {
+        ...DEFAULT_ITINERARY,
+        owner: {
+          id: user?.sub ?? DEFAULT_OWNER.id,
+          name: user?.name ?? DEFAULT_OWNER.name,
+          email: user?.email ?? DEFAULT_OWNER.email,
+        },
       },
-    },
-    mode: 'onChange',
-  });
+      mode: 'onChange',
+    });
+
+  const { errors, isValid, isDirty, dirtyFields } = formState;
 
   // 日付の監視と dayPlans の自動生成
   React.useEffect(() => {
@@ -134,7 +135,10 @@ export default withPageAuthRequired(function NewItineraryPage() {
               building: null,
               country: 'Japan',
             },
-            location: null,
+            location: {
+              latitude: undefined,
+              longitude: undefined,
+            },
           },
           description: '',
           startTime: '',
@@ -150,8 +154,11 @@ export default withPageAuthRequired(function NewItineraryPage() {
   };
 
   const onSubmit = async (values: ClientItineraryInput) => {
-    console.log('Starting form submission...');
-    console.log('Form values:', {
+    console.log('Form State:', {
+      isValid,
+      isDirty,
+      dirtyFields,
+      errors,
       title: values.title,
       description: values.description,
       startDate: values.startDate,
@@ -203,6 +210,32 @@ export default withPageAuthRequired(function NewItineraryPage() {
     );
   };
 
+  // 検証状態の監視
+  React.useEffect(() => {
+    console.log('Form validation state:', {
+      isValid,
+      isDirty,
+      errors,
+      hasErrors: Object.keys(errors).length > 0,
+    });
+  }, [isValid, isDirty, errors]);
+
+  // transportation の値を監視
+  const transportation = watch('transportation');
+  React.useEffect(() => {
+    console.log('Form Transportation Value:', {
+      fullTransportation: transportation,
+      details: transportation?.details,
+      detailsType: typeof transportation?.details,
+    });
+  }, [transportation]);
+
+  // 全体の値も監視
+  const values = watch();
+  React.useEffect(() => {
+    console.log('All form values:', values);
+  }, [values]);
+
   return (
     <main className='container mx-auto p-4'>
       <Card className='max-w-2xl mx-auto'>
@@ -213,7 +246,13 @@ export default withPageAuthRequired(function NewItineraryPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+          <form
+            onSubmit={handleSubmit((values) => {
+              console.log('Form submit event triggered');
+              onSubmit(values);
+            })}
+            className='space-y-4'
+          >
             <div className='space-y-2'>
               <Label
                 htmlFor='title'
@@ -281,6 +320,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
                   day={day}
                   dayIndex={dayIndex}
                   register={register}
+                  trigger={trigger}
                   addActivity={addActivity}
                   removeActivity={removeActivity}
                   errors={errors}

@@ -2,37 +2,53 @@ import { z } from 'zod';
 
 export const locationSchema = z
   .object({
-    latitude: z
-      .string()
-      .transform((val) => {
-        if (!val) return undefined;
-        const num = Number(val);
-        return isNaN(num) ? undefined : num;
-      })
-      .refine(
-        (val) => val !== undefined && val >= -90 && val <= 90,
-        '緯度は-90から90の間である必要があります'
-      ),
-    longitude: z
-      .string()
-      .transform((val) => {
-        if (!val) return undefined;
-        const num = Number(val);
-        return isNaN(num) ? undefined : num;
-      })
-      .refine(
-        (val) => val !== undefined && val >= -180 && val <= 180,
-        '経度は-180から180の間である必要があります'
-      ),
+    latitude: z.string().optional(),
+    longitude: z.string().optional(),
   })
-  .refine(
-    (data) => data.latitude !== undefined && data.longitude !== undefined,
-    {
-      message: '緯度と経度の両方を入力してください',
-      path: ['latitude', 'longitude'], // エラーメッセージを両方に適用
+  .superRefine((data, ctx) => {
+    if (!data.latitude && !data.longitude) return;
+
+    if (
+      (!data.latitude && data.longitude) ||
+      (data.latitude && !data.longitude)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '緯度と経度は両方入力するか、両方とも空欄にしてください',
+        path: ['latitude'], // 片方のフィールドにのみエラーを表示
+      });
+      return;
     }
-  )
+
+    const lat = Number(data.latitude);
+    const lon = Number(data.longitude);
+
+    if (isNaN(lat) || isNaN(lon)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '有効な数値を入力してください。',
+        path: ['latitude'],
+      });
+      return;
+    }
+
+    if (lat < -90 || lat > 90) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '緯度は-90から90の間である必要があります。',
+        path: ['latitude'],
+      });
+    }
+
+    if (lon < -180 || lon > 180) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '経度は-180から180の間である必要があります。',
+        path: ['longitude'],
+      });
+    }
+  })
   .transform((data) => ({
-    latitude: data.latitude,
-    longitude: data.longitude,
+    latitude: data.latitude ? Number(data.latitude) : undefined,
+    longitude: data.longitude ? Number(data.longitude) : undefined,
   }));

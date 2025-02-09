@@ -2,18 +2,21 @@
 
 import { useState } from 'react';
 import { PlaceForm } from './PlaceForm';
+import { UseFormRegister, UseFormTrigger, FieldErrors  } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 
 type ActivityFormProps = {
   dayIndex: number;
   activityIndex: number;
-  register: any; // useFormから渡される
+  register: UseFormRegister<ClientItineraryInput>;
+  trigger: UseFormTrigger<ClientItineraryInput>;
   remove: (dayIndex: number, activityIndex: number) => void;
-  errors: any;
+  errors: FieldErrors<ClientItineraryInput>;
   onValidationError?: (hasError: boolean) => void;
 };
 
@@ -21,6 +24,7 @@ export function ActivityForm({
   dayIndex,
   activityIndex,
   register,
+  trigger,
   remove,
   errors,
   onValidationError,
@@ -93,9 +97,8 @@ export function ActivityForm({
         dayIndex={dayIndex}
         activityIndex={activityIndex}
         register={register}
+        trigger={trigger}
         basePath={basePath}
-        setCustomError={setCustomError}
-        clearCustomError={clearCustomError}
         errors={errors}
       />
       {/* エラーメッセージの表示 */}

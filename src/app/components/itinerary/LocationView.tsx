@@ -10,7 +10,13 @@ type LocationProps = {
 };
 
 export const LocationView: React.FC<LocationProps> = ({ location }) => {
-  if (!location) return '位置情報なし';
+  if (
+    !location ||
+    location.latitude === undefined ||
+    location.longitude === undefined
+  ) {
+    return;
+  }
   return (
     <Map
       latitude={location.latitude}
