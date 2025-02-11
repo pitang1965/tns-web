@@ -3,11 +3,14 @@
 import {
   UseFormRegister,
   UseFormTrigger,
+  UseFormSetValue,
   Path,
   FieldErrors,
 } from 'react-hook-form';
+import { MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -16,6 +19,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
+import { extractCoordinatesFromGoogleMapsUrl } from '@/utils/maps';
+import { useToast } from '@/components/ui/use-toast';
 
 const PLACE_TYPES = {
   HOME: '自宅',
@@ -39,6 +44,7 @@ type PlaceFormProps = {
   activityIndex: number;
   register: UseFormRegister<ClientItineraryInput>;
   trigger: UseFormTrigger<ClientItineraryInput>;
+  setValue: UseFormSetValue<ClientItineraryInput>;
   basePath: string;
   errors: FieldErrors<ClientItineraryInput>;
 };
@@ -48,6 +54,7 @@ export function PlaceForm({
   activityIndex,
   register,
   trigger,
+  setValue,
   basePath,
   errors,
 }: PlaceFormProps) {
@@ -55,6 +62,41 @@ export function PlaceForm({
     `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
   const lonPath =
     `${basePath}.place.location.longitude` as Path<ClientItineraryInput>;
+
+  const { toast } = useToast();
+
+  const handleGoogleMapsUrl = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const coords = extractCoordinatesFromGoogleMapsUrl(clipboardText);
+
+      if (coords) {
+        console.log(coords);
+        setValue(latPath, coords.latitude.toString());
+        setValue(lonPath, coords.longitude.toString());
+        // バリデーションを実行
+        await trigger([latPath, lonPath]);
+      } else {
+        console.error('クリップボードのテキストに有効な座標が見つかりません。');
+        toast({
+          title: 'Google Mapsから取得',
+          description: 'クリップボードのテキストに有効な座標が見つかりません。',
+          variant: 'destructive',
+        });
+        setValue(latPath, '');
+        setValue(lonPath, '');
+      }
+    } catch (error) {
+      console.error('クリップボードの読み取りに失敗しました:', error);
+      toast({
+        title: 'Google Mapsから取得',
+        description: 'クリップボードの読み取りに失敗しました',
+        variant: 'destructive',
+      });
+      setValue(latPath, '');
+      setValue(lonPath, '');
+    }
+  };
 
   return (
     <div className='space-y-4'>
@@ -133,7 +175,19 @@ export function PlaceForm({
       </div>
 
       <div className='space-y-2'>
-        <Label>座標</Label>
+        <div className='flex items-center justify-between'>
+          <Label>座標</Label>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='flex items-center gap-2 text-sm'
+            onClick={handleGoogleMapsUrl}
+          >
+            <MapPin className='w-4 h-4' />
+            Google Mapsから取得
+          </Button>
+        </div>
         <div className='flex gap-2'>
           <div className='flex-1'>
             <Input

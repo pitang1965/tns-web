@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import { PlaceForm } from './PlaceForm';
-import { UseFormRegister, UseFormTrigger, FieldErrors  } from 'react-hook-form';
+import {
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormTrigger,
+  FieldErrors,
+} from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +20,7 @@ type ActivityFormProps = {
   activityIndex: number;
   register: UseFormRegister<ClientItineraryInput>;
   trigger: UseFormTrigger<ClientItineraryInput>;
+  setValue: UseFormSetValue<ClientItineraryInput>;
   remove: (dayIndex: number, activityIndex: number) => void;
   errors: FieldErrors<ClientItineraryInput>;
   onValidationError?: (hasError: boolean) => void;
@@ -25,13 +31,16 @@ export function ActivityForm({
   activityIndex,
   register,
   trigger,
+  setValue,
   remove,
   errors,
   onValidationError,
 }: ActivityFormProps) {
   const basePath = `dayPlans.${dayIndex}.activities.${activityIndex}`;
   // エラーメッセージの取得用のヘルパー関数
-  const getFieldError = (fieldName: string) => {
+  const getFieldError = (
+    fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number]
+  ) => {
     return errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.[
       fieldName
     ]?.message;
@@ -89,15 +98,14 @@ export function ActivityForm({
         />
       </div>
       {getFieldError('title') && (
-          <p className='text-red-500 text-sm mt-1'>
-            {getFieldError('title')}
-          </p>
-        )}
+        <p className='text-red-500 text-sm mt-1'>{getFieldError('title')}</p>
+      )}
       <PlaceForm
         dayIndex={dayIndex}
         activityIndex={activityIndex}
         register={register}
         trigger={trigger}
+        setValue={setValue}
         basePath={basePath}
         errors={errors}
       />

@@ -321,6 +321,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
                   dayIndex={dayIndex}
                   register={register}
                   trigger={trigger}
+                  setValue={setValue}
                   addActivity={addActivity}
                   removeActivity={removeActivity}
                   errors={errors}
