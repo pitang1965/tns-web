@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -34,7 +35,10 @@ export default function RootLayout({
             >
               <div className='flex flex-col min-h-screen bg-background text-foreground'>
                 <Header />
-                <main className='flex-1'>{children}</main>
+                <main className='flex-1'>
+                  {children}
+                  <Toaster />
+                </main>
                 <Footer />
               </div>
             </ThemeProvider>
