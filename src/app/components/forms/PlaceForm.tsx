@@ -6,8 +6,10 @@ import {
   UseFormSetValue,
   Path,
   FieldErrors,
+  useFormContext,
 } from 'react-hook-form';
 import { MapPin } from 'lucide-react';
+import { LocationView } from '@/components/itinerary/LocationView';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -42,26 +44,39 @@ const PLACE_TYPES = {
 type PlaceFormProps = {
   dayIndex: number;
   activityIndex: number;
-  register: UseFormRegister<ClientItineraryInput>;
-  trigger: UseFormTrigger<ClientItineraryInput>;
-  setValue: UseFormSetValue<ClientItineraryInput>;
   basePath: string;
-  errors: FieldErrors<ClientItineraryInput>;
 };
 
 export function PlaceForm({
   dayIndex,
   activityIndex,
-  register,
-  trigger,
-  setValue,
   basePath,
-  errors,
 }: PlaceFormProps) {
+  const {
+    register,
+    setValue,
+    trigger,
+    watch,
+    formState: { errors },
+  } = useFormContext<ClientItineraryInput>();
+
   const latPath =
     `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
   const lonPath =
     `${basePath}.place.location.longitude` as Path<ClientItineraryInput>;
+
+  // watchを使って値を直接参照
+  const latitude = watch(latPath);
+  const longitude = watch(lonPath);
+
+  // locationオブジェクトを直接生成
+  const location =
+    latitude && longitude
+      ? {
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        }
+      : null;
 
   const { toast } = useToast();
 
@@ -228,6 +243,7 @@ export function PlaceForm({
             )}
           </div>
         </div>
+        {location && <LocationView location={location} />}
       </div>
     </div>
   );

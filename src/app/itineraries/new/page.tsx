@@ -5,7 +5,7 @@ import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
   clientItinerarySchema,
   ClientItineraryInput,
@@ -69,21 +69,28 @@ export default withPageAuthRequired(function NewItineraryPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const { register, handleSubmit, watch, setValue, trigger, formState } =
-    useForm<ClientItineraryInput>({
-      resolver: zodResolver(clientItinerarySchema),
-      defaultValues: {
-        ...DEFAULT_ITINERARY,
-        owner: {
-          id: user?.sub ?? DEFAULT_OWNER.id,
-          name: user?.name ?? DEFAULT_OWNER.name,
-          email: user?.email ?? DEFAULT_OWNER.email,
-        },
+  const methods = useForm<ClientItineraryInput>({
+    resolver: zodResolver(clientItinerarySchema),
+    defaultValues: {
+      ...DEFAULT_ITINERARY,
+      owner: {
+        id: user?.sub ?? DEFAULT_OWNER.id,
+        name: user?.name ?? DEFAULT_OWNER.name,
+        email: user?.email ?? DEFAULT_OWNER.email,
       },
-      mode: 'onChange',
-    });
+    },
+    mode: 'onChange',
+  });
 
-  const { errors, isValid, isDirty, dirtyFields } = formState;
+  const {
+    formState: { isValid, isDirty, dirtyFields, errors },
+    watch,
+    setValue,
+
+    trigger,
+    register,
+    handleSubmit,
+  } = methods;
 
   // 日付の監視と dayPlans の自動生成
   React.useEffect(() => {
@@ -216,6 +223,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
       isValid,
       isDirty,
       errors,
+      dirtyFields,
       hasErrors: Object.keys(errors).length > 0,
     });
   }, [isValid, isDirty, errors]);
@@ -246,92 +254,90 @@ export default withPageAuthRequired(function NewItineraryPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={handleSubmit((values) => {
-              console.log('Form submit event triggered');
-              onSubmit(values);
-            })}
-            className='space-y-4'
-          >
-            <div className='space-y-2'>
-              <Label
-                htmlFor='title'
-                className="after:content-['*'] after:ml-0.5 after:text-red-500"
-              >
-                旅程タイトル
-              </Label>
-              <Input
-                id='title'
-                {...register('title')}
-                placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
-              />
-              {errors.title && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.title.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='description'>説明</Label>
-              <Textarea
-                id='description'
-                {...register('description')}
-                placeholder='説明'
-              />
-              {errors.description && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label
-                htmlFor='startDate'
-                className="after:content-['*'] after:ml-0.5 after:text-red-500"
-              >
-                開始日
-              </Label>
-              <Input id='startDate' type='date' {...register('startDate')} />
-              {errors.startDate && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.startDate.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label
-                htmlFor='endDate'
-                className="after:content-['*'] after:ml-0.5 after:text-red-500"
-              >
-                終了日
-              </Label>
-              <Input id='endDate' type='date' {...register('endDate')} />
-              {errors.endDate && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.endDate.message}
-                </p>
-              )}{' '}
-            </div>
-            <div className='space-y-4'>
-              <h3 className='text-lg font-medium'>日程詳細</h3>
-              {watch('dayPlans')?.map((day, dayIndex) => (
-                <DayPlanForm
-                  key={day.date}
-                  day={day}
-                  dayIndex={dayIndex}
-                  register={register}
-                  trigger={trigger}
-                  setValue={setValue}
-                  addActivity={addActivity}
-                  removeActivity={removeActivity}
-                  errors={errors}
+          <FormProvider {...methods}>
+            <form
+              onSubmit={handleSubmit((values) => {
+                console.log('Form submit event triggered');
+                onSubmit(values);
+              })}
+              className='space-y-4'
+            >
+              <div className='space-y-2'>
+                <Label
+                  htmlFor='title'
+                  className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                >
+                  旅程タイトル
+                </Label>
+                <Input
+                  id='title'
+                  {...register('title')}
+                  placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
                 />
-              ))}
-            </div>
-            <Button type='submit' className='w-full'>
-              保存
-            </Button>
-          </form>
+                {errors.title && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.title.message}
+                  </p>
+                )}
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='description'>説明</Label>
+                <Textarea
+                  id='description'
+                  {...register('description')}
+                  placeholder='説明'
+                />
+                {errors.description && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.description.message}
+                  </p>
+                )}
+              </div>
+              <div className='space-y-2'>
+                <Label
+                  htmlFor='startDate'
+                  className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                >
+                  開始日
+                </Label>
+                <Input id='startDate' type='date' {...register('startDate')} />
+                {errors.startDate && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.startDate.message}
+                  </p>
+                )}
+              </div>
+              <div className='space-y-2'>
+                <Label
+                  htmlFor='endDate'
+                  className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                >
+                  終了日
+                </Label>
+                <Input id='endDate' type='date' {...register('endDate')} />
+                {errors.endDate && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.endDate.message}
+                  </p>
+                )}{' '}
+              </div>
+              <div className='space-y-4'>
+                <h3 className='text-lg font-medium'>日程詳細</h3>
+                {watch('dayPlans')?.map((day, dayIndex) => (
+                  <DayPlanForm
+                    key={day.date}
+                    day={day}
+                    dayIndex={dayIndex}
+                    addActivity={addActivity}
+                    removeActivity={removeActivity}
+                  />
+                ))}
+              </div>
+              <Button type='submit' className='w-full'>
+                保存
+              </Button>
+            </form>
+          </FormProvider>
         </CardContent>
       </Card>
     </main>
