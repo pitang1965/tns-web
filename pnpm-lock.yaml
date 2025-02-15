@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.5.0
     version: 3.6.0(next@14.2.23)
   '@hookform/resolvers':
-    specifier: ^3.9.0
-    version: 3.10.0(react-hook-form@7.54.2)
+    specifier: ^4.0.0
+    version: 4.1.0(react-hook-form@7.54.2)
   '@mapbox/mapbox-gl-language':
     specifier: ^1.0.1
     version: 1.0.1(mapbox-gl@3.9.4)
@@ -425,11 +425,12 @@ packages:
       '@hapi/hoek': 9.3.0
     dev: false
 
-  /@hookform/resolvers@3.10.0(react-hook-form@7.54.2):
-    resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
+  /@hookform/resolvers@4.1.0(react-hook-form@7.54.2):
+    resolution: {integrity: sha512-fX/uHKb+OOCpACLc6enuTQsf0ZpRrKbeBBPETg5PCPLCIYV6osP2Bw6ezuclM61lH+wBF9eXcuC0+BFh9XOEnQ==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
+      caniuse-lite: 1.0.30001699
       react-hook-form: 7.54.2(react@19.0.0)
     dev: false
 
