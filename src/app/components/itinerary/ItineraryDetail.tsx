@@ -1,12 +1,13 @@
 'use client';
 
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
+import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
-import { useRouter } from 'next/navigation';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 type ItineraryDetailProps = {
@@ -15,7 +16,7 @@ type ItineraryDetailProps = {
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const { itinerary, loading, error } = useGetItinerary(id);
-  const handleDelete = useDeleteItinerary();
+  const deleteItinerary = useDeleteItinerary();
   const router = useRouter();
 
   if (loading) {
@@ -30,31 +31,22 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     return <div>旅程が見つかりませんよ。</div>;
   }
 
-  const onDelete = async () => {
-    const deleted = await handleDelete(id);
-    if (deleted) {
-      router.push('/itineraries'); // 削除後に旅程一覧ページにリダイレクト
-    }
-  };
-
   return (
     <div className='flex flex-col gap-4 items-center w-full max-w-4xl mx-auto'>
       <div className='flex gap-2'>
         <Button onClick={() => {}}>編集</Button>
-        <Button
-          onClick={onDelete}
-          className='delete-itinerary'
-          variant='destructive'
-        >
-          削除
-        </Button>
+        <DeleteConfirmationDialog
+          itineraryId={id}
+          deleteItinerary={deleteItinerary}
+          onSuccess={() => router.push('/itineraries')}
+        />
       </div>
       <ItineraryHeader itinerary={itinerary} />
 
       <div className='w-full'>
         <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
         {itinerary.dayPlans?.length > 0 ? (
-          itinerary.dayPlans.map((day: DayPlan, index:number) => (
+          itinerary.dayPlans.map((day: DayPlan, index: number) => (
             <DayPlanView key={index} day={day} />
           ))
         ) : (

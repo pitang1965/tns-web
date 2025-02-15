@@ -14,6 +14,7 @@ import {
   TransportationBadge,
   TransportationType,
 } from '@/components/TransportationBadge';
+import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 
 type Props = {
@@ -22,13 +23,6 @@ type Props = {
 
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   const deleteItinerary = useDeleteItinerary();
-
-  const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    if (itinerary.id) {
-      deleteItinerary(itinerary.id);
-    }
-  };
 
   return (
     <Card className='flex flex-col h-full'>
@@ -60,13 +54,16 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
           <Button className='flex-1' onClick={() => {}}>
             編集
           </Button>
-          <Button
-            className='flex-1 delete-itinerary'
-            onClick={handleDelete}
-            variant='destructive'
-          >
-            削除
-          </Button>
+          <div className='flex-1'>
+            <DeleteConfirmationDialog
+              itineraryId={itinerary.id || ''}
+              deleteItinerary={deleteItinerary}
+              onSuccess={() => {
+                // リストの更新は親コンポーネントで行われる想定
+                // router.refresh() は自動的に行われる
+              }}
+            />
+          </div>
         </div>
       </CardFooter>
     </Card>
