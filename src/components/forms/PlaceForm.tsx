@@ -1,13 +1,7 @@
 'use client';
 
-import {
-  UseFormRegister,
-  UseFormTrigger,
-  UseFormSetValue,
-  Path,
-  FieldErrors,
-  useFormContext,
-} from 'react-hook-form';
+import { useState } from 'react';
+import { Path, useFormContext } from 'react-hook-form';
 import { MapPin } from 'lucide-react';
 import { LocationView } from '@/components/itinerary/LocationView';
 import { Input } from '@/components/ui/input';
@@ -20,6 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/utils/maps';
 import { useToast } from '@/components/ui/use-toast';
@@ -59,6 +59,7 @@ export function PlaceForm({
     watch,
     formState: { errors },
   } = useFormContext<ClientItineraryInput>();
+  const [isAddressOpen, setIsAddressOpen] = useState(false);
 
   const latPath =
     `${basePath}.place.location.latitude` as Path<ClientItineraryInput>;
@@ -149,44 +150,64 @@ export function PlaceForm({
 
       <div className='space-y-2'>
         <Label>住所</Label>
-        <div className='grid grid-cols-2 gap-2'>
-          <Input
-            {...register(
-              `${basePath}.place.address.postalCode` as Path<ClientItineraryInput>
-            )}
-            placeholder='郵便番号'
-          />
-          <Input
-            {...register(
-              `${basePath}.place.address.prefecture` as Path<ClientItineraryInput>
-            )}
-            placeholder='都道府県'
-          />
-          <Input
-            {...register(
-              `${basePath}.place.address.city` as Path<ClientItineraryInput>
-            )}
-            placeholder='市区町村'
-          />
-          <Input
-            {...register(
-              `${basePath}.place.address.town` as Path<ClientItineraryInput>
-            )}
-            placeholder='町名'
-          />
-          <Input
-            {...register(
-              `${basePath}.place.address.block` as Path<ClientItineraryInput>
-            )}
-            placeholder='番地'
-          />
-          <Input
-            {...register(
-              `${basePath}.place.address.building` as Path<ClientItineraryInput>
-            )}
-            placeholder='建物名'
-          />
-        </div>
+        <Collapsible open={isAddressOpen} onOpenChange={setIsAddressOpen}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='flex items-center gap-2' // justify-between を削除
+            >
+              {isAddressOpen ? (
+                <ChevronUp className='h-4 w-4' />
+              ) : (
+                <ChevronDown className='h-4 w-4' />
+              )}
+              <span>
+                {isAddressOpen ? '入力フォームを非表示' : '入力フォームを表示'}
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className='grid grid-cols-2 gap-2'>
+              <Input
+                {...register(
+                  `${basePath}.place.address.postalCode` as Path<ClientItineraryInput>
+                )}
+                placeholder='郵便番号'
+              />
+              <Input
+                {...register(
+                  `${basePath}.place.address.prefecture` as Path<ClientItineraryInput>
+                )}
+                placeholder='都道府県'
+              />
+              <Input
+                {...register(
+                  `${basePath}.place.address.city` as Path<ClientItineraryInput>
+                )}
+                placeholder='市区町村'
+              />
+              <Input
+                {...register(
+                  `${basePath}.place.address.town` as Path<ClientItineraryInput>
+                )}
+                placeholder='町名'
+              />
+              <Input
+                {...register(
+                  `${basePath}.place.address.block` as Path<ClientItineraryInput>
+                )}
+                placeholder='番地'
+              />
+              <Input
+                {...register(
+                  `${basePath}.place.address.building` as Path<ClientItineraryInput>
+                )}
+                placeholder='建物名'
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
 
       <div className='space-y-2'>
