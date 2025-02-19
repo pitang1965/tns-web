@@ -7,8 +7,8 @@ import { getSession } from '@auth0/nextjs-auth0';
 export async function createItineraryAction(
   title: string,
   description: string,
-  startDate: string,
-  endDate: string,
+  startDate: string | undefined,
+  numberOfDays: number,
   dayPlans: ClientItineraryInput['dayPlans']
 ) {
   try {
@@ -26,8 +26,8 @@ export async function createItineraryAction(
     const newItineraryInput: ClientItineraryInput = {
       title,
       description,
-      startDate: new Date(startDate).toISOString(),
-      endDate: new Date(endDate).toISOString(),
+      startDate: startDate ? new Date(startDate).toISOString() : undefined,
+      numberOfDays,
       dayPlans: dayPlans.map((day) => ({
         ...day,
         activities: day.activities.map((activity) => {

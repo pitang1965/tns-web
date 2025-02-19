@@ -42,7 +42,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
         </CardHeader>
         <CardContent>
           <CardDescription className='mb-2'>
-            {itinerary.startDate} - {itinerary.endDate}
+            {itinerary.startDate} から {itinerary.numberOfDays}日間
           </CardDescription>
           <CardDescription className='line-clamp-3'>
             {itinerary.description}

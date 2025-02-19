@@ -6,7 +6,7 @@ import { ActivityForm } from './ActivityForm';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 
 type DayPlanFormProps = {
-  day: { date: string; activities: any[] };
+  day: { date: string | null; activities: any[]; };
   dayIndex: number;
   addActivity: (dayIndex: number) => void;
   removeActivity: (dayIndex: number, activityIndex: number) => void;
@@ -21,12 +21,15 @@ export function DayPlanForm({
   const {
     formState: { errors },
   } = useFormContext<ClientItineraryInput>();
+
+  // 日付表示の生成
+  const dayDisplay = day.date
+    ? `${new Date(day.date).toLocaleDateString('ja-JP')} - ${dayIndex + 1}日目`
+    : `${dayIndex + 1}日目`;
+
   return (
     <div className='border rounded-lg p-4 space-y-4'>
-      <h3 className='text-lg font-medium'>
-        {new Date(day.date).toLocaleDateString('ja-JP')} - {dayIndex + 1}日目
-      </h3>
-
+      <h3 className='text-lg font-medium'>{dayDisplay}</h3>
       <div className='space-y-4'>
         {day.activities?.map((activity, activityIndex) => (
           <ActivityForm

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,8 @@ import {
 } from '@/components/ui/card';
 
 type DayPlan = {
-  date: string;
+  date?: string;
+  dayIndex: number;
   activities: Array<{
     id: string;
     title: string;
@@ -47,8 +48,8 @@ type DayPlan = {
 const DEFAULT_ITINERARY = {
   title: '',
   description: '',
-  startDate: '',
-  endDate: '',
+  startDate: undefined,
+  numberOfDays: 1,
   isPublic: false,
   dayPlans: [],
   transportation: {
@@ -93,32 +94,34 @@ export default withPageAuthRequired(function NewItineraryPage() {
   } = methods;
 
   // 日付の監視と dayPlans の自動生成
-  React.useEffect(() => {
+  useEffect(() => {
     const startDate = watch('startDate');
-    const endDate = watch('endDate');
+    const numberOfDays = watch('numberOfDays');
 
-    // バリデーションをトリガー
-    trigger(['startDate', 'endDate']);
+    trigger(['startDate', 'numberOfDays']);
 
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const dayCount =
-        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
-        1;
+    const dayCount = numberOfDays || 0;
 
-      const newDayPlans = Array.from({ length: dayCount }, (_, index) => {
-        const currentDate = new Date(start);
-        currentDate.setDate(start.getDate() + index);
+    const newDayPlans = Array.from({ length: dayCount }, (_, index) => {
+      if (startDate) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(currentDate.getDate() + index);
         return {
+          dayIndex: index,
           date: currentDate.toISOString().split('T')[0],
           activities: [],
         };
-      });
+      }
 
-      setValue('dayPlans', newDayPlans);
-    }
-  }, [watch('startDate'), watch('endDate'), setValue]);
+      return {
+        date: null,
+        dayIndex: index,
+        activities: [],
+      };
+    });
+
+    setValue('dayPlans', newDayPlans);
+  }, [watch('startDate'), watch('numberOfDays'), setValue]);
 
   // アクティビティの追加・削除関数
   const addActivity = (dayIndex: number) => {
@@ -169,7 +172,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
       title: values.title,
       description: values.description,
       startDate: values.startDate,
-      endDate: values.endDate,
+      numberOfDays: values.numberOfDays,
       dayPlansLength: values.dayPlans?.length,
       dayPlans: values.dayPlans,
     });
@@ -178,7 +181,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
         values.title,
         values.description,
         values.startDate,
-        values.endDate,
+        values.numberOfDays,
         values.dayPlans
       );
       console.log('createItineraryAction result', result);
@@ -294,12 +297,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
                 )}
               </div>
               <div className='space-y-2'>
-                <Label
-                  htmlFor='startDate'
-                  className="after:content-['*'] after:ml-0.5 after:text-red-500"
-                >
-                  開始日
-                </Label>
+                <Label htmlFor='startDate'>開始日</Label>
                 <Input id='startDate' type='date' {...register('startDate')} />
                 {errors.startDate && (
                   <p className='text-red-500 text-sm mt-1'>
@@ -309,23 +307,30 @@ export default withPageAuthRequired(function NewItineraryPage() {
               </div>
               <div className='space-y-2'>
                 <Label
-                  htmlFor='endDate'
+                  htmlFor='numberOfDays'
                   className="after:content-['*'] after:ml-0.5 after:text-red-500"
                 >
-                  終了日
+                  日数
                 </Label>
-                <Input id='endDate' type='date' {...register('endDate')} />
-                {errors.endDate && (
+                <Input
+                  id='numberOfDays'
+                  type='number'
+                  min={1}
+                  {...register('numberOfDays', {
+                    valueAsNumber: true, // 文字列ではなく数値として扱う
+                  })}
+                />
+                {errors.numberOfDays && (
                   <p className='text-red-500 text-sm mt-1'>
-                    {errors.endDate.message}
+                    {errors.numberOfDays.message}
                   </p>
-                )}{' '}
+                )}
               </div>
               <div className='space-y-4'>
                 <h3 className='text-lg font-medium'>日程詳細</h3>
                 {watch('dayPlans')?.map((day, dayIndex) => (
                   <DayPlanForm
-                    key={day.date}
+                    key={dayIndex}
                     day={day}
                     dayIndex={dayIndex}
                     addActivity={addActivity}
