@@ -55,7 +55,7 @@ dependencies:
     version: 3.9.4
   mongodb:
     specifier: ^6.9.0
-    version: 6.13.0
+    version: 6.13.1
   mongoose:
     specifier: ^8.7.0
     version: 8.10.1
@@ -2880,6 +2880,11 @@ packages:
     engines: {node: '>=16.20.1'}
     dev: false
 
+  /bson@6.10.3:
+    resolution: {integrity: sha512-MTxGsqgYTwfshYWTRdmZRC+M7FnG1b4y7RO7p2k3X24Wq0yv1m77Wsj0BzlPzd/IowgESfsruQCUToa7vbOpPQ==}
+    engines: {node: '>=16.20.1'}
+    dev: false
+
   /buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
     dev: false
@@ -4516,11 +4521,11 @@ packages:
       whatwg-url: 14.1.1
     dev: false
 
-  /mongodb@6.13.0:
-    resolution: {integrity: sha512-KeESYR5TEaFxOuwRqkOm3XOsMqCSkdeDMjaW5u2nuKfX7rqaofp7JQGoi7sVqQcNJTKuveNbzZtWMstb8ABP6Q==}
+  /mongodb@6.13.1:
+    resolution: {integrity: sha512-gdq40tX8StmhP6akMp1pPoEVv+9jTYFSrga/g23JxajPAQhH39ysZrHGzQCSd9PEOnuEQEdjIWqxO7ZSwC0w7Q==}
     engines: {node: '>=16.20.1'}
     peerDependencies:
-      '@aws-sdk/credential-providers': ^3.188.0
+      '@aws-sdk/credential-providers': ^3.632.0
       '@mongodb-js/zstd': ^1.1.0 || ^2.0.0
       gcp-metadata: ^5.2.0
       kerberos: ^2.0.1
@@ -4544,7 +4549,7 @@ packages:
         optional: true
     dependencies:
       '@mongodb-js/saslprep': 1.2.0
-      bson: 6.10.2
+      bson: 6.10.3
       mongodb-connection-string-url: 3.0.2
     dev: false
 
@@ -4554,7 +4559,7 @@ packages:
     dependencies:
       bson: 6.10.2
       kareem: 2.6.3
-      mongodb: 6.13.0
+      mongodb: 6.13.1
       mpath: 0.9.0
       mquery: 5.0.0
       ms: 2.1.3
