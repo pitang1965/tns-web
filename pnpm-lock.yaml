@@ -93,7 +93,7 @@ devDependencies:
     version: 3.4.1
   '@types/node':
     specifier: ^22.7.4
-    version: 22.13.4
+    version: 22.13.5
   '@types/react':
     specifier: ^19.0.0
     version: 19.0.8
@@ -120,7 +120,7 @@ devDependencies:
     version: 3.4.17(ts-node@10.9.2)
   ts-node:
     specifier: ^10.9.2
-    version: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
+    version: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
   typescript:
     specifier: ^5
     version: 5.7.3
@@ -2208,7 +2208,7 @@ packages:
   /@types/connect@3.4.36:
     resolution: {integrity: sha512-P63Zd/JUGq+PdrM1lv0Wv5SBYeA2+CORvbrXbngriYY0jzLUWfQMQQxOhjONEz/wlHOAxOdY7CY65rgQdTjq2w==}
     dependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
     dev: false
 
   /@types/eslint-scope@3.7.7:
@@ -2269,11 +2269,11 @@ packages:
   /@types/mysql@2.15.26:
     resolution: {integrity: sha512-DSLCOXhkvfS5WNNPbfn2KdICAmk8lLc+/PNvnPnF7gOdMZCxopXduqv0OQ13y/yA/zXTSikZZqVgybUxOEg6YQ==}
     dependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
     dev: false
 
-  /@types/node@22.13.4:
-    resolution: {integrity: sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg==}
+  /@types/node@22.13.5:
+    resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
     dependencies:
       undici-types: 6.20.0
 
@@ -2290,7 +2290,7 @@ packages:
   /@types/pg@8.6.1:
     resolution: {integrity: sha512-1Kc4oAGzAl7uqUStZCDvaLFqZrW9qWSjXOmBfdgyBP5La7Us6Mg4GBvRlSoaZMhQF/zSj1C8CtKMBkoiT8eL8w==}
     dependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
       pg-protocol: 1.7.1
       pg-types: 2.2.0
     dev: false
@@ -2320,7 +2320,7 @@ packages:
   /@types/tedious@4.0.14:
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
     dependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
     dev: false
 
   /@types/webidl-conversions@7.0.3:
@@ -4177,7 +4177,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: false
@@ -4885,7 +4885,7 @@ packages:
     dependencies:
       lilconfig: 3.1.3
       postcss: 8.5.2
-      ts-node: 10.9.2(@types/node@22.13.4)(typescript@5.7.3)
+      ts-node: 10.9.2(@types/node@22.13.5)(typescript@5.7.3)
       yaml: 2.7.0
 
   /postcss-nested@6.2.0(postcss@8.5.2):
@@ -5676,7 +5676,7 @@ packages:
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  /ts-node@10.9.2(@types/node@22.13.4)(typescript@5.7.3):
+  /ts-node@10.9.2(@types/node@22.13.5)(typescript@5.7.3):
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
     peerDependencies:
@@ -5695,7 +5695,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
       acorn: 8.14.0
       acorn-walk: 8.3.4
       arg: 4.1.3
