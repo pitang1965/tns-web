@@ -36,11 +36,11 @@ export function DeleteConfirmationDialog({
         // コールバックで成功を通知
         onSuccess?.();
       } else {
-        alert(result.message || '旅程の削除中にエラーが発生しました。');
+        alert(result.message || '旅程の削除中にエラーが発生しました。#2');
       }
     } catch (error) {
       console.error('Error deleting itinerary:', error);
-      alert('旅程の削除中にエラーが発生しました。');
+      alert('旅程の削除中にエラーが発生しました。#3');
     }
     setIsDeleting(false);
   };

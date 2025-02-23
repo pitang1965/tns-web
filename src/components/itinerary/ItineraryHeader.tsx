@@ -13,34 +13,30 @@ const getTransportationType = (
   return undefined;
 };
 
+const calculateEndDate = (startDate: string, numberOfDays: number): Date => {
+  const start = new Date(startDate);
+  const end = new Date(start);
+  end.setDate(start.getDate() + numberOfDays - 1);
+  return end;
+};
+
 export const ItineraryHeader: React.FC<{
   itinerary: ClientItineraryDocument;
 }> = ({ itinerary }) => {
   const transportationType = getTransportationType(itinerary.transportation);
 
-  // 日付表示用の文字列を生成
-  const dateDisplay = itinerary.startDate
-    ? `${itinerary.startDate} ～ ${
-        new Date(itinerary.startDate).getDate() + itinerary.numberOfDays - 1
-      }日`
-    : `${itinerary.numberOfDays}日間`;
-
-  const formatDateDisplay = (date: string) => {
-    return new Date(date).toLocaleDateString('ja-JP', {
+  const formatDate = (date: Date | string): string => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       weekday: 'short',
     });
   };
-
   const periodDisplay = itinerary.startDate
-    ? `${formatDateDisplay(itinerary.startDate)} ～ ${formatDateDisplay(
-        new Date(
-          new Date(itinerary.startDate).setDate(
-            new Date(itinerary.startDate).getDate() + itinerary.numberOfDays - 1
-          )
-        ).toISOString()
+    ? `${formatDate(itinerary.startDate)} ～ ${formatDate(
+        calculateEndDate(itinerary.startDate, itinerary.numberOfDays)
       )}`
     : `${itinerary.numberOfDays}日間`;
 

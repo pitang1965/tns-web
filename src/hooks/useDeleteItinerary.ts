@@ -12,7 +12,7 @@ export function useDeleteItinerary() {
       console.error('Error deleting itinerary:', error);
       return {
         success: false,
-        message: '旅程の削除中にエラーが発生しました。',
+        message: '旅程の削除中にエラーが発生しました。#1',
       };
     }
   };
