@@ -4,13 +4,7 @@ import { createItinerary } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { getSession } from '@auth0/nextjs-auth0';
 
-export async function createItineraryAction(
-  title: string,
-  description: string,
-  startDate: string | undefined,
-  numberOfDays: number,
-  dayPlans: ClientItineraryInput['dayPlans']
-) {
+export async function createItineraryAction(data: ClientItineraryInput) {
   try {
     const session = await getSession();
     if (!session?.user) {
@@ -24,11 +18,9 @@ export async function createItineraryAction(
 
     const now = new Date();
     const newItineraryInput: ClientItineraryInput = {
-      title,
-      description,
-      startDate: startDate ? new Date(startDate).toISOString() : undefined,
-      numberOfDays,
-      dayPlans: dayPlans.map((day) => ({
+     ...data,
+      startDate: data.startDate ? new Date(data.startDate).toISOString() : undefined,
+      dayPlans: data.dayPlans.map((day) => ({
         ...day,
         activities: day.activities.map((activity) => {
           // locationが空の場合は削除
