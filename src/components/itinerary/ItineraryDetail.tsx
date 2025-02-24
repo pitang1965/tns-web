@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
-import { DeleteConfirmationDialog } from '@/components/DeleteConfirmationDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
@@ -18,6 +19,12 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const { itinerary, loading, error } = useGetItinerary(id);
   const deleteItinerary = useDeleteItinerary();
   const router = useRouter();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleDelete = async () => {
+    await deleteItinerary(id);
+    router.push('/itineraries');
+  };
 
   if (loading) {
     return <div>読み込み中...</div>;
@@ -34,12 +41,16 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   return (
     <div className='flex flex-col gap-4 items-center w-full max-w-4xl mx-auto'>
       <div className='flex gap-2'>
-        <Button size="sm" onClick={() => {}}>編集</Button>
-        <DeleteConfirmationDialog
-          itineraryId={id}
-          deleteItinerary={deleteItinerary}
-          onSuccess={() => router.push('/itineraries')}
-        />
+        <Button size='sm' onClick={() => {}}>
+          編集
+        </Button>
+        <Button
+          variant='destructive'
+          size='sm'
+          onClick={() => setIsConfirmOpen(true)}
+        >
+          削除
+        </Button>
       </div>
       <ItineraryHeader itinerary={itinerary} />
 
@@ -55,6 +66,15 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           </p>
         )}
       </div>
+      <ConfirmationDialog
+        isOpen={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        title='旅程の削除'
+        description='この旅程を削除してもよろしいですか？この操作は取り消せません。'
+        confirmLabel='削除'
+        onConfirm={handleDelete}
+        variant='destructive'
+      />
     </div>
   );
 };
