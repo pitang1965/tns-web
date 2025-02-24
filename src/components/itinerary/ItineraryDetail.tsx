@@ -34,7 +34,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   return (
     <div className='flex flex-col gap-4 items-center w-full max-w-4xl mx-auto'>
       <div className='flex gap-2'>
-        <Button onClick={() => {}}>編集</Button>
+        <Button size="sm" onClick={() => {}}>編集</Button>
         <DeleteConfirmationDialog
           itineraryId={id}
           deleteItinerary={deleteItinerary}

@@ -51,7 +51,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </Link>
       <CardFooter className='mt-auto'>
         <div className='flex gap-2 w-full'>
-          <Button className='flex-1' onClick={() => {}}>
+          <Button size="sm" className='flex-1' onClick={() => {}}>
             編集
           </Button>
           <div className='flex-1'>
