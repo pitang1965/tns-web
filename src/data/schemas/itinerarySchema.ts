@@ -65,11 +65,23 @@ export function toClientItinerary(
   doc: ServerItineraryDocument
 ): ClientItineraryDocument {
   const { _id, ...rest } = doc;
+
+  // createdAtとupdatedAtが文字列かDateオブジェクトかを確認し、適切に処理
+  const createdAtStr =
+    typeof doc.createdAt === 'string'
+      ? doc.createdAt
+      : doc.createdAt.toISOString();
+
+  const updatedAtStr =
+    typeof doc.updatedAt === 'string'
+      ? doc.updatedAt
+      : doc.updatedAt.toISOString();
+
   return {
     id: _id, // すでに文字列なのでそのまま使用
     ...rest,
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
+    createdAt: createdAtStr,
+    updatedAt: updatedAtStr,
   };
 }
 

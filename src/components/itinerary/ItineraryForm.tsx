@@ -173,6 +173,29 @@ export function ItineraryForm({
     );
   };
 
+  const getErrorsForDisplay = (errors: any) => {
+    // 単純なエラーメッセージのみを収集
+    const result: Record<string, string> = {};
+
+    // エラーオブジェクトを走査
+    Object.keys(errors).forEach((key) => {
+      if (errors[key]) {
+        if (typeof errors[key] === 'object' && errors[key].message) {
+          // メッセージプロパティがある場合はそれを使用
+          result[key] = errors[key].message;
+        } else if (typeof errors[key] === 'string') {
+          // 文字列の場合はそのまま使用
+          result[key] = errors[key];
+        } else {
+          // その他の場合は単に「エラー」と表示
+          result[key] = 'エラーがあります';
+        }
+      }
+    });
+
+    return result;
+  };
+
   return (
     <Card className='max-w-2xl mx-auto'>
       <CardHeader>
@@ -271,7 +294,9 @@ export function ItineraryForm({
               Object.keys(errors).length > 0 && (
                 <div className='mb-4 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800'>
                   <p>フォームにエラーがあります:</p>
-                  <pre>{JSON.stringify(errors, null, 2)}</pre>
+                  <pre>
+                    {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
+                  </pre>
                 </div>
               )}
             <Button type='submit' className='w-full' disabled={isSubmitting}>

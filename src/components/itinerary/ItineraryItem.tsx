@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +25,7 @@ type Props = {
 export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   const deleteItinerary = useDeleteItinerary();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const router = useRouter();
 
   const handleDelete = async () => {
     if (!itinerary.id) {
@@ -59,7 +61,11 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </Link>
       <CardFooter className='mt-auto'>
         <div className='flex gap-2 w-full'>
-          <Button size='sm' className='flex-1' onClick={() => {}}>
+          <Button
+            size='sm'
+            className='flex-1'
+            onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
+          >
             編集
           </Button>
           <Button

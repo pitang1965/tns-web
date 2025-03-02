@@ -1,4 +1,4 @@
-import { ObjectId, WithoutId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
 import {
   ServerItineraryDocument,
@@ -31,7 +31,7 @@ export async function createItinerary(
   const db = await getDatabase();
   const now = new Date();
 
-  // WithoutIdを使用して_idを除外した型を定義
+  // ServerItineraryInsertDocument型を使用してデータベースに挿入するドキュメントを準備
   const docToInsert: ServerItineraryInsertDocument = {
     ...newItinerary,
     createdAt: now,
@@ -85,7 +85,6 @@ export async function getItineraryById(
   const db = await getDatabase();
 
   try {
-    console.log('id: ', id);
     const objectId = new ObjectId(id);
     const itinerary = await db
       .collection<ServerItineraryDocument>('itineraries')
@@ -111,5 +110,71 @@ export async function getItineraryById(
   }
 }
 
-// 他の必要なAPI関数をここに追加
-// 例: createItinerary, updateItinerary, deleteItinerary など
+export async function updateItinerary(
+  id: string,
+  updatedData: ClientItineraryInput
+): Promise<ClientItineraryDocument> {
+  const user = await getAuthenticatedUser();
+  const db = await getDatabase();
+  const now = new Date();
+
+  try {
+    const objectId = new ObjectId(id);
+
+    // 旅程が実際に存在するか確認
+    const existingDoc = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .findOne({ _id: objectId as any });
+
+    console.log('Existing document:', existingDoc);
+
+    if (!existingDoc) {
+      throw new Error('旅程が見つかりません');
+    }
+
+    // 所有者が一致するか確認
+    if (existingDoc.owner.id !== user.sub) {
+      throw new Error('この旅程を更新する権限がありません');
+    }
+
+    // 更新するドキュメントの準備
+    const updateDoc = {
+      $set: {
+        ...updatedData,
+        updatedAt: now,
+      },
+    };
+
+    // 所有者が一致する場合のみ更新を許可する（ObjectId型を使用）
+    const result = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .updateOne({ _id: objectId as any, 'owner.id': user.sub }, updateDoc);
+
+    if (result.matchedCount === 0) {
+      throw new Error('旅程の更新に失敗しました');
+    }
+
+    // 更新されたドキュメントを取得
+    const updatedDoc = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .findOne({ _id: objectId as any });
+
+    if (!updatedDoc) {
+      throw new Error('更新された旅程の取得に失敗しました');
+    }
+
+    // ObjectIdを文字列に変換
+    const updatedWithStringId = {
+      ...updatedDoc,
+      _id: updatedDoc._id.toString(),
+    };
+
+    return toClientItinerary(updatedWithStringId);
+  } catch (error) {
+    console.error('Error in updateItinerary:', error);
+    throw error;
+  }
+}
+
+// TODO: 他の必要なAPI関数をここに追加
+// 例: deleteItinerary など
