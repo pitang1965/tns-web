@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const locationSchema = z
   .object({
-    latitude: z.string().optional(),
-    longitude: z.string().optional(),
+    latitude: z.union([z.string(), z.number()]).optional(),
+    longitude: z.union([z.string(), z.number()]).optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.latitude && !data.longitude) return;
