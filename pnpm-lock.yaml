@@ -126,7 +126,7 @@ devDependencies:
     version: 5.7.3
   undici-types:
     specifier: ^7.0.0
-    version: 7.3.0
+    version: 7.4.0
 
 packages:
 
@@ -5828,8 +5828,8 @@ packages:
   /undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
-  /undici-types@7.3.0:
-    resolution: {integrity: sha512-z2pHpkN2BEJl3QlQo0GtfGCyuhuBbWX60vzGwyn7ex/seM2UkvyGEfEV0Qb9pXc5StNfcJpsstgaf2YTEJa63Q==}
+  /undici-types@7.4.0:
+    resolution: {integrity: sha512-4tv8DA1nBRW5kF2KBJZzEBjd66kDf3jArNVPoktdlv9Xsgw7EcIMu1bVbAXbX5IWuuZZ3YW3jIM2x85SPgMP6w==}
     dev: true
 
   /unplugin@1.0.1:
