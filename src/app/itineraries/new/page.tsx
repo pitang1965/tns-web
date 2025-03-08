@@ -2,14 +2,18 @@
 
 import { useState } from 'react';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
+import router from 'next/router';
 import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/components/TransportationBadge'; 
+import { TransportationType } from '@/components/TransportationBadge';
+import { LoadingSpinner } from '@/components/loading-spinner';
+import { toast } from '@/components/ui/use-toast';
 
 export default withPageAuthRequired(function NewItineraryPage() {
   const { user } = useUser(); // useUserを追加
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const initialData = {
     title: '',
@@ -33,6 +37,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data:', data);
     setIsSubmitting(true);
+    setIsLoading(true);
 
     // ownerフィールドを追加
     const dataWithOwner = {
@@ -48,10 +53,21 @@ export default withPageAuthRequired(function NewItineraryPage() {
       const result = await createItineraryAction(dataWithOwner);
       console.log('Server action result:', result);
       setIsSubmitting(false);
+      if (result.success) {
+        router.push(`/itineraries/${result.id}`);
+      } else {
+        setIsLoading(false);
+        toast({
+          title: '旅程の作成に失敗しました',
+          description: result.error,
+          variant: 'destructive',
+        });
+      }
       return result;
     } catch (error) {
       console.error('Error submitting form:', error);
       setIsSubmitting(false);
+      setIsLoading(false);
       return {
         success: false,
         error:
@@ -64,6 +80,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
 
   return (
     <main className='container mx-auto p-4'>
+      {isLoading && <LoadingSpinner />}
       <ItineraryForm
         initialData={initialData}
         onSubmit={handleSubmit}

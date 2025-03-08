@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { LoadingSpinner } from '@/components/loading-spinner';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
@@ -27,7 +28,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   };
 
   if (loading) {
-    return <div>読み込み中...</div>;
+    return <LoadingSpinner />;
   }
 
   if (error) {

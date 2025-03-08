@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
 import { Info, Search, BookHeart, CircleUser } from 'lucide-react';
+import { LoadingSpinner } from '@/components/loading-spinner';
 
 const activeClassNames =
   'underline decoration-1 underline-offset-4 decoration-current';
@@ -32,7 +33,7 @@ export function Navigation() {
   const { user, isLoading } = useUser();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return (

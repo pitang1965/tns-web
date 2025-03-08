@@ -7,10 +7,11 @@ import { ModeToggle } from '@/components/ui/mode-toggle';
 import { UserAvatar } from '@/components/UserAvatar';
 import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
+import { LoadingSpinner } from '@/components/loading-spinner';
 
 export function Header() {
   const { user, error, isLoading } = useUser();
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <div>{error.message}</div>;
 
   return (

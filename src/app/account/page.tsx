@@ -2,6 +2,7 @@
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import { LoadingSpinner } from '@/components/loading-spinner';
 
 type UserInfoProps = {
   label: string;
@@ -18,9 +19,9 @@ function UserInfo({ label, value }: UserInfoProps) {
 
 export default withPageAuthRequired(function Account() {
   const { user, error, isLoading } = useUser();
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <div>{error.message}</div>;
-  if (!user) return <div>ユーザー情報が取得できませんでした</div>
+  if (!user) return <div>ユーザー情報が取得できませんでした</div>;
 
   return (
     <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
