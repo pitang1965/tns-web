@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { Button } from '@/components/ui/button';
+import { Crosshair } from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
@@ -20,81 +22,85 @@ const MapComponent: React.FC<MapProps> = ({
   const marker = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
+    // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
     if (mapContainer.current && !map.current) {
+      // コンソールで確認
+      console.log('Initializing map with container:', mapContainer.current);
+      console.log('Initial position:', { latitude, longitude });
+
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [longitude, latitude] as [number, number], // Mapboxは [経度, 緯度] の順序を期待する
+        center: [longitude, latitude] as [number, number],
         zoom: zoom,
-        language: 'ja', // 言語を日本語に設定
-        localIdeographFontFamily: "'Noto Sans', 'Noto Sans CJK JP', sans-serif",
+      });
+
+      // マップの読み込みエラーを監視
+      map.current.on('error', (e) => {
+        console.error('Map error:', e.error);
       });
 
       map.current.on('load', () => {
+        console.log('Map loaded');
         if (map.current) {
-          // 地図の中心座標を確認
-          const center = map.current.getCenter();
-
-          // 日本語ラベルを設定
-          const layers = [
-            'country-label',
-            'state-label',
-            'settlement-label',
-            'poi-label',
-          ];
-          layers.forEach((layer) => {
-            if (map.current?.getLayer(layer)) {
-              map.current.setLayoutProperty(layer, 'text-field', [
-                'coalesce',
-                ['get', 'name_ja'],
-                ['get', 'name'],
-              ]);
-            }
-          });
+          // マーカーを追加
+          marker.current = new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map.current);
         }
       });
     }
 
-    // マーカーを作成または更新
+    // マップが存在する場合は位置を更新
     if (map.current) {
-      const newPosition: [number, number] = [longitude, latitude];
-      console.log('Updating position to:', { latitude, longitude });
+      console.log('Updating map position to:', [longitude, latitude]);
+      map.current.setCenter([longitude, latitude]);
 
-      map.current.setCenter(newPosition);
-
+      // マーカーも更新
       if (marker.current) {
-        marker.current.setLngLat(newPosition);
-        const markerPos = marker.current.getLngLat();
-        console.log('Marker position after update:', {
-          lat: markerPos.lat,
-          lng: markerPos.lng,
-        });
-      } else {
-        marker.current = new mapboxgl.Marker({
-          anchor: 'center',
-        })
-          .setLngLat(newPosition)
-          .addTo(map.current);
-
-        const markerPos = marker.current.getLngLat();
-        console.log('New marker position:', {
-          lat: markerPos.lat,
-          lng: markerPos.lng,
-        });
+        marker.current.setLngLat([longitude, latitude]);
       }
     }
 
     return () => {
       if (map.current) {
         map.current.remove();
-        // map が削除されると、それに関連するすべてのマーカーも自動的に削除
         map.current = null;
         marker.current = null;
       }
     };
   }, [latitude, longitude, zoom]);
 
-  return <div ref={mapContainer} style={{ width: '100%', height: '250px' }} />;
+  const centerOnMarker = () => {
+    if (map.current && marker.current) {
+      const markerPosition = marker.current.getLngLat();
+      map.current.flyTo({
+        center: [markerPosition.lng, markerPosition.lat],
+        zoom: zoom,
+        duration: 1000,
+      });
+    }
+  };
+
+  return (
+    <div className='relative w-full h-[250px] border border-gray-200 rounded-md overflow-hidden'>
+      {/* mapContainer要素には明示的な幅と高さを設定 */}
+      <div ref={mapContainer} className='w-full h-full' />
+
+      {/* ボタンは相対位置で配置 */}
+      <div className='absolute bottom-2 right-2 z-10'>
+        <Button
+          onClick={centerOnMarker}
+          size='sm'
+          variant='outline'
+          className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
+        >
+          <Crosshair className='mr-2 h-4 w-4' />
+          ピンの位置へ
+        </Button>
+      </div>
+    </div>
+  );
 };
 
 export default MapComponent;
