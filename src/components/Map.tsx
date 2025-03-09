@@ -24,15 +24,12 @@ const MapComponent: React.FC<MapProps> = ({
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
     if (mapContainer.current && !map.current) {
-      // コンソールで確認
-      console.log('Initializing map with container:', mapContainer.current);
-      console.log('Initial position:', { latitude, longitude });
-
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [longitude, latitude] as [number, number],
-        zoom: zoom,
+        zoom,
+        language: 'ja',
       });
 
       // マップの読み込みエラーを監視
@@ -41,12 +38,28 @@ const MapComponent: React.FC<MapProps> = ({
       });
 
       map.current.on('load', () => {
-        console.log('Map loaded');
         if (map.current) {
           // マーカーを追加
           marker.current = new mapboxgl.Marker()
             .setLngLat([longitude, latitude])
             .addTo(map.current);
+
+          // 日本語ラベルを設定
+          const layers = [
+            'country-label',
+            'state-label',
+            'settlement-label',
+            'poi-label',
+          ];
+          layers.forEach((layer) => {
+            if (map.current?.getLayer(layer)) {
+              map.current.setLayoutProperty(layer, 'text-field', [
+                'coalesce',
+                ['get', 'name_ja'],
+                ['get', 'name'],
+              ]);
+            }
+          });
         }
       });
     }
