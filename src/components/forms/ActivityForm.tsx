@@ -68,7 +68,7 @@ export function ActivityForm({
   };
 
   return (
-    <div className='space-y-2 p-4 border rounded-lg'>
+    <div className='space-y-2 p-4 border border-border rounded-lg bg-muted/30 dark:bg-muted/20'>
       <div className='flex justify-between items-center'>
         <h4 className='font-medium'>アクティビティ {activityIndex + 1}</h4>
         <div className='flex gap-1'>
