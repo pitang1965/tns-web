@@ -2,25 +2,32 @@
 
 import { useState } from 'react';
 import { PlaceForm } from './PlaceForm';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, FieldErrors } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { MoveUp, MoveDown, Trash2 } from 'lucide-react';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 
 type ActivityFormProps = {
   dayIndex: number;
   activityIndex: number;
   remove: (dayIndex: number, activityIndex: number) => void;
+  moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
   onValidationError?: (hasError: boolean) => void;
+  errors: FieldErrors<ClientItineraryInput>; //
 };
 
 export function ActivityForm({
   dayIndex,
   activityIndex,
   remove,
+  moveActivity,
+  isFirst = false,
+  isLast = false,
   onValidationError,
 }: ActivityFormProps) {
   const {
@@ -64,14 +71,43 @@ export function ActivityForm({
     <div className='space-y-2 p-4 border rounded-lg'>
       <div className='flex justify-between items-center'>
         <h4 className='font-medium'>アクティビティ {activityIndex + 1}</h4>
-        <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          onClick={() => remove(dayIndex, activityIndex)}
-        >
-          <Trash2 className='h-4 w-4' />
-        </Button>
+        <div className='flex gap-1'>
+          {moveActivity && !isFirst && (
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              onClick={() =>
+                moveActivity(dayIndex, activityIndex, activityIndex - 1)
+              }
+              title='上に移動'
+            >
+              <MoveUp className='h-4 w-4' />
+            </Button>
+          )}
+          {moveActivity && !isLast && (
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              onClick={() =>
+                moveActivity(dayIndex, activityIndex, activityIndex + 1)
+              }
+              title='下に移動'
+            >
+              <MoveDown className='h-4 w-4' />
+            </Button>
+          )}
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            onClick={() => remove(dayIndex, activityIndex)}
+            title='削除'
+          >
+            <Trash2 className='h-4 w-4' />
+          </Button>
+        </div>
       </div>
 
       <div className='space-y-2'>

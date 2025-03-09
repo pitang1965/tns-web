@@ -20,7 +20,22 @@ export function DayPlanForm({
 }: DayPlanFormProps) {
   const {
     formState: { errors },
+    watch,
+    setValue,
   } = useFormContext<ClientItineraryInput>();
+
+  const moveActivity = (dayIndex: number, fromIndex: number, toIndex: number) => {
+    const activities = watch(`dayPlans.${dayIndex}.activities`);
+    if (!activities) return;
+
+    const newActivities = [...activities];
+    const [movedItem] = newActivities.splice(fromIndex, 1);
+    newActivities.splice(toIndex, 0, movedItem);
+
+    setValue(`dayPlans.${dayIndex}.activities`, newActivities, {
+      shouldValidate: true,
+    });
+  };
 
   // 日付表示の生成
   const dayDisplay = day.date
@@ -37,6 +52,10 @@ export function DayPlanForm({
             dayIndex={dayIndex}
             activityIndex={activityIndex}
             remove={removeActivity}
+            moveActivity={moveActivity}
+            isFirst={activityIndex === 0}
+            isLast={activityIndex === day.activities.length - 1}
+            errors={errors}
           />
         ))}
 
