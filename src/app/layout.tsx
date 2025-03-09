@@ -36,7 +36,7 @@ export default function RootLayout({
               <div className='flex flex-col min-h-screen bg-background text-foreground'>
                 <Header />
                 <main className='flex-1'>
-                  {children}
+                  <div className='pt-12'>{children}</div>
                   <Toaster />
                 </main>
                 <Footer />

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
+import { ItineraryToc } from '@/components/itinerary/ItineraryToc';
 import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
 import { updateItineraryAction } from '@/actions/updateItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
@@ -17,7 +18,6 @@ type EditItineraryPageProps = {
 export default withPageAuthRequired(function EditItineraryPage({
   params,
 }: EditItineraryPageProps) {
-  const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { itinerary, loading, error } = useGetItinerary(params.id);
   const router = useRouter();
@@ -62,14 +62,19 @@ export default withPageAuthRequired(function EditItineraryPage({
 
   return (
     <main className='container mx-auto p-4'>
-      <ItineraryForm
-        initialData={itinerary}
-        onSubmit={handleSubmit}
-        title='旅程の編集'
-        description='旅程の詳細を編集してください。* の付いた項目は入力必須です。'
-        submitLabel='更新'
-        isSubmitting={isSubmitting}
-      />
+      <div className='flex gap-6'>
+        <ItineraryToc itinerary={itinerary} />
+        <div className='flex-1'>
+          <ItineraryForm
+            initialData={itinerary}
+            onSubmit={handleSubmit}
+            title='旅程の編集'
+            description='旅程の詳細を編集してください。* の付いた項目は入力必須です。'
+            submitLabel='更新'
+            isSubmitting={isSubmitting}
+          />
+        </div>
+      </div>
     </main>
   );
 });
