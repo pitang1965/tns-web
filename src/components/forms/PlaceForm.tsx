@@ -21,7 +21,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { extractCoordinatesFromGoogleMapsUrl } from '@/utils/maps';
+import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
 
 const PLACE_TYPES = {
