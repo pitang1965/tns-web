@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
+import { formatDateWithWeekday } from '@/lib/date';
 
 type DayPlanFormProps = {
   day: { date: string | null; activities: any[]; };
@@ -39,7 +40,7 @@ export function DayPlanForm({
 
   // 日付表示の生成
   const dayDisplay = day.date
-    ? `${new Date(day.date).toLocaleDateString('ja-JP')} - ${dayIndex + 1}日目`
+    ? `${dayIndex + 1}日目: ${formatDateWithWeekday(day.date)}`
     : `${dayIndex + 1}日目`;
 
   return (
