@@ -62,8 +62,10 @@ export default withPageAuthRequired(function EditItineraryPage({
 
   return (
     <main className='container mx-auto p-4'>
-      <div className='flex gap-6'>
-        <ItineraryToc itinerary={itinerary} />
+      <div className='flex flex-col md:flex-row gap-6'>
+        <div className='hidden md:block'>
+          <ItineraryToc itinerary={itinerary} />
+        </div>
         <div className='flex-1'>
           <ItineraryForm
             initialData={itinerary}
