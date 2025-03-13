@@ -16,6 +16,7 @@ export const ActivityView: React.FC<ActivityProps> = ({ activity }) => (
         startTime={activity.startTime ?? undefined}
         endTime={activity.endTime ?? undefined}
       />
+      {activity.cost && activity.cost > 0 ? `　(${activity.cost}円)` : ''}
     </div>
     <PlaceView
       name={activity.place.name}
