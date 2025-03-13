@@ -174,7 +174,17 @@ export function ActivityForm({
         <Label>予算</Label>
         <Input
           type='number'
-          {...register(`dayPlans.${dayIndex}.activities.${activityIndex}.cost`)}
+          {...register(
+            `dayPlans.${dayIndex}.activities.${activityIndex}.cost`,
+            {
+              setValueAs: (value: string) => {
+                // 空文字の場合はnullを返す
+                if (value === '') return null;
+                // 数値に変換
+                return Number(value);
+              }
+            }
+          )}
           placeholder='0'
         />
       </div>
