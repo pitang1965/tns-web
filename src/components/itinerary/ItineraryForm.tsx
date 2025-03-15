@@ -108,8 +108,18 @@ export function ItineraryForm({
   const handleFormSubmit = async (values: ClientItineraryInput) => {
     try {
       const result = await onSubmit(values);
-      if (result.success && result.id) {
-        router.push(`/itineraries/${result.id}`);
+      if (result.success) {
+        toast({
+          title: '操作が完了しました',
+          description: '正常に保存されました',
+          variant: 'default',
+        });
+
+        // submitLabel が「作成」の場合のみリダイレクト
+        if (submitLabel === '作成' && result.id) {
+          router.push(`/itineraries/${result.id}`);
+        }
+        // 「更新」の場合はリダイレクトせず、同じ画面に留まる
       } else {
         toast({
           title: '操作に失敗しました',

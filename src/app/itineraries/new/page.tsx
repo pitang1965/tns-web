@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
@@ -11,7 +11,8 @@ import { LoadingSpinner } from '@/components/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 
 export default withPageAuthRequired(function NewItineraryPage() {
-  const { user } = useUser(); // useUserを追加
+  const { user } = useUser();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
