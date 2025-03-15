@@ -127,12 +127,17 @@ export function PlaceForm({
       <div className='space-y-2'>
         <Label>場所のタイプ</Label>
         <Select
+          value={
+            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || ''
+          }
           onValueChange={(value) => {
-            register(
-              `${basePath}.place.type` as Path<ClientItineraryInput>
-            ).onChange({
-              target: { value },
-            });
+            setValue(
+              `${basePath}.place.type` as Path<ClientItineraryInput>,
+              value,
+              {
+                shouldValidate: true,
+              }
+            );
           }}
         >
           <SelectTrigger>
