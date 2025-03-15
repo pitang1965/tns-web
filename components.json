@@ -15,6 +15,7 @@
     "data": "@/data",
     "hooks": "@/hooks",
     "lib": "@/lib",
+    "utils": "@/utils",
     "actions": "@/actions"
   }
 }
