@@ -66,7 +66,6 @@ const MapComponent: React.FC<MapProps> = ({
 
     // マップが存在する場合は位置を更新
     if (map.current) {
-      console.log('Updating map position to:', [longitude, latitude]);
       map.current.setCenter([longitude, latitude]);
 
       // マーカーも更新

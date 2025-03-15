@@ -81,7 +81,6 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
 export async function getItineraryById(
   id: string
 ): Promise<ClientItineraryDocument | null> {
-  const user = await getAuthenticatedUser();
   const db = await getDatabase();
 
   try {
