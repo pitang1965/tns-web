@@ -38,7 +38,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
     <Card className='flex flex-col h-full'>
       <Link
         href={`/itineraries/${itinerary.id}`}
-        className='flex-grow hover:opacity-80 transition-opacity duration-300'
+        className='grow hover:opacity-80 transition-opacity duration-300'
       >
         <CardHeader>
           <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
