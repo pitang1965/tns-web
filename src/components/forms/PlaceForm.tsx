@@ -128,7 +128,7 @@ export function PlaceForm({
         <Label>場所のタイプ</Label>
         <Select
           value={
-            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || ''
+            String(watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '')
           }
           onValueChange={(value) => {
             setValue(
