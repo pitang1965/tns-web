@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,6 @@ import {
   ClientItineraryDocument,
 } from '@/data/schemas/itinerarySchema';
 import { DayPlanForm } from '@/components/forms/DayPlanForm';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -23,9 +22,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { TransportationType } from '@/components/TransportationBadge';
+import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 
 type ItineraryFormProps = {
-  initialData?: ClientItineraryDocument;
+  initialData?: ClientItineraryDocument & { _id?: string };
   onSubmit: (
     data: ClientItineraryInput
   ) => Promise<{ success: boolean; id?: string; error?: string }>;
@@ -60,6 +60,12 @@ export function ItineraryForm({
   const router = useRouter();
   const { toast } = useToast();
 
+  // カスタムダーティフラグを追加
+  const [formModified, setFormModified] = useState(false);
+
+  const isCreating = submitLabel === '作成';
+  const itineraryId = initialData?._id;
+
   const methods = useForm<ClientItineraryInput>({
     resolver: zodResolver(clientItinerarySchema),
     defaultValues: initialData || DEFAULT_ITINERARY,
@@ -67,13 +73,42 @@ export function ItineraryForm({
   });
 
   const {
-    formState: { isValid, errors },
+    formState: { errors },
     watch,
     setValue,
     trigger,
     register,
     handleSubmit,
   } = methods;
+
+  // フォームの初期化後にダーティフラグをリセットする
+  useEffect(() => {
+    // コンポーネント初期化後に少し遅延してリセット
+    const timer = setTimeout(() => {
+      setFormModified(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // formが変更された時にダーティフラグをセット
+  const handleInputChange = () => {
+    setFormModified(true);
+  };
+
+  // 戻るボタン処理
+  const handleBack = () => {
+    if (formModified) {
+      if (confirm('入力内容は破棄されます。よろしいですか？')) {
+        router.push(
+          isCreating ? '/itineraries' : `/itineraries/${itineraryId}`
+        );
+      }
+    } else {
+      // 変更がない場合は確認なしで戻る
+      router.push(isCreating ? '/itineraries' : `/itineraries/${itineraryId}`);
+    }
+  };
 
   // 日付の監視と dayPlans の自動生成
   useEffect(() => {
@@ -116,7 +151,7 @@ export function ItineraryForm({
         });
 
         // submitLabel が「作成」の場合のみリダイレクト
-        if (submitLabel === '作成' && result.id) {
+        if (isCreating && result.id) {
           router.push(`/itineraries/${result.id}`);
         }
         // 「更新」の場合はリダイレクトせず、同じ画面に留まる
@@ -206,6 +241,22 @@ export function ItineraryForm({
     return result;
   };
 
+  const handleSave = () => {
+    return handleSubmit((data) => {
+      console.log('更新ボタンがクリックされました。データ:', data);
+      setFormModified(false);
+      return handleFormSubmit(data);
+    })();
+  };
+
+  const handleCreate = () => {
+    return handleSubmit((data) => {
+      setFormModified(false);
+      console.log('作成ボタンがクリックされました。データ:', data);
+      return handleFormSubmit(data);
+    })();
+  };
+
   return (
     <Card className='max-w-2xl mx-auto'>
       <CardHeader>
@@ -215,6 +266,7 @@ export function ItineraryForm({
       <CardContent>
         <FormProvider {...methods}>
           <form
+            onChange={handleInputChange}
             onSubmit={(e) => {
               handleSubmit((data) => {
                 console.log(
@@ -309,9 +361,13 @@ export function ItineraryForm({
                   </pre>
                 </div>
               )}
-            <Button type='submit' className='w-full' disabled={isSubmitting}>
-              {submitLabel}
-            </Button>
+            <FixedActionButtons
+              mode={isCreating ? 'create' : 'edit'}
+              onBack={handleBack}
+              onSave={isCreating ? undefined : handleSave}
+              onCreate={isCreating ? handleCreate : undefined}
+              disabled={isSubmitting}
+            />
           </form>
         </FormProvider>
       </CardContent>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/navigation';
 import { ItineraryToc } from '@/components/itinerary/ItineraryToc';
 import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
 import { updateItineraryAction } from '@/actions/updateItinerary';
@@ -20,7 +19,6 @@ export default withPageAuthRequired(function EditItineraryPage({
 }: EditItineraryPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { itinerary, loading, error } = useGetItinerary(params.id);
-  const router = useRouter();
 
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data for update:', data);
