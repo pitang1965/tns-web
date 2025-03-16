@@ -1,8 +1,31 @@
 import { z } from 'zod';
-import { objectIdSchema } from './commonSchemas';
 import { userReferenceSchema } from './userSchema';
 import { activitySchema } from './activitySchema';
 import { transportationSchema } from './transportationSchema';
+
+// MongoDBのObjectIdをブラウザでも使える形で定義
+// 実際のimportはサーバー側のコードでのみ行う
+type ObjectId = any; // ブラウザでの型エラーを防ぐためのプレースホルダー
+let mongoObjectId: any = null;
+
+// サーバーサイドでのみMongoDBをインポート
+if (typeof window === 'undefined') {
+  // サーバーサイドの場合のみmongodbをインポート
+  const mongodb = require('mongodb');
+  mongoObjectId = mongodb.ObjectId;
+}
+
+// MongoDBのObjectId用のスキーマ定義（型安全なバージョン）
+export const objectIdSchema = z.custom<ObjectId>((val) => {
+  // サーバーサイドの場合は実際のObjectIdクラスを使用
+  if (typeof window === 'undefined' && mongoObjectId) {
+    if (val instanceof mongoObjectId) return true;
+    if (typeof val === 'string' && mongoObjectId.isValid(val)) return true;
+    return false;
+  }
+  // クライアントサイドの場合は緩い検証（文字列かどうか）
+  return typeof val === 'string' || val === undefined || val === null;
+});
 
 // Day plan schema
 const dayPlanSchema = z.object({
@@ -29,7 +52,7 @@ const baseSchema = z.object({
 // MongoDB用のドキュメント型
 export const serverItinerarySchema = baseSchema.merge(
   z.object({
-    _id: objectIdSchema.optional(),
+    _id: objectIdSchema.optional(), // ObjectId型として定義
     createdAt: z.date(),
     updatedAt: z.date(),
   })
@@ -43,6 +66,7 @@ export const clientItinerarySchema = baseSchema.merge(
     updatedAt: z.string().optional(),
   })
 );
+
 // 型定義
 export type DayPlan = z.infer<typeof dayPlanSchema>;
 
@@ -60,7 +84,7 @@ export type ClientItineraryInput = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >;
 
-// Helper function
+// Helper function - サーバー側でのみ使用
 export function toClientItinerary(
   doc: ServerItineraryDocument
 ): ClientItineraryDocument {
@@ -77,8 +101,16 @@ export function toClientItinerary(
       ? doc.updatedAt
       : doc.updatedAt.toISOString();
 
+  // ObjectIdの処理（サーバーサイドの場合）
+  const idStr =
+    typeof _id === 'string'
+      ? _id
+      : mongoObjectId && _id instanceof mongoObjectId
+      ? _id.toString()
+      : _id;
+
   return {
-    id: _id, // すでに文字列なのでそのまま使用
+    id: idStr,
     ...rest,
     createdAt: createdAtStr,
     updatedAt: updatedAtStr,

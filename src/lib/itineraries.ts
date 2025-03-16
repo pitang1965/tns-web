@@ -69,40 +69,40 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
     .find({ 'owner.id': user.sub })
     .toArray();
 
-  // ObjectIdを文字列に変換
-  const itinerariesWithStringId = itineraries.map((doc) => ({
-    ...doc,
-    _id: doc._id.toString(),
-  }));
-
-  return itinerariesWithStringId.map(toClientItinerary);
+  return itineraries.map(toClientItinerary);
 }
 
+// 以下の関数はサーバーサイドでのみ使用します
 export async function getItineraryById(
   id: string
 ): Promise<ClientItineraryDocument | null> {
-  const db = await getDatabase();
+  const client = await clientPromise;
+  const db = client.db('itinerary_db');
 
   try {
-    const objectId = new ObjectId(id);
-    const itinerary = await db
-      .collection<ServerItineraryDocument>('itineraries')
-      .findOne({ _id: objectId.toString() });
-
-    if (!itinerary) {
-      console.log('itinerary is null');
+    // 有効なObjectIdかチェック
+    if (!ObjectId.isValid(id)) {
+      console.log(`Invalid ObjectId format: ${id}`);
       return null;
     }
 
-    // console.log('itinerary: ', JSON.stringify(itinerary, null, 2));
+    // ObjectIdを正しく使用
+    const objectId = new ObjectId(id);
+    console.log(`Finding itinerary with _id: ${objectId}`);
 
-    // ObjectIdを文字列に変換
-    const itineraryWithStringId = {
-      ...itinerary,
-      _id: itinerary._id.toString(),
-    };
+    const itinerary = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .findOne({ _id: objectId });
 
-    return toClientItinerary(itineraryWithStringId);
+    if (!itinerary) {
+      console.log(`Itinerary not found for id: ${id}`);
+      return null;
+    }
+
+    console.log(`Itinerary found: ${itinerary.title}`);
+
+    // toClientItinerary関数を使用して変換
+    return toClientItinerary(itinerary);
   } catch (error) {
     console.error('Error in getItineraryById:', error);
     return null;
