@@ -68,7 +68,7 @@ export default withPageAuthRequired(function EditItineraryPage({
           <ItineraryForm
             initialData={itinerary}
             onSubmit={handleSubmit}
-            title='旅程の編集'
+            title='旅程編集'
             description='旅程の詳細を編集してください。* の付いた項目は入力必須です。'
             submitLabel='更新'
             isSubmitting={isSubmitting}
