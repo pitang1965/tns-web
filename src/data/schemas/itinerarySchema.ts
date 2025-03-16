@@ -1,31 +1,8 @@
 import { z } from 'zod';
+import { objectIdSchema } from './commonSchemas';
 import { userReferenceSchema } from './userSchema';
 import { activitySchema } from './activitySchema';
 import { transportationSchema } from './transportationSchema';
-
-// MongoDBのObjectIdをブラウザでも使える形で定義
-// 実際のimportはサーバー側のコードでのみ行う
-type ObjectId = any; // ブラウザでの型エラーを防ぐためのプレースホルダー
-let mongoObjectId: any = null;
-
-// サーバーサイドでのみMongoDBをインポート
-if (typeof window === 'undefined') {
-  // サーバーサイドの場合のみmongodbをインポート
-  const mongodb = require('mongodb');
-  mongoObjectId = mongodb.ObjectId;
-}
-
-// MongoDBのObjectId用のスキーマ定義（型安全なバージョン）
-export const objectIdSchema = z.custom<ObjectId>((val) => {
-  // サーバーサイドの場合は実際のObjectIdクラスを使用
-  if (typeof window === 'undefined' && mongoObjectId) {
-    if (val instanceof mongoObjectId) return true;
-    if (typeof val === 'string' && mongoObjectId.isValid(val)) return true;
-    return false;
-  }
-  // クライアントサイドの場合は緩い検証（文字列かどうか）
-  return typeof val === 'string' || val === undefined || val === null;
-});
 
 // Day plan schema
 const dayPlanSchema = z.object({
@@ -102,12 +79,26 @@ export function toClientItinerary(
       : doc.updatedAt.toISOString();
 
   // ObjectIdの処理（サーバーサイドの場合）
-  const idStr =
-    typeof _id === 'string'
-      ? _id
-      : mongoObjectId && _id instanceof mongoObjectId
-      ? _id.toString()
-      : _id;
+  let idStr = '';
+  if (typeof window === 'undefined') {
+    try {
+      const mongodb = require('mongodb');
+      const mongoObjectId = mongodb.ObjectId;
+
+      idStr =
+        typeof _id === 'string'
+          ? _id
+          : mongoObjectId && _id instanceof mongoObjectId
+          ? _id.toString()
+          : String(_id);
+    } catch {
+      // mongodbが利用できない場合
+      idStr = String(_id);
+    }
+  } else {
+    // クライアントサイドの場合
+    idStr = String(_id);
+  }
 
   return {
     id: idStr,
