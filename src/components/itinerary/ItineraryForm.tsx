@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/card';
 import { TransportationType } from '@/components/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
+import { DayPagination } from '@/components/itinerary/DayPagination'; // 既存のDayPaginationコンポーネントをインポート
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -138,7 +139,13 @@ export function ItineraryForm({
     });
 
     setValue('dayPlans', newDayPlans);
-  }, [watch('startDate'), watch('numberOfDays'), setValue, initialData]);
+  }, [
+    watch('startDate'),
+    watch('numberOfDays'),
+    setValue,
+    initialData,
+    trigger,
+  ]);
 
   const handleFormSubmit = async (values: ClientItineraryInput) => {
     try {
@@ -257,6 +264,32 @@ export function ItineraryForm({
     })();
   };
 
+  // DayPlanFormをレンダリングする関数
+  const renderDayPlanForm = (day: any, index: number) => {
+    return (
+      <DayPlanForm
+        key={index}
+        day={day}
+        dayIndex={index}
+        addActivity={addActivity}
+        removeActivity={removeActivity}
+      />
+    );
+  };
+
+  // ページネーションの上部に日数表示を追加
+  const renderPaginationHeader = (currentIndex: number) => {
+    const numberOfDays = watch('numberOfDays') || 0;
+    return (
+      <div className='flex justify-between items-center mb-2'>
+        <h3 className='text-lg font-medium'>日程詳細</h3>
+        <span className='text-sm text-gray-500'>
+          {currentIndex + 1} / {numberOfDays}日目
+        </span>
+      </div>
+    );
+  };
+
   return (
     <Card className='max-w-2xl mx-auto'>
       <CardHeader>
@@ -341,16 +374,22 @@ export function ItineraryForm({
               )}
             </div>
             <div className='space-y-4'>
-              <h3 className='text-lg font-medium'>日程詳細</h3>
-              {watch('dayPlans')?.map((day, dayIndex) => (
-                <DayPlanForm
-                  key={dayIndex}
-                  day={day}
-                  dayIndex={dayIndex}
-                  addActivity={addActivity}
-                  removeActivity={removeActivity}
-                />
-              ))}
+              {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
+              {watch('dayPlans')?.length > 0 && (
+                <>
+                  {/* DayPaginationコンポーネントの使用 */}
+                  <DayPagination
+                    dayPlans={watch('dayPlans')}
+                    renderDayPlan={(dayPlan, index) => (
+                      <>
+                        {/* 各ページの上部に現在の日数表示を追加 */}
+                        {renderPaginationHeader(index)}
+                        {renderDayPlanForm(dayPlan, index)}
+                      </>
+                    )}
+                  />
+                </>
+              )}
             </div>
             {process.env.NODE_ENV === 'development' &&
               Object.keys(errors).length > 0 && (

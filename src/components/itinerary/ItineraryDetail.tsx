@@ -12,6 +12,7 @@ import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
+import { DayPagination } from '@/components/itinerary/DayPagination'; // 新しく作成したコンポーネントをインポート
 
 type ItineraryDetailProps = {
   id: string;
@@ -40,6 +41,11 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     router.push('/itineraries');
   };
 
+  // 日ごとの旅程をレンダリングする関数
+  const renderDayPlan = (day: DayPlan, index: number) => {
+    return <DayPlanView key={index} day={day} />;
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -62,10 +68,12 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           <ItineraryHeader itinerary={itinerary} />
 
           <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
+
           {itinerary.dayPlans?.length > 0 ? (
-            itinerary.dayPlans.map((day: DayPlan, index: number) => (
-              <DayPlanView key={index} day={day} />
-            ))
+            <DayPagination
+              dayPlans={itinerary.dayPlans}
+              renderDayPlan={renderDayPlan}
+            />
           ) : (
             <p className='text-center text-gray-600 dark:text-gray-400'>
               まだ旅程の詳細が登録されていません。「編集」ボタンから旅程を追加してください。
