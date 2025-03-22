@@ -14,7 +14,7 @@ import {
 import {
   TransportationBadge,
   TransportationType,
-} from '@/components/common/TransportationBadge';
+} from '@/components/itinerary/TransportationBadge';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 

@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { TransportationType } from '@/components/common/TransportationBadge';
+import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { DayPagination } from '@/components/itinerary/DayPagination'; // 既存のDayPaginationコンポーネントをインポート
 

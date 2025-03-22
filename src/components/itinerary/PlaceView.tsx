@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlaceTypeBadge } from '@/components/common/PlaceTypeBadge';
+import { PlaceTypeBadge } from '@/components/itinerary/PlaceTypeBadge';
 import { AddressView } from './AddressView';
 import { LocationView } from './LocationView';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
