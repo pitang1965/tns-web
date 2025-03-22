@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Path, useFormContext } from 'react-hook-form';
 import { MapPin } from 'lucide-react';
 import { LocationView } from '@/components/itinerary/LocationView';
+import { PlaceNavigationButton } from '@/components/itinerary//PlaceNavigationButton';
+import { GoogleMapsCoordinatesButton } from '@/components/itinerary/GoogleMapsCoordinatesButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -81,39 +83,6 @@ export function PlaceForm({
 
   const { toast } = useToast();
 
-  const handleGoogleMapsUrl = async () => {
-    try {
-      const clipboardText = await navigator.clipboard.readText();
-      const coords = extractCoordinatesFromGoogleMapsUrl(clipboardText);
-
-      if (coords) {
-        console.log(coords);
-        setValue(latPath, coords.latitude.toString());
-        setValue(lonPath, coords.longitude.toString());
-        // バリデーションを実行
-        await trigger([latPath, lonPath]);
-      } else {
-        console.error('クリップボードのテキストに有効な座標が見つかりません。');
-        toast({
-          title: 'Google Mapsから取得',
-          description: 'クリップボードのテキストに有効な座標が見つかりません。',
-          variant: 'destructive',
-        });
-        setValue(latPath, '');
-        setValue(lonPath, '');
-      }
-    } catch (error) {
-      console.error('クリップボードの読み取りに失敗しました:', error);
-      toast({
-        title: 'Google Mapsから取得',
-        description: 'クリップボードの読み取りに失敗しました',
-        variant: 'destructive',
-      });
-      setValue(latPath, '');
-      setValue(lonPath, '');
-    }
-  };
-
   return (
     <div className='space-y-4'>
       <div className='space-y-2'>
@@ -127,9 +96,9 @@ export function PlaceForm({
       <div className='space-y-2'>
         <Label>場所のタイプ</Label>
         <Select
-          value={
-            String(watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '')
-          }
+          value={String(
+            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || ''
+          )}
           onValueChange={(value) => {
             setValue(
               `${basePath}.place.type` as Path<ClientItineraryInput>,
@@ -216,18 +185,19 @@ export function PlaceForm({
       </div>
 
       <div className='space-y-2'>
-        <div className='flex items-center justify-between'>
-          <Label>座標</Label>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='flex items-center gap-2 text-sm'
-            onClick={handleGoogleMapsUrl}
-          >
-            <MapPin className='w-4 h-4' />
-            Google Mapsから取得
-          </Button>
+        <div className='flex items-center gap-2'>
+          <Label className='mr-auto'>座標</Label>
+          <PlaceNavigationButton
+            latitude={location?.latitude}
+            longitude={location?.longitude}
+          />
+          <GoogleMapsCoordinatesButton
+            onCoordinatesExtracted={(lat, lng) => {
+              setValue(latPath, lat);
+              setValue(lonPath, lng);
+              trigger([latPath, lonPath]);
+            }}
+          />
         </div>
         <div className='flex gap-2'>
           <div className='flex-1'>
