@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 
 const DynamicMap = dynamic(() => import('@/components/common/Map'), {
   ssr: false,
-  loading: () => <p>地図の読込中...</p>,
+  loading: () => <p>地図の読み込み中...</p>,
 });
 
 export default function ClientHome() {
