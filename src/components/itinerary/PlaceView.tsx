@@ -16,11 +16,11 @@ export const PlaceView: React.FC<PlaceProps> = ({
   <div className='mt-1'>
     <div className='flex items-center gap-2'>
       <PlaceTypeBadge type={type} />
+      <span className='font-medium'>{name}</span>
       <PlaceNavigationButton
         latitude={location?.latitude}
         longitude={location?.longitude}
       />
-      <span className='font-medium'>{name}</span>
     </div>
     {address && <AddressView address={address} />}
     {location && <LocationView location={location} />}
