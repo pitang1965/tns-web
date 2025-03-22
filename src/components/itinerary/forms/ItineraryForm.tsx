@@ -9,7 +9,7 @@ import {
   ClientItineraryInput,
   ClientItineraryDocument,
 } from '@/data/schemas/itinerarySchema';
-import { DayPlanForm } from '@/components/forms/DayPlanForm';
+import { DayPlanForm } from '@/components/itinerary/forms/DayPlanForm';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { TransportationType } from '@/components/TransportationBadge';
+import { TransportationType } from '@/components/common/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { DayPagination } from '@/components/itinerary/DayPagination'; // 既存のDayPaginationコンポーネントをインポート
 

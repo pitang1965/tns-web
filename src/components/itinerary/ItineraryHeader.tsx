@@ -2,7 +2,7 @@ import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import {
   TransportationBadge,
   TransportationType,
-} from '@/components/TransportationBadge';
+} from '@/components/common/TransportationBadge';
 
 const getTransportationType = (
   transportation: ClientItineraryDocument['transportation']

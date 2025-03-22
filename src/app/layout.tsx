@@ -3,11 +3,11 @@ import type { Metadata } from 'next';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/ThemeProvider';
+import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });

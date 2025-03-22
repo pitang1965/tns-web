@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-const DynamicMap = dynamic(() => import('@/components/Map'), {
+const DynamicMap = dynamic(() => import('@/components/common/Map'), {
   ssr: false,
   loading: () => <p>地図の読込中...</p>,
 });

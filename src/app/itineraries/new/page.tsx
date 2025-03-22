@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
-import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
+import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/components/TransportationBadge';
-import { LoadingSpinner } from '@/components/loading-spinner';
+import { TransportationType } from '@/components/common/TransportationBadge';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 
 export default withPageAuthRequired(function NewItineraryPage() {

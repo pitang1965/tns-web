@@ -2,7 +2,7 @@
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
-import { LoadingSpinner } from '@/components/loading-spinner';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 type UserInfoProps = {
   label: string;

@@ -1,6 +1,6 @@
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PlaceView } from './PlaceView';
-import { TimeRangeDisplay } from '@/components/TimeRangeDisplay';
+import { TimeRangeDisplay } from '@/components/common/TimeRangeDisplay';
 
 type AcitivityType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];

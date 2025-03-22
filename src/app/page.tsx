@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getSession } from '@auth0/nextjs-auth0';
-import PublicHome from '@/components/PublicHome';
-import LoggedInHome from '@/components/LoggedInHome';
+import PublicHome from '@/components/common/PublicHome';
+import LoggedInHome from '@/components/common/LoggedInHome';
 
 export const metadata: Metadata = {
   title: '旅のしおり | あなたの旅行計画をサポート',
@@ -28,6 +28,6 @@ export default async function Home() {
   if (session?.user) {
     return <LoggedInHome userName={session.user.name || 'ゲスト'} />;
   } else {
-    return (<PublicHome />)
+    return <PublicHome />;
   }
 }

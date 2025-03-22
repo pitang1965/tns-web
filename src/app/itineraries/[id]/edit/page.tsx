@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { ItineraryToc } from '@/components/itinerary/ItineraryToc';
-import { ItineraryForm } from '@/components/itinerary/ItineraryForm';
+import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { updateItineraryAction } from '@/actions/updateItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { useGetItinerary } from '@/hooks/useGetItinerary';

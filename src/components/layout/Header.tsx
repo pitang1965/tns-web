@@ -4,10 +4,10 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { LoginButton } from '@/components/auth/LoginButton';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { UserAvatar } from '@/components/UserAvatar';
+import { UserAvatar } from '@/components/common/UserAvatar';
 import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
-import { LoadingSpinner } from '@/components/loading-spinner';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 export function Header() {
   const { user, error, isLoading } = useUser();

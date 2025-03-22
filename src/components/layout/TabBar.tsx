@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
 import { Info, Search, BookHeart, CircleUser } from 'lucide-react';
-import { LoadingSpinner } from '@/components/loading-spinner';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 const activeClassNames = 'text-blue-500 dark:text-blue-400';
 const inactiveClassNames = 'text-gray-600 dark:text-gray-400';

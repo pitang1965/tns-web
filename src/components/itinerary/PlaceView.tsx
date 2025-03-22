@@ -1,10 +1,10 @@
 import React from 'react';
-import { PlaceTypeBadge } from '@/components/PlaceTypeBadge';
+import { PlaceTypeBadge } from '@/components/common/PlaceTypeBadge';
 import { AddressView } from './AddressView';
 import { LocationView } from './LocationView';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 type PlaceProps =
-ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
+  ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
 
 export const PlaceView: React.FC<PlaceProps> = ({
   name,
