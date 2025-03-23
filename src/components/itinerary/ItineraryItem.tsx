@@ -36,34 +36,37 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
 
   return (
     <Card className='flex flex-col h-full'>
-      <Link
-        href={`/itineraries/${itinerary.id}`}
-        className='grow hover:opacity-80 transition-opacity duration-300'
-      >
-        <CardHeader>
-          <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
-          {itinerary.transportation && (
-            <TransportationBadge
-              type={
-                (itinerary.transportation.type as TransportationType) || 'OTHER'
-              }
-            />
-          )}
-        </CardHeader>
-        <CardContent>
-          <CardDescription className='mb-2'>
-            {itinerary.startDate} から {itinerary.numberOfDays}日間
-          </CardDescription>
-          <CardDescription className='line-clamp-3'>
-            {itinerary.description}
-          </CardDescription>
-        </CardContent>
-      </Link>
+      <CardHeader>
+        <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
+        {itinerary.transportation && (
+          <TransportationBadge
+            type={
+              (itinerary.transportation.type as TransportationType) || 'OTHER'
+            }
+          />
+        )}
+      </CardHeader>
+      <CardContent>
+        <CardDescription className='mb-2'>
+          {itinerary.startDate} から {itinerary.numberOfDays}日間
+        </CardDescription>
+        <CardDescription className='line-clamp-3'>
+          {itinerary.description}
+        </CardDescription>
+      </CardContent>
       <CardFooter className='mt-auto'>
         <div className='flex gap-2 w-full'>
           <Button
             size='sm'
-            className='flex-1'
+            variant='secondary'
+            className='flex-1 cursor-pointer'
+            onClick={() => router.push(`/itineraries/${itinerary.id}`)}
+          >
+            見る
+          </Button>
+          <Button
+            size='sm'
+            className='flex-1 cursor-pointer'
             onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
           >
             編集
@@ -71,7 +74,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
           <Button
             variant='destructive'
             size='sm'
-            className='flex-1'
+            className='flex-1 cursor-pointer'
             onClick={() => setIsConfirmOpen(true)}
           >
             削除
