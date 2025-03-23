@@ -24,9 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ja'>
-      <ErrorBoundary>
-        <UserProvider>
-          <body className={inter.className}>
+      <body className={inter.className}>
+        <ErrorBoundary>
+          <UserProvider>
             <ThemeProvider
               attribute='class'
               defaultTheme='system'
@@ -42,9 +42,9 @@ export default function RootLayout({
                 <Footer />
               </div>
             </ThemeProvider>
-          </body>
-        </UserProvider>
-      </ErrorBoundary>
+          </UserProvider>
+        </ErrorBoundary>
+      </body>
     </html>
   );
 }

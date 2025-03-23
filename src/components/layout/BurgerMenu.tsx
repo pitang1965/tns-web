@@ -27,7 +27,7 @@ export function BurgerMenu() {
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger>
         <Button variant='outline'>
           <svg
             className='w-5 h-5'

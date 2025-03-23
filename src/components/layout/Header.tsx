@@ -3,7 +3,7 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { LoginButton } from '@/components/auth/LoginButton';
-import { ModeToggle } from '@/components/ui/mode-toggle';
+import { ModeToggle } from '@/components/common/ModeToggle';
 import { UserAvatar } from '@/components/common/UserAvatar';
 import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
