@@ -55,7 +55,7 @@ dependencies:
     version: 3.10.0
   mongodb:
     specifier: ^6.9.0
-    version: 6.14.1
+    version: 6.15.0
   mongoose:
     specifier: ^8.7.0
     version: 8.10.1
@@ -4682,7 +4682,7 @@ packages:
     resolution: {integrity: sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA==}
     dependencies:
       '@types/whatwg-url': 11.0.5
-      whatwg-url: 14.1.1
+      whatwg-url: 14.2.0
     dev: false
 
   /mongodb@6.13.1:
@@ -4717,8 +4717,8 @@ packages:
       mongodb-connection-string-url: 3.0.2
     dev: false
 
-  /mongodb@6.14.1:
-    resolution: {integrity: sha512-GnHWIm4GtgREkssWRv9vYKNvqwbLd8WL5hCW3nCqzI2OxEZ6Q5g6vc3J6L1Grz0x1hx1wmYAprLlRr3kzBLcJg==}
+  /mongodb@6.15.0:
+    resolution: {integrity: sha512-ifBhQ0rRzHDzqp9jAQP6OwHSH7dbYIQjD3SbJs9YYk9AikKEettW/9s/tbSFDTpXcRbF+u1aLrhHxDFaYtZpFQ==}
     engines: {node: '>=16.20.1'}
     peerDependencies:
       '@aws-sdk/credential-providers': ^3.188.0
@@ -5782,8 +5782,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
-  /tr46@5.0.0:
-    resolution: {integrity: sha512-tk2G5R2KRwBd+ZN0zaEXpmzdKyOYksXwywulIX95MBODjSzMIuQnQ3m8JxgbhnL1LeVo7lqQKsYa1O3Htl7K5g==}
+  /tr46@5.1.0:
+    resolution: {integrity: sha512-IUWnUK7ADYR5Sl1fZlO1INDUhVhatWl7BtJWsIhwJ0UAK7ilzzIa8uIqOO/aYVWHZPJkKbEL+362wrzoeRF7bw==}
     engines: {node: '>=18'}
     dependencies:
       punycode: 2.3.1
@@ -6065,11 +6065,11 @@ packages:
       - uglify-js
     dev: false
 
-  /whatwg-url@14.1.1:
-    resolution: {integrity: sha512-mDGf9diDad/giZ/Sm9Xi2YcyzaFpbdLpJPr+E9fSkyQ7KpQD4SdFcugkRQYzhmfI4KeV4Qpnn2sKPdo+kmsgRQ==}
+  /whatwg-url@14.2.0:
+    resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
     engines: {node: '>=18'}
     dependencies:
-      tr46: 5.0.0
+      tr46: 5.1.0
       webidl-conversions: 7.0.0
     dev: false
 
