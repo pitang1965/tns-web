@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import {
 } from '@/components/itinerary/TransportationBadge';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
+import { formatDateWithWeekday } from '@/lib/date';
 
 type Props = {
   itinerary: ClientItineraryDocument;
@@ -48,7 +48,8 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>
-          {itinerary.startDate} から {itinerary.numberOfDays}日間
+          {itinerary.startDate && formatDateWithWeekday(itinerary.startDate)} から{' '}
+          {itinerary.numberOfDays}日間
         </CardDescription>
         <CardDescription className='line-clamp-3'>
           {itinerary.description}
