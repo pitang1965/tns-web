@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 export default withPageAuthRequired(
   async function Itineraries() {
     const itineraries = await getItineraries();
-    // console.log('--- itineraries: ', JSON.stringify(itineraries, null, 2));
 
     return (
       <main className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>

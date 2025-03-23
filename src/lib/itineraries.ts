@@ -64,12 +64,36 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
 
-  const itineraries = await db
-    .collection<ServerItineraryDocument>('itineraries')
-    .find({ 'owner.id': user.sub })
-    .toArray();
+  try {
+    const itineraries = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .find({ 'owner.id': user.sub })
+      .toArray();
 
-  return itineraries.map(toClientItinerary);
+    return itineraries.map(toClientItinerary);
+  } catch (error) {
+    console.error('Error in getItineraries:', error);
+    return [];
+  }
+}
+
+export async function getPublicItineraries(): Promise<
+  ClientItineraryDocument[]
+> {
+  const db = await getDatabase();
+
+  try {
+    const itineraries = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .find({ isPublic: true })
+      .sort({ updatedAt: -1 })
+      .toArray();
+
+    return itineraries.map(toClientItinerary);
+  } catch (error) {
+    console.error('Error in getPublicItineraries:', error);
+    return [];
+  }
 }
 
 // 以下の関数はサーバーサイドでのみ使用します
@@ -174,6 +198,3 @@ export async function updateItinerary(
     throw error;
   }
 }
-
-// TODO: 他の必要なAPI関数をここに追加
-// 例: deleteItinerary など
