@@ -65,7 +65,7 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
   // 有効な座標の場合はドロップダウンメニューを表示
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className='flex items-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground'>
+      <DropdownMenuTrigger className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'>
         <MapPin className='w-4 h-4' />
         地図を開く
       </DropdownMenuTrigger>

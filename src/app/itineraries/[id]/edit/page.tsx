@@ -59,12 +59,12 @@ export default withPageAuthRequired(function EditItineraryPage({
   }
 
   return (
-    <main className='container mx-auto p-4'>
-      <div className='flex flex-col md:flex-row gap-6'>
-        <div className='hidden md:block'>
+    <main className='min-w-[320px]'>
+      <div className='flex flex-col lg:flex-row gap-6'>
+        <div className='hidden lg:block w-1/4 max-w-[250px]'>
           <ItineraryToc itinerary={itinerary} />
         </div>
-        <div className='flex-1'>
+        <div className='flex-1 min-w-0 sm:min-w-[320px]'>
           <ItineraryForm
             initialData={itinerary}
             onSubmit={handleSubmit}

@@ -185,19 +185,23 @@ export function PlaceForm({
       </div>
 
       <div className='space-y-2'>
-        <div className='flex items-center gap-2'>
-          <Label className='mr-auto'>座標</Label>
-          <PlaceNavigationButton
-            latitude={location?.latitude}
-            longitude={location?.longitude}
-          />
-          <GoogleMapsCoordinatesButton
-            onCoordinatesExtracted={(lat, lng) => {
-              setValue(latPath, lat);
-              setValue(lonPath, lng);
-              trigger([latPath, lonPath]);
-            }}
-          />
+        <div>
+          <Label className='whitespace-nowrap block mb-2'>座標</Label>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
+            <PlaceNavigationButton
+              latitude={location?.latitude}
+              longitude={location?.longitude}
+              className='whitespace-nowrap'
+            />
+            <GoogleMapsCoordinatesButton
+              onCoordinatesExtracted={(lat, lng) => {
+                setValue(latPath, lat);
+                setValue(lonPath, lng);
+                trigger([latPath, lonPath]);
+              }}
+              className='whitespace-nowrap'
+            />
+          </div>
         </div>
         <div className='flex gap-2'>
           <div className='flex-1'>
