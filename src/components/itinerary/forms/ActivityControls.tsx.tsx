@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 
 type ActivityControlsProps = {
   dayIndex: number;
@@ -35,9 +36,9 @@ export function ActivityControls({
   onShiftSubsequentActivities,
 }: ActivityControlsProps) {
   const [isTimeShiftDialogOpen, setIsTimeShiftDialogOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleShiftSubsequentActivities = () => {
-    console.log('Dialog open triggered'); // デバッグログ
     setIsTimeShiftDialogOpen(true);
   };
 
@@ -50,6 +51,8 @@ export function ActivityControls({
       onShiftSubsequentActivities(dayIndex, activityIndex, delayMinutes);
     }
   };
+
+  const handleDelete = async () => remove(dayIndex, activityIndex);
 
   return (
     <>
@@ -84,7 +87,7 @@ export function ActivityControls({
           type='button'
           variant='ghost'
           size='sm'
-          onClick={() => remove(dayIndex, activityIndex)}
+          onClick={() => setIsConfirmOpen(true)}
           title='削除'
         >
           <Trash2 className='h-4 w-4' />
@@ -113,6 +116,15 @@ export function ActivityControls({
         onConfirm={handleTimeShiftConfirm}
         dayIndex={dayIndex}
         activityIndex={activityIndex}
+      />
+      <ConfirmationDialog
+        isOpen={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        title='アクティビティの削除'
+        description='このアクティビィティを削除してもよろしいですか？'
+        confirmLabel='削除'
+        onConfirm={handleDelete}
+        variant='destructive'
       />
     </>
   );
