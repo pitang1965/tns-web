@@ -41,9 +41,13 @@ export function ActivityControls({
     setIsTimeShiftDialogOpen(true);
   };
 
-  const handleTimeShiftConfirm = (minutes: number) => {
+  const handleTimeShiftConfirm = (
+    dayIndex: number,
+    activityIndex: number,
+    delayMinutes: number
+  ) => {
     if (onShiftSubsequentActivities) {
-      onShiftSubsequentActivities(dayIndex, activityIndex, minutes);
+      onShiftSubsequentActivities(dayIndex, activityIndex, delayMinutes);
     }
   };
 

@@ -32,7 +32,7 @@ export function ActivityForm({
     register,
     formState: { errors },
   } = useFormContext<ClientItineraryInput>();
-
+  const { getValues, setValue } = useFormContext<ClientItineraryInput>();
   const basePath = `dayPlans.${dayIndex}.activities.${activityIndex}`;
 
   // エラーメッセージの取得用のヘルパー関数
@@ -44,13 +44,51 @@ export function ActivityForm({
     ]?.message;
   };
 
-  const handleShiftSubsequentActivities = () => {
-    // 「以降のアクティビティの時間をずらす」の処理をここに実装
-    // 具体的な処理は後で実装
-    console.log('以降のアクティビティの時間をずらす', {
-      dayIndex,
-      activityIndex,
-    });
+  const handleShiftSubsequentActivities = (
+    dayIndex: number,
+    activityIndex: number,
+    delayMinutes: number
+  ) => {
+    const activities = getValues(`dayPlans.${dayIndex}.activities`);
+
+    // 選択されたアクティビティ以降の時間を調整（同じ日のみ）
+    for (let i = activityIndex; i < activities.length; i++) {
+      const activity = activities[i];
+
+      // 開始時間の調整（設定されている場合のみ）
+      if (activity.startTime) {
+        const startTime = adjustTime(activity.startTime, delayMinutes);
+        setValue(`dayPlans.${dayIndex}.activities.${i}.startTime`, startTime);
+      }
+
+      // 終了時間の調整（設定されている場合のみ）
+      if (activity.endTime) {
+        const endTime = adjustTime(activity.endTime, delayMinutes);
+        setValue(`dayPlans.${dayIndex}.activities.${i}.endTime`, endTime);
+      }
+    }
+  };
+
+  // 時間をずらす関数（24時間制で処理、日をまたいでも単純に時刻を調整）
+  const adjustTime = (timeString: string, delayMinutes: number): string => {
+    // 時間文字列から時間と分を取得
+    const [hours, minutes] = timeString.split(':').map(Number);
+
+    // 総分数を計算
+    let totalMinutes = hours * 60 + minutes + delayMinutes;
+
+    // 24時間制で調整（負の値や24時間を超える値に対応）
+    totalMinutes = ((totalMinutes % 1440) + 1440) % 1440; // 1440 = 24時間 * 60分
+
+    // 時間と分に戻す
+    const newHours = Math.floor(totalMinutes / 60);
+    const newMinutes = totalMinutes % 60;
+
+    // HH:MM 形式に整形
+    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(
+      2,
+      '0'
+    )}`;
   };
 
   return (

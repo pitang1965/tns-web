@@ -24,7 +24,7 @@ import { useForm } from 'react-hook-form';
 type TimeShiftDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (minutes: number) => void;
+  onConfirm: (dyIndex: number, acitivityIndex: number, minutes: number) => void;
   dayIndex: number;
   activityIndex: number;
 };
@@ -45,8 +45,8 @@ export function TimeShiftDialog({
 
   const handleSubmit = form.handleSubmit((data) => {
     const minutes = parseInt(data.minutes, 10);
-    const finalMinutes = data.direction === 'subtract' ? -minutes : minutes;
-    onConfirm(finalMinutes);
+    const delayMinutes = data.direction === 'subtract' ? -minutes : minutes;
+    onConfirm(dayIndex, activityIndex, delayMinutes);
     onOpenChange(false);
   });
 
