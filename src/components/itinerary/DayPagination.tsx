@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -15,30 +15,51 @@ import { DayPlan } from '@/data/schemas/itinerarySchema';
 interface DayPaginationProps {
   dayPlans: DayPlan[];
   renderDayPlan: (dayPlan: DayPlan, index: number) => React.ReactNode;
+  onPageChange?: (index: number) => void; // 追加: ページ変更時のコールバック
 }
 
 export const DayPagination: React.FC<DayPaginationProps> = ({
   dayPlans,
   renderDayPlan,
+  onPageChange,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // ページを変更する関数
   const goToPage = (page: number) => {
     setCurrentPage(page);
+    // 親コンポーネントに現在のインデックスを通知（インデックスは0始まり）
+    if (onPageChange) {
+      onPageChange(page - 1);
+    }
   };
+
+  // コンポーネントがマウントされた時に初期ページを親に通知
+  useEffect(() => {
+    if (onPageChange) {
+      onPageChange(currentPage - 1);
+    }
+  }, []);
 
   // 前のページに移動
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      if (onPageChange) {
+        onPageChange(newPage - 1);
+      }
     }
   };
 
   // 次のページに移動
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      if (onPageChange) {
+        onPageChange(newPage - 1);
+      }
     }
   };
 

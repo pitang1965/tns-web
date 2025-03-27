@@ -10,9 +10,6 @@ import {
   ClientItineraryDocument,
 } from '@/data/schemas/itinerarySchema';
 import { DayPlanForm } from '@/components/itinerary/forms/DayPlanForm';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Card,
@@ -23,7 +20,8 @@ import {
 } from '@/components/ui/card';
 import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
-import { DayPagination } from '@/components/itinerary/DayPagination'; // 既存のDayPaginationコンポーネントをインポート
+import { DayPagination } from '@/components/itinerary/DayPagination';
+import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -61,6 +59,10 @@ export function ItineraryForm({
   const router = useRouter();
   const { toast } = useToast();
 
+  // 旅程全体に関する情報の折りたたみ
+  const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(false);
+  const [currentDayIndex, setCurrentDayIndex] = useState(0);
+
   // カスタムダーティフラグを追加
   const [formModified, setFormModified] = useState(false);
 
@@ -78,7 +80,6 @@ export function ItineraryForm({
     watch,
     setValue,
     trigger,
-    register,
     handleSubmit,
   } = methods;
 
@@ -146,6 +147,11 @@ export function ItineraryForm({
     initialData,
     trigger,
   ]);
+
+  useEffect(() => {
+    // 1日目表示時は基本情報を展開、それ以外では折りたたむ
+    setIsBasicInfoOpen(currentDayIndex === 0);
+  }, [currentDayIndex]);
 
   const handleFormSubmit = async (values: ClientItineraryInput) => {
     try {
@@ -311,75 +317,20 @@ export function ItineraryForm({
             }}
             className='space-y-4'
           >
-            {' '}
-            <div className='space-y-2'>
-              <Label
-                htmlFor='title'
-                className="after:content-['*'] after:ml-0.5 after:text-red-500"
-              >
-                旅程タイトル
-              </Label>
-              <Input
-                id='title'
-                {...register('title')}
-                placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
-              />
-              {errors.title && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.title.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='description'>説明</Label>
-              <Textarea
-                id='description'
-                {...register('description')}
-                placeholder='説明'
-              />
-              {errors.description && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.description.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='startDate'>開始日</Label>
-              <Input id='startDate' type='date' {...register('startDate')} />
-              {errors.startDate && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.startDate.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <Label
-                htmlFor='numberOfDays'
-                className="after:content-['*'] after:ml-0.5 after:text-red-500"
-              >
-                日数
-              </Label>
-              <Input
-                id='numberOfDays'
-                type='number'
-                min={1}
-                {...register('numberOfDays', {
-                  valueAsNumber: true, // 文字列ではなく数値として扱う
-                })}
-              />
-              {errors.numberOfDays && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.numberOfDays.message}
-                </p>
-              )}
-            </div>
-            <div className='space-y-4'>
+            {/* BasicInfoSectionコンポーネントを使用 */}
+            <BasicInfoSection
+              isOpen={isBasicInfoOpen}
+              onOpenChange={setIsBasicInfoOpen}
+            />
+
+            <div className='space-y-4 my-4'>
               {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
               {watch('dayPlans')?.length > 0 && (
                 <>
                   {/* DayPaginationコンポーネントの使用 */}
                   <DayPagination
                     dayPlans={watch('dayPlans')}
+                    onPageChange={setCurrentDayIndex}
                     renderDayPlan={(dayPlan, index) => (
                       <>
                         {/* 各ページの上部に現在の日数表示を追加 */}
