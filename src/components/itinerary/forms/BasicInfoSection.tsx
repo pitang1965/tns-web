@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,6 +24,7 @@ export function BasicInfoSection({
   const {
     register,
     formState: { errors },
+    control,
   } = useFormContext();
 
   return (
@@ -95,6 +97,25 @@ export function BasicInfoSection({
                 {errors.numberOfDays.message as string}
               </p>
             )}
+          </div>
+          <div className='flex items-center justify-between space-y-0 my-4'>
+            <Label htmlFor='isPublic'>公開設定</Label>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm text-gray-500'>非公開</span>
+              <Controller
+                name='isPublic'
+                control={control}
+                defaultValue={false}
+                render={({ field }) => (
+                  <Switch
+                    id='isPublic'
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <span className='text-sm text-gray-500'>公開</span>
+            </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
