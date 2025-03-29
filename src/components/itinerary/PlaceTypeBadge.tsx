@@ -27,5 +27,9 @@ type PlaceTypeBadgeProps = {
 export const PlaceTypeBadge: React.FC<PlaceTypeBadgeProps> = ({ type }) => {
   const { color, label } = placeTypeMap[type] || placeTypeMap.OTHER;
 
-  return <Badge className={`${color} text-white w-fit`}>{label}</Badge>;
+  return (
+    <Badge className={`${color} text-white w-fit whitespace-nowrap`}>
+      {label}
+    </Badge>
+  );
 };
