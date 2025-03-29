@@ -1,6 +1,7 @@
 'use client';
 
 import React, { ErrorInfo, ReactNode } from 'react';
+import { H2, LargeText, Text } from '@/components/common/Typography';
 import { logger } from '@/lib/logger';
 
 interface ErrorBoundaryProps {
@@ -38,14 +39,16 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div>
-          <h1>問題が発生しました。ご不便をおかけして申し訳ございません。</h1>
+          <H2>問題が発生しました。ご不便をおかけして申し訳ございません。</H2>
           {/* エラーの詳細は開発環境でのみ表示する */}
           {process.env.NODE_ENV === 'development' && (
             <details style={{ whiteSpace: 'pre-wrap' }}>
-              <summary>エラー詳細 (開発環境のみ)</summary>
-              {this.state.error && this.state.error.toString()}
+              <LargeText>
+                <summary>エラー詳細 (開発環境のみ)</summary>
+              </LargeText>
+              <Text>{this.state.error && this.state.error.toString()}</Text>
               <br />
-              {this.state.errorInfo?.componentStack}
+              <Text>{this.state.errorInfo?.componentStack}</Text>
             </details>
           )}
         </div>

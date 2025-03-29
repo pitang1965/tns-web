@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
+import { H3 } from '@/components/common/Typography';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { formatDateWithWeekday } from '@/lib/date';
 
@@ -45,7 +46,7 @@ export function DayPlanForm({
 
   return (
     <div className='border rounded-lg p-4 space-y-4'>
-      <h3 className='text-lg font-medium'>{dayDisplay}</h3>
+      <H3>{dayDisplay}</H3>
       <div className='space-y-4'>
         {day.activities?.map((activity, activityIndex) => (
           <ActivityForm

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
+import { H3, SmallText } from '@/components/common/Typography';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -31,7 +32,7 @@ export function BasicInfoSection({
     <div className='border rounded-lg p-4 space-y-4'>
       <Collapsible open={isOpen} onOpenChange={onOpenChange} className='mb-4'>
         <CollapsibleTrigger className='flex items-center justify-between w-full p-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600'>
-          <h3 className='text-lg font-medium'>旅程基本情報</h3>
+          <H3>旅程基本情報</H3>
           <span className='text-gray-500 dark:text-gray-400'>
             {isOpen ? '▲' : '▼'}
           </span>
@@ -50,9 +51,7 @@ export function BasicInfoSection({
               placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
             />
             {errors.title && (
-              <p className='text-red-500 text-sm mt-1'>
-                {errors.title.message as string}
-              </p>
+              <SmallText>{errors.title.message as string}</SmallText>
             )}
           </div>
           <div className='space-y-4 my-4'>
@@ -63,18 +62,14 @@ export function BasicInfoSection({
               placeholder='説明'
             />
             {errors.description && (
-              <p className='text-red-500 text-sm mt-1'>
-                {errors.description.message as string}
-              </p>
+              <SmallText>{errors.description.message as string}</SmallText>
             )}
           </div>
           <div className='space-y-4 my-4'>
             <Label htmlFor='startDate'>開始日</Label>
             <Input id='startDate' type='date' {...register('startDate')} />
             {errors.startDate && (
-              <p className='text-red-500 text-sm mt-1'>
-                {errors.startDate.message as string}
-              </p>
+              <SmallText>{errors.startDate.message as string}</SmallText>
             )}
           </div>
           <div className='space-y-4 my-4'>
@@ -93,9 +88,7 @@ export function BasicInfoSection({
               })}
             />
             {errors.numberOfDays && (
-              <p className='text-red-500 text-sm mt-1'>
-                {errors.numberOfDays.message as string}
-              </p>
+              <SmallText>{errors.numberOfDays.message as string}</SmallText>
             )}
           </div>
           <div className='flex items-center justify-between space-y-0 my-4'>

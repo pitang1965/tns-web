@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
+import { H1, LargeText } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
 
 export const metadata: Metadata = {
@@ -15,12 +16,12 @@ export default withPageAuthRequired(
     const itineraries = await getItineraries();
 
     return (
-      <main className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
+      <main className='flex flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24 bg-background text-foreground'>
         <section>
-          <h1 className='text-3xl font-bold mb-6'>保存された旅程一覧</h1>
-          <p className='text-lg mb-8'>
+          <H1>保存された旅程一覧</H1>
+          <LargeText>
             これまでに作成した旅程を確認できます。新しい旅程を作成する場合は、「新規作成」ボタンをクリックしてください。
-          </p>
+          </LargeText>
           <ItineraryList itineraries={itineraries} />
         </section>
       </main>

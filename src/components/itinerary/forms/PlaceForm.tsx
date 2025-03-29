@@ -25,6 +25,7 @@ import {
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
+import { SmallText } from '@/components/common/Typography';
 
 const PLACE_TYPES = {
   HOME: '自宅',
@@ -215,12 +216,12 @@ export function PlaceForm({
             />
             {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
               ?.location?.latitude && (
-              <p className='text-red-500 text-sm mt-1'>
+              <SmallText>
                 {
                   errors.dayPlans[dayIndex].activities[activityIndex].place
                     .location.latitude.message
                 }
-              </p>
+              </SmallText>
             )}
           </div>
           <div className='flex-1'>
@@ -234,12 +235,12 @@ export function PlaceForm({
             />
             {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
               ?.location?.longitude && (
-              <p className='text-red-500 text-sm mt-1'>
+              <SmallText>
                 {
                   errors.dayPlans[dayIndex].activities[activityIndex].place
                     .location.longitude.message
                 }
-              </p>
+              </SmallText>
             )}
           </div>
         </div>

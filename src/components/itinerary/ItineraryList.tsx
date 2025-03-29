@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ItineraryItem } from './ItineraryItem';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { LargeText } from '@/components/common/Typography';
 
 type Props = {
   itineraries: ClientItineraryDocument[];
@@ -28,9 +29,7 @@ export const ItineraryList: React.FC<Props> = ({ itineraries }) => {
             <ItineraryItem key={itinerary.id} itinerary={itinerary} />
           ))
         ) : (
-          <p className='col-span-full text-center text-gray-500'>
-            保存された旅程はまだありません。
-          </p>
+          <LargeText>保存された旅程はまだありません。</LargeText>
         )}
       </div>
     </div>

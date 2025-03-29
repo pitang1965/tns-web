@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { ActivityControls } from './ActivityControls.tsx';
+import { SmallText } from '@/components/common/Typography';
 
 type ActivityFormProps = {
   dayIndex: number;
@@ -121,11 +122,11 @@ export function ActivityForm({
           placeholder='例: 出発、休憩、散策、昼食、宿泊地到着、入浴'
         />
         {getFieldError('title') && (
-          <p className='text-red-500 text-sm'>{getFieldError('title')}</p>
+          <SmallText>{getFieldError('title')}</SmallText>
         )}
       </div>
       {getFieldError('title') && (
-        <p className='text-red-500 text-sm mt-1'>{getFieldError('title')}</p>
+        <SmallText>{getFieldError('title')}</SmallText>
       )}
       <PlaceForm
         dayIndex={dayIndex}
@@ -142,7 +143,7 @@ export function ActivityForm({
             )}
           />
           {getFieldError('startTime') && (
-            <p className='text-red-500 text-sm'>{getFieldError('startTime')}</p>
+            <SmallText>{getFieldError('startTime')}</SmallText>
           )}
         </div>
         <div className='space-y-2'>
@@ -154,7 +155,7 @@ export function ActivityForm({
             )}
           />
           {getFieldError('endTime') && (
-            <p className='text-red-500 text-sm'>{getFieldError('endTime')}</p>
+            <SmallText>{getFieldError('endTime')}</SmallText>
           )}
         </div>
       </div>
@@ -185,7 +186,7 @@ export function ActivityForm({
           placeholder='0'
         />
         {getFieldError('cost') && (
-          <p className='text-red-500 text-sm'>{getFieldError('cost')}</p>
+          <SmallText>{getFieldError('cost')}</SmallText>
         )}
       </div>
     </div>

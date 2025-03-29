@@ -22,6 +22,7 @@ import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { DayPagination } from '@/components/itinerary/DayPagination';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
+import { H3, LargeText } from '@/components/common/Typography';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -288,7 +289,7 @@ export function ItineraryForm({
     const numberOfDays = watch('numberOfDays') || 0;
     return (
       <div className='flex justify-between items-center mb-2'>
-        <h3 className='text-lg font-medium'>日程詳細</h3>
+        <H3>日程詳細</H3>
         <span className='text-sm text-gray-500'>
           {currentIndex + 1} / {numberOfDays}日目
         </span>
@@ -345,7 +346,7 @@ export function ItineraryForm({
             {process.env.NODE_ENV === 'development' &&
               Object.keys(errors).length > 0 && (
                 <div className='mb-4 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800'>
-                  <p>フォームにエラーがあります:</p>
+                  <LargeText>フォームにエラーがあります:</LargeText>
                   <pre>
                     {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
                   </pre>

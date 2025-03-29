@@ -7,6 +7,7 @@ import { ItineraryToc } from '@/components/itinerary/ItineraryToc';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { H2, LargeText } from '@/components/common/Typography';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
@@ -78,12 +79,10 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       // ログインしていない場合はログインを促す
       return (
         <div className='container mx-auto p-8 text-center'>
-          <h2 className='text-2xl font-bold mb-4'>
-            このコンテンツを閲覧するにはログインが必要です
-          </h2>
-          <p className='mb-6'>
+          <H2>このコンテンツを閲覧するにはログインが必要です</H2>
+          <LargeText>
             この旅程は非公開に設定されています。閲覧するには認証が必要です。
-          </p>
+          </LargeText>
           <Button onClick={handleLogin}>ログイン</Button>
         </div>
       );
@@ -91,8 +90,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       // ログイン済みだがアクセス権がない場合
       return (
         <div className='container mx-auto p-8 text-center'>
-          <h2 className='text-2xl font-bold mb-4'>アクセス権限がありません</h2>
-          <p className='mb-6'>この旅程を閲覧する権限がありません。</p>
+          <H2>アクセス権限がありません</H2>
+          <LargeText>この旅程を閲覧する権限がありません。</LargeText>
           <Button onClick={handleBack} variant='secondary'>
             戻る
           </Button>
@@ -112,7 +111,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
           {!user && isPublic && (
             <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
-              <p className='text-sm'>
+              <LargeText>
                 この旅程をマイリストに追加したり、編集したりするには
                 <Button
                   variant='link'
@@ -122,11 +121,11 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
                   ログイン
                 </Button>
                 してください。
-              </p>
+              </LargeText>
             </div>
           )}
 
-          <h2 className='text-2xl font-semibold mb-4'>旅程詳細</h2>
+          <H2>旅程詳細</H2>
 
           {itinerary.dayPlans?.length > 0 ? (
             <DayPagination
@@ -134,9 +133,9 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
               renderDayPlan={renderDayPlan}
             />
           ) : (
-            <p className='text-center text-gray-600 dark:text-gray-400'>
+            <LargeText>
               まだ旅程の詳細が登録されていません。「編集」ボタンから旅程を追加してください。
-            </p>
+            </LargeText>
           )}
 
           <FixedActionButtons

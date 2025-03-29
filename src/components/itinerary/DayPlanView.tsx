@@ -1,5 +1,6 @@
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ActivityView } from './ActivityView';
+import { H3, LargeText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 
 type DayPlan = ServerItineraryDocument['dayPlans'][number];
@@ -10,7 +11,7 @@ type DayPlanProps = {
 
 export const DayPlanView: React.FC<DayPlanProps> = ({ day }) => (
   <div className='mb-6 bg-background text-foreground p-4 rounded-lg'>
-    <h3 className='text-xl font-semibold mb-2'>{day.date && formatDateWithWeekday(day.date)}</h3>
+    <H3>{day.date && formatDateWithWeekday(day.date)}</H3>
     {day.activities.length > 0 ? (
       <ul className='space-y-2'>
         {day.activities.map((activity) => (
@@ -18,7 +19,7 @@ export const DayPlanView: React.FC<DayPlanProps> = ({ day }) => (
         ))}
       </ul>
     ) : (
-      <p>この日の予定はありません。</p>
+      <LargeText>この日の予定はありません。</LargeText>
     )}
   </div>
 );

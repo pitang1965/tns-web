@@ -1,6 +1,7 @@
 import React from 'react';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
-import { PublicItineraryItem } from './PublicItineraryItem';
+import { PublicItineraryItem } from '@/components/itinerary/PublicItineraryItem';
+import { LargeText } from '@/components/common/Typography';
 
 type Props = {
   itineraries: ClientItineraryDocument[];
@@ -24,9 +25,7 @@ export const PublicItineraryList: React.FC<Props> = ({
           <PublicItineraryItem key={itinerary.id} itinerary={itinerary} />
         ))
       ) : (
-        <p className='col-span-full text-center text-gray-500'>
-          公開されている旅程はまだありません。
-        </p>
+        <LargeText>公開されている旅程はまだありません。</LargeText>
       )}
     </div>
   );

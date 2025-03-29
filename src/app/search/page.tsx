@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PublicItineraryList } from '@/components/itinerary/PublicItineraryList';
+import { H1, H2, LargeText } from '@/components/common/Typography';
 import { getPublicItineraries } from '@/lib/itineraries';
 
 export const metadata: Metadata = {
@@ -14,11 +15,11 @@ export default async function Search() {
 
   return (
     <div className='container mx-auto p-4 md:p-6'>
-      <h1 className='text-3xl md:text-4xl font-bold mb-6'>旅行先を検索</h1>
-      <p className='text-lg mb-8'>みんなが共有している旅程を探索しよう！</p>
+      <H1>旅行先を検索</H1>
+      <LargeText>みんなが共有している旅程を探索しよう！</LargeText>
 
       <div className='mb-8'>
-        <h2 className='text-xl font-semibold mb-4'>公開されている旅程</h2>
+        <H2>公開されている旅程</H2>
         <PublicItineraryList itineraries={publicItineraries} />
       </div>
     </div>

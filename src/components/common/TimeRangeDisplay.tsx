@@ -1,4 +1,5 @@
 import React from 'react';
+import { SmallText } from '@/components/common/Typography';;
 
 type TimeRangeDisplayProps = {
   startTime?: string;
@@ -37,5 +38,5 @@ export const TimeRangeDisplay: React.FC<TimeRangeDisplayProps> = ({
     return null;
   };
 
-  return <p className='font-medium'>{renderTimeInfo()}</p>;
+  return <SmallText>{renderTimeInfo()}</SmallText>;
 };

@@ -1,6 +1,7 @@
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PlaceView } from './PlaceView';
 import { TimeRangeDisplay } from '@/components/common/TimeRangeDisplay';
+import { H3 } from '@/components/common/Typography';
 
 type AcitivityType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
@@ -11,7 +12,7 @@ type ActivityProps = {
 export const ActivityView: React.FC<ActivityProps> = ({ activity }) => (
   <li className='bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50'>
     <div className='flex'>
-      <p className='font-medium'>{activity.title}</p>
+      <H3>{activity.title}</H3>
       <TimeRangeDisplay
         startTime={activity.startTime ?? undefined}
         endTime={activity.endTime ?? undefined}

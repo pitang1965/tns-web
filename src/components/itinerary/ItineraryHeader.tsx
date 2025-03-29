@@ -3,6 +3,7 @@ import {
   TransportationBadge,
   TransportationType,
 } from '@/components/itinerary/TransportationBadge';
+import { H1, LargeText, Text } from '@/components/common/Typography';
 
 const getTransportationType = (
   transportation: ClientItineraryDocument['transportation']
@@ -42,10 +43,10 @@ export const ItineraryHeader: React.FC<{
 
   return (
     <div className='flex flex-col items-center justify-between p-6 bg-background text-foreground w-full'>
-      <h1 className='text-3xl font-bold mb-4'>{itinerary.title}</h1>
+      <H1>{itinerary.title}</H1>
       {transportationType && <TransportationBadge type={transportationType} />}
-      <p className='text-lg mt-2'>{itinerary.description}</p>
-      <p className='mt-2'>期間: {periodDisplay}</p>
+      <LargeText>{itinerary.description}</LargeText>
+      <Text>期間: {periodDisplay}</Text>
     </div>
   );
 };

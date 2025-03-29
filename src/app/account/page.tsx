@@ -3,6 +3,7 @@ import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { H1, LargeText } from '@/components/common/Typography';
 
 type UserInfoProps = {
   label: string;
@@ -11,9 +12,9 @@ type UserInfoProps = {
 
 function UserInfo({ label, value }: UserInfoProps) {
   return (
-    <p className='text-lg py-2'>
+    <LargeText>
       {label}: {value}
-    </p>
+    </LargeText>
   );
 }
 
@@ -24,9 +25,9 @@ export default withPageAuthRequired(function Account() {
   if (!user) return <div>ユーザー情報が取得できませんでした</div>;
 
   return (
-    <div className='flex flex-col items-center justify-between p-24 bg-background text-foreground'>
+    <div className='flex flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24 bg-background text-foreground'>
       <div>
-        <p className='text-5xl py-4'>アカウント</p>
+        <H1>アカウント</H1>
         <div>
           <Avatar>
             <AvatarImage src={user.picture || undefined} />
