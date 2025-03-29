@@ -7,6 +7,24 @@ export const metadata: Metadata = {
   title: '旅行先を検索 | 旅のしおり',
   description:
     '理想の旅行先を見つけよう。多様な目的地の中から、あなたにぴったりの行き先を探索できます。',
+  keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
+  openGraph: {
+    title: '旅のしおり',
+    description: '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+    images: [
+      {
+        url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
+        width: 1200,
+        height: 628,
+        alt: '旅のしおりアプリ - 旅行計画作成ツール',
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default async function Search() {

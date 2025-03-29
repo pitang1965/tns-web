@@ -5,10 +5,27 @@ import { H1, LargeText } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
 
 export const metadata: Metadata = {
-  title: '保存された旅程一覧 | あなたの旅行計画',
+  title: '保存された旅程一覧 | 旅のしおり',
   description:
     'あなたが作成した旅程の一覧です。過去の旅行計画を確認したり、新しい旅程を作成したりできます。',
   keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
+  openGraph: {
+    title: '旅のしおり',
+    description: '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+    images: [
+      {
+        url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
+        width: 1200,
+        height: 628,
+        alt: '旅のしおりアプリ - 旅行計画作成ツール',
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default withPageAuthRequired(

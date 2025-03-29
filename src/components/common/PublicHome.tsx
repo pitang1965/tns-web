@@ -15,8 +15,8 @@ export default function ClientHome() {
       <H1>旅のしおり作成</H1>
       <Image
         className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] mb-4'
-        src='/over40.svg'
-        alt='Over 40 Web Club Logo'
+        src='/azuki.webp'
+        alt='あずきちゃん（スズキ エブリイワゴン）'
         width={90}
         height={90}
         priority
