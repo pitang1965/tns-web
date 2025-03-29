@@ -13,7 +13,7 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '旅を快適に！|旅のしおり',
+  title: '旅のしおり',
   description:
     '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
   openGraph: {
