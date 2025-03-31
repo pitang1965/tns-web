@@ -34,11 +34,55 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
     return isValid;
   };
 
-  // 現在地からのルート検索を開く
+  // デバイスタイプを検出する関数
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
+
+  // 現在地からのルート検索を開く - モバイル対応版
   const openCurrentLocationRoute = () => {
     if (!isValidCoordinate()) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-    window.open(url, '_blank');
+
+    // モバイルデバイスの場合
+    if (isMobileDevice()) {
+      let mapUrl;
+
+      // iOSの場合
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        // iOS用のURLスキーム（comgooglemaps://）を使用
+        mapUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
+
+        // Googleマップアプリがインストールされていない場合のフォールバック
+        if (!navigator.userAgent.match('CriOS')) {
+          // Chrome on iOSでない場合
+          window.location.href = mapUrl;
+          // 少し遅延してアプリが開かなかった場合はウェブ版にリダイレクト
+          setTimeout(() => {
+            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+          }, 2000);
+          return;
+        }
+      }
+      // Androidの場合
+      else if (/Android/i.test(navigator.userAgent)) {
+        // Android用のインテント構文
+        mapUrl = `google.navigation:q=${latitude},${longitude}&mode=d`;
+      }
+      // その他のモバイルデバイスの場合はウェブ版を使用
+      else {
+        mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+      }
+
+      // URLを開く
+      window.location.href = mapUrl;
+    }
+    // PCの場合は元の動作を維持
+    else {
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+      window.open(url, '_blank');
+    }
   };
 
   // 地図上で場所を表示
