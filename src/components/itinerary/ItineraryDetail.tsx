@@ -12,6 +12,7 @@ import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
+import { useDayParam } from '@/hooks/useDayParam'; // 新しいカスタムフックをインポート
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 import { DayPagination } from '@/components/itinerary/DayPagination';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,10 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const deleteItinerary = useDeleteItinerary();
   const router = useRouter();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const { user, isLoading: userLoading } = useUser();
+  const { user } = useUser();
+
+  // 日付パラメータの管理をカスタムフックに委譲
+  const dayParamHook = useDayParam(id, itinerary?.dayPlans?.length || 0);
 
   const handleDelete = async () => {
     await deleteItinerary(id);
@@ -100,6 +104,11 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     }
   }
 
+  // day パラメータが有効範囲外の場合の処理
+  if (dayParamHook.isDayOutOfRange) {
+    dayParamHook.redirectToFirstDay();
+  }
+
   return (
     <main className='container mx-auto p-4'>
       <div className='flex flex-col md:flex-row gap-6'>
@@ -131,6 +140,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             <DayPagination
               dayPlans={itinerary.dayPlans}
               renderDayPlan={renderDayPlan}
+              initialSelectedDay={dayParamHook.selectedDay}
+              onDayChange={dayParamHook.handleDayChange}
             />
           ) : (
             <LargeText>

@@ -15,39 +15,58 @@ import { DayPlan } from '@/data/schemas/itinerarySchema';
 interface DayPaginationProps {
   dayPlans: DayPlan[];
   renderDayPlan: (dayPlan: DayPlan, index: number) => React.ReactNode;
-  onPageChange?: (index: number) => void; // 追加: ページ変更時のコールバック
+  onDayChange?: (day: number) => void; // 日付変更時、URLを更新するためのコールバック
+  initialSelectedDay?: number; // URLから初期表示する日付
 }
 
 export const DayPagination: React.FC<DayPaginationProps> = ({
   dayPlans,
   renderDayPlan,
-  onPageChange,
+  onDayChange,
+  initialSelectedDay = 1,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  // 初期選択日が有効な範囲内になるように調整
+  const validInitialDay = Math.min(
+    Math.max(initialSelectedDay, 1),
+    dayPlans?.length || 1
+  );
+
+  const [currentPage, setCurrentPage] = useState(validInitialDay);
+
+  // initialSelectedDayが変更されたときにcurrentPageを更新
+  useEffect(() => {
+    if (initialSelectedDay) {
+      const validDay = Math.min(
+        Math.max(initialSelectedDay, 1),
+        dayPlans?.length || 1
+      );
+      setCurrentPage(validDay);
+    }
+  }, [initialSelectedDay, dayPlans?.length]);
+
+  // コンポーネントがマウントされた時に初期ページを親に通知
+  useEffect(() => {
+    if (onDayChange && initialSelectedDay !== currentPage) {
+      onDayChange(currentPage);
+    }
+  }, []);
 
   // ページを変更する関数
   const goToPage = (page: number) => {
     setCurrentPage(page);
-    // 親コンポーネントに現在のインデックスを通知（インデックスは0始まり）
-    if (onPageChange) {
-      onPageChange(page - 1);
+    // 親コンポーネントに現在のページを通知
+    if (onDayChange) {
+      onDayChange(page);
     }
   };
-
-  // コンポーネントがマウントされた時に初期ページを親に通知
-  useEffect(() => {
-    if (onPageChange) {
-      onPageChange(currentPage - 1);
-    }
-  }, []);
 
   // 前のページに移動
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       const newPage = currentPage - 1;
       setCurrentPage(newPage);
-      if (onPageChange) {
-        onPageChange(newPage - 1);
+      if (onDayChange) {
+        onDayChange(newPage);
       }
     }
   };
@@ -57,8 +76,8 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     if (currentPage < totalPages) {
       const newPage = currentPage + 1;
       setCurrentPage(newPage);
-      if (onPageChange) {
-        onPageChange(newPage - 1);
+      if (onDayChange) {
+        onDayChange(newPage);
       }
     }
   };
@@ -81,7 +100,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
             onClick={() => goToPage(page)}
             isActive={page === currentPage}
           >
-            {page}
+            {page}日目
           </PaginationLink>
         </PaginationItem>
       ));
@@ -97,7 +116,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
           onClick={() => goToPage(1)}
           isActive={1 === currentPage}
         >
-          1
+          1日目
         </PaginationLink>
       </PaginationItem>
     );
@@ -111,7 +130,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}
+              {i}日目
             </PaginationLink>
           </PaginationItem>
         );
@@ -136,7 +155,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}
+              {i}日目
             </PaginationLink>
           </PaginationItem>
         );
@@ -156,7 +175,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}
+              {i}日目
             </PaginationLink>
           </PaginationItem>
         );
@@ -176,7 +195,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
             onClick={() => goToPage(totalPages)}
             isActive={totalPages === currentPage}
           >
-            {totalPages}
+            {totalPages}日目
           </PaginationLink>
         </PaginationItem>
       );
