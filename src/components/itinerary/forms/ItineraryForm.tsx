@@ -331,7 +331,7 @@ export function ItineraryForm({
                   {/* DayPaginationコンポーネントの使用 */}
                   <DayPagination
                     dayPlans={watch('dayPlans')}
-                    onPageChange={setCurrentDayIndex}
+                    onDayChange={setCurrentDayIndex}
                     renderDayPlan={(dayPlan, index) => (
                       <>
                         {/* 各ページの上部に現在の日数表示を追加 */}
