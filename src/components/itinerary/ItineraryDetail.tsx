@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { ItineraryToc } from '@/components/itinerary/ItineraryToc';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
@@ -10,12 +11,11 @@ import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { H2, LargeText } from '@/components/common/Typography';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
+import { DayPagination } from '@/components/itinerary/DayPagination';
+import { useDayParam } from '@/hooks/useDayParam';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
-import { useDayParam } from '@/hooks/useDayParam'; // 新しいカスタムフックをインポート
 import { DayPlan } from '@/data/schemas/itinerarySchema';
-import { DayPagination } from '@/components/itinerary/DayPagination';
-import { Button } from '@/components/ui/button';
 
 type ItineraryDetailProps = {
   id: string;
