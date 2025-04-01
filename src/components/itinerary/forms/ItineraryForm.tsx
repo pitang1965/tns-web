@@ -18,11 +18,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { H3, LargeText } from '@/components/common/Typography';
 import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
-import { DayPagination } from '@/components/itinerary/DayPagination';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
-import { H3, LargeText } from '@/components/common/Typography';
+import { DayPagination } from '@/components/itinerary/DayPagination';
+import { useDayParam } from '@/hooks/useDayParam'; // useDayParamフックをインポート
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -62,7 +63,6 @@ export function ItineraryForm({
 
   // 旅程全体に関する情報の折りたたみ
   const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(false);
-  const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
   // カスタムダーティフラグを追加
   const [formModified, setFormModified] = useState(false);
@@ -83,6 +83,14 @@ export function ItineraryForm({
     trigger,
     handleSubmit,
   } = methods;
+
+  // useDayParamフックを使用して日付パラメータを管理
+  const dayParamHook = useDayParam(
+    itineraryId || 'new', // 新規作成時は 'new' を使用
+    initialData?.dayPlans?.length || 1 // 初期値はinitialDataから取得
+  );
+
+  // 上に移動済み
 
   // フォームの初期化後にダーティフラグをリセットする
   useEffect(() => {
@@ -117,10 +125,10 @@ export function ItineraryForm({
   useEffect(() => {
     const startDate = watch('startDate');
     const numberOfDays = watch('numberOfDays');
-
-    trigger(['startDate', 'numberOfDays']);
-
     const dayCount = numberOfDays || 0;
+
+    // フォームのバリデーション
+    trigger(['startDate', 'numberOfDays']);
 
     const newDayPlans = Array.from({ length: dayCount }, (_, index) => {
       const existingDayPlan = initialData?.dayPlans?.[index];
@@ -140,6 +148,7 @@ export function ItineraryForm({
       };
     });
 
+    // dayPlansの更新
     setValue('dayPlans', newDayPlans);
   }, [
     watch('startDate'),
@@ -149,10 +158,25 @@ export function ItineraryForm({
     trigger,
   ]);
 
+  // 日数の変更に応じて選択中の日を調整する
+  useEffect(() => {
+    const numberOfDays = watch('numberOfDays') || 0;
+
+    // 日数が変わった場合、選択日が範囲外にならないようにする
+    if (dayParamHook.selectedDay >= numberOfDays && numberOfDays > 0) {
+      const newDay = numberOfDays - 1;
+      // 無限ループを避けるため、値が実際に変わる場合のみ更新
+      if (newDay !== dayParamHook.selectedDay) {
+        dayParamHook.handleDayChange(newDay);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dayParamHook.selectedDay]);
+
   useEffect(() => {
     // 1日目表示時は基本情報を展開、それ以外では折りたたむ
-    setIsBasicInfoOpen(currentDayIndex === 0);
-  }, [currentDayIndex]);
+    setIsBasicInfoOpen(dayParamHook.selectedDay === 0);
+  }, [dayParamHook.selectedDay]);
 
   const handleFormSubmit = async (values: ClientItineraryInput) => {
     try {
@@ -297,6 +321,11 @@ export function ItineraryForm({
     );
   };
 
+  // day パラメータが有効範囲外の場合の処理
+  if (dayParamHook.isDayOutOfRange) {
+    dayParamHook.redirectToFirstDay();
+  }
+
   return (
     <Card className='max-w-2xl mx-auto'>
       <CardHeader>
@@ -328,10 +357,11 @@ export function ItineraryForm({
               {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
               {watch('dayPlans')?.length > 0 && (
                 <>
-                  {/* DayPaginationコンポーネントの使用 */}
+                  {/* DayPaginationコンポーネントの使用 - dayParamHookを統合 */}
                   <DayPagination
                     dayPlans={watch('dayPlans')}
-                    onDayChange={setCurrentDayIndex}
+                    onDayChange={dayParamHook.handleDayChange}
+                    initialSelectedDay={dayParamHook.selectedDay}
                     renderDayPlan={(dayPlan, index) => (
                       <>
                         {/* 各ページの上部に現在の日数表示を追加 */}
