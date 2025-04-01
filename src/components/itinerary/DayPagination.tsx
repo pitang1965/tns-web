@@ -100,7 +100,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
             onClick={() => goToPage(page)}
             isActive={page === currentPage}
           >
-            {page}日目
+            {page}
           </PaginationLink>
         </PaginationItem>
       ));
@@ -130,7 +130,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}日目
+              {i}
             </PaginationLink>
           </PaginationItem>
         );
@@ -155,7 +155,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}日目
+              {i}
             </PaginationLink>
           </PaginationItem>
         );
@@ -175,7 +175,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               onClick={() => goToPage(i)}
               isActive={i === currentPage}
             >
-              {i}日目
+              {i}
             </PaginationLink>
           </PaginationItem>
         );
