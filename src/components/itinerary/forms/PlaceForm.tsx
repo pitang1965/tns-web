@@ -5,7 +5,7 @@ import { Path, useFormContext } from 'react-hook-form';
 import { MapPin } from 'lucide-react';
 import { LocationView } from '@/components/itinerary/LocationView';
 import { PlaceNavigationButton } from '@/components/itinerary//PlaceNavigationButton';
-import { GoogleMapsCoordinatesButton } from '@/components/itinerary/GoogleMapsCoordinatesButton';
+import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -194,7 +194,7 @@ export function PlaceForm({
               longitude={location?.longitude}
               className='whitespace-nowrap'
             />
-            <GoogleMapsCoordinatesButton
+            <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
                 setValue(latPath, lat);
                 setValue(lonPath, lng);

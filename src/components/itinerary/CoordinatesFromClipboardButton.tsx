@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 
-interface GoogleMapsCoordinatesButtonProps {
+interface CoordinatesFromClipboardButtonProps {
   onCoordinatesExtracted: (latitude: string, longitude: string) => void;
   className?: string;
 }
 
-export const GoogleMapsCoordinatesButton: React.FC<
-  GoogleMapsCoordinatesButtonProps
+export const CoordinatesFromClipboardButton: React.FC<
+  CoordinatesFromClipboardButtonProps
 > = ({ onCoordinatesExtracted, className = '' }) => {
   const { toast } = useToast();
 
@@ -56,7 +56,7 @@ export const GoogleMapsCoordinatesButton: React.FC<
       onClick={handleGoogleMapsUrl}
     >
       <MapPin className='w-4 h-4' />
-      Google Mapsから取得
+      クリップボードから座標取得
     </Button>
   );
 };
