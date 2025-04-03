@@ -222,7 +222,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
                 }}
                 isActive={i === currentPage}
               >
-                {i}日目
+                {i}
               </PaginationLink>
             </PaginationItem>
           );
