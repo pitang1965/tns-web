@@ -22,7 +22,7 @@ import { H3, LargeText } from '@/components/common/Typography';
 import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
-import { DayPagination } from '@/components/itinerary/DayPagination';
+import { DayPagination } from '@/components/layout/DayPagination';
 import { useDayParam } from '@/hooks/useDayParam'; // useDayParamフックをインポート
 
 type ItineraryFormProps = {
