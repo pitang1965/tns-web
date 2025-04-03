@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -25,6 +25,9 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
   onDayChange,
   initialSelectedDay = 1,
 }) => {
+  // 直前のページ操作を追跡するref
+  const isUserNavigation = useRef(false);
+
   // 初期選択日が有効な範囲内になるように調整
   const validInitialDay = Math.min(
     Math.max(initialSelectedDay, 1),
@@ -33,14 +36,29 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
   const [currentPage, setCurrentPage] = useState(validInitialDay);
 
+  // デバッグ用
+  const prevInitialSelectedDayRef = useRef(initialSelectedDay);
+
   // initialSelectedDayが変更されたときにcurrentPageを更新
+  // ただし、ユーザーがページを変更した場合は反映しない
   useEffect(() => {
-    if (initialSelectedDay) {
-      const validDay = Math.min(
-        Math.max(initialSelectedDay, 1),
-        dayPlans?.length || 1
-      );
-      setCurrentPage(validDay);
+    // ユーザーによるナビゲーションの場合は処理をスキップ
+    if (isUserNavigation.current) {
+      isUserNavigation.current = false;
+      return;
+    }
+
+    // 前回のinitialSelectedDayと現在の値が異なる場合のみ処理（親コンポーネントからの変更）
+    if (initialSelectedDay !== prevInitialSelectedDayRef.current) {
+      prevInitialSelectedDayRef.current = initialSelectedDay;
+
+      if (initialSelectedDay) {
+        const validDay = Math.min(
+          Math.max(initialSelectedDay, 1),
+          dayPlans?.length || 1
+        );
+        setCurrentPage(validDay);
+      }
     }
   }, [initialSelectedDay, dayPlans?.length]);
 
@@ -53,7 +71,19 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
   // ページを変更する関数
   const goToPage = (page: number) => {
+    console.log('ページに移動:', page, '合計ページ数:', dayPlans?.length);
+
+    // ユーザーのナビゲーションであることをマーク
+    isUserNavigation.current = true;
+
+    // 妥当性チェック（範囲を確認）
+    if (page < 1 || page > (dayPlans?.length || 1)) {
+      console.error('無効なページ番号:', page);
+      return;
+    }
+
     setCurrentPage(page);
+
     // 親コンポーネントに現在のページを通知
     if (onDayChange) {
       onDayChange(page);
@@ -63,22 +93,15 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
   // 前のページに移動
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      const newPage = currentPage - 1;
-      setCurrentPage(newPage);
-      if (onDayChange) {
-        onDayChange(newPage);
-      }
+      goToPage(currentPage - 1);
     }
   };
 
   // 次のページに移動
   const goToNextPage = () => {
+    const totalPages = dayPlans?.length || 0;
     if (currentPage < totalPages) {
-      const newPage = currentPage + 1;
-      setCurrentPage(newPage);
-      if (onDayChange) {
-        onDayChange(newPage);
-      }
+      goToPage(currentPage + 1);
     }
   };
 
@@ -97,10 +120,13 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       return Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
         <PaginationItem key={page}>
           <PaginationLink
-            onClick={() => goToPage(page)}
+            onClick={(e) => {
+              e.preventDefault(); // デフォルトのリンク動作を防止
+              goToPage(page);
+            }}
             isActive={page === currentPage}
           >
-            {page}
+            {page}日目
           </PaginationLink>
         </PaginationItem>
       ));
@@ -113,7 +139,10 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     items.push(
       <PaginationItem key={1}>
         <PaginationLink
-          onClick={() => goToPage(1)}
+          onClick={(e) => {
+            e.preventDefault();
+            goToPage(1);
+          }}
           isActive={1 === currentPage}
         >
           1日目
@@ -124,22 +153,29 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     // 現在のページが前方に寄っている場合
     if (currentPage < 4) {
       for (let i = 2; i <= 4; i++) {
+        if (i <= totalPages) {
+          items.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={(e) => {
+                  e.preventDefault();
+                  goToPage(i);
+                }}
+                isActive={i === currentPage}
+              >
+                {i}日目
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
+      }
+      if (totalPages > 4) {
         items.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              onClick={() => goToPage(i)}
-              isActive={i === currentPage}
-            >
-              {i}
-            </PaginationLink>
+          <PaginationItem key='ellipsis1'>
+            <PaginationEllipsis />
           </PaginationItem>
         );
       }
-      items.push(
-        <PaginationItem key='ellipsis1'>
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
     }
     // 現在のページが後方に寄っている場合
     else if (currentPage > totalPages - 3) {
@@ -149,16 +185,22 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
         </PaginationItem>
       );
       for (let i = totalPages - 3; i < totalPages; i++) {
-        items.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              onClick={() => goToPage(i)}
-              isActive={i === currentPage}
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>
-        );
+        if (i > 1) {
+          // 最初のページと重複しないように
+          items.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={(e) => {
+                  e.preventDefault();
+                  goToPage(i);
+                }}
+                isActive={i === currentPage}
+              >
+                {i}日目
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
       }
     }
     // 中間にある場合
@@ -169,16 +211,22 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
         </PaginationItem>
       );
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-        items.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              onClick={() => goToPage(i)}
-              isActive={i === currentPage}
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>
-        );
+        if (i > 1 && i < totalPages) {
+          // 最初と最後のページと重複しないように
+          items.push(
+            <PaginationItem key={i}>
+              <PaginationLink
+                onClick={(e) => {
+                  e.preventDefault();
+                  goToPage(i);
+                }}
+                isActive={i === currentPage}
+              >
+                {i}日目
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
       }
       items.push(
         <PaginationItem key='ellipsis2'>
@@ -192,7 +240,11 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       items.push(
         <PaginationItem key={totalPages}>
           <PaginationLink
-            onClick={() => goToPage(totalPages)}
+            onClick={(e) => {
+              e.preventDefault();
+              console.log('最終日クリック:', totalPages);
+              goToPage(totalPages);
+            }}
             isActive={totalPages === currentPage}
           >
             {totalPages}日目
@@ -214,7 +266,10 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={goToPreviousPage}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToPreviousPage();
+                  }}
                   className={
                     currentPage === 1
                       ? 'pointer-events-none opacity-50'
@@ -227,7 +282,10 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={goToNextPage}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goToNextPage();
+                  }}
                   className={
                     currentPage === totalPages
                       ? 'pointer-events-none opacity-50'
