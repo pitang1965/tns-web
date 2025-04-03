@@ -54,7 +54,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
   // 日ごとの旅程をレンダリングする関数
   const renderDayPlan = (day: DayPlan, index: number) => {
-    return <DayPlanView key={index} day={day} />;
+    return <DayPlanView key={index} day={day} dayIndex={index} />;
   };
 
   if (loading) {
