@@ -5,9 +5,9 @@
  * @returns 緯度経度の組、または null
  */
 
-export function extractCoordinatesFromGoogleMapsUrl(url: string) {
+export function extractCoordinatesFromGoogleMapsUrl(input: string) {
   // ピンの位置を探す（!3dと!4dの後の数値）
-  const pinCoords = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  const pinCoords = input.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
 
   if (pinCoords) {
     return {
@@ -16,8 +16,19 @@ export function extractCoordinatesFromGoogleMapsUrl(url: string) {
     };
   }
 
+  // 単純な緯度,経度形式の文字列から抽出を試みる
+  // 例: "34.1948618,132.2084567"
+  const simpleCoords = input.match(/^(-?\d+\.\d+),\s*(-?\d+\.\d+)$/);
+
+  if (simpleCoords) {
+    return {
+      latitude: parseFloat(simpleCoords[1]),
+      longitude: parseFloat(simpleCoords[2]),
+    };
+  }
+
   // 地図の中心位置を探す（/@の後の座標）
-  const centerCoords = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  const centerCoords = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
 
   if (centerCoords) {
     return {
