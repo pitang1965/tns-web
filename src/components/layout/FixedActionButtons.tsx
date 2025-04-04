@@ -25,7 +25,7 @@ export function FixedActionButtons({
   customButtons,
 }: FixedActionButtonsProps) {
   return (
-    <div className='fixed bottom-4 right-4 flex gap-2 z-50'>
+    <div className='fixed top-16 right-4 flex gap-2 z-50'>
       {/* 共通: 戻るボタン（詳細・編集・新規作成のすべてで利用可能） */}
       {onBack && (
         <Button
