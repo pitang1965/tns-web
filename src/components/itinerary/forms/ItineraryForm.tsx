@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { H3, LargeText } from '@/components/common/Typography';
+import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
@@ -63,6 +64,12 @@ export function ItineraryForm({
 
   // 旅程全体に関する情報の折りたたみ
   const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(false);
+
+  // 確認ダイアログの表示/非表示
+  const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
+
+  // バックURLを保存する変数
+  const [backUrlState, setBackUrlState] = useState('');
 
   // カスタムダーティフラグを追加
   const [formModified, setFormModified] = useState(false);
@@ -118,16 +125,23 @@ export function ItineraryForm({
       ? `/itineraries/${itineraryId}`
       : '/itineraries';
 
-    console.log('戻るボタンクリック - 遷移先:', backUrl);
+    // バックURLを状態に保存
+    setBackUrlState(backUrl);
 
     if (formModified) {
-      if (confirm('入力内容は破棄されます。よろしいですか？')) {
-        router.push(backUrl);
-      }
+      // 変更がある場合は確認ダイアログを表示
+      setIsBackConfirmOpen(true);
     } else {
       // 変更がない場合は確認なしで戻る
       router.push(backUrl);
     }
+  };
+
+  // 確認ダイアログで「はい」を選択した際の処理
+  const handleConfirmedBack = async (): Promise<void> => {
+    router.push(backUrlState);
+    // Promiseを返す必要があるので、即座に解決するPromiseを返す
+    return Promise.resolve();
   };
 
   // 日付の監視と dayPlans の自動生成
@@ -424,69 +438,80 @@ export function ItineraryForm({
   }
 
   return (
-    <Card className='max-w-2xl mx-auto'>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <FormProvider {...methods}>
-          <form
-            onChange={handleInputChange}
-            // フォーム送信ハンドラーもマウスイベントを処理するように修正
-            onSubmit={(e) => {
-              // デフォルトのフォーム送信イベントを抑制
-              e.preventDefault();
-              console.log('Form onSubmit triggered.');
-              // 明示的にボタンクリックで処理する
-            }}
-            className='space-y-4'
-          >
-            {/* BasicInfoSectionコンポーネントを使用 */}
-            <BasicInfoSection
-              isOpen={isBasicInfoOpen}
-              onOpenChange={setIsBasicInfoOpen}
-            />
+    <>
+      <Card className='max-w-2xl mx-auto'>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FormProvider {...methods}>
+            <form
+              onChange={handleInputChange}
+              // フォーム送信ハンドラーもマウスイベントを処理するように修正
+              onSubmit={(e) => {
+                // デフォルトのフォーム送信イベントを抑制
+                e.preventDefault();
+                console.log('Form onSubmit triggered.');
+                // 明示的にボタンクリックで処理する
+              }}
+              className='space-y-4'
+            >
+              {/* BasicInfoSectionコンポーネントを使用 */}
+              <BasicInfoSection
+                isOpen={isBasicInfoOpen}
+                onOpenChange={setIsBasicInfoOpen}
+              />
 
-            <div className='space-y-4 my-4'>
-              {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
-              {watch('dayPlans')?.length > 0 && (
-                <>
-                  {/* DayPaginationコンポーネントの使用 - dayParamHookを統合 */}
-                  <DayPagination
-                    dayPlans={watch('dayPlans')}
-                    onDayChange={dayParamHook.handleDayChange}
-                    initialSelectedDay={dayParamHook.selectedDay}
-                    renderDayPlan={(dayPlan, index) => (
-                      <>
-                        {/* 各ページの上部に現在の日数表示を追加 */}
-                        {renderPaginationHeader(index)}
-                        {renderDayPlanForm(dayPlan, index)}
-                      </>
-                    )}
-                  />
-                </>
-              )}
-            </div>
-            {process.env.NODE_ENV === 'development' &&
-              Object.keys(errors).length > 0 && (
-                <div className='mb-4 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800'>
-                  <LargeText>フォームにエラーがあります:</LargeText>
-                  <pre>
-                    {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
-                  </pre>
-                </div>
-              )}
-            <FixedActionButtons
-              mode={isCreating ? 'create' : 'edit'}
-              onBack={handleBack}
-              onSave={isCreating ? undefined : handleSave}
-              onCreate={isCreating ? handleCreate : undefined}
-              disabled={isSubmitting}
-            />
-          </form>
-        </FormProvider>
-      </CardContent>
-    </Card>
+              <div className='space-y-4 my-4'>
+                {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
+                {watch('dayPlans')?.length > 0 && (
+                  <>
+                    {/* DayPaginationコンポーネントの使用 - dayParamHookを統合 */}
+                    <DayPagination
+                      dayPlans={watch('dayPlans')}
+                      onDayChange={dayParamHook.handleDayChange}
+                      initialSelectedDay={dayParamHook.selectedDay}
+                      renderDayPlan={(dayPlan, index) => (
+                        <>
+                          {/* 各ページの上部に現在の日数表示を追加 */}
+                          {renderPaginationHeader(index)}
+                          {renderDayPlanForm(dayPlan, index)}
+                        </>
+                      )}
+                    />
+                  </>
+                )}
+              </div>
+              {process.env.NODE_ENV === 'development' &&
+                Object.keys(errors).length > 0 && (
+                  <div className='mb-4 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800'>
+                    <LargeText>フォームにエラーがあります:</LargeText>
+                    <pre>
+                      {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
+                    </pre>
+                  </div>
+                )}
+              <FixedActionButtons
+                mode={isCreating ? 'create' : 'edit'}
+                onBack={handleBack}
+                onSave={isCreating ? undefined : handleSave}
+                onCreate={isCreating ? handleCreate : undefined}
+                disabled={isSubmitting}
+              />
+            </form>
+          </FormProvider>
+        </CardContent>
+      </Card>
+      <ConfirmationDialog
+        isOpen={isBackConfirmOpen}
+        onOpenChange={setIsBackConfirmOpen}
+        title='入力内容の破棄'
+        description='入力内容は破棄されます。よろしいですか？'
+        confirmLabel='入力を破棄'
+        onConfirm={handleConfirmedBack}
+        variant='destructive'
+      />
+    </>
   );
 }
