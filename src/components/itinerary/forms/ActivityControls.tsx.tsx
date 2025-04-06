@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import { TimeShiftDialog } from '@/components/itinerary/forms/TimeShiftDialog';
 import { Button } from '@/components/ui/button';
-import {
-  MoveUp,
-  MoveDown,
-  Trash2,
-  MoreVertical,
-  
-} from 'lucide-react';
+import { MoveUp, MoveDown, Trash2, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,7 +44,7 @@ export function ActivityControls({
   onShiftSubsequentActivities,
 }: ActivityControlsProps) {
   const [isTimeShiftDialogOpen, setIsTimeShiftDialogOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isPrevDayConfirmOpen, setIsPrevDayConfirmOpen] = useState(false);
   const [isNextDayConfirmOpen, setIsNextDayConfirmOpen] = useState(false);
 
@@ -117,7 +111,7 @@ export function ActivityControls({
           type='button'
           variant='ghost'
           size='sm'
-          onClick={() => setIsConfirmOpen(true)}
+          onClick={() => setIsDeleteConfirmOpen(true)}
           title='削除'
         >
           <Trash2 className='h-4 w-4' />
@@ -158,8 +152,8 @@ export function ActivityControls({
         activityIndex={activityIndex}
       />
       <ConfirmationDialog
-        isOpen={isConfirmOpen}
-        onOpenChange={setIsConfirmOpen}
+        isOpen={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
         title='アクティビティの削除'
         description='このアクティビィティを削除してもよろしいですか？'
         confirmLabel='削除'
