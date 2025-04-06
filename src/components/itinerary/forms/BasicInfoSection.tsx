@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { H3, SmallText } from '@/components/common/Typography';
 import { Input } from '@/components/ui/input';
@@ -26,7 +26,21 @@ export function BasicInfoSection({
     register,
     formState: { errors },
     control,
+    watch,
+    setValue,
   } = useFormContext();
+
+  // 開始日を監視
+  const startDate = watch('startDate');
+
+  // コンポーネントマウント時とstartDate値変更時に実行
+  useEffect(() => {
+    // ISOString形式の日付をYYYY-MM-DD形式に変換する
+    if (startDate && startDate.includes('T')) {
+      const dateOnly = startDate.split('T')[0];
+      setValue('startDate', dateOnly);
+    }
+  }, [startDate, setValue]);
 
   return (
     <div className='border rounded-lg p-4 space-y-4'>
@@ -67,7 +81,17 @@ export function BasicInfoSection({
           </div>
           <div className='space-y-4 my-4'>
             <Label htmlFor='startDate'>開始日</Label>
-            <Input id='startDate' type='date' {...register('startDate')} />
+            <Input
+              id='startDate'
+              type='date'
+              {...register('startDate', {
+                setValueAs: (value) => {
+                  // input[type="date"]から受け取った値を処理
+                  if (!value) return undefined;
+                  return value; // YYYY-MM-DD形式を維持
+                },
+              })}
+            />
             {errors.startDate && (
               <SmallText>{errors.startDate.message as string}</SmallText>
             )}
