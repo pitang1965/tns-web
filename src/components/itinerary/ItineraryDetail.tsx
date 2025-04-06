@@ -111,6 +111,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
   return (
     <main className='container mx-auto p-4'>
+      {/* FixedActionButtonsのための余白を確保 */}
+      <div className='pt-8 md:pt-12'></div>
       <div className='flex flex-col md:flex-row gap-6'>
         <div className='hidden md:block'>
           <ItineraryToc itinerary={itinerary} />
@@ -154,6 +156,14 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             onBack={handleBack}
             onEdit={handleEdit}
             onDelete={handleDeleteConfirm}
+            shareData={{
+              title: itinerary.title,
+              dayIndex: dayParamHook.selectedDay,
+              date:
+                itinerary.dayPlans[dayParamHook.selectedDay]?.date ||
+                itinerary.startDate,
+              id: itinerary.id,
+            }}
           />
 
           <ConfirmationDialog

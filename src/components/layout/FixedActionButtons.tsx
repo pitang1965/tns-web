@@ -1,6 +1,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Plus, Save, Trash, ArrowLeft, Check } from 'lucide-react';
+import {
+  Edit,
+  Plus,
+  Save,
+  Trash,
+  ArrowLeft,
+  Check,
+  Share2,
+} from 'lucide-react';
+import { formatDateWithWeekday } from '@/lib/date';
 
 export type FixedActionButtonsProps = {
   mode?: 'detail' | 'edit' | 'create';
@@ -12,6 +21,13 @@ export type FixedActionButtonsProps = {
   onCreate?: () => void;
   customButtons?: React.ReactNode;
   disabled?: boolean;
+  // Twitter共有用のプロパティを修正
+  shareData?: {
+    title: string;
+    dayIndex: number;
+    date?: string;
+    id?: string;
+  };
 };
 
 export function FixedActionButtons({
@@ -23,7 +39,33 @@ export function FixedActionButtons({
   onBack,
   onCreate,
   customButtons,
+  shareData,
 }: FixedActionButtonsProps) {
+  // X(Twitter)共有機能
+  const handleShareToTwitter = () => {
+    if (!shareData || !shareData.id) return;
+
+    const { title, dayIndex, date, id } = shareData;
+
+    // 日付をフォーマット（dateがundefinedの場合は空文字列を使用）
+    const formattedDate = date ? formatDateWithWeekday(date) : '';
+
+    // ツイート内容の作成
+    const tweetText = encodeURIComponent(
+      `${title} ${
+        dayIndex + 1
+      }日目: ${formattedDate}の旅程です。\nhttps://tabi.over40web.club/itineraries/${id}?day=${
+        dayIndex + 1
+      }`
+    );
+
+    // X(Twitter)共有URLを作成
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
+    // 新しいウィンドウでTwitter共有画面を開く
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  };
+
   return (
     <div className='fixed top-16 right-4 flex gap-2 z-50'>
       {/* 共通: 戻るボタン（詳細・編集・新規作成のすべてで利用可能） */}
@@ -41,6 +83,18 @@ export function FixedActionButtons({
       {/* 詳細モード */}
       {mode === 'detail' && (
         <>
+          {/* X(Twitter)共有ボタン - 詳細モードでのみ表示 */}
+          {shareData && shareData.id && (
+            <Button
+              onClick={handleShareToTwitter}
+              size='icon'
+              variant='secondary'
+              className='rounded-full shadow-lg bg-blue-500 hover:bg-blue-600 text-white'
+            >
+              <Share2 className='h-5 w-5' />
+            </Button>
+          )}
+
           {onEdit && (
             <Button
               onClick={onEdit}
