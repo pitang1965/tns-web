@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { TimeShiftDialog } from '@/components/itinerary/forms/TimeShiftDialog';
 import { Button } from '@/components/ui/button';
-import { MoveUp, MoveDown, Trash2, MoreVertical } from 'lucide-react';
+import {
+  MoveUp,
+  MoveDown,
+  Trash2,
+  MoreVertical,
+  
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +23,12 @@ type ActivityControlsProps = {
   activityIndex: number;
   remove: (dayIndex: number, activityIndex: number) => void;
   moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
+  moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
+  moveToNextDay?: (dayIndex: number, activityIndex: number) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  isPreviousDayAvailable?: boolean;
+  isNextDayAvailable?: boolean;
   onShiftSubsequentActivities?: (
     dayIndex: number,
     activityIndex: number,
@@ -31,12 +41,18 @@ export function ActivityControls({
   activityIndex,
   remove,
   moveActivity,
+  moveToPreviousDay,
+  moveToNextDay,
   isFirst = false,
   isLast = false,
+  isPreviousDayAvailable = false,
+  isNextDayAvailable = false,
   onShiftSubsequentActivities,
 }: ActivityControlsProps) {
   const [isTimeShiftDialogOpen, setIsTimeShiftDialogOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isPrevDayConfirmOpen, setIsPrevDayConfirmOpen] = useState(false);
+  const [isNextDayConfirmOpen, setIsNextDayConfirmOpen] = useState(false);
 
   const handleShiftSubsequentActivities = () => {
     setIsTimeShiftDialogOpen(true);
@@ -53,6 +69,20 @@ export function ActivityControls({
   };
 
   const handleDelete = async () => remove(dayIndex, activityIndex);
+
+  const handleMoveToPreviousDay = async () => {
+    if (moveToPreviousDay) {
+      moveToPreviousDay(dayIndex, activityIndex);
+    }
+    setIsPrevDayConfirmOpen(false);
+  };
+
+  const handleMoveToNextDay = async () => {
+    if (moveToNextDay) {
+      moveToNextDay(dayIndex, activityIndex);
+    }
+    setIsNextDayConfirmOpen(false);
+  };
 
   return (
     <>
@@ -107,6 +137,16 @@ export function ActivityControls({
             <DropdownMenuItem onClick={handleShiftSubsequentActivities}>
               以降のアクティビティの時間をずらす
             </DropdownMenuItem>
+            {isPreviousDayAvailable && (
+              <DropdownMenuItem onClick={() => setIsPrevDayConfirmOpen(true)}>
+                前日の末尾に移動
+              </DropdownMenuItem>
+            )}
+            {isNextDayAvailable && (
+              <DropdownMenuItem onClick={() => setIsNextDayConfirmOpen(true)}>
+                翌日の先頭に移動
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -125,6 +165,22 @@ export function ActivityControls({
         confirmLabel='削除'
         onConfirm={handleDelete}
         variant='destructive'
+      />
+      <ConfirmationDialog
+        isOpen={isPrevDayConfirmOpen}
+        onOpenChange={setIsPrevDayConfirmOpen}
+        title='前日に移動'
+        description='このアクティビティを前日に移動しますか？前日の末尾に追加され、時刻情報はクリアされます。'
+        confirmLabel='移動'
+        onConfirm={handleMoveToPreviousDay}
+      />
+      <ConfirmationDialog
+        isOpen={isNextDayConfirmOpen}
+        onOpenChange={setIsNextDayConfirmOpen}
+        title='翌日に移動'
+        description='このアクティビティを翌日に移動しますか？翌日の先頭に追加され、時刻情報はクリアされます。'
+        confirmLabel='移動'
+        onConfirm={handleMoveToNextDay}
       />
     </>
   );

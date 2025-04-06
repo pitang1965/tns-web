@@ -8,17 +8,23 @@ import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { formatDateWithWeekday } from '@/lib/date';
 
 type DayPlanFormProps = {
-  day: { date: string | null; activities: any[]; };
+  day: { date: string | null; activities: any[] };
   dayIndex: number;
+  daysCount: number;
   addActivity: (dayIndex: number) => void;
   removeActivity: (dayIndex: number, activityIndex: number) => void;
+  moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
+  moveToNextDay?: (dayIndex: number, activityIndex: number) => void;
 };
 
 export function DayPlanForm({
   day,
   dayIndex,
+  daysCount,
   addActivity,
   removeActivity,
+  moveToPreviousDay,
+  moveToNextDay,
 }: DayPlanFormProps) {
   const {
     formState: { errors },
@@ -26,7 +32,11 @@ export function DayPlanForm({
     setValue,
   } = useFormContext<ClientItineraryInput>();
 
-  const moveActivity = (dayIndex: number, fromIndex: number, toIndex: number) => {
+  const moveActivity = (
+    dayIndex: number,
+    fromIndex: number,
+    toIndex: number
+  ) => {
     const activities = watch(`dayPlans.${dayIndex}.activities`);
     if (!activities) return;
 
@@ -55,8 +65,12 @@ export function DayPlanForm({
             activityIndex={activityIndex}
             remove={removeActivity}
             moveActivity={moveActivity}
+            moveToPreviousDay={moveToPreviousDay}
+            moveToNextDay={moveToNextDay}
             isFirst={activityIndex === 0}
             isLast={activityIndex === day.activities.length - 1}
+            isPreviousDayAvailable={dayIndex > 0}
+            isNextDayAvailable={dayIndex < daysCount - 1}
             errors={errors}
           />
         ))}

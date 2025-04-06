@@ -90,8 +90,6 @@ export function ItineraryForm({
     initialData?.dayPlans?.length || 1 // 初期値はinitialDataから取得
   );
 
-  // 上に移動済み
-
   // フォームの初期化後にダーティフラグをリセットする
   useEffect(() => {
     // コンポーネント初期化後に少し遅延してリセット
@@ -256,6 +254,80 @@ export function ItineraryForm({
     );
   };
 
+  // 日をまたいだアクティビティの移動機能
+  const moveToPreviousDay = (dayIndex: number, activityIndex: number) => {
+    if (dayIndex <= 0) return;
+
+    // 現在のアクティビティを取得
+    const activities = watch(`dayPlans.${dayIndex}.activities`);
+    if (!activities) return;
+
+    // 移動するアクティビティを取得し、時刻情報をクリア
+    const movedActivity = { ...activities[activityIndex] };
+    movedActivity.startTime = null;
+    movedActivity.endTime = null;
+
+    // 現在の日からアクティビティを削除
+    const newActivities = [...activities];
+    newActivities.splice(activityIndex, 1);
+
+    // 前日のアクティビティを取得
+    const prevDayActivities =
+      watch(`dayPlans.${dayIndex - 1}.activities`) || [];
+
+    // 前日の末尾にアクティビティを追加
+    const newPrevDayActivities = [...prevDayActivities, movedActivity];
+
+    // フォームの値を更新
+    setValue(`dayPlans.${dayIndex}.activities`, newActivities, {
+      shouldValidate: true,
+    });
+
+    setValue(`dayPlans.${dayIndex - 1}.activities`, newPrevDayActivities, {
+      shouldValidate: true,
+    });
+
+    // フォーム変更フラグを更新
+    setFormModified(true);
+  };
+
+  const moveToNextDay = (dayIndex: number, activityIndex: number) => {
+    const numberOfDays = watch('numberOfDays') || 0;
+    if (dayIndex >= numberOfDays - 1) return;
+
+    // 現在のアクティビティを取得
+    const activities = watch(`dayPlans.${dayIndex}.activities`);
+    if (!activities) return;
+
+    // 移動するアクティビティを取得し、時刻情報をクリア
+    const movedActivity = { ...activities[activityIndex] };
+    movedActivity.startTime = null;
+    movedActivity.endTime = null;
+
+    // 現在の日からアクティビティを削除
+    const newActivities = [...activities];
+    newActivities.splice(activityIndex, 1);
+
+    // 翌日のアクティビティを取得
+    const nextDayActivities =
+      watch(`dayPlans.${dayIndex + 1}.activities`) || [];
+
+    // 翌日の先頭にアクティビティを追加
+    const newNextDayActivities = [movedActivity, ...nextDayActivities];
+
+    // フォームの値を更新
+    setValue(`dayPlans.${dayIndex}.activities`, newActivities, {
+      shouldValidate: true,
+    });
+
+    setValue(`dayPlans.${dayIndex + 1}.activities`, newNextDayActivities, {
+      shouldValidate: true,
+    });
+
+    // フォーム変更フラグを更新
+    setFormModified(true);
+  };
+
   const getErrorsForDisplay = (errors: any) => {
     // 単純なエラーメッセージのみを収集
     const result: Record<string, string> = {};
@@ -297,13 +369,17 @@ export function ItineraryForm({
 
   // DayPlanFormをレンダリングする関数
   const renderDayPlanForm = (day: any, index: number) => {
+    const numberOfDays = watch('numberOfDays') || 0;
     return (
       <DayPlanForm
         key={index}
         day={day}
         dayIndex={index}
+        daysCount={numberOfDays}
         addActivity={addActivity}
         removeActivity={removeActivity}
+        moveToPreviousDay={moveToPreviousDay}
+        moveToNextDay={moveToNextDay}
       />
     );
   };

@@ -14,10 +14,14 @@ type ActivityFormProps = {
   activityIndex: number;
   remove: (dayIndex: number, activityIndex: number) => void;
   moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
+  moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
+  moveToNextDay?: (dayIndex: number, activityIndex: number) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  isPreviousDayAvailable?: boolean;
+  isNextDayAvailable?: boolean;
   onValidationError?: (hasError: boolean) => void;
-  errors: FieldErrors<ClientItineraryInput>; //
+  errors: FieldErrors<ClientItineraryInput>;
 };
 
 export function ActivityForm({
@@ -25,8 +29,12 @@ export function ActivityForm({
   activityIndex,
   remove,
   moveActivity,
+  moveToPreviousDay,
+  moveToNextDay,
   isFirst = false,
   isLast = false,
+  isPreviousDayAvailable = false,
+  isNextDayAvailable = false,
   onValidationError,
 }: ActivityFormProps) {
   const {
@@ -101,8 +109,12 @@ export function ActivityForm({
           activityIndex={activityIndex}
           remove={remove}
           moveActivity={moveActivity}
+          moveToPreviousDay={moveToPreviousDay}
+          moveToNextDay={moveToNextDay}
           isFirst={isFirst}
           isLast={isLast}
+          isPreviousDayAvailable={isPreviousDayAvailable}
+          isNextDayAvailable={isNextDayAvailable}
           onShiftSubsequentActivities={handleShiftSubsequentActivities}
         />
       </div>
@@ -125,9 +137,6 @@ export function ActivityForm({
           <SmallText>{getFieldError('title')}</SmallText>
         )}
       </div>
-      {getFieldError('title') && (
-        <SmallText>{getFieldError('title')}</SmallText>
-      )}
       <PlaceForm
         dayIndex={dayIndex}
         activityIndex={activityIndex}
