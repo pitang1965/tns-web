@@ -121,7 +121,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           {!user && isPublic && (
             <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
               <LargeText>
-                この旅程をマイリストに追加したり、編集したりするには
+                この旅程を編集するには
                 <Button
                   variant='link'
                   className='p-0 mx-1 h-auto'
