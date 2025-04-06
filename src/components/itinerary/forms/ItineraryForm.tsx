@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/card';
 import { H3, LargeText } from '@/components/common/Typography';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
@@ -61,6 +62,9 @@ export function ItineraryForm({
 }: ItineraryFormProps) {
   const router = useRouter();
   const { toast } = useToast();
+
+  // 保存中の状態を管理するためのstate
+  const [isSaving, setIsSaving] = useState(false);
 
   // 旅程全体に関する情報の折りたたみ
   const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(false);
@@ -382,24 +386,39 @@ export function ItineraryForm({
     e.preventDefault();
     e.stopPropagation();
 
-    return handleSubmit((data) => {
-      console.log('更新ボタンがクリックされました。データ:', data);
-      setFormModified(false);
-      return handleFormSubmit(data);
-    })();
+    // 保存中の状態をtrueに設定
+    setIsSaving(true);
+
+    try {
+      handleSubmit(async (data) => {
+        console.log('更新ボタンがクリックされました。データ:', data);
+        setFormModified(false);
+        return await handleFormSubmit(data);
+      })();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // 作成ボタンのクリックハンドラー
-  const handleCreate = (e: React.MouseEvent) => {
+  const handleCreate = async (e: React.MouseEvent) => {
     // イベントの伝播を停止
     e.preventDefault();
     e.stopPropagation();
 
-    return handleSubmit((data) => {
-      setFormModified(false);
-      console.log('作成ボタンがクリックされました。データ:', data);
-      return handleFormSubmit(data);
-    })();
+    // 保存中の状態をtrueに設定
+    setIsSaving(true);
+
+    try {
+      await handleSubmit(async (data) => {
+        setFormModified(false);
+        console.log('作成ボタンがクリックされました。データ:', data);
+        return await handleFormSubmit(data);
+      })();
+    } finally {
+      // 処理が完了したら保存中の状態をfalseに戻す
+      setIsSaving(false);
+    }
   };
 
   // DayPlanFormをレンダリングする関数
@@ -497,9 +516,11 @@ export function ItineraryForm({
                 onBack={handleBack}
                 onSave={isCreating ? undefined : handleSave}
                 onCreate={isCreating ? handleCreate : undefined}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSaving}
               />
             </form>
+            // LoadingSpinnerコンポーネントを条件付きでレンダリング
+            {isSaving && <LoadingSpinner />}
           </FormProvider>
         </CardContent>
       </Card>
