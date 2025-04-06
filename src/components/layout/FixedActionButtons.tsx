@@ -14,11 +14,11 @@ import { formatDateWithWeekday } from '@/lib/date';
 export type FixedActionButtonsProps = {
   mode?: 'detail' | 'edit' | 'create';
   onEdit?: () => void;
-  onSave?: () => void;
-  onBack?: () => void;
+  onSave?: (e: React.MouseEvent) => void;
+  onBack?: (e: React.MouseEvent) => void;
   onDelete?: () => void;
   onAdd?: () => void;
-  onCreate?: () => void;
+  onCreate?: (e: React.MouseEvent) => void;
   customButtons?: React.ReactNode;
   disabled?: boolean;
   // Twitter共有用のプロパティを修正
@@ -40,6 +40,7 @@ export function FixedActionButtons({
   onCreate,
   customButtons,
   shareData,
+  disabled = false,
 }: FixedActionButtonsProps) {
   // X(Twitter)共有機能
   const handleShareToTwitter = () => {
@@ -52,11 +53,7 @@ export function FixedActionButtons({
 
     // ツイート内容の作成
     const tweetText = encodeURIComponent(
-      `${title} ${
-        dayIndex
-      }日目: ${formattedDate}の旅程です。\nhttps://tabi.over40web.club/itineraries/${id}?day=${
-        dayIndex
-      }`
+      `${title} ${dayIndex}日目: ${formattedDate}の旅程です。\nhttps://tabi.over40web.club/itineraries/${id}?day=${dayIndex}`
     );
 
     // X(Twitter)共有URLを作成
@@ -71,10 +68,12 @@ export function FixedActionButtons({
       {/* 共通: 戻るボタン（詳細・編集・新規作成のすべてで利用可能） */}
       {onBack && (
         <Button
-          onClick={onBack}
+          onClick={(e) => onBack(e)}
           size='icon'
           variant='outline'
           className='rounded-full shadow-lg'
+          disabled={disabled}
+          type='button' // 明示的にbuttonタイプを指定
         >
           <ArrowLeft className='h-5 w-5' />
         </Button>
@@ -90,6 +89,8 @@ export function FixedActionButtons({
               size='icon'
               variant='secondary'
               className='rounded-full shadow-lg bg-blue-500 hover:bg-blue-600 text-white'
+              disabled={disabled}
+              type='button'
             >
               <Share2 className='h-5 w-5' />
             </Button>
@@ -101,6 +102,8 @@ export function FixedActionButtons({
               size='icon'
               variant='secondary'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Edit className='h-5 w-5' />
             </Button>
@@ -111,6 +114,8 @@ export function FixedActionButtons({
               size='icon'
               variant='destructive'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Trash className='h-5 w-5' />
             </Button>
@@ -121,6 +126,8 @@ export function FixedActionButtons({
               size='icon'
               variant='default'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Plus className='h-5 w-5' />
             </Button>
@@ -137,16 +144,20 @@ export function FixedActionButtons({
               size='icon'
               variant='destructive'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Trash className='h-5 w-5' />
             </Button>
           )}
           {onSave && (
             <Button
-              onClick={onSave}
+              onClick={(e) => onSave(e)}
               size='icon'
               variant='default'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Save className='h-5 w-5' />
             </Button>
@@ -159,10 +170,12 @@ export function FixedActionButtons({
         <>
           {onCreate && (
             <Button
-              onClick={onCreate}
+              onClick={(e) => onCreate(e)}
               size='icon'
               variant='default'
               className='rounded-full shadow-lg'
+              disabled={disabled}
+              type='button'
             >
               <Check className='h-5 w-5' />
             </Button>

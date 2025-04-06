@@ -106,16 +106,27 @@ export function ItineraryForm({
   };
 
   // 戻るボタン処理
-  const handleBack = () => {
+  const handleBack = (e: React.MouseEvent) => {
+    // イベントの伝播を停止して、フォーム送信が発生しないようにする
+    e.preventDefault();
+    e.stopPropagation();
+
+    // ルーティング先を確認する
+    const backUrl = isCreating
+      ? '/itineraries'
+      : itineraryId
+      ? `/itineraries/${itineraryId}`
+      : '/itineraries';
+
+    console.log('戻るボタンクリック - 遷移先:', backUrl);
+
     if (formModified) {
       if (confirm('入力内容は破棄されます。よろしいですか？')) {
-        router.push(
-          isCreating ? '/itineraries' : `/itineraries/${itineraryId}`
-        );
+        router.push(backUrl);
       }
     } else {
       // 変更がない場合は確認なしで戻る
-      router.push(isCreating ? '/itineraries' : `/itineraries/${itineraryId}`);
+      router.push(backUrl);
     }
   };
 
@@ -351,7 +362,12 @@ export function ItineraryForm({
     return result;
   };
 
-  const handleSave = () => {
+  // 保存ボタンのクリックハンドラー
+  const handleSave = (e: React.MouseEvent) => {
+    // イベントの伝播を停止
+    e.preventDefault();
+    e.stopPropagation();
+
     return handleSubmit((data) => {
       console.log('更新ボタンがクリックされました。データ:', data);
       setFormModified(false);
@@ -359,7 +375,12 @@ export function ItineraryForm({
     })();
   };
 
-  const handleCreate = () => {
+  // 作成ボタンのクリックハンドラー
+  const handleCreate = (e: React.MouseEvent) => {
+    // イベントの伝播を停止
+    e.preventDefault();
+    e.stopPropagation();
+
     return handleSubmit((data) => {
       setFormModified(false);
       console.log('作成ボタンがクリックされました。データ:', data);
@@ -412,14 +433,12 @@ export function ItineraryForm({
         <FormProvider {...methods}>
           <form
             onChange={handleInputChange}
+            // フォーム送信ハンドラーもマウスイベントを処理するように修正
             onSubmit={(e) => {
-              handleSubmit((data) => {
-                console.log(
-                  'Form handleSubmit callback triggered with data:',
-                  data
-                );
-                handleFormSubmit(data);
-              })(e);
+              // デフォルトのフォーム送信イベントを抑制
+              e.preventDefault();
+              console.log('Form onSubmit triggered.');
+              // 明示的にボタンクリックで処理する
             }}
             className='space-y-4'
           >
