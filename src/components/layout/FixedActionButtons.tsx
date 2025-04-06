@@ -53,9 +53,9 @@ export function FixedActionButtons({
     // ツイート内容の作成
     const tweetText = encodeURIComponent(
       `${title} ${
-        dayIndex + 1
+        dayIndex
       }日目: ${formattedDate}の旅程です。\nhttps://tabi.over40web.club/itineraries/${id}?day=${
-        dayIndex + 1
+        dayIndex
       }`
     );
 
