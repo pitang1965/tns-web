@@ -5,6 +5,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## 概要
 旅行計画の作成から実施までをサポートするウェブアプリケーションで、Google Maps連携により効率的な旅程管理を実現します。カーナビゲーション（Android Auto・Apple CarPlay）との連携を前提に設計されており、旅行中の移動をスムーズにサポートします。
 
+![image](https://github.com/user-attachments/assets/22973f88-6411-49fb-9f3e-6284d649bb26)
+
 ## 主な機能
 - **アカウント管理**: アカウントを作成して個人の旅程を管理
 - **旅程作成・共有**: 公開設定により、作成した旅程を他のユーザーと共有可能
