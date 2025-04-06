@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-# 旅程管理ウェブアプリケーション
+# 旅程管理ウェブアプリケーション「旅のしおり」
 
 ## 概要
 旅行計画の作成から実施までをサポートするウェブアプリケーションで、Google Maps連携により効率的な旅程管理を実現します。カーナビゲーション（Android Auto・Apple CarPlay）との連携を前提に設計されており、旅行中の移動をスムーズにサポートします。
