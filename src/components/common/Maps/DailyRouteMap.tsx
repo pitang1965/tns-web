@@ -110,7 +110,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
 
           // 境界ボックスがある場合は、それを使用して表示範囲を調整
           const bounds = calculateBounds();
-          if (bounds && activities.length > 1) {
+          if (bounds && activities.length > 1 && map.current) {
             map.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
               padding: 50, // 境界とマップエッジの間にパディングを追加
             });
