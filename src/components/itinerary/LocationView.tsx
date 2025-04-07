@@ -1,6 +1,6 @@
 import React from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
-import Map from '@/components/common/Map';
+import Map from '@/components/common/Maps/Map';
 
 type LocationType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number]['place']['location'];

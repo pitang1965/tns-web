@@ -10,7 +10,7 @@ import {
   SmallText,
 } from '@/components/common/Typography';
 
-const DynamicMap = dynamic(() => import('@/components/common/Map'), {
+const DynamicMap = dynamic(() => import('@/components/common/Maps/Map'), {
   ssr: false,
   loading: () => <LargeText>地図の読み込み中...</LargeText>,
 });
