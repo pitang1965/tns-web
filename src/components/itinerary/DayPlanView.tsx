@@ -21,8 +21,13 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
       <H3>{dayDisplay}</H3>
       {day.activities.length > 0 ? (
         <ul className='space-y-2'>
-          {day.activities.map((activity) => (
-            <ActivityView key={activity.id} activity={activity} />
+          {day.activities.map((activity, activityIndex) => (
+            <ActivityView
+              key={activity.id}
+              activity={activity}
+              index={activityIndex}
+              total={day.activities.length}
+            />
           ))}
         </ul>
       ) : (

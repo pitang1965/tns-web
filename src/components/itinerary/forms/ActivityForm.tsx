@@ -12,6 +12,7 @@ import { SmallText } from '@/components/common/Typography';
 type ActivityFormProps = {
   dayIndex: number;
   activityIndex: number;
+  total?: number;
   remove: (dayIndex: number, activityIndex: number) => void;
   moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
   moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
@@ -27,6 +28,7 @@ type ActivityFormProps = {
 export function ActivityForm({
   dayIndex,
   activityIndex,
+  total,
   remove,
   moveActivity,
   moveToPreviousDay,
@@ -100,10 +102,15 @@ export function ActivityForm({
     )}`;
   };
 
+  // アクティビティのタイトル表示を生成
+  const activityHeader = total 
+    ? `アクティビティ ${activityIndex + 1}/${total}` 
+    : `アクティビティ ${activityIndex + 1}`;
+
   return (
     <div className='space-y-2 p-4 border border-border rounded-lg bg-muted/30 dark:bg-muted/20'>
       <div className='flex justify-between items-center'>
-        <h4 className='font-medium'>アクティビティ {activityIndex + 1}</h4>
+        <h4 className='font-medium'>{activityHeader}</h4>
         <ActivityControls
           dayIndex={dayIndex}
           activityIndex={activityIndex}

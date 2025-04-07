@@ -54,6 +54,9 @@ export function DayPlanForm({
     ? `${dayIndex + 1}日目: ${formatDateWithWeekday(day.date)}`
     : `${dayIndex + 1}日目`;
 
+  // その日の活動の総数を取得
+  const totalActivities = day.activities?.length || 0;
+
   return (
     <div className='border rounded-lg p-4 space-y-4'>
       <H3>{dayDisplay}</H3>
@@ -63,6 +66,7 @@ export function DayPlanForm({
             key={activity.id}
             dayIndex={dayIndex}
             activityIndex={activityIndex}
+            total={totalActivities}
             remove={removeActivity}
             moveActivity={moveActivity}
             moveToPreviousDay={moveToPreviousDay}

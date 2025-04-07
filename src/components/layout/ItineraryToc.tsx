@@ -45,7 +45,12 @@ export function ItineraryToc({ itinerary }: ItineraryTocProps) {
                         key={actIndex}
                         className='text-sm text-gray-600 dark:text-gray-400'
                       >
-                        {activity.title}
+                        <div className='flex'>
+                          <div className='w-5 flex-shrink-0'>
+                            {actIndex + 1}.
+                          </div>
+                          <div>{activity.title}</div>
+                        </div>
                       </li>
                     ))}
                 </ul>
