@@ -8,6 +8,7 @@ import { transportationSchema } from './transportationSchema';
 const dayPlanSchema = z.object({
   date: z.string().nullable(),
   activities: z.array(activitySchema),
+  notes: z.string().optional(),
 });
 
 // 基本スキーマ

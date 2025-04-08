@@ -16,9 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 type DayPlanFormProps = {
-  day: { date: string | null; activities: any[] };
+  day: { date: string | null; activities: any[]; notes?: string };
   dayIndex: number;
   daysCount: number;
   addActivity: (dayIndex: number) => void;
@@ -41,6 +43,7 @@ export function DayPlanForm({
     formState: { errors },
     watch,
     setValue,
+    register,
   } = useFormContext<ClientItineraryInput>();
 
   const moveActivity = (
@@ -119,6 +122,19 @@ export function DayPlanForm({
           />
         </div>
       )}
+
+      {/* デイノート - その日のメモ */}
+      <div className='mb-4'>
+        <Label htmlFor={`dayPlans.${dayIndex}.notes`} className='mb-2 block'>
+          この日のメモ
+        </Label>
+        <Textarea
+          id={`dayPlans.${dayIndex}.notes`}
+          placeholder='旅行の計画やメモを記入してください...'
+          className='min-h-24'
+          {...register(`dayPlans.${dayIndex}.notes`)}
+        />
+      </div>
 
       <div className='space-y-4'>
         {day.activities?.map((activity, activityIndex) => (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ActivityView } from './ActivityView';
-import { H3, LargeText } from '@/components/common/Typography';
+import { H3, LargeText, Text } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { Button } from '@/components/ui/button';
 import { Map } from 'lucide-react';
@@ -54,6 +54,9 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
   // 位置情報が設定されているアクティビティが2つ以上ある場合にのみ地図を表示
   const shouldShowMap = activitiesWithLocation.length >= 2;
 
+  // メモが存在するかチェック
+  const hasNotes = day.notes && day.notes.trim().length > 0;
+
   return (
     <div className='mb-6 bg-background text-foreground p-4 rounded-lg'>
       <div className='flex justify-between items-center mb-4'>
@@ -81,6 +84,14 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
             compact={true}
             onExpandClick={() => setShowFullMap(true)}
           />
+        </div>
+      )}
+
+      {/* その日のメモ */}
+      {hasNotes && (
+        <div className='mb-4 bg-muted/50 p-3 rounded-md'>
+          <H3>メモ</H3>
+          <Text className='whitespace-pre-wrap'>{day.notes}</Text>
         </div>
       )}
 
