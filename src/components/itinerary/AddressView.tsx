@@ -1,5 +1,6 @@
 import React from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { H3, Text } from '@/components/common/Typography';
 
 type AddressType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number]['place']['address'];
@@ -32,9 +33,5 @@ export const AddressView: React.FC<AddressProps> = ({ address }) => {
     return null;
   }
 
-  return (
-    <div className='text-sm text-gray-600 dark:text-gray-400'>
-      {formattedAddress}
-    </div>
-  );
+  return <Text>{formattedAddress}</Text>;
 };

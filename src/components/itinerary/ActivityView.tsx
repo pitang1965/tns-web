@@ -1,7 +1,7 @@
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PlaceView } from './PlaceView';
 import { TimeRangeDisplay } from '@/components/common/TimeRangeDisplay';
-import { H3 } from '@/components/common/Typography';
+import { H3, Text } from '@/components/common/Typography';
 
 type ActivityType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
@@ -41,7 +41,7 @@ export const ActivityView: React.FC<ActivityProps> = ({
         location={activity.place.location}
       />
       {activity.description && (
-        <div className='text-sm mt-1'>{activity.description}</div>
+        <Text>{activity.description}</Text>
       )}
     </li>
   );
