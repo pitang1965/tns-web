@@ -3,25 +3,64 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 # 旅程管理ウェブアプリケーション「旅のしおり」
 
 ## 概要
-旅行計画の作成から実施までをサポートするウェブアプリケーションで、Google Maps連携により効率的な旅程管理を実現します。カーナビゲーション（Android Auto・Apple CarPlay）との連携を前提に設計されており、旅行中の移動をスムーズにサポートします。
+
+旅行計画の作成から実施までをサポートするウェブアプリケーションで、Google Maps 連携により効率的な旅程管理を実現します。カーナビゲーション（Android Auto・Apple CarPlay）との連携を前提に設計されており、旅行中の移動をスムーズにサポートします。
 
 ![image](https://github.com/user-attachments/assets/22973f88-6411-49fb-9f3e-6284d649bb26)
 
 ## 主な機能
+
 - **アカウント管理**: アカウントを作成して個人の旅程を管理
 - **旅程作成・共有**: 公開設定により、作成した旅程を他のユーザーと共有可能
 - **複数日程対応**: 複数日にわたる旅行計画を日ごとに管理
 - **地図連携**: 各アクティビティに地図情報を紐づけて視覚的に管理
-- **座標データ連携**: Google Mapsから座標データ（例: 座標が埋め込まれたURLや、`34.1560076,132.3973073`）をクリップボード経由で簡単インポート
-- **ナビゲーション**: 保存した位置情報からGoogle Maps起動やルート検索が可能
-- **SNS共有**: 旅程をX（Twitter）で共有するボタンを実装
+- **座標データ連携**: Google Maps から座標データ（例: 座標が埋め込まれた URL や、`34.1560076,132.3973073`）をクリップボード経由で簡単インポート
+- **ナビゲーション**: 保存した位置情報から Google Maps 起動やルート検索が可能
+- **SNS 共有**: 旅程を X（Twitter）で共有するボタンを実装
 
 ## 使用例
+
 1. 旅行前: 複数日程の旅程を作成し、各スポットの位置情報を登録
 2. 旅行中: 登録したスポットへのナビゲーションをワンタップで起動
-3. 旅行後: 思い出の旅程をSNSで共有
+3. 旅行後: 思い出の旅程を SNS で共有
 
-Google Mapsとシームレスに連携することで、旅行計画から実際の移動までをスムーズにサポートします。
+Google Maps とシームレスに連携することで、旅行計画から実際の移動までをスムーズにサポートします。
+
+## 主要技術
+
+### フレームワーク
+
+- [Next.js](https://nextjs.org/) - React ベースのフルスタックフレームワーク
+
+### UI/UX ライブラリ
+- [React](https://react.dev/) - ユーザーインターフェース構築用ライブラリ
+- [Radix UI](https://www.radix-ui.com/) - アクセシビリティに優れたヘッドレス UI コンポーネント
+- [Tailwind CSS](https://tailwindcss.com/) - ユーティリティファーストの CSS フレームワーク
+- [Lucide React](https://lucide.dev/) - アイコンライブラリ
+
+### 地図関連
+- [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) - インタラクティブな地図実装
+- [React Leaflet](https://react-leaflet.js.org/) - React 用地図コンポーネント
+
+### データ処理
+- [MongoDB](https://www.mongodb.com/) - NoSQL データベース
+- [Mongoose](https://mongoosejs.com/) - MongoDB のオブジェクトモデリングツール
+
+### フォーム処理/バリデーション
+- [React Hook Form](https://react-hook-form.com/) - フォーム状態管理
+- [Zod](https://github.com/colinhacks/zod) - TypeScript ファーストのスキーマバリデーション
+
+- **認証**:
+- [@auth0/nextjs-auth0](https://github.com/auth0/nextjs-auth0) - Auth0 による認証機能
+
+### モニタリング
+- [Sentry](https://sentry.io/) - エラー追跡と監視
+
+## 開発ツール
+
+- **言語**: [TypeScript](https://www.typescriptlang.org/)
+- **リンター**: [ESLint](https://eslint.org/)
+- **環境変数**: [dotenv](https://github.com/motdotla/dotenv)
 
 ## .env.local の設定
 
@@ -93,15 +132,15 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 # ファイルの解説
 
-* components.json
-  * shadcn/uiライブラリを使用するNext.jsプロジェクトの設定ファイル
-* sentry.*.ts
-  * SentryをNext.jsアプリケーションに統合するための設定ファイル
-    * sentry.client.config.ts:このファイルはクライアントサイド（ブラウザ）でのSentryの設定を行う。
-    * ユーザーのブラウザで発生したエラーやパフォーマンスの問題を捕捉する。
-    * sentry.edge.config.ts
-      * このファイルはEdge環境（例：Vercel Edge Functions）でのSentryの設定を行う。
-      * サーバーレス関数やエッジコンピューティング環境で発生したエラーを追跡する。
-    * sentry.server.config.ts:
-      * このファイルはサーバーサイドでのSentryの設定を行う。
-      * Node.js環境で実行されるサーバーサイドのコードで発生したエラーを捕捉する。
+- components.json
+  - shadcn/ui ライブラリを使用する Next.js プロジェクトの設定ファイル
+- sentry.\*.ts
+  - Sentry を Next.js アプリケーションに統合するための設定ファイル
+    - sentry.client.config.ts:このファイルはクライアントサイド（ブラウザ）での Sentry の設定を行う。
+    - ユーザーのブラウザで発生したエラーやパフォーマンスの問題を捕捉する。
+    - sentry.edge.config.ts
+      - このファイルは Edge 環境（例：Vercel Edge Functions）での Sentry の設定を行う。
+      - サーバーレス関数やエッジコンピューティング環境で発生したエラーを追跡する。
+    - sentry.server.config.ts:
+      - このファイルはサーバーサイドでの Sentry の設定を行う。
+      - Node.js 環境で実行されるサーバーサイドのコードで発生したエラーを捕捉する。
