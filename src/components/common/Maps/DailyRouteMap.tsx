@@ -29,8 +29,8 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
   onExpandClick,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
+  const mapInstance = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // すべてのアクティビティを表示範囲に収めるための境界ボックスを計算
@@ -59,38 +59,45 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
     ];
   };
 
+  // マップの初期化
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
-    if (mapContainer.current && !map.current) {
-      // 緯度経度の中心を計算
-      let centerLng, centerLat;
+    if (!mapContainer.current || mapInstance.current) return;
 
-      if (activities.length > 0) {
-        if (activities.length === 1) {
-          centerLng = activities[0].longitude;
-          centerLat = activities[0].latitude;
-        } else {
-          // すべてのアクティビティの平均位置を中心にする
-          const sumLng = activities.reduce(
-            (sum, act) => sum + act.longitude,
-            0
-          );
-          const sumLat = activities.reduce((sum, act) => sum + act.latitude, 0);
-          centerLng = sumLng / activities.length;
-          centerLat = sumLat / activities.length;
-        }
+    if (activities.length === 0) return;
 
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v11',
-          center: [centerLng, centerLat] as [number, number],
-          zoom: initialZoom,
-          language: 'ja',
-        });
+    // 緯度経度の中心を計算
+    let centerLng, centerLat;
 
-        map.current.on('load', () => {
-          setMapLoaded(true);
+    if (activities.length === 1) {
+      centerLng = activities[0].longitude;
+      centerLat = activities[0].latitude;
+    } else {
+      // すべてのアクティビティの平均位置を中心にする
+      const sumLng = activities.reduce((sum, act) => sum + act.longitude, 0);
+      const sumLat = activities.reduce((sum, act) => sum + act.latitude, 0);
+      centerLng = sumLng / activities.length;
+      centerLat = sumLat / activities.length;
+    }
 
+    try {
+      mapInstance.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [centerLng, centerLat] as [number, number],
+        zoom: initialZoom,
+      });
+
+      // エラーハンドリングを追加
+      mapInstance.current.on('error', (e) => {
+        console.error('Mapbox error:', e.error);
+      });
+
+      mapInstance.current.on('load', () => {
+        if (!mapInstance.current) return;
+        setMapLoaded(true);
+
+        try {
           // 日本語ラベルを設定
           const layers = [
             'country-label',
@@ -98,9 +105,10 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
             'settlement-label',
             'poi-label',
           ];
+
           layers.forEach((layer) => {
-            if (map.current?.getLayer(layer)) {
-              map.current.setLayoutProperty(layer, 'text-field', [
+            if (mapInstance.current?.getLayer(layer)) {
+              mapInstance.current.setLayoutProperty(layer, 'text-field', [
                 'coalesce',
                 ['get', 'name_ja'],
                 ['get', 'name'],
@@ -110,8 +118,8 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
 
           // 境界ボックスがある場合は、それを使用して表示範囲を調整
           const bounds = calculateBounds();
-          if (bounds && activities.length > 1 && map.current) {
-            map.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
+          if (bounds && activities.length > 1 && mapInstance.current) {
+            mapInstance.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
               padding: 50, // 境界とマップエッジの間にパディングを追加
             });
           }
@@ -120,27 +128,32 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
           if (activities.length > 1) {
             addRouteLines();
           }
-        });
-      }
+        } catch (error) {
+          console.error('Error during map setup:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to initialize map:', error);
     }
 
     // クリーンアップ関数
     return () => {
-      // 以前のマーカーをすべて削除
-      markers.current.forEach((marker) => marker.remove());
-      markers.current = [];
+      clearMapResources();
     };
-  }, []);
+  }, []); // 空の依存配列で初期化時のみ実行
 
-  // マップが読み込まれた後、またはアクティビティが変更された時にマーカーを追加
+  // マーカーの更新と位置調整
   useEffect(() => {
-    if (map.current && mapLoaded) {
+    if (!mapInstance.current || !mapLoaded) return;
+
+    try {
       // 以前のマーカーをすべて削除
-      markers.current.forEach((marker) => marker.remove());
-      markers.current = [];
+      clearMarkers();
 
       // 各アクティビティにマーカーを追加
       activities.forEach((activity) => {
+        if (!mapInstance.current) return;
+
         // カスタムマーカー要素を作成
         const markerElement = document.createElement('div');
         markerElement.className = 'custom-marker';
@@ -168,7 +181,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
         const marker = new mapboxgl.Marker(markerElement)
           .setLngLat([activity.longitude, activity.latitude])
           .setPopup(popup)
-          .addTo(map.current!);
+          .addTo(mapInstance.current);
 
         // ホバー時にポップアップを表示
         markerElement.addEventListener('mouseenter', () => {
@@ -181,85 +194,149 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
         });
 
         // マーカーの配列に追加
-        markers.current.push(marker);
+        markersRef.current.push(marker);
       });
 
-      // 境界ボックスを再計算し、ビューを調整
-      const bounds = calculateBounds();
-      if (bounds && activities.length > 1) {
-        map.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
-          padding: 50,
-        });
-      } else if (activities.length === 1) {
-        map.current.flyTo({
-          center: [activities[0].longitude, activities[0].latitude],
-          zoom: initialZoom,
-          duration: 1000,
-        });
-      }
+      // マップの表示範囲を調整
+      updateMapBounds();
 
       // 線を更新（複数のポイントがある場合）
       if (activities.length > 1) {
         addRouteLines();
       }
+    } catch (error) {
+      console.error('Error updating markers:', error);
     }
   }, [activities, mapLoaded]);
 
+  // マーカーをクリアする関数
+  const clearMarkers = () => {
+    markersRef.current.forEach((marker) => {
+      try {
+        marker.remove();
+      } catch (e) {
+        console.error('Error removing marker:', e);
+      }
+    });
+    markersRef.current = [];
+  };
+
+  // マップリソースをクリアする関数
+  const clearMapResources = () => {
+    // まずマーカーをクリア
+    clearMarkers();
+
+    // マップを削除
+    if (mapInstance.current) {
+      try {
+        // ルートラインのレイヤーとソースを削除
+        if (mapInstance.current.getLayer('route-line')) {
+          mapInstance.current.removeLayer('route-line');
+        }
+
+        if (mapInstance.current.getSource('route')) {
+          mapInstance.current.removeSource('route');
+        }
+
+        // マップを削除
+        mapInstance.current.remove();
+      } catch (e) {
+        console.error('Error removing map:', e);
+      }
+
+      mapInstance.current = null;
+      setMapLoaded(false);
+    }
+  };
+
+  // マップの表示範囲を調整する関数
+  const updateMapBounds = () => {
+    if (!mapInstance.current) return;
+
+    try {
+      const bounds = calculateBounds();
+      if (bounds && activities.length > 1) {
+        mapInstance.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
+          padding: 50,
+        });
+      } else if (activities.length === 1) {
+        mapInstance.current.flyTo({
+          center: [activities[0].longitude, activities[0].latitude],
+          zoom: initialZoom,
+          duration: 500, // 短めの時間に変更
+        });
+      }
+    } catch (error) {
+      console.error('Error updating map bounds:', error);
+    }
+  };
+
   // ルートライン（アクティビティ間の線）を追加する関数
   const addRouteLines = () => {
-    if (!map.current || activities.length < 2) return;
+    if (!mapInstance.current || activities.length < 2) return;
 
-    // すでに存在する場合はルートレイヤーを削除
-    if (map.current.getSource('route')) {
-      map.current.removeLayer('route-line');
-      map.current.removeSource('route');
-    }
+    try {
+      // すでに存在する場合はルートレイヤーを削除
+      if (mapInstance.current.getLayer('route-line')) {
+        mapInstance.current.removeLayer('route-line');
+      }
 
-    // ルートラインのためのGeoJSON形式のデータを作成
-    const routeCoordinates = activities.map((activity) => [
-      activity.longitude,
-      activity.latitude,
-    ]);
+      if (mapInstance.current.getSource('route')) {
+        mapInstance.current.removeSource('route');
+      }
 
-    // ルートラインのソースを追加
-    map.current.addSource('route', {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: routeCoordinates,
+      // ルートラインのためのGeoJSON形式のデータを作成
+      const routeCoordinates = activities.map((activity) => [
+        activity.longitude,
+        activity.latitude,
+      ]);
+
+      // ルートラインのソースを追加
+      mapInstance.current.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeCoordinates,
+          },
         },
-      },
-    });
+      });
 
-    // ルートラインのレイヤーを追加
-    map.current.addLayer({
-      id: 'route-line',
-      type: 'line',
-      source: 'route',
-      layout: {
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      paint: {
-        'line-color': '#3b82f6',
-        'line-width': 3,
-        'line-opacity': 0.8,
-        'line-dasharray': [1, 1],
-      },
-    });
+      // ルートラインのレイヤーを追加
+      mapInstance.current.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#3b82f6',
+          'line-width': 3,
+          'line-opacity': 0.8,
+          'line-dasharray': [1, 1],
+        },
+      });
+    } catch (error) {
+      console.error('Error adding route lines:', error);
+    }
   };
 
   // 全てのマーカーを表示する範囲に調整する関数
   const fitAllMarkers = () => {
-    if (map.current && activities.length > 0) {
-      const bounds = calculateBounds();
-      if (bounds) {
-        map.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
-          padding: 50,
-        });
+    if (mapInstance.current && activities.length > 0) {
+      try {
+        const bounds = calculateBounds();
+        if (bounds) {
+          mapInstance.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
+            padding: 50,
+          });
+        }
+      } catch (error) {
+        console.error('Error fitting markers:', error);
       }
     }
   };
@@ -287,7 +364,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
             variant='outline'
             className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
           >
-            <ChevronsUp className='mr-2 h-4 w-4' />
+            <ChevronsUp className='h-4 w-4 mr-1' />
             全て表示
           </Button>
         )}
@@ -299,7 +376,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
             variant='outline'
             className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
           >
-            <Maximize2 className='mr-2 h-4 w-4' />
+            <Maximize2 className='h-4 w-4 mr-1' />
             拡大表示
           </Button>
         )}
