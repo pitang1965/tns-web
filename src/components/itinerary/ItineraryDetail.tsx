@@ -29,7 +29,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const { user } = useUser();
 
   // 日付パラメータの管理をカスタムフックに委譲
-  const dayParamHook = useDayParam(id, itinerary?.dayPlans?.length || 0);
+  const dayParamHook = useDayParam(id, (itinerary?.dayPlans?.length || 1)-1);
 
   const handleDelete = async () => {
     await deleteItinerary(id);
@@ -142,7 +142,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             <DayPagination
               dayPlans={itinerary.dayPlans}
               renderDayPlan={renderDayPlan}
-              initialSelectedDay={dayParamHook.selectedDay}
+              initialSelectedDay={dayParamHook.selectedDay + 1}
               onDayChange={dayParamHook.handleDayChange}
             />
           ) : (
@@ -158,7 +158,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             onDelete={handleDeleteConfirm}
             shareData={{
               title: itinerary.title,
-              dayIndex: dayParamHook.selectedDay,
+              dayIndex: dayParamHook.selectedDay + 1,
               date:
                 itinerary.dayPlans[dayParamHook.selectedDay]?.date ||
                 itinerary.startDate,

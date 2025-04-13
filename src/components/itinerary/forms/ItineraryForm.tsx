@@ -25,7 +25,7 @@ import { TransportationType } from '@/components/itinerary/TransportationBadge';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
 import { DayPagination } from '@/components/layout/DayPagination';
-import { useDayParam } from '@/hooks/useDayParam'; // useDayParamフックをインポート
+import { useDayParam } from '@/hooks/useDayParam';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -97,8 +97,8 @@ export function ItineraryForm({
 
   // useDayParamフックを使用して日付パラメータを管理
   const dayParamHook = useDayParam(
-    itineraryId || 'new', // 新規作成時は 'new' を使用
-    initialData?.dayPlans?.length || 1 // 初期値はinitialDataから取得
+    itineraryId || 'new',
+    (watch('numberOfDays') || 1) - 1 // 日数から1引いて0ベースの最大インデックスに
   );
 
   // フォームの初期化後にダーティフラグをリセットする
@@ -188,17 +188,16 @@ export function ItineraryForm({
   // 日数の変更に応じて選択中の日を調整する
   useEffect(() => {
     const numberOfDays = watch('numberOfDays') || 0;
+    const maxDayIndex = numberOfDays - 1
 
-    // 日数が変わった場合、選択日が範囲外にならないようにする
-    if (dayParamHook.selectedDay >= numberOfDays && numberOfDays > 0) {
-      const newDay = numberOfDays - 1;
-      // 無限ループを避けるため、値が実際に変わる場合のみ更新
-      if (newDay !== dayParamHook.selectedDay) {
-        dayParamHook.handleDayChange(newDay);
-      }
+  // 日数が変わった場合、選択日が範囲外にならないようにする
+  if (dayParamHook.selectedDay > maxDayIndex && maxDayIndex >= 0) {
+    // 無限ループを避けるため、値が実際に変わる場合のみ更新
+    if (maxDayIndex !== dayParamHook.selectedDay) {
+      dayParamHook.handleDayChange(maxDayIndex);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dayParamHook.selectedDay]);
+  }
+}, [watch('numberOfDays')]);
 
   useEffect(() => {
     // 1日目表示時は基本情報を展開、それ以外では折りたたむ
@@ -490,7 +489,7 @@ export function ItineraryForm({
                     <DayPagination
                       dayPlans={watch('dayPlans')}
                       onDayChange={dayParamHook.handleDayChange}
-                      initialSelectedDay={dayParamHook.selectedDay}
+                      initialSelectedDay={dayParamHook.selectedDay + 1}
                       renderDayPlan={(dayPlan, index) => (
                         <>
                           {/* 各ページの上部に現在の日数表示を追加 */}
