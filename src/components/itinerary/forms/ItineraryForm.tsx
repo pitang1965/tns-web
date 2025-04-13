@@ -26,6 +26,8 @@ import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection';
 import { DayPagination } from '@/components/layout/DayPagination';
 import { useDayParam } from '@/hooks/useDayParam';
+import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
+import { itineraryAtom } from '@/data/store/itineraryAtoms';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -94,6 +96,9 @@ export function ItineraryForm({
     trigger,
     handleSubmit,
   } = methods;
+
+  // カスタムフックを使用してフォームとJotaiを同期
+  useSyncFormWithJotai(methods, itineraryAtom, initialData);
 
   // useDayParamフックを使用して日付パラメータを管理
   const dayParamHook = useDayParam(
@@ -188,16 +193,16 @@ export function ItineraryForm({
   // 日数の変更に応じて選択中の日を調整する
   useEffect(() => {
     const numberOfDays = watch('numberOfDays') || 0;
-    const maxDayIndex = numberOfDays - 1
+    const maxDayIndex = numberOfDays - 1;
 
-  // 日数が変わった場合、選択日が範囲外にならないようにする
-  if (dayParamHook.selectedDay > maxDayIndex && maxDayIndex >= 0) {
-    // 無限ループを避けるため、値が実際に変わる場合のみ更新
-    if (maxDayIndex !== dayParamHook.selectedDay) {
-      dayParamHook.handleDayChange(maxDayIndex);
+    // 日数が変わった場合、選択日が範囲外にならないようにする
+    if (dayParamHook.selectedDay > maxDayIndex && maxDayIndex >= 0) {
+      // 無限ループを避けるため、値が実際に変わる場合のみ更新
+      if (maxDayIndex !== dayParamHook.selectedDay) {
+        dayParamHook.handleDayChange(maxDayIndex);
+      }
     }
-  }
-}, [watch('numberOfDays')]);
+  }, [watch('numberOfDays')]);
 
   useEffect(() => {
     // 1日目表示時は基本情報を展開、それ以外では折りたたむ

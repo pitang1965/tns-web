@@ -1,17 +1,37 @@
 'use client';
 
-import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
+import React, { useEffect } from 'react';
+import { useAtom } from 'jotai';
 import { H3, Text, SmallText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { itineraryAtom } from '@/data/store/itineraryAtoms';
 
+import { DayPlan } from '@/data/schemas/itinerarySchema';
+import { activitySchema } from '@/data/schemas/activitySchema';
+import { z } from 'zod';
+
+// Activity型を推論
+type Activity = z.infer<typeof activitySchema>;
+
+// Props型を定義
 type ItineraryTocProps = {
-  itinerary: ClientItineraryInput;
+  initialItinerary?: any;
 };
 
-export function ItineraryToc({ itinerary }: ItineraryTocProps) {
+export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Jotaiアトムから旅程データを取得
+  const [itinerary, setItinerary] = useAtom(itineraryAtom);
+
+  // コンポーネントがマウントされたときに初期データをロード
+  useEffect(() => {
+    if (initialItinerary && Object.keys(initialItinerary).length > 0) {
+      setItinerary(initialItinerary);
+    }
+  }, [initialItinerary, setItinerary]);
 
   const handleDayClick = (dayNumber: number) => {
     // 現在のURLを取得
@@ -28,7 +48,7 @@ export function ItineraryToc({ itinerary }: ItineraryTocProps) {
         <div className='p-4'>
           <H3>目次</H3>
           {itinerary.dayPlans && itinerary.dayPlans.length > 0 ? (
-            itinerary.dayPlans.map((day, index) => (
+            itinerary.dayPlans.map((day: DayPlan, index: number) => (
               <div
                 key={index}
                 className='mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded'
@@ -40,7 +60,7 @@ export function ItineraryToc({ itinerary }: ItineraryTocProps) {
                 </Text>
                 <ul className='ml-4 mt-2 space-y-1'>
                   {day.activities &&
-                    day.activities.map((activity, actIndex) => (
+                    day.activities.map((activity: Activity, actIndex: number) => (
                       <li
                         key={actIndex}
                         className='text-sm text-gray-600 dark:text-gray-400'
