@@ -46,6 +46,9 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - [MongoDB](https://www.mongodb.com/) - NoSQL データベース
 - [Mongoose](https://mongoosejs.com/) - MongoDB のオブジェクトモデリングツール
 
+### 状態管理
+- [Jotai](https://jotai.org/) - プリミティブで柔軟なReact向け状態管理ライブラリ
+
 ### フォーム処理/バリデーション
 - [React Hook Form](https://react-hook-form.com/) - フォーム状態管理
 - [Zod](https://github.com/colinhacks/zod) - TypeScript ファーストのスキーマバリデーション
