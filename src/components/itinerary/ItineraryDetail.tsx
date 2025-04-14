@@ -115,7 +115,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       <div className='pt-8 md:pt-12'></div>
       <div className='flex flex-col md:flex-row gap-6'>
         <div className='hidden md:block'>
-          <ItineraryToc itinerary={itinerary} />
+          <ItineraryToc initialItinerary={itinerary} />
         </div>
         <div className='flex-1'>
           <ItineraryHeader itinerary={itinerary} />
