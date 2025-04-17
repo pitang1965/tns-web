@@ -171,12 +171,14 @@ export function ItineraryForm({
           dayIndex: index,
           date: currentDate.toISOString().split('T')[0],
           activities: existingDayPlan?.activities || [],
+          notes: existingDayPlan?.notes || '', // notesフィールドを明示的に初期化
         };
       }
       return {
         date: null,
         dayIndex: index,
         activities: existingDayPlan?.activities || [],
+        notes: existingDayPlan?.notes || '', // notesフィールドを明示的に初期化
       };
     });
 
@@ -488,23 +490,19 @@ export function ItineraryForm({
 
               <div className='space-y-4 my-4'>
                 {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
-                {watch('dayPlans')?.length > 0 && (
-                  <>
-                    {/* DayPaginationコンポーネントの使用 - dayParamHookを統合 */}
-                    <DayPagination
-                      dayPlans={watch('dayPlans')}
-                      onDayChange={dayParamHook.handleDayChange}
-                      initialSelectedDay={dayParamHook.selectedDay + 1}
-                      renderDayPlan={(dayPlan, index) => (
-                        <>
-                          {/* 各ページの上部に現在の日数表示を追加 */}
-                          {renderPaginationHeader(index)}
-                          {renderDayPlanForm(dayPlan, index)}
-                        </>
-                      )}
-                    />
-                  </>
-                )}
+                {/* dayPlansが存在しない場合でもDayPaginationを表示 */}
+                <DayPagination
+                  dayPlans={watch('dayPlans')}
+                  onDayChange={dayParamHook.handleDayChange}
+                  initialSelectedDay={dayParamHook.selectedDay + 1}
+                  renderDayPlan={(dayPlan, index) => (
+                    <>
+                      {/* 各ページの上部に現在の日数表示を追加 */}
+                      {renderPaginationHeader(index)}
+                      {renderDayPlanForm(dayPlan, index)}
+                    </>
+                  )}
+                />
               </div>
               {process.env.NODE_ENV === 'development' &&
                 Object.keys(errors).length > 0 && (

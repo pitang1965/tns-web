@@ -27,6 +27,8 @@ export async function updateItineraryAction(
         : undefined,
       dayPlans: data.dayPlans.map((day) => ({
         ...day,
+        // notesフィールドが存在しない場合は空文字列を設定
+        notes: day.notes || '',
         activities: day.activities.map((activity) => {
           // locationが空の場合は削除
           const newActivity = { ...activity };

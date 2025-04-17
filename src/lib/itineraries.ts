@@ -239,10 +239,28 @@ export async function updateItinerary(
       throw new Error('この旅程を更新する権限がありません');
     }
 
+    // 既存のdayPlansのnotesを保持するためのマップを作成
+    const existingNotesMap = new Map();
+    existingDoc.dayPlans.forEach((day, index) => {
+      if (day.notes) {
+        existingNotesMap.set(index, day.notes);
+      }
+    });
+
     // 更新するドキュメントの準備
     const updateDoc = {
       $set: {
         ...updatedData,
+        // dayPlansの各要素に対して、既存のnotesがあれば保持
+        dayPlans: updatedData.dayPlans.map((day, index) => {
+          // 既存のnotesがあれば使用し、なければ新しいdayのnotesを使用
+          const existingNotes = existingNotesMap.get(index);
+          return {
+            ...day,
+            notes:
+              existingNotes !== undefined ? existingNotes : day.notes || '',
+          };
+        }),
         updatedAt: now,
       },
     };

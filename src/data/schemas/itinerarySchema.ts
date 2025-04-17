@@ -216,6 +216,7 @@ export class ItineraryManager {
             date: currentDate.toISOString().split('T')[0],
             dayIndex: currentDays + i,
             activities: [],
+            notes: '', // notesフィールドを明示的に初期化
           };
         }
       );

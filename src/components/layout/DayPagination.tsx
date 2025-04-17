@@ -258,9 +258,23 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     return items;
   };
 
+  // デバッグ用のログ
+  useEffect(() => {
+    console.log('DayPagination render:', {
+      dayPlans,
+      currentPage,
+      actualTotalDays,
+    });
+  }, [dayPlans, currentPage, actualTotalDays]);
+
   return (
     <>
-      {currentDayPlan && renderDayPlan(currentDayPlan, currentPage - 1)}
+      {dayPlans &&
+      dayPlans.length > 0 &&
+      currentPage > 0 &&
+      currentPage <= dayPlans.length
+        ? renderDayPlan(dayPlans[currentPage - 1], currentPage - 1)
+        : currentDayPlan && renderDayPlan(currentDayPlan, currentPage - 1)}
 
       {actualTotalDays > 1 && (
         <div className='mt-6'>
