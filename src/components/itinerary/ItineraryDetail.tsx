@@ -14,6 +14,7 @@ import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { DayPagination } from '@/components/layout/DayPagination';
 import { useDayParam } from '@/hooks/useDayParam';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
+import { useGetItineraryDay } from '@/hooks/useGetItineraryDay'; // 新しいフック
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
@@ -22,14 +23,33 @@ type ItineraryDetailProps = {
 };
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
-  const { itinerary, loading, error } = useGetItinerary(id);
+  // 最初は基本メタデータだけを取得（日程の総数を知るため）
+  const { itinerary: metadataOnly, loading: metadataLoading } =
+    useGetItinerary(id);
   const deleteItinerary = useDeleteItinerary();
   const router = useRouter();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const { user } = useUser();
 
-  // 日付パラメータの管理をカスタムフックに委譲
-  const dayParamHook = useDayParam(id, (itinerary?.dayPlans?.length || 1)-1);
+  // 日付パラメータの管理
+  const dayParamHook = useDayParam(
+    id,
+    (metadataOnly?.dayPlans?.length || 1) - 1
+  );
+
+  const currentDayIndex = dayParamHook.selectedDay; // 0ベースのインデックス
+
+  // 選択された日のデータのみを取得
+  const {
+    metadata,
+    dayPlan: currentDayPlan,
+    loading: dayLoading,
+    error: dayError,
+  } = useGetItineraryDay(id, currentDayIndex);
+
+  // 読み込み状態を合成
+  const loading = metadataLoading || dayLoading;
+  const error = dayError;
 
   const handleDelete = async () => {
     await deleteItinerary(id);
@@ -53,8 +73,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   };
 
   // 日ごとの旅程をレンダリングする関数
-  const renderDayPlan = (day: DayPlan, index: number) => {
-    return <DayPlanView key={index} day={day} dayIndex={index} />;
+  const renderDayPlan = (dayPlan: DayPlan, index: number) => {
+    return <DayPlanView key={index} day={dayPlan} dayIndex={index} />;
   };
 
   if (loading) {
@@ -62,20 +82,20 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   }
 
   if (error) {
-    return <div>エラーが発生しました: {error}</div>;
+    return <LargeText className='p-4'>エラーが発生しました: {error}</LargeText>;
   }
 
-  if (!itinerary || typeof itinerary !== 'object') {
-    return <div>旅程が見つかりません。</div>;
+  if (!metadata || !currentDayPlan) {
+    return <LargeText>旅程が見つかりません。</LargeText>;
   }
 
   // アクセス制御ロジック
-  const isPublic = itinerary.isPublic;
-  const isOwner = user && itinerary.owner && user.sub === itinerary.owner.id;
+  const isPublic = metadata.isPublic;
+  const isOwner = user && metadata.owner && user.sub === metadata.owner.id;
   const isSharedWithUser =
     user &&
-    itinerary.sharedWith &&
-    itinerary.sharedWith.some((sharedUser) => sharedUser.id === user.sub);
+    metadata.sharedWith &&
+    metadata.sharedWith.some((sharedUser) => sharedUser.id === user.sub);
 
   // 非公開かつ所有者でもなく共有されてもいない場合はアクセス不可
   if (!isPublic && !isOwner && !isSharedWithUser) {
@@ -115,10 +135,10 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       <div className='pt-8 md:pt-12'></div>
       <div className='flex flex-col md:flex-row gap-6'>
         <div className='hidden md:block'>
-          <ItineraryToc initialItinerary={itinerary} />
+          <ItineraryToc initialItinerary={metadata} />
         </div>
         <div className='flex-1'>
-          <ItineraryHeader itinerary={itinerary} />
+          <ItineraryHeader itinerary={metadata} />
 
           {!user && isPublic && (
             <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
@@ -138,9 +158,10 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
           <H2>旅程詳細</H2>
 
-          {itinerary.dayPlans?.length > 0 ? (
+          {metadata.totalDays > 0 ? (
             <DayPagination
-              dayPlans={itinerary.dayPlans}
+              totalDays={metadata.totalDays}
+              currentDayPlan={currentDayPlan}
               renderDayPlan={renderDayPlan}
               initialSelectedDay={dayParamHook.selectedDay + 1}
               onDayChange={dayParamHook.handleDayChange}
@@ -157,12 +178,10 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             onEdit={handleEdit}
             onDelete={handleDeleteConfirm}
             shareData={{
-              title: itinerary.title,
+              title: metadata.title,
               dayIndex: dayParamHook.selectedDay + 1,
-              date:
-                itinerary.dayPlans[dayParamHook.selectedDay]?.date ||
-                itinerary.startDate,
-              id: itinerary.id,
+              date: currentDayPlan.date || undefined,
+              id: metadata.id,
             }}
           />
 

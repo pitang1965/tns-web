@@ -37,10 +37,11 @@ export function useDayParam(itineraryId: string, maxDays: number = 0) {
 
   // 日付切り替え時にURLを更新する関数
   const handleDayChange = (day: number) => {
-    // 現在のURLを取得し、dayパラメータだけを更新した新しいURLを構築
-    // 内部は0ベース、URLは1ベース
+    // DayPaginationからの入力は既に1ベース（例: 14日目 = 14）
+    // URLも1ベース表記なので、そのまま使用
+    console.log('handleDayChange が呼び出されました。入力値:', day);
     const url = new URL(window.location.href);
-    url.searchParams.set('day', (day + 1).toString());
+    url.searchParams.set('day', day.toString());
 
     // 更新したURLオブジェクトを使ってページ遷移
     router.push(url.toString());

@@ -5,33 +5,38 @@ import { useAtom } from 'jotai';
 import { H3, Text, SmallText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { itineraryAtom } from '@/data/store/itineraryAtoms';
+import {
+  ItineraryMetadata,
+  itineraryMetadataAtom,
+} from '@/data/store/itineraryAtoms';
 
-import { DayPlan } from '@/data/schemas/itinerarySchema';
-import { activitySchema } from '@/data/schemas/activitySchema';
-import { z } from 'zod';
+type ActivitySummary = {
+  id?: string;
+  title: string;
+};
 
-// Activity型を推論
-type Activity = z.infer<typeof activitySchema>;
+type DaySummary = {
+  date: string | null;
+  notes?: string;
+  activities?: ActivitySummary[];
+};
 
-// Props型を定義
 type ItineraryTocProps = {
-  initialItinerary?: any;
+  initialItinerary?: Partial<ItineraryMetadata>;
 };
 
 export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Jotaiアトムから旅程データを取得
-  const [itinerary, setItinerary] = useAtom(itineraryAtom);
+  const [metadata, setMetadata] = useAtom(itineraryMetadataAtom);
 
   // コンポーネントがマウントされたときに初期データをロード
   useEffect(() => {
     if (initialItinerary && Object.keys(initialItinerary).length > 0) {
-      setItinerary(initialItinerary);
+      setMetadata(initialItinerary as ItineraryMetadata);
     }
-  }, [initialItinerary, setItinerary]);
+  }, [initialItinerary, setMetadata]);
 
   const handleDayClick = (dayNumber: number) => {
     // 現在のURLを取得
@@ -42,13 +47,17 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
     router.push(`?${params.toString()}`);
   };
 
+  // 表示用のデータを取得
+  const summaries =
+    initialItinerary?.dayPlanSummaries || metadata.dayPlanSummaries || [];
+
   return (
     <div className='w-64 shrink-0'>
       <div className='fixed w-64 top-16 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg max-h-[calc(100vh-80px)] overflow-y-auto'>
         <div className='p-4'>
           <H3>目次</H3>
-          {itinerary.dayPlans && itinerary.dayPlans.length > 0 ? (
-            itinerary.dayPlans.map((day: DayPlan, index: number) => (
+          {summaries.length > 0 ? (
+            summaries.map((day: DaySummary, index: number) => (
               <div
                 key={index}
                 className='mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded'
@@ -58,9 +67,12 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
                   {index + 1}日目{' '}
                   {day.date && `: ${formatDateWithWeekday(day.date)}`}
                 </Text>
-                <ul className='ml-4 mt-2 space-y-1'>
-                  {day.activities &&
-                    day.activities.map((activity: Activity, actIndex: number) => (
+                {day.notes && (
+                  <SmallText className='mt-1 ml-2'>{day.notes}</SmallText>
+                )}
+                {day.activities && day.activities.length > 0 && (
+                  <ul className='ml-4 mt-2 space-y-1'>
+                    {day.activities.map((activity, actIndex) => (
                       <li
                         key={actIndex}
                         className='text-sm text-gray-600 dark:text-gray-400'
@@ -69,11 +81,12 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
                           <div className='w-5 flex-shrink-0'>
                             {actIndex + 1}.
                           </div>
-                          <div>{activity.title}</div>
+                          <SmallText>{activity.title}</SmallText>
                         </div>
                       </li>
                     ))}
-                </ul>
+                  </ul>
+                )}
               </div>
             ))
           ) : (

@@ -27,7 +27,7 @@ import { BasicInfoSection } from '@/components/itinerary/forms/BasicInfoSection'
 import { DayPagination } from '@/components/layout/DayPagination';
 import { useDayParam } from '@/hooks/useDayParam';
 import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
-import { itineraryAtom } from '@/data/store/itineraryAtoms';
+import { itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -98,7 +98,7 @@ export function ItineraryForm({
   } = methods;
 
   // カスタムフックを使用してフォームとJotaiを同期
-  useSyncFormWithJotai(methods, itineraryAtom, initialData);
+  useSyncFormWithJotai(methods, itineraryMetadataAtom, initialData);
 
   // useDayParamフックを使用して日付パラメータを管理
   const dayParamHook = useDayParam(

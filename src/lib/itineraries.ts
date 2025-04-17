@@ -133,6 +133,85 @@ export async function getItineraryById(
   }
 }
 
+export async function getItineraryWithDay(
+  id: string,
+  dayIndex: number
+): Promise<{ metadata: any; dayPlan: any } | null> {
+  const client = await clientPromise;
+  const db = client.db('itinerary_db');
+
+  try {
+    // 有効なObjectIdかチェック
+    if (!ObjectId.isValid(id)) {
+      console.log(`Invalid ObjectId format: ${id}`);
+      return null;
+    }
+
+    const objectId = new ObjectId(id);
+
+    // MongoDB集約パイプラインを使用して効率的にデータを取得
+    const pipeline = [
+      { $match: { _id: objectId } },
+      {
+        $project: {
+          // 基本的なメタデータのみ取得
+          title: 1,
+          description: 1,
+          isPublic: 1,
+          owner: 1,
+          sharedWith: 1,
+          totalDays: { $size: '$dayPlans' },
+          // 指定した日のデータのみ取得
+          dayPlan: { $arrayElemAt: ['$dayPlans', dayIndex] },
+          // 全日程のタイトルと日付のみを取得（目次用）
+          dayPlanSummaries: {
+            $map: {
+              input: '$dayPlans',
+              as: 'day',
+              in: {
+                date: '$$day.date',
+                notes: '$$day.notes',
+              },
+            },
+          },
+        },
+      },
+    ];
+
+    const result = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .aggregate(pipeline)
+      .toArray();
+
+    if (!result || result.length === 0) {
+      console.log(`Itinerary not found for id: ${id}`);
+      return null;
+    }
+
+    const itineraryData = result[0];
+
+    // メタデータと現在の日のデータを分離
+    const metadata = {
+      id: itineraryData._id.toString(),
+      title: itineraryData.title,
+      description: itineraryData.description,
+      isPublic: itineraryData.isPublic,
+      owner: itineraryData.owner,
+      sharedWith: itineraryData.sharedWith,
+      totalDays: itineraryData.totalDays,
+      dayPlanSummaries: itineraryData.dayPlanSummaries,
+    };
+
+    // 指定された日のデータ
+    const dayPlan = itineraryData.dayPlan;
+
+    return { metadata, dayPlan };
+  } catch (error) {
+    console.error('Error in getItineraryWithDay:', error);
+    return null;
+  }
+}
+
 export async function updateItinerary(
   id: string,
   updatedData: ClientItineraryInput

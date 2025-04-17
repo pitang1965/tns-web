@@ -62,7 +62,7 @@ export default withPageAuthRequired(function EditItineraryPage({
     <main className='min-w-[320px]'>
       <div className='flex flex-col lg:flex-row gap-6'>
         <div className='hidden lg:block w-1/4 max-w-[250px]'>
-          <ItineraryToc itinerary={itinerary} />
+          <ItineraryToc initialItinerary={itinerary} />
         </div>
         <div className='flex-1 min-w-0 sm:min-w-[320px]'>
           <ItineraryForm

@@ -13,14 +13,17 @@ import {
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 interface DayPaginationProps {
-  dayPlans: DayPlan[];
+  dayPlans?: DayPlan[];
+  totalDays?: number;
+  currentDayPlan?: DayPlan | null;
   renderDayPlan: (dayPlan: DayPlan, index: number) => React.ReactNode;
-  onDayChange?: (day: number) => void; // 日付変更時、URLを更新するためのコールバック
-  initialSelectedDay?: number; // URLから初期表示する日付
+  onDayChange?: (day: number) => void;
+  initialSelectedDay?: number;
 }
-
 export const DayPagination: React.FC<DayPaginationProps> = ({
   dayPlans,
+  totalDays,
+  currentDayPlan,
   renderDayPlan,
   onDayChange,
   initialSelectedDay = 1,
@@ -28,10 +31,13 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
   // 直前のページ操作を追跡するref
   const isUserNavigation = useRef(false);
 
+  // 実際の日数を計算（dayPlansの長さまたはtotalDaysから）
+  const actualTotalDays = dayPlans?.length || totalDays || 1;
+
   // 初期選択日が有効な範囲内になるように調整
   const validInitialDay = Math.min(
     Math.max(initialSelectedDay, 1),
-    dayPlans?.length || 1
+    actualTotalDays
   );
 
   const [currentPage, setCurrentPage] = useState(validInitialDay);
@@ -55,12 +61,12 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       if (initialSelectedDay) {
         const validDay = Math.min(
           Math.max(initialSelectedDay, 1),
-          dayPlans?.length || 1
+          actualTotalDays
         );
         setCurrentPage(validDay);
       }
     }
-  }, [initialSelectedDay, dayPlans?.length]);
+  }, [initialSelectedDay, actualTotalDays]);
 
   // コンポーネントがマウントされた時に初期ページを親に通知
   useEffect(() => {
@@ -71,13 +77,13 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
   // ページを変更する関数
   const goToPage = (page: number) => {
-    console.log('ページに移動:', page, '合計ページ数:', dayPlans?.length);
+    console.log('ページに移動:', page, '合計ページ数:', actualTotalDays);
 
     // ユーザーのナビゲーションであることをマーク
     isUserNavigation.current = true;
 
     // 妥当性チェック（範囲を確認）
-    if (page < 1 || page > (dayPlans?.length || 1)) {
+    if (page < 1 || page > actualTotalDays) {
       console.error('無効なページ番号:', page);
       return;
     }
@@ -99,37 +105,33 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
   // 次のページに移動
   const goToNextPage = () => {
-    const totalPages = dayPlans?.length || 0;
-    if (currentPage < totalPages) {
+    if (currentPage < actualTotalDays) {
       goToPage(currentPage + 1);
     }
   };
 
   // 表示するページ数の計算
-  const totalPages = dayPlans?.length || 0;
   const maxVisiblePages = 5; // 表示するページリンクの最大数
-
-  // 現在のページの旅程を取得
-  const currentDayPlan =
-    dayPlans && dayPlans.length > 0 ? dayPlans[currentPage - 1] : null;
 
   // ページネーションリンクの生成
   const generatePaginationLinks = () => {
     // ページ数が少ない場合はすべて表示
-    if (totalPages <= maxVisiblePages) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-        <PaginationItem key={page}>
-          <PaginationLink
-            onClick={(e) => {
-              e.preventDefault(); // デフォルトのリンク動作を防止
-              goToPage(page);
-            }}
-            isActive={page === currentPage}
-          >
-            {page}日目
-          </PaginationLink>
-        </PaginationItem>
-      ));
+    if (actualTotalDays <= maxVisiblePages) {
+      return Array.from({ length: actualTotalDays }, (_, i) => i + 1).map(
+        (page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              onClick={(e) => {
+                e.preventDefault(); // デフォルトのリンク動作を防止
+                goToPage(page);
+              }}
+              isActive={page === currentPage}
+            >
+              {page}日目
+            </PaginationLink>
+          </PaginationItem>
+        )
+      );
     }
 
     // ページ数が多い場合は省略表示
@@ -153,7 +155,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     // 現在のページが前方に寄っている場合
     if (currentPage < 4) {
       for (let i = 2; i <= 4; i++) {
-        if (i <= totalPages) {
+        if (i <= actualTotalDays) {
           items.push(
             <PaginationItem key={i}>
               <PaginationLink
@@ -169,7 +171,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
           );
         }
       }
-      if (totalPages > 4) {
+      if (actualTotalDays > 4) {
         items.push(
           <PaginationItem key='ellipsis1'>
             <PaginationEllipsis />
@@ -178,13 +180,13 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       }
     }
     // 現在のページが後方に寄っている場合
-    else if (currentPage > totalPages - 3) {
+    else if (currentPage > actualTotalDays - 3) {
       items.push(
         <PaginationItem key='ellipsis1'>
           <PaginationEllipsis />
         </PaginationItem>
       );
-      for (let i = totalPages - 3; i < totalPages; i++) {
+      for (let i = actualTotalDays - 3; i < actualTotalDays; i++) {
         if (i > 1) {
           // 最初のページと重複しないように
           items.push(
@@ -211,7 +213,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
         </PaginationItem>
       );
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-        if (i > 1 && i < totalPages) {
+        if (i > 1 && i < actualTotalDays) {
           // 最初と最後のページと重複しないように
           items.push(
             <PaginationItem key={i}>
@@ -222,7 +224,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
                 }}
                 isActive={i === currentPage}
               >
-                {i}
+                {i}日目
               </PaginationLink>
             </PaginationItem>
           );
@@ -236,18 +238,18 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     }
 
     // 常に最後のページを表示
-    if (totalPages > 1) {
+    if (actualTotalDays > 1) {
       items.push(
-        <PaginationItem key={totalPages}>
+        <PaginationItem key={actualTotalDays}>
           <PaginationLink
             onClick={(e) => {
               e.preventDefault();
-              console.log('最終日クリック:', totalPages);
-              goToPage(totalPages);
+              console.log('最終日クリック:', actualTotalDays);
+              goToPage(actualTotalDays);
             }}
-            isActive={totalPages === currentPage}
+            isActive={actualTotalDays === currentPage}
           >
-            {totalPages}日目
+            {actualTotalDays}日目
           </PaginationLink>
         </PaginationItem>
       );
@@ -260,7 +262,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     <>
       {currentDayPlan && renderDayPlan(currentDayPlan, currentPage - 1)}
 
-      {totalPages > 1 && (
+      {actualTotalDays > 1 && (
         <div className='mt-6'>
           <Pagination>
             <PaginationContent>
@@ -287,7 +289,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
                     goToNextPage();
                   }}
                   className={
-                    currentPage === totalPages
+                    currentPage === actualTotalDays
                       ? 'pointer-events-none opacity-50'
                       : 'cursor-pointer'
                   }
