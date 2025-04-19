@@ -1,0 +1,7 @@
+# Facebookのクローラーを明示的に許可
+User-agent: facebookexternalhit
+Allow: /
+
+# その他すべてのボットに対するルール
+User-agent: *
+Allow: /
