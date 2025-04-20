@@ -52,8 +52,8 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
     initialItinerary?.dayPlanSummaries || metadata.dayPlanSummaries || [];
 
   return (
-    <div className='w-64 shrink-0'>
-      <div className='fixed w-64 top-16 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg max-h-[calc(100vh-80px)] overflow-y-auto'>
+    <div className='w-80 shrink-0'>
+      <div className='fixed w-80 top-16 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg max-h-[calc(100vh-80px)] overflow-y-auto'>
         <div className='p-4'>
           <H3>目次</H3>
           {summaries.length > 0 ? (
