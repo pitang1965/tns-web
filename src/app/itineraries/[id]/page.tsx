@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import ItineraryDetail from '@/components/itinerary/ItineraryDetail';
 import { getItineraryById } from '@/lib/itineraries';
+import { formatDateWithWeekday } from '@/lib/date';
 
 type PageProps = {
   params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> => {
   const itinerary = await getItineraryById(params.id);
 
@@ -35,10 +38,23 @@ export const generateMetadata = async ({
     };
   }
 
+  // dayパラメータから日付情報を取得
+  const dayIndex = searchParams.day
+    ? parseInt(searchParams.day as string) - 1
+    : 0;
+  const dayPlan = itinerary.dayPlans[dayIndex];
+  const dayDisplay = dayPlan?.date
+    ? `${dayIndex + 1}日目：${formatDateWithWeekday(dayPlan.date)}`
+    : `${dayIndex + 1}日目`;
+
   // 旅程のタイトルと説明を使用
-  const title = `${itinerary.title} | 旅のしおり`;
+  const title = `${itinerary.title} ${dayDisplay} | 旅のしおり`;
   const description =
     itinerary.description || '旅のしおりで作成された旅行計画です。';
+
+  // URLを構築（searchParamsがある場合はそれも含める）
+  const baseUrl = `https://tabi.over40web.club/itineraries/${params.id}`;
+  const url = searchParams.day ? `${baseUrl}?day=${searchParams.day}` : baseUrl;
 
   return {
     title: title,
@@ -47,7 +63,7 @@ export const generateMetadata = async ({
     openGraph: {
       title: title,
       description: description,
-      url: `https://tabi.over40web.club/itineraries/${params.id}`,
+      url: url,
       images: [
         {
           url: 'https://tabi.over40web.club/touge.webp',
