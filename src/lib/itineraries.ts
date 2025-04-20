@@ -239,36 +239,33 @@ export async function updateItinerary(
       throw new Error('この旅程を更新する権限がありません');
     }
 
-    // 既存のdayPlansのnotesを保持するためのマップを作成
-    const existingNotesMap = new Map();
-    existingDoc.dayPlans.forEach((day, index) => {
-      if (day.notes) {
-        existingNotesMap.set(index, day.notes);
-      }
-    });
-
     // 更新するドキュメントの準備
     const updateDoc = {
-      $set: {
-        ...updatedData,
-        // dayPlansの各要素に対して、既存のnotesがあれば保持
-        dayPlans: updatedData.dayPlans.map((day, index) => {
-          // 既存のnotesがあれば使用し、なければ新しいdayのnotesを使用
-          const existingNotes = existingNotesMap.get(index);
-          return {
-            ...day,
-            notes:
-              existingNotes !== undefined ? existingNotes : day.notes || '',
-          };
-        }),
-        updatedAt: now,
-      },
+      title: updatedData.title,
+      description: updatedData.description,
+      numberOfDays: updatedData.numberOfDays,
+      startDate: updatedData.startDate,
+      transportation: updatedData.transportation,
+      isPublic: updatedData.isPublic,
+      sharedWith: updatedData.sharedWith,
+      updatedAt: now,
+      // dayPlansの各要素に対して、新しいnotesを使用
+      dayPlans: updatedData.dayPlans.map((day) => ({
+        ...day,
+        // notesフィールドが存在しない場合は空文字列を設定
+        notes: day.notes !== undefined ? day.notes : '',
+      })),
     };
+
+    console.log('更新するドキュメント:', JSON.stringify(updateDoc, null, 2));
 
     // 所有者が一致する場合のみ更新を許可する（ObjectId型を使用）
     const result = await db
       .collection<ServerItineraryDocument>('itineraries')
-      .updateOne({ _id: objectId as any, 'owner.id': user.sub }, updateDoc);
+      .updateOne(
+        { _id: objectId as any, 'owner.id': user.sub },
+        { $set: updateDoc }
+      );
 
     if (result.matchedCount === 0) {
       throw new Error('旅程の更新に失敗しました');
