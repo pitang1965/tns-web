@@ -47,6 +47,7 @@ export const generateMetadata = async ({
     openGraph: {
       title: title,
       description: description,
+      url: `https://tabi.over40web.club/itineraries/${params.id}`,
       images: [
         {
           url: 'https://tabi.over40web.club/touge.webp',
@@ -58,6 +59,9 @@ export const generateMetadata = async ({
       locale: 'ja_JP',
       type: 'website',
     },
+    // other: {
+    //   'fb:app_id': '1234567890',
+    // },
     twitter: {
       card: 'summary_large_image',
     },
