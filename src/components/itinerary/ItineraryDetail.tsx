@@ -175,8 +175,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           <FixedActionButtons
             mode='detail'
             onBack={handleBack}
-            onEdit={handleEdit}
-            onDelete={handleDeleteConfirm}
+            onEdit={isOwner ? handleEdit : undefined}
+            onDelete={isOwner ? handleDeleteConfirm : undefined}
             shareData={{
               title: metadata.title,
               dayIndex: dayParamHook.selectedDay + 1,

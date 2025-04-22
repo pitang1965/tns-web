@@ -17,6 +17,7 @@ import {
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { formatDateWithWeekday } from '@/lib/date';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 type Props = {
   itinerary: ClientItineraryDocument;
@@ -26,6 +27,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   const deleteItinerary = useDeleteItinerary();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
 
   const handleDelete = async () => {
     if (!itinerary.id) {
@@ -48,8 +50,8 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>
-          {itinerary.startDate && formatDateWithWeekday(itinerary.startDate)} から{' '}
-          {itinerary.numberOfDays}日間
+          {itinerary.startDate && formatDateWithWeekday(itinerary.startDate)}{' '}
+          から {itinerary.numberOfDays}日間
         </CardDescription>
         <CardDescription className='line-clamp-3'>
           {itinerary.description}
@@ -65,21 +67,25 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
           >
             見る
           </Button>
-          <Button
-            size='sm'
-            className='flex-1 cursor-pointer'
-            onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
-          >
-            編集
-          </Button>
-          <Button
-            variant='destructive'
-            size='sm'
-            className='flex-1 cursor-pointer'
-            onClick={() => setIsConfirmOpen(true)}
-          >
-            削除
-          </Button>
+          {user && itinerary.owner && user.sub === itinerary.owner.id && (
+            <>
+              <Button
+                size='sm'
+                className='flex-1 cursor-pointer'
+                onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
+              >
+                編集
+              </Button>
+              <Button
+                variant='destructive'
+                size='sm'
+                className='flex-1 cursor-pointer'
+                onClick={() => setIsConfirmOpen(true)}
+              >
+                削除
+              </Button>
+            </>
+          )}
         </div>
       </CardFooter>
       <ConfirmationDialog
