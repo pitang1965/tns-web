@@ -57,7 +57,14 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   };
 
   const handleEdit = () => {
-    router.push(`/itineraries/${id}/edit`);
+    // 現在のdayパラメータを取得
+    const params = new URLSearchParams(window.location.search);
+    const day = params.get('day');
+    if (day) {
+      router.push(`/itineraries/${id}/edit?day=${day}`);
+    } else {
+      router.push(`/itineraries/${id}/edit`);
+    }
   };
 
   const handleDeleteConfirm = () => {
