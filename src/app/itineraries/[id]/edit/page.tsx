@@ -28,6 +28,12 @@ export default withPageAuthRequired(function EditItineraryPage({
       const result = await updateItineraryAction(params.id, data);
       console.log('Update action result:', result);
       setIsSubmitting(false);
+      if (!result) {
+        return {
+          success: false,
+          error: 'サーバーからの応答がありませんでした。',
+        };
+      }
       return result;
     } catch (error) {
       console.error('Error submitting form:', error);

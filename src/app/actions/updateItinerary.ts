@@ -51,6 +51,13 @@ export async function updateItineraryAction(
 
     const updatedItinerary = await updateItinerary(id, updatedData);
 
+    if (!updatedItinerary || !updatedItinerary.id) {
+      return {
+        success: false,
+        error: '旅程の更新に失敗しました（データが返されませんでした）',
+      };
+    }
+
     return { success: true, id: updatedItinerary.id };
   } catch (error) {
     console.error('Error updating itinerary:', error);

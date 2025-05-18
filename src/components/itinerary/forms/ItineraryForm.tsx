@@ -214,6 +214,14 @@ export function ItineraryForm({
   const handleFormSubmit = async (values: ClientItineraryInput) => {
     try {
       const result = await onSubmit(values);
+      if (!result) {
+        toast({
+          title: '操作に失敗しました',
+          description: 'サーバーからの応答がありませんでした。',
+          variant: 'destructive',
+        });
+        return;
+      }
       if (result.success) {
         toast({
           title: '操作が完了しました',
