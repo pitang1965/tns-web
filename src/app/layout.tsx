@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
 import { Inter } from 'next/font/google';
@@ -44,6 +45,14 @@ export default function RootLayout({
   return (
     <html lang='ja'>
       <body className={inter.className}>
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+            crossOrigin='anonymous'
+            strategy='afterInteractive'
+          />
+        )}
         <ErrorBoundary>
           <UserProvider>
             <ThemeProvider
