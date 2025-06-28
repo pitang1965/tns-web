@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { LoginButton } from '@/components/auth/LoginButton';
@@ -11,6 +12,12 @@ import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 export function Header() {
   const { user, error, isLoading } = useUser();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div>{error.message}</div>;
 
@@ -28,10 +35,10 @@ export function Header() {
             <Navigation />
           </div>
 
-          {!user && <LoginButton />}
+          {isClient && !user && <LoginButton />}
           <ModeToggle />
         </div>
-        {user && <UserAvatar user={user} />}
+        {isClient && user && <UserAvatar user={user} />}
       </div>
     </header>
   );
