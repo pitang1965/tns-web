@@ -10,6 +10,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   TransportationBadge,
   TransportationType,
@@ -39,7 +40,14 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   return (
     <Card className='flex flex-col h-full'>
       <CardHeader>
-        <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
+        <div className='flex items-center gap-2'>
+          <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
+          {itinerary.isPublic ? (
+            <Badge>公開</Badge>
+          ) : (
+            <Badge variant='outline'>非公開</Badge>
+          )}
+        </div>
         {itinerary.transportation && (
           <TransportationBadge
             type={

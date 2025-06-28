@@ -4,6 +4,7 @@ import {
   TransportationType,
 } from '@/components/itinerary/TransportationBadge';
 import { H1, LargeText, Text } from '@/components/common/Typography';
+import { Badge } from '@/components/ui/badge';
 
 // どちらの形式のデータも受け入れられるユニオン型を作成
 type ItineraryHeaderProps = {
@@ -15,6 +16,7 @@ type ItineraryHeaderProps = {
         startDate?: string;
         numberOfDays?: number;
         totalDays?: number; // API が返す形式
+        isPublic?: boolean;
         transportation?: {
           type: string;
           details: string | null;
@@ -69,7 +71,14 @@ export const ItineraryHeader: React.FC<ItineraryHeaderProps> = ({
 
   return (
     <div className='flex flex-col items-center justify-between p-6 bg-background text-foreground w-full'>
-      <H1>{itinerary.title}</H1>
+      <div className='flex items-center gap-2'>
+        <H1>{itinerary.title}</H1>
+        {'isPublic' in itinerary && (
+          <Badge variant={itinerary.isPublic ? 'default' : 'outline'}>
+            {itinerary.isPublic ? '公開' : '非公開'}
+          </Badge>
+        )}
+      </div>
       {transportationType && <TransportationBadge type={transportationType} />}
       <LargeText>{itinerary.description}</LargeText>
       <Text>期間: {periodDisplay}</Text>
