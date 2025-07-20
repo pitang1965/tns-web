@@ -59,6 +59,72 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
     ];
   };
 
+  // マーカーをクリアする関数
+  const clearMarkers = () => {
+    markersRef.current.forEach((marker) => {
+      try {
+        marker.remove();
+      } catch (e) {
+        console.error('Error removing marker:', e);
+      }
+    });
+    markersRef.current = [];
+  };
+
+  // ルートライン（アクティビティ間の線）を追加する関数
+  const addRouteLines = () => {
+    if (!mapInstance.current || activities.length < 2) return;
+
+    try {
+      // すでに存在する場合はルートレイヤーを削除
+      if (mapInstance.current.getLayer('route-line')) {
+        mapInstance.current.removeLayer('route-line');
+      }
+
+      if (mapInstance.current.getSource('route')) {
+        mapInstance.current.removeSource('route');
+      }
+
+      // ルートラインのためのGeoJSON形式のデータを作成
+      const routeCoordinates = activities.map((activity) => [
+        activity.longitude,
+        activity.latitude,
+      ]);
+
+      // ルートラインのソースを追加
+      mapInstance.current.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeCoordinates,
+          },
+        },
+      });
+
+      // ルートラインのレイヤーを追加
+      mapInstance.current.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          'line-color': '#3b82f6',
+          'line-width': 3,
+          'line-opacity': 0.8,
+          'line-dasharray': [1, 1],
+        },
+      });
+    } catch (error) {
+      console.error('Error adding route lines:', error);
+    }
+  };
+
   // マップの初期化
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
@@ -138,7 +204,30 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
 
     // クリーンアップ関数
     return () => {
-      clearMapResources();
+      // まずマーカーをクリア
+      clearMarkers();
+
+      // マップを削除
+      if (mapInstance.current) {
+        try {
+          // ルートラインのレイヤーとソースを削除
+          if (mapInstance.current.getLayer('route-line')) {
+            mapInstance.current.removeLayer('route-line');
+          }
+
+          if (mapInstance.current.getSource('route')) {
+            mapInstance.current.removeSource('route');
+          }
+
+          // マップを削除
+          mapInstance.current.remove();
+        } catch (e) {
+          console.error('Error removing map:', e);
+        }
+
+        mapInstance.current = null;
+        setMapLoaded(false);
+      }
     };
   }, []); // 空の依存配列で初期化時のみ実行
 
@@ -170,27 +259,30 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
         markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
         markerElement.innerText = activity.order.toString();
 
-        // ポップアップを作成
+        // ポップアップを作成（初期状態では空）
         const popup = new mapboxgl.Popup({
           offset: 25,
           closeButton: false,
           closeOnClick: false,
-        }).setHTML(`<strong>${activity.order}. ${activity.title}</strong>`);
+        });
 
-        // マーカーを作成し、マップに追加
+        // マーカーを作成し、マップに追加（ポップアップは設定しない）
         const marker = new mapboxgl.Marker(markerElement)
           .setLngLat([activity.longitude, activity.latitude])
-          .setPopup(popup)
           .addTo(mapInstance.current);
 
         // ホバー時にポップアップを表示
         markerElement.addEventListener('mouseenter', () => {
           marker.getElement().style.zIndex = '10';
-          marker.togglePopup();
+          popup
+            .setLngLat([activity.longitude, activity.latitude])
+            .setHTML(`<div style="font-weight: bold; color: black; padding: 5px;">${activity.order}. ${activity.title}</div>`)
+            .addTo(mapInstance.current!);
         });
+
         markerElement.addEventListener('mouseleave', () => {
           marker.getElement().style.zIndex = '1';
-          marker.togglePopup();
+          popup.remove();
         });
 
         // マーカーの配列に追加
@@ -208,46 +300,6 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
       console.error('Error updating markers:', error);
     }
   }, [activities, mapLoaded]);
-
-  // マーカーをクリアする関数
-  const clearMarkers = () => {
-    markersRef.current.forEach((marker) => {
-      try {
-        marker.remove();
-      } catch (e) {
-        console.error('Error removing marker:', e);
-      }
-    });
-    markersRef.current = [];
-  };
-
-  // マップリソースをクリアする関数
-  const clearMapResources = () => {
-    // まずマーカーをクリア
-    clearMarkers();
-
-    // マップを削除
-    if (mapInstance.current) {
-      try {
-        // ルートラインのレイヤーとソースを削除
-        if (mapInstance.current.getLayer('route-line')) {
-          mapInstance.current.removeLayer('route-line');
-        }
-
-        if (mapInstance.current.getSource('route')) {
-          mapInstance.current.removeSource('route');
-        }
-
-        // マップを削除
-        mapInstance.current.remove();
-      } catch (e) {
-        console.error('Error removing map:', e);
-      }
-
-      mapInstance.current = null;
-      setMapLoaded(false);
-    }
-  };
 
   // マップの表示範囲を調整する関数
   const updateMapBounds = () => {
@@ -268,60 +320,6 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
       }
     } catch (error) {
       console.error('Error updating map bounds:', error);
-    }
-  };
-
-  // ルートライン（アクティビティ間の線）を追加する関数
-  const addRouteLines = () => {
-    if (!mapInstance.current || activities.length < 2) return;
-
-    try {
-      // すでに存在する場合はルートレイヤーを削除
-      if (mapInstance.current.getLayer('route-line')) {
-        mapInstance.current.removeLayer('route-line');
-      }
-
-      if (mapInstance.current.getSource('route')) {
-        mapInstance.current.removeSource('route');
-      }
-
-      // ルートラインのためのGeoJSON形式のデータを作成
-      const routeCoordinates = activities.map((activity) => [
-        activity.longitude,
-        activity.latitude,
-      ]);
-
-      // ルートラインのソースを追加
-      mapInstance.current.addSource('route', {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: routeCoordinates,
-          },
-        },
-      });
-
-      // ルートラインのレイヤーを追加
-      mapInstance.current.addLayer({
-        id: 'route-line',
-        type: 'line',
-        source: 'route',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          'line-color': '#3b82f6',
-          'line-width': 3,
-          'line-opacity': 0.8,
-          'line-dasharray': [1, 1],
-        },
-      });
-    } catch (error) {
-      console.error('Error adding route lines:', error);
     }
   };
 
