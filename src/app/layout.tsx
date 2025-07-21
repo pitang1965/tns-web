@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/Footer';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
+import ItineraryUrlTracker from '@/components/common/ItineraryUrlTracker';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -62,6 +63,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <div className='flex flex-col min-h-screen bg-background text-foreground'>
+                <ItineraryUrlTracker />
                 <Header />
                 <main className='flex-1 relative'>
                   <div className='pt-12 pb-16'>{children}</div>
