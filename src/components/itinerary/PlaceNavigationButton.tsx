@@ -1,22 +1,31 @@
 import React from 'react';
-import { MapPin, Navigation, Map } from 'lucide-react';
+import { MapPin, Navigation, Map, Route } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
+
+type Activity =
+  ServerItineraryDocument['dayPlans'][number]['activities'][number];
 
 type PlaceNavigationButtonProps = {
   latitude?: number;
   longitude?: number;
   className?: string;
+  // 複数経由地ルート検索用のプロパティ（オプション）
+  activities?: Activity[];
+  currentActivityIndex?: number;
 };
 
 export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
   latitude,
   longitude,
   className = '',
+  activities = [],
+  currentActivityIndex = -1,
 }) => {
   // 有効な座標かどうかを確認
   const isValidCoordinate = () => {
@@ -85,11 +94,107 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
     }
   };
 
+  // 住所オブジェクトを文字列に変換する関数
+  const formatAddress = (address: Activity['place']['address']) => {
+    if (!address) return null;
+
+    const parts = [
+      address.prefecture,
+      address.city,
+      address.town,
+      address.block,
+      address.building,
+    ].filter((part) => part && part.trim() !== '');
+
+    return parts.join('');
+  };
+
+  // 現在のアクティビティから最終地までのルート検索
+  const openCurrentToFinalRoute = () => {
+    if (!activities.length || currentActivityIndex < 0) return;
+
+    // 現在のアクティビティから最後までの位置情報があるアクティビティを取得
+    const remainingActivities = activities
+      .slice(currentActivityIndex)
+      .filter(
+        (activity) =>
+          activity.place.location &&
+          activity.place.location.latitude &&
+          activity.place.location.longitude &&
+          activity.place.location.latitude !== 0 &&
+          activity.place.location.longitude !== 0 &&
+          !isNaN(activity.place.location.latitude) &&
+          !isNaN(activity.place.location.longitude)
+      );
+
+    if (remainingActivities.length < 2) return;
+
+    const waypoints = remainingActivities.map((activity) => {
+      const { latitude, longitude } = activity.place.location!;
+
+      // 住所がある場合はエンコードして使用
+      const addressString = formatAddress(activity.place.address);
+      if (addressString) {
+        return encodeURIComponent(addressString);
+      }
+      // 座標のみの場合
+      return `${latitude},${longitude}`;
+    });
+
+    // 現在地から開始し、残りの地点を経由地として設定
+    const destination = waypoints[waypoints.length - 1];
+    const waypointsParam = waypoints.slice(0, -1).join('|');
+
+    // Google Maps API形式のURL
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+
+    if (waypointsParam) {
+      url += `&waypoints=${waypointsParam}`;
+    }
+
+    if (isMobileDevice()) {
+      // モバイルの場合
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        // iOSの場合、URL形式を調整
+        const mobileUrl = `https://www.google.com/maps/dir/Current+Location/${waypoints.join(
+          '/'
+        )}?travelmode=driving`;
+        window.location.href = mobileUrl;
+      } else {
+        // Androidの場合
+        window.location.href = url;
+      }
+    } else {
+      // PCの場合は新しいタブで開く
+      window.open(url, '_blank');
+    }
+  };
+
   // 地図上で場所を表示
   const showOnMap = () => {
     if (!isValidCoordinate()) return;
     const url = `https://www.google.com/maps/place/${latitude},${longitude}`;
     window.open(url, '_blank');
+  };
+
+  // 現在のアクティビティから最終地までのルート検索が可能かチェック
+  const canShowMultiWaypointRoute = () => {
+    if (!activities.length || currentActivityIndex < 0) return false;
+
+    const remainingActivities = activities
+      .slice(currentActivityIndex)
+      .filter(
+        (activity) =>
+          activity.place.location &&
+          activity.place.location.latitude &&
+          activity.place.location.longitude &&
+          activity.place.location.latitude !== 0 &&
+          activity.place.location.longitude !== 0 &&
+          !isNaN(activity.place.location.latitude) &&
+          !isNaN(activity.place.location.longitude)
+      );
+
+    return remainingActivities.length >= 2;
   };
 
   // 座標が無効な場合は無効なボタンを表示
@@ -118,6 +223,12 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
           <Navigation className='mr-2 h-4 w-4' />
           <span>現在地からのルート検索</span>
         </DropdownMenuItem>
+        {canShowMultiWaypointRoute() && (
+          <DropdownMenuItem onClick={openCurrentToFinalRoute}>
+            <Route className='mr-2 h-4 w-4' />
+            <span>現在地から最終地までのルート検索</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={showOnMap}>
           <Map className='mr-2 h-4 w-4' />
           <span>地図で表示</span>

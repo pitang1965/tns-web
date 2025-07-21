@@ -8,6 +8,7 @@ import { Map } from 'lucide-react';
 import DailyRouteMap, {
   ActivityLocation,
 } from '@/components/common/Maps/DailyRouteMap';
+import { DayRouteNavigationButton } from './DayRouteNavigationButton';
 import {
   Dialog,
   DialogContent,
@@ -62,18 +63,25 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
       <div className='flex justify-between items-center mb-4'>
         <H3>{dayDisplay}</H3>
 
-        {/* 位置情報を持つアクティビティが2つ以上ある場合のみボタンを表示 */}
-        {shouldShowMap && (
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => setShowFullMap(true)}
-            className='flex items-center gap-1'
-          >
-            <Map className='h-4 w-4' />
-            <span>ルートマップ</span>
-          </Button>
-        )}
+        <div className='flex items-center gap-2'>
+          {/* ルート検索ボタン - 位置情報を持つアクティビティが2つ以上ある場合のみ表示 */}
+          {shouldShowMap && (
+            <DayRouteNavigationButton activities={day.activities} />
+          )}
+
+          {/* 位置情報を持つアクティビティが2つ以上ある場合のみマップボタンを表示 */}
+          {shouldShowMap && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowFullMap(true)}
+              className='flex items-center gap-1'
+            >
+              <Map className='h-4 w-4' />
+              <span>ルートマップ</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* ルートマップ (コンパクト表示) - 位置情報を持つアクティビティが2つ以上ある場合のみ */}
@@ -104,6 +112,7 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
               activity={activity}
               index={activityIndex}
               total={day.activities.length}
+              allActivities={day.activities}
             />
           ))}
         </ul>

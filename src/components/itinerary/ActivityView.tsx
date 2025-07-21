@@ -10,12 +10,15 @@ type ActivityProps = {
   activity: ActivityType;
   index?: number; // 活動の順番（0から始まる）- オプショナル
   total?: number; // その日の活動の総数 - オプショナル
+  // 複数経由地ルート検索用のプロパティ
+  allActivities?: ActivityType[];
 };
 
 export const ActivityView: React.FC<ActivityProps> = ({
   activity,
   index,
   total,
+  allActivities,
 }) => {
   // indexとtotalが両方提供された場合のみ、番号表示を追加
   const titlePrefix =
@@ -39,10 +42,10 @@ export const ActivityView: React.FC<ActivityProps> = ({
         type={activity.place.type}
         address={activity.place.address}
         location={activity.place.location}
+        allActivities={allActivities}
+        currentActivityIndex={index}
       />
-      {activity.description && (
-        <Text>{activity.description}</Text>
-      )}
+      {activity.description && <Text>{activity.description}</Text>}
     </li>
   );
 };

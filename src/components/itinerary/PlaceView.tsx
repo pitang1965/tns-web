@@ -4,14 +4,22 @@ import { AddressView } from './AddressView';
 import { LocationView } from './LocationView';
 import { PlaceNavigationButton } from './PlaceNavigationButton';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
-type PlaceProps =
-  ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
+
+type ActivityType = ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type PlacePropsBase = ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
+
+type PlaceProps = PlacePropsBase & {
+  allActivities?: ActivityType[];
+  currentActivityIndex?: number;
+};
 
 export const PlaceView: React.FC<PlaceProps> = ({
   name,
   type,
   address,
   location,
+  allActivities,
+  currentActivityIndex,
 }) => (
   <div className='mt-1'>
     <div className='flex items-center gap-2'>
@@ -21,6 +29,8 @@ export const PlaceView: React.FC<PlaceProps> = ({
         <PlaceNavigationButton
           latitude={location?.latitude}
           longitude={location?.longitude}
+          activities={allActivities}
+          currentActivityIndex={currentActivityIndex}
         />
       </div>
     </div>
