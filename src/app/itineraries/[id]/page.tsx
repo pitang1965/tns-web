@@ -38,17 +38,14 @@ export const generateMetadata = async ({
     };
   }
 
-  // dayパラメータから日付情報を取得
-  const dayIndex = searchParams.day
-    ? parseInt(searchParams.day as string) - 1
-    : 0;
-  const dayPlan = itinerary.dayPlans[dayIndex];
-  const dayDisplay = dayPlan?.date
-    ? `${dayIndex + 1}日目：${formatDateWithWeekday(dayPlan.date)}`
-    : `${dayIndex + 1}日目`;
+  // dayパラメータがある場合は日数を表示
+  const dayParam = searchParams.day
+    ? parseInt(searchParams.day as string)
+    : null;
+  const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
 
   // 旅程のタイトルと説明を使用
-  const title = `${itinerary.title} ${dayDisplay} | 旅のしおり`;
+  const title = `${itinerary.title}${dayDisplay} | 旅のしおり`;
   const description =
     itinerary.description || '旅のしおりで作成された旅行計画です。';
 

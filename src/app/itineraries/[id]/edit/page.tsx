@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { ItineraryToc } from '@/components/layout/ItineraryToc';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
@@ -18,7 +19,17 @@ export default withPageAuthRequired(function EditItineraryPage({
   params,
 }: EditItineraryPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams();
   const { itinerary, loading, error } = useGetItinerary(params.id);
+
+  // ページタイトルを動的に設定
+  useEffect(() => {
+    if (itinerary?.title) {
+      const dayParam = searchParams.get('day');
+      const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
+      document.title = `${itinerary.title}${dayDisplay} | 旅のしおり`;
+    }
+  }, [itinerary?.title, searchParams]);
 
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data for update:', data);
