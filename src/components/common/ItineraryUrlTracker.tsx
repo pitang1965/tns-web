@@ -52,11 +52,8 @@ export default function ItineraryUrlTracker() {
               }
             } else {
               // 表示ページの場合
-              if (dayParam) {
-                title = `${itineraryTitle} ${dayParam}日目`;
-              } else {
-                title = itineraryTitle;
-              }
+              // itineraryTitleに既に日付情報が含まれている場合があるので、そのまま使用
+              title = itineraryTitle;
             }
           } else {
             // ページタイトルが取得できない場合のフォールバック
