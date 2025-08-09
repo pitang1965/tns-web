@@ -60,8 +60,8 @@ dependencies:
     specifier: ^2.12.2
     version: 2.13.0(@babel/core@7.26.9)(@types/react@19.0.10)(react@19.0.0)
   lucide-react:
-    specifier: ^0.536.0
-    version: 0.536.0(react@19.0.0)
+    specifier: ^0.539.0
+    version: 0.539.0(react@19.0.0)
   mapbox-gl:
     specifier: ^3.7.0
     version: 3.14.0
@@ -4707,8 +4707,8 @@ packages:
       yallist: 4.0.0
     dev: false
 
-  /lucide-react@0.536.0(react@19.0.0):
-    resolution: {integrity: sha512-2PgvNa9v+qz4Jt/ni8vPLt4jwoFybXHuubQT8fv4iCW5TjDxkbZjNZZHa485ad73NSEn/jdsEtU57eE1g+ma8A==}
+  /lucide-react@0.539.0(react@19.0.0):
+    resolution: {integrity: sha512-VVISr+VF2krO91FeuCrm1rSOLACQUYVy7NQkzrOty52Y8TlTPcXcMdQFj9bYzBgXbWCiywlwSZ3Z8u6a+6bMlg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
     dependencies:
