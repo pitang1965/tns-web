@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "mongodb-readonly"
+  ],
+  "enableAllProjectMcpServers": true
+}
