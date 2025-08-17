@@ -24,6 +24,7 @@
     "paths": {
       "@/actions/*": ["./src/app/actions/*"],
       "@/components/*": ["./src/components/*"],
+      "@/constants/*": ["./src/constants/*"],
       "@/data/*": ["./src/data/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/lib/*": ["./src/lib/*"],
