@@ -39,7 +39,7 @@ export const useItineraryAccess = ({
     metadata.sharedWith &&
     metadata.sharedWith.some((sharedUser) => sharedUser.id === user.sub);
 
-  const hasAccess = isPublic || isOwner || isSharedWithUser;
+  const hasAccess = isPublic || Boolean(isOwner) || Boolean(isSharedWithUser);
   const needsLogin = !hasAccess && !user;
 
   return {
