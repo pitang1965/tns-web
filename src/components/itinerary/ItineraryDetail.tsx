@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ItineraryToc } from '@/components/layout/ItineraryToc';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
@@ -12,10 +10,12 @@ import { H2, LargeText } from '@/components/common/Typography';
 import { ItineraryHeader } from '@/components/itinerary/ItineraryHeader';
 import { FixedActionButtons } from '@/components/layout/FixedActionButtons';
 import { DayPagination } from '@/components/layout/DayPagination';
+import { ItineraryAccessGate } from '@/components/itinerary/ItineraryAccessGate';
 import { useDayParam } from '@/hooks/useDayParam';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
-import { useGetItineraryDay } from '@/hooks/useGetItineraryDay'; // 新しいフック
-import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
+import { useGetItineraryDay } from '@/hooks/useGetItineraryDay';
+import { useItineraryAccess } from '@/hooks/useItineraryAccess';
+import { useItineraryActions } from '@/hooks/useItineraryActions';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 type ItineraryDetailProps = {
@@ -23,13 +23,10 @@ type ItineraryDetailProps = {
 };
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
+  const { user } = useUser();
   // 最初は基本メタデータだけを取得（日程の総数を知るため）
   const { itinerary: metadataOnly, loading: metadataLoading } =
     useGetItinerary(id);
-  const deleteItinerary = useDeleteItinerary();
-  const router = useRouter();
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const { user } = useUser();
 
   // 日付パラメータの管理
   const dayParamHook = useDayParam(
@@ -37,7 +34,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     (metadataOnly?.dayPlans?.length || 1) - 1
   );
 
-  const currentDayIndex = dayParamHook.selectedDay; // 0ベースのインデックス
+  const currentDayIndex = dayParamHook.selectedDay;
 
   // 選択された日のデータのみを取得
   const {
@@ -47,39 +44,16 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     error: dayError,
   } = useGetItineraryDay(id, currentDayIndex);
 
+  // アクセス制御
+  const access = useItineraryAccess({ user, metadata });
+
+  // アクション
+  const actions = useItineraryActions({ id });
+
   // 読み込み状態を合成
   const loading = metadataLoading || dayLoading;
   const error = dayError;
 
-  const handleDelete = async () => {
-    await deleteItinerary(id);
-    router.push('/itineraries');
-  };
-
-  const handleEdit = () => {
-    // 現在のdayパラメータを取得
-    const params = new URLSearchParams(window.location.search);
-    const day = params.get('day');
-    if (day) {
-      router.push(`/itineraries/${id}/edit?day=${day}`);
-    } else {
-      router.push(`/itineraries/${id}/edit`);
-    }
-  };
-
-  const handleDeleteConfirm = () => {
-    setIsConfirmOpen(true);
-  };
-
-  const handleBack = () => {
-    router.push('/itineraries');
-  };
-
-  const handleLogin = () => {
-    router.push(`/api/auth/login?returnTo=/itineraries/${id}`);
-  };
-
-  // 日ごとの旅程をレンダリングする関数
   const renderDayPlan = (dayPlan: DayPlan, index: number) => {
     return <DayPlanView key={index} day={dayPlan} dayIndex={index} />;
   };
@@ -96,39 +70,16 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     return <LargeText>旅程が見つかりません。</LargeText>;
   }
 
-  // アクセス制御ロジック
-  const isPublic = metadata.isPublic;
-  const isOwner = user && metadata.owner && user.sub === metadata.owner.id;
-  const isSharedWithUser =
-    user &&
-    metadata.sharedWith &&
-    metadata.sharedWith.some((sharedUser) => sharedUser.id === user.sub);
-
-  // 非公開かつ所有者でもなく共有されてもいない場合はアクセス不可
-  if (!isPublic && !isOwner && !isSharedWithUser) {
-    if (!user) {
-      // ログインしていない場合はログインを促す
-      return (
-        <div className='container mx-auto p-8 text-center'>
-          <H2>このコンテンツを閲覧するにはログインが必要です</H2>
-          <LargeText>
-            この旅程は非公開に設定されています。閲覧するには認証が必要です。
-          </LargeText>
-          <Button onClick={handleLogin}>ログイン</Button>
-        </div>
-      );
-    } else {
-      // ログイン済みだがアクセス権がない場合
-      return (
-        <div className='container mx-auto p-8 text-center'>
-          <H2>アクセス権限がありません</H2>
-          <LargeText>この旅程を閲覧する権限がありません。</LargeText>
-          <Button onClick={handleBack} variant='secondary'>
-            戻る
-          </Button>
-        </div>
-      );
-    }
+  // アクセス制御チェック
+  if (!access.hasAccess) {
+    return (
+      <ItineraryAccessGate
+        needsLogin={access.needsLogin}
+        hasAccess={access.hasAccess}
+        onLogin={actions.handleLogin}
+        onBack={actions.handleBack}
+      />
+    );
   }
 
   // day パラメータが有効範囲外の場合の処理
@@ -147,14 +98,14 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
         <div className='flex-1'>
           <ItineraryHeader itinerary={metadata} />
 
-          {!user && isPublic && (
+          {!user && access.isPublic && (
             <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
               <LargeText>
                 この旅程を編集するには
                 <Button
                   variant='link'
                   className='p-0 mx-1 h-auto'
-                  onClick={handleLogin}
+                  onClick={actions.handleLogin}
                 >
                   ログイン
                 </Button>
@@ -181,9 +132,9 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
           <FixedActionButtons
             mode='detail'
-            onBack={handleBack}
-            onEdit={isOwner ? handleEdit : undefined}
-            onDelete={isOwner ? handleDeleteConfirm : undefined}
+            onBack={actions.handleBack}
+            onEdit={access.isOwner ? actions.handleEdit : undefined}
+            onDelete={access.isOwner ? actions.handleDeleteConfirm : undefined}
             shareData={{
               title: metadata.title,
               dayIndex: dayParamHook.selectedDay + 1,
@@ -193,12 +144,12 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           />
 
           <ConfirmationDialog
-            isOpen={isConfirmOpen}
-            onOpenChange={setIsConfirmOpen}
+            isOpen={actions.isConfirmOpen}
+            onOpenChange={actions.setIsConfirmOpen}
             title='旅程の削除'
             description='この旅程を削除してもよろしいですか？この操作は取り消せません。'
             confirmLabel='削除'
-            onConfirm={handleDelete}
+            onConfirm={actions.handleDelete}
             variant='destructive'
           />
         </div>
