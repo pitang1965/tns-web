@@ -1,11 +1,15 @@
 'use client';
 
 import { PlaceForm } from './PlaceForm';
-import { ActivityFormFields } from './ActivityFormFields';
 import { FieldErrors } from 'react-hook-form';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { ActivityControls } from './ActivityControls.tsx';
 import { useActivityTime } from '@/hooks/useActivityTime';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { SmallText } from '@/components/common/Typography';
+import { useActivityForm } from '@/hooks/useActivityForm';
 
 type ActivityFormProps = {
   dayIndex: number;
@@ -39,6 +43,10 @@ export function ActivityForm({
 }: ActivityFormProps) {
   const { handleShiftSubsequentActivities } = useActivityTime();
   const basePath = `dayPlans.${dayIndex}.activities.${activityIndex}`;
+  const { getFieldError, getFieldRegister, register } = useActivityForm(
+    dayIndex,
+    activityIndex
+  );
 
   // アクティビティのタイトル表示を生成
   const activityHeader = total 
@@ -64,15 +72,75 @@ export function ActivityForm({
         />
       </div>
 
-      <ActivityFormFields
-        dayIndex={dayIndex}
-        activityIndex={activityIndex}
-      />
-      <PlaceForm
-        dayIndex={dayIndex}
-        activityIndex={activityIndex}
-        basePath={basePath}
-      />
+      <div className='space-y-4'>
+        <div className='space-y-2'>
+          <Label
+            htmlFor='title'
+            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+          >
+            タイトル
+          </Label>
+          <Input
+            id='title'
+            {...getFieldRegister('title')}
+            placeholder='例: 出発、休憩、散策、昼食、宿泊地到着、入浴'
+          />
+          {getFieldError('title') && (
+            <SmallText>{getFieldError('title')}</SmallText>
+          )}
+        </div>
+
+        <PlaceForm
+          dayIndex={dayIndex}
+          activityIndex={activityIndex}
+          basePath={basePath}
+        />
+
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Label>開始時間</Label>
+            <Input type='time' {...getFieldRegister('startTime')} />
+            {getFieldError('startTime') && (
+              <SmallText>{getFieldError('startTime')}</SmallText>
+            )}
+          </div>
+          <div className='space-y-2'>
+            <Label>終了時間</Label>
+            <Input type='time' {...getFieldRegister('endTime')} />
+            {getFieldError('endTime') && (
+              <SmallText>{getFieldError('endTime')}</SmallText>
+            )}
+          </div>
+        </div>
+
+        <div className='space-y-2'>
+          <Label>説明</Label>
+          <Textarea
+            {...getFieldRegister('description')}
+            placeholder='詳細な説明'
+          />
+        </div>
+
+        <div className='space-y-2'>
+          <Label>予算</Label>
+          <Input
+            type='number'
+            {...register(
+              `dayPlans.${dayIndex}.activities.${activityIndex}.cost`,
+              {
+                setValueAs: (value: string) => {
+                  if (value === '') return null;
+                  return Number(value);
+                },
+              }
+            )}
+            placeholder='0'
+          />
+          {getFieldError('cost') && (
+            <SmallText>{getFieldError('cost')}</SmallText>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
