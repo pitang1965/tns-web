@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Map } from 'lucide-react';
+import { PlusCircle, Map, Clock } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { H3 } from '@/components/common/Typography';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { formatDateWithWeekday } from '@/lib/date';
+import { sortActivitiesByTime } from '@/lib/activitySort';
 import DailyRouteMap, {
   ActivityLocation,
 } from '@/components/common/Maps/DailyRouteMap';
@@ -63,6 +64,17 @@ export function DayPlanForm({
     });
   };
 
+  const handleSortActivitiesByTime = () => {
+    const activities = watch(`dayPlans.${dayIndex}.activities`);
+    if (!activities) return;
+
+    const sortedActivities = sortActivitiesByTime(activities);
+
+    setValue(`dayPlans.${dayIndex}.activities`, sortedActivities, {
+      shouldValidate: true,
+    });
+  };
+
   // 日付表示の生成
   const dayDisplay = day.date
     ? `${dayIndex + 1}日目: ${formatDateWithWeekday(day.date)}`
@@ -98,18 +110,34 @@ export function DayPlanForm({
       <div className='flex justify-between items-center'>
         <H3>{dayDisplay}</H3>
 
-        {/* 位置情報を持つアクティビティが2つ以上ある場合のみボタンを表示 */}
-        {shouldShowMap && (
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => setShowFullMap(true)}
-            className='flex items-center gap-1'
-          >
-            <Map className='h-4 w-4' />
-            <span>ルートマップ</span>
-          </Button>
-        )}
+        <div className='flex gap-2'>
+          {/* 時間順並び替えボタン - アクティビティが2つ以上ある場合のみ表示 */}
+          {totalActivities >= 2 && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleSortActivitiesByTime}
+              className='flex items-center gap-1'
+              type='button'
+            >
+              <Clock className='h-4 w-4' />
+              <span>時間でソート</span>
+            </Button>
+          )}
+
+          {/* 位置情報を持つアクティビティが2つ以上ある場合のみボタンを表示 */}
+          {shouldShowMap && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setShowFullMap(true)}
+              className='flex items-center gap-1'
+            >
+              <Map className='h-4 w-4' />
+              <span>ルートマップ</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* ルートマップ (コンパクト表示) */}
