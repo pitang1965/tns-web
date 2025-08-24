@@ -9,6 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Upload,
   Download,
   MapPin,
@@ -68,8 +75,8 @@ export default function CampingSpotsAdminPage() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'map' | 'list'>('map');
   const [searchTerm, setSearchTerm] = useState('');
-  const [prefectureFilter, setPrefectureFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+  const [prefectureFilter, setPrefectureFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   const filteredSpots = useMemo(() => {
     return spots.filter((spot) => {
@@ -79,10 +86,10 @@ export default function CampingSpotsAdminPage() {
       ) {
         return false;
       }
-      if (prefectureFilter && spot.prefecture !== prefectureFilter) {
+      if (prefectureFilter !== 'all' && spot.prefecture !== prefectureFilter) {
         return false;
       }
-      if (typeFilter && spot.type !== typeFilter) {
+      if (typeFilter !== 'all' && spot.type !== typeFilter) {
         return false;
       }
       return true;
@@ -372,32 +379,40 @@ export default function CampingSpotsAdminPage() {
                       className='pl-10'
                     />
                   </div>
-                  <select
-                    className='px-3 py-2 border border-gray-200 rounded-lg'
+                  <Select 
                     value={prefectureFilter}
-                    onChange={(e) => setPrefectureFilter(e.target.value)}
+                    onValueChange={setPrefectureFilter}
                   >
-                    <option value=''>全都道府県</option>
-                    {PrefectureOptions.map((prefecture) => (
-                      <option key={prefecture} value={prefecture}>
-                        {prefecture}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className='px-3 py-2 border border-gray-200 rounded-lg'
+                    <SelectTrigger>
+                      <SelectValue placeholder="全都道府県" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全都道府県</SelectItem>
+                      {PrefectureOptions.map((prefecture) => (
+                        <SelectItem key={prefecture} value={prefecture}>
+                          {prefecture}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select 
                     value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
+                    onValueChange={setTypeFilter}
                   >
-                    <option value=''>全種別</option>
-                    {Object.entries(CampingSpotTypeLabels).map(
-                      ([key, label]) => (
-                        <option key={key} value={key}>
-                          {label}
-                        </option>
-                      )
-                    )}
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="全種別" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全種別</SelectItem>
+                      {Object.entries(CampingSpotTypeLabels).map(
+                        ([key, label]) => (
+                          <SelectItem key={key} value={key}>
+                            {label}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
