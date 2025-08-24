@@ -7,7 +7,9 @@ export interface ICampingSpot extends Document {
   address?: string;
   type: 'roadside_station' | 'paid_parking' | 'sa_pa' | 'park' | 'shrine_temple' | 'beach' | 'mountain' | 'rv_park' | 'convenience_store' | 'other';
   distanceToToilet?: number; // meters
-  distanceToBath?: number; // meters, null if no bath nearby
+  distanceToBath?: number; // meters
+  distanceToConvenience?: number; // meters
+  elevation?: number; // meters, null if no bath nearby
   quietnessLevel?: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
   securityLevel?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
   overallRating?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
@@ -67,6 +69,14 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     min: 0,
   },
   distanceToBath: {
+    type: Number,
+    min: 0,
+  },
+  distanceToConvenience: {
+    type: Number,
+    min: 0,
+  },
+  elevation: {
     type: Number,
     min: 0,
   },

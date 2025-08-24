@@ -147,6 +147,12 @@ export async function createCampingSpot(data: FormData) {
     distanceToBath: formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
       ? Number(formObject.distanceToBath)
       : undefined,
+    distanceToConvenience: formObject.distanceToConvenience && formObject.distanceToConvenience.trim() !== ''
+      ? Number(formObject.distanceToConvenience)
+      : undefined,
+    elevation: formObject.elevation && formObject.elevation.trim() !== ''
+      ? Number(formObject.elevation)
+      : undefined,
     quietnessLevel: formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
       ? Number(formObject.quietnessLevel)
       : undefined,
@@ -228,6 +234,12 @@ export async function updateCampingSpot(id: string, data: FormData) {
     distanceToBath: formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
       ? Number(formObject.distanceToBath)
       : undefined,
+    distanceToConvenience: formObject.distanceToConvenience && formObject.distanceToConvenience.trim() !== ''
+      ? Number(formObject.distanceToConvenience)
+      : undefined,
+    elevation: formObject.elevation && formObject.elevation.trim() !== ''
+      ? Number(formObject.elevation)
+      : undefined,
     quietnessLevel: formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
       ? Number(formObject.quietnessLevel)
       : undefined,
@@ -275,7 +287,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const unsetFields: any = {};
 
   // Handle optional fields that should be unset when undefined
-  const optionalFields = ['distanceToToilet', 'distanceToBath', 'quietnessLevel', 'securityLevel', 'overallRating', 'capacity', 'notes'];
+  const optionalFields = ['distanceToToilet', 'distanceToBath', 'distanceToConvenience', 'elevation', 'quietnessLevel', 'securityLevel', 'overallRating', 'capacity', 'notes'];
 
   Object.keys(validatedData).forEach(key => {
     const value = (validatedData as any)[key];

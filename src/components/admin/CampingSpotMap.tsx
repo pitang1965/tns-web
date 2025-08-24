@@ -222,6 +222,12 @@ export default function CampingSpotMap({
               ? `<div><strong>入浴施設:</strong> ${spot.distanceToBath}m</div>`
               : ''
           }
+          ${
+            spot.distanceToConvenience
+              ? `<div><strong>コンビニ:</strong> ${spot.distanceToConvenience}m</div>`
+              : ''
+          }
+          ${spot.elevation ? `<div><strong>標高:</strong> ${spot.elevation}m</div>` : ''}
           <div class="flex gap-1 mt-2">
             ${
               spot.hasRoof

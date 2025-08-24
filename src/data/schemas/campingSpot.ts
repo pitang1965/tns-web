@@ -32,6 +32,8 @@ export const CampingSpotSchema = z.object({
   type: CampingSpotTypeSchema,
   distanceToToilet: z.number().min(0, 'トイレまでの距離は0以上で入力してください').optional(),
   distanceToBath: z.number().min(0).optional(),
+  distanceToConvenience: z.number().min(0).optional(),
+  elevation: z.number().min(0).optional(),
   quietnessLevel: z.number().int().min(1).max(5).optional(),
   securityLevel: z.number().int().min(1).max(5).optional(),
   overallRating: z.number().int().min(1).max(5).optional(),
@@ -77,6 +79,12 @@ export const CampingSpotCSVSchema = z.object({
   }).optional().default(''),
   distanceToBath: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "入浴施設までの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  distanceToConvenience: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "コンビニまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "標高は空欄または0以上の数値で入力してください",
   }).optional().default(''),
   quietnessLevel: z.string().refine((val) => {
     const num = Number(val);
@@ -142,6 +150,12 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   }).optional().default(''),
   'お風呂までの距離(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "入浴施設までの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  'コンビニまでの距離(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "コンビニまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  '標高(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "標高は空欄または0以上の数値で入力してください",
   }).optional().default(''),
   '静寂レベル(1-5)': z.string().refine((val) => {
     const num = Number(val);
@@ -228,6 +242,8 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     type: csvRow.type as CampingSpotType,
     distanceToToilet: csvRow.distanceToToilet ? Number(csvRow.distanceToToilet) : undefined,
     distanceToBath: csvRow.distanceToBath ? Number(csvRow.distanceToBath) : undefined,
+    distanceToConvenience: csvRow.distanceToConvenience ? Number(csvRow.distanceToConvenience) : undefined,
+    elevation: csvRow.elevation ? Number(csvRow.elevation) : undefined,
     quietnessLevel: csvRow.quietnessLevel ? Number(csvRow.quietnessLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
     securityLevel: csvRow.securityLevel ? Number(csvRow.securityLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
     overallRating: csvRow.overallRating ? Number(csvRow.overallRating) as 1 | 2 | 3 | 4 | 5 : undefined,
@@ -257,6 +273,8 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     type: csvRow['タイプ'] as CampingSpotType,
     distanceToToilet: csvRow['トイレまでの距離(m)'] ? Number(csvRow['トイレまでの距離(m)']) : undefined,
     distanceToBath: csvRow['お風呂までの距離(m)'] ? Number(csvRow['お風呂までの距離(m)']) : undefined,
+    distanceToConvenience: csvRow['コンビニまでの距離(m)'] ? Number(csvRow['コンビニまでの距離(m)']) : undefined,
+    elevation: csvRow['標高(m)'] ? Number(csvRow['標高(m)']) : undefined,
     quietnessLevel: csvRow['静寂レベル(1-5)'] ? Number(csvRow['静寂レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
     securityLevel: csvRow['治安レベル(1-5)'] ? Number(csvRow['治安レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
     overallRating: csvRow['総合評価(1-5)'] ? Number(csvRow['総合評価(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,

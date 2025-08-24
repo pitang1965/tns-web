@@ -44,6 +44,8 @@ type CampingSpotFormData = {
   type: CampingSpotType;
   distanceToToilet?: string;
   distanceToBath?: string;
+  distanceToConvenience?: string;
+  elevation?: string;
   quietnessLevel?: string;
   securityLevel?: string;
   overallRating?: string;
@@ -68,7 +70,6 @@ export default function CampingSpotForm({
   const [loading, setLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const isEdit = !!spot?._id;
-
 
   const {
     register,
@@ -138,7 +139,7 @@ export default function CampingSpotForm({
         overallRating: formValues.overallRating,
         capacity: formValues.capacity,
         distanceToToilet: formValues.distanceToToilet,
-        notes: formValues.notes
+        notes: formValues.notes,
       });
       reset(formValues);
     } else {
@@ -179,7 +180,7 @@ export default function CampingSpotForm({
         overallRating: data.overallRating,
         capacity: data.capacity,
         distanceToToilet: data.distanceToToilet,
-        notes: data.notes
+        notes: data.notes,
       });
 
       const formData = new FormData();
@@ -353,24 +354,14 @@ export default function CampingSpotForm({
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
                 <Label htmlFor='lat'>緯度 *</Label>
-                <Input
-                  id='lat'
-                  type='number'
-                  step='any'
-                  {...register('lat')}
-                />
+                <Input id='lat' type='number' step='any' {...register('lat')} />
                 {errors.lat && (
                   <p className='text-sm text-red-500'>{errors.lat.message}</p>
                 )}
               </div>
               <div>
                 <Label htmlFor='lng'>経度 *</Label>
-                <Input
-                  id='lng'
-                  type='number'
-                  step='any'
-                  {...register('lng')}
-                />
+                <Input id='lng' type='number' step='any' {...register('lng')} />
                 {errors.lng && (
                   <p className='text-sm text-red-500'>{errors.lng.message}</p>
                 )}
@@ -418,6 +409,9 @@ export default function CampingSpotForm({
                   </p>
                 )}
               </div>
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
                 <Label htmlFor='distanceToToilet'>トイレまでの距離 (m)</Label>
                 <Input
@@ -432,15 +426,34 @@ export default function CampingSpotForm({
                   </p>
                 )}
               </div>
+              <div>
+                <Label htmlFor='distanceToConvenience'>
+                  コンビニまでの距離 (m)
+                </Label>
+                <Input
+                  id='distanceToConvenience'
+                  type='text'
+                  {...register('distanceToConvenience')}
+                  placeholder='距離(m)または空欄'
+                />
+              </div>
+              <div>
+                <Label htmlFor='distanceToBath'>入浴施設までの距離 (m)</Label>
+                <Input
+                  id='distanceToBath'
+                  type='text'
+                  {...register('distanceToBath')}
+                  placeholder='距離(m)または空欄'
+                />
+              </div>
             </div>
-
             <div>
-              <Label htmlFor='distanceToBath'>入浴施設まで距離 (m)</Label>
+              <Label htmlFor='elevation'>標高 (m)</Label>
               <Input
-                id='distanceToBath'
+                id='elevation'
                 type='text'
-                {...register('distanceToBath')}
-                placeholder='距離(m)または空欄'
+                {...register('elevation')}
+                placeholder='標高(m)または空欄'
               />
             </div>
 
