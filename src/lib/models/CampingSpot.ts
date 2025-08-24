@@ -5,7 +5,8 @@ export interface ICampingSpot extends Document {
   coordinates: [number, number]; // [lng, lat]
   prefecture: string;
   address?: string;
-  type: 'roadside_station' | 'paid_parking' | 'sa_pa' | 'park' | 'shrine_temple' | 'beach' | 'mountain' | 'rv_park' | 'convenience_store' | 'other';
+  url?: string;
+  type: 'roadside_station' | 'paid_parking' | 'sa_pa' | 'park' | 'beach' | 'mountain' | 'rv_park' | 'convenience_store' | 'other';
   distanceToToilet?: number; // meters
   distanceToBath?: number; // meters
   distanceToConvenience?: number; // meters
@@ -43,7 +44,8 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     required: true,
     validate: {
       validator: function(v: number[]) {
-        return v.length === 2 && 
+        return v.length === 2
+          &&
                v[0] >= -180 && v[0] <= 180 && // longitude
                v[1] >= -90 && v[1] <= 90;     // latitude
       },
@@ -59,10 +61,26 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     type: String,
     trim: true,
   },
+  url: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v: string) {
+        if (!v) return true; // optional field
+        try {
+          new URL(v);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      message: 'URLの形式が正しくありません'
+    }
+  },
   type: {
     type: String,
     required: true,
-    enum: ['roadside_station', 'paid_parking', 'sa_pa', 'park', 'shrine_temple', 'beach', 'mountain', 'rv_park', 'convenience_store', 'other'],
+    enum: ['roadside_station', 'paid_parking', 'sa_pa', 'park', 'beach', 'mountain', 'rv_park', 'convenience_store', 'other'],
   },
   distanceToToilet: {
     type: Number,

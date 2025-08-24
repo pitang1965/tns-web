@@ -5,7 +5,6 @@ export const CampingSpotTypeSchema = z.enum([
   'paid_parking',
   'sa_pa',
   'park',
-  'shrine_temple',
   'beach',
   'mountain',
   'rv_park',
@@ -29,6 +28,7 @@ export const CampingSpotSchema = z.object({
   }),
   prefecture: z.string().min(1, '都道府県を選択してください').trim(),
   address: z.string().trim().optional(),
+  url: z.string().url('有効なURLを入力してください').trim().optional(),
   type: CampingSpotTypeSchema,
   distanceToToilet: z.number().min(0, 'トイレまでの距離は0以上で入力してください').optional(),
   distanceToBath: z.number().min(0).optional(),
@@ -71,6 +71,17 @@ export const CampingSpotCSVSchema = z.object({
   }),
   prefecture: z.string().min(1).trim(),
   address: z.string().trim().optional().default(''),
+  url: z.string().refine((val) => {
+    if (val === '') return true;
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, {
+    message: "有効なURLを入力してください",
+  }).optional().default(''),
   type: z.string().refine((val) => CampingSpotTypeSchema.safeParse(val).success, {
     message: "有効な種別を選択してください",
   }),
@@ -142,6 +153,17 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   }),
   '都道府県': z.string().min(1).trim(),
   '住所': z.string().trim().optional().default(''),
+  'URL': z.string().refine((val) => {
+    if (val === '') return true;
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, {
+    message: "有効なURLを入力してください",
+  }).optional().default(''),
   'タイプ': z.string().refine((val) => CampingSpotTypeSchema.safeParse(val).success, {
     message: "有効な種別を選択してください",
   }),
@@ -239,6 +261,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     coordinates: [Number(csvRow.lng), Number(csvRow.lat)],
     prefecture: csvRow.prefecture,
     address: csvRow.address || undefined,
+    url: csvRow.url || undefined,
     type: csvRow.type as CampingSpotType,
     distanceToToilet: csvRow.distanceToToilet ? Number(csvRow.distanceToToilet) : undefined,
     distanceToBath: csvRow.distanceToBath ? Number(csvRow.distanceToBath) : undefined,
@@ -270,6 +293,7 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     coordinates: [Number(csvRow['経度']), Number(csvRow['緯度'])],
     prefecture: csvRow['都道府県'],
     address: csvRow['住所'] || undefined,
+    url: csvRow['URL'] || undefined,
     type: csvRow['タイプ'] as CampingSpotType,
     distanceToToilet: csvRow['トイレまでの距離(m)'] ? Number(csvRow['トイレまでの距離(m)']) : undefined,
     distanceToBath: csvRow['お風呂までの距離(m)'] ? Number(csvRow['お風呂までの距離(m)']) : undefined,
@@ -300,7 +324,6 @@ export const CampingSpotTypeLabels: Record<CampingSpotType, string> = {
   paid_parking: '有料駐車場',
   sa_pa: 'SA/PA',
   park: '公園',
-  shrine_temple: '神社・寺',
   beach: '海岸・浜辺',
   mountain: '山間部',
   rv_park: 'RVパーク',

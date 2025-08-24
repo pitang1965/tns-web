@@ -87,6 +87,7 @@ export default function CSVImportDialog({
       '経度',
       '都道府県',
       '住所',
+      'URL',
       'タイプ',
       'トイレまでの距離(m)',
       'お風呂までの距離(m)',
@@ -113,6 +114,7 @@ export default function CSVImportDialog({
       '139.6503',             // 経度
       '東京都',               // 都道府県
       '東京都千代田区',       // 住所
+      '',                     // URL - 任意
       'roadside_station',     // タイプ
       '',                     // トイレまでの距離(m) - 任意
       '',                     // お風呂までの距離(m) - 任意

@@ -187,6 +187,9 @@ export async function createCampingSpot(data: FormData) {
           .map((a) => a.trim())
           .filter((a) => a)
       : [],
+    url: formObject.url && formObject.url.trim() !== ''
+      ? formObject.url.trim()
+      : undefined,
     notes: formObject.notes && formObject.notes.trim() !== ''
       ? formObject.notes.trim()
       : undefined,
@@ -275,6 +278,9 @@ export async function updateCampingSpot(id: string, data: FormData) {
           .map((a) => a.trim())
           .filter((a) => a)
       : [],
+    url: formObject.url && formObject.url.trim() !== ''
+      ? formObject.url.trim()
+      : undefined,
     notes: formObject.notes && formObject.notes.trim() !== ''
       ? formObject.notes.trim()
       : undefined,
@@ -288,7 +294,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const unsetFields: any = {};
 
   // Handle optional fields that should be unset when undefined
-  const optionalFields = ['distanceToToilet', 'distanceToBath', 'distanceToConvenience', 'elevation', 'quietnessLevel', 'securityLevel', 'overallRating', 'capacity', 'notes'];
+  const optionalFields = ['distanceToToilet', 'distanceToBath', 'distanceToConvenience', 'elevation', 'quietnessLevel', 'securityLevel', 'overallRating', 'capacity', 'url', 'notes'];
 
   Object.keys(validatedData).forEach(key => {
     const value = (validatedData as any)[key];

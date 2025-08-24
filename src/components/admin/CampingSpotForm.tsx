@@ -41,6 +41,7 @@ type CampingSpotFormData = {
   lng: string;
   prefecture: string;
   address?: string;
+  url?: string;
   type: CampingSpotType;
   distanceToToilet?: string;
   distanceToBath?: string;
@@ -86,6 +87,7 @@ export default function CampingSpotForm({
       lng: '139.6917',
       prefecture: '',
       address: '',
+      url: '',
       type: 'other' as CampingSpotType,
       distanceToToilet: '',
       distanceToBath: '',
@@ -116,6 +118,7 @@ export default function CampingSpotForm({
         lng: spot.coordinates[0].toString(),
         prefecture: spot.prefecture,
         address: spot.address || '',
+        url: spot.url || '',
         type: spot.type,
         distanceToToilet: spot.distanceToToilet?.toString() || '',
         distanceToBath: spot.distanceToBath?.toString() || '',
@@ -150,6 +153,7 @@ export default function CampingSpotForm({
         lng: '139.6917',
         prefecture: '',
         address: '',
+        url: '',
         type: 'other' as CampingSpotType,
         distanceToToilet: '',
         distanceToBath: '',
@@ -195,6 +199,9 @@ export default function CampingSpotForm({
       // Handle optional string fields
       if (data.address && data.address.trim() !== '') {
         formData.append('address', data.address);
+      }
+      if (data.url && data.url.trim() !== '') {
+        formData.append('url', data.url);
       }
       if (data.priceNote && data.priceNote.trim() !== '') {
         formData.append('priceNote', data.priceNote);
@@ -360,13 +367,24 @@ export default function CampingSpotForm({
               </div>
             </div>
 
-            <div>
-              <Label htmlFor='address'>住所</Label>
-              <Input
-                id='address'
-                {...register('address')}
-                placeholder='住所（任意）'
-              />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div>
+                <Label htmlFor='address'>住所</Label>
+                <Input
+                  id='address'
+                  {...register('address')}
+                  placeholder='住所（任意）'
+                />
+              </div>
+              <div>
+                <Label htmlFor='url'>URL</Label>
+                <Input
+                  id='url'
+                  type='url'
+                  {...register('url')}
+                  placeholder='URL（任意）'
+                />
+              </div>
             </div>
 
             {/* Type and Basic Properties */}
