@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
 import { X, Save, Trash2 } from 'lucide-react';
@@ -37,26 +37,26 @@ interface CampingSpotFormProps {
 
 type CampingSpotFormData = {
   name: string;
-  lat: number;
-  lng: number;
+  lat: string;
+  lng: string;
   prefecture: string;
   address?: string;
   type: CampingSpotType;
-  distanceToToilet: number;
-  distanceToBath?: number;
-  quietnessLevel: number;
-  securityLevel: number;
-  overallRating: number;
+  distanceToToilet?: string;
+  distanceToBath?: string;
+  quietnessLevel?: string;
+  securityLevel?: string;
+  overallRating?: string;
   hasRoof: boolean;
   hasPowerOutlet: boolean;
   isGatedPaid: boolean;
   isFree: boolean;
-  pricePerNight?: number;
+  pricePerNight?: string;
   priceNote?: string;
-  capacity: number;
+  capacity?: string;
   restrictions: string;
   amenities: string;
-  notes: string;
+  notes?: string;
 };
 
 export default function CampingSpotForm({
@@ -69,72 +69,171 @@ export default function CampingSpotForm({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const isEdit = !!spot?._id;
 
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<CampingSpotFormData>({
     // resolver: zodResolver(...), // Disabled for now to fix build issues
-    defaultValues: spot
-      ? {
-          name: spot.name,
-          lat: spot.coordinates[1],
-          lng: spot.coordinates[0],
-          prefecture: spot.prefecture,
-          address: spot.address || '',
-          type: spot.type,
-          distanceToToilet: spot.distanceToToilet,
-          distanceToBath: spot.distanceToBath,
-          quietnessLevel: spot.quietnessLevel,
-          securityLevel: spot.securityLevel,
-          overallRating: spot.overallRating,
-          hasRoof: spot.hasRoof,
-          hasPowerOutlet: spot.hasPowerOutlet,
-          isGatedPaid: spot.isGatedPaid,
-          isFree: spot.pricing.isFree,
-          pricePerNight: spot.pricing.pricePerNight,
-          priceNote: spot.pricing.priceNote || '',
-          capacity: spot.capacity,
-          restrictions: spot.restrictions.join(', '),
-          amenities: spot.amenities.join(', '),
-          notes: spot.notes,
-        }
-      : {
-          name: '',
-          lat: 35.6895,
-          lng: 139.6917,
-          prefecture: '',
-          address: '',
-          type: 'other' as CampingSpotType,
-          distanceToToilet: 0,
-          quietnessLevel: 3,
-          securityLevel: 3,
-          overallRating: 3,
-          hasRoof: false,
-          hasPowerOutlet: false,
-          isGatedPaid: false,
-          isFree: true,
-          capacity: 1,
-          restrictions: '',
-          amenities: '',
-          notes: '',
-        },
+    defaultValues: {
+      name: '',
+      lat: '35.6895',
+      lng: '139.6917',
+      prefecture: '',
+      address: '',
+      type: 'other' as CampingSpotType,
+      distanceToToilet: '',
+      distanceToBath: '',
+      quietnessLevel: '',
+      securityLevel: '',
+      overallRating: '',
+      hasRoof: false,
+      hasPowerOutlet: false,
+      isGatedPaid: false,
+      isFree: true,
+      pricePerNight: '',
+      priceNote: '',
+      capacity: '',
+      restrictions: '',
+      amenities: '',
+      notes: '',
+    },
   });
 
   const isFree = watch('isFree');
+
+  // コンポーネントマウント時とspotが変わった時にフォームの値を設定
+  useEffect(() => {
+    if (spot) {
+      const formValues = {
+        name: spot.name,
+        lat: spot.coordinates[1].toString(),
+        lng: spot.coordinates[0].toString(),
+        prefecture: spot.prefecture,
+        address: spot.address || '',
+        type: spot.type,
+        distanceToToilet: spot.distanceToToilet?.toString() || '',
+        distanceToBath: spot.distanceToBath?.toString() || '',
+        quietnessLevel: spot.quietnessLevel?.toString() || '',
+        securityLevel: spot.securityLevel?.toString() || '',
+        overallRating: spot.overallRating?.toString() || '',
+        hasRoof: spot.hasRoof,
+        hasPowerOutlet: spot.hasPowerOutlet,
+        isGatedPaid: spot.isGatedPaid,
+        isFree: spot.pricing.isFree,
+        pricePerNight: spot.pricing.pricePerNight?.toString() || '',
+        priceNote: spot.pricing.priceNote || '',
+        capacity: spot.capacity?.toString() || '',
+        restrictions: spot.restrictions.join(', '),
+        amenities: spot.amenities.join(', '),
+        notes: spot.notes || '',
+      };
+      console.log('Setting form values:', {
+        quietnessLevel: formValues.quietnessLevel,
+        securityLevel: formValues.securityLevel,
+        overallRating: formValues.overallRating,
+        capacity: formValues.capacity,
+        distanceToToilet: formValues.distanceToToilet,
+        notes: formValues.notes
+      });
+      reset(formValues);
+    } else {
+      // 新規作成の場合はデフォルト値にリセット
+      reset({
+        name: '',
+        lat: '35.6895',
+        lng: '139.6917',
+        prefecture: '',
+        address: '',
+        type: 'other' as CampingSpotType,
+        distanceToToilet: '',
+        distanceToBath: '',
+        quietnessLevel: '',
+        securityLevel: '',
+        overallRating: '',
+        hasRoof: false,
+        hasPowerOutlet: false,
+        isGatedPaid: false,
+        isFree: true,
+        pricePerNight: '',
+        priceNote: '',
+        capacity: '',
+        restrictions: '',
+        amenities: '',
+        notes: '',
+      });
+    }
+  }, [spot, reset]);
 
   const onSubmit = async (data: CampingSpotFormData) => {
     try {
       setLoading(true);
 
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, value.toString());
-        }
+      console.log('Form submission data:', {
+        quietnessLevel: data.quietnessLevel,
+        securityLevel: data.securityLevel,
+        overallRating: data.overallRating,
+        capacity: data.capacity,
+        distanceToToilet: data.distanceToToilet,
+        notes: data.notes
       });
+
+      const formData = new FormData();
+
+      // Handle required fields
+      formData.append('name', data.name);
+      formData.append('lat', data.lat);
+      formData.append('lng', data.lng);
+      formData.append('prefecture', data.prefecture);
+      formData.append('type', data.type);
+
+      // Handle optional string fields
+      if (data.address && data.address.trim() !== '') {
+        formData.append('address', data.address);
+      }
+      if (data.priceNote && data.priceNote.trim() !== '') {
+        formData.append('priceNote', data.priceNote);
+      }
+      if (data.notes && data.notes.trim() !== '') {
+        formData.append('notes', data.notes);
+      }
+
+      // Handle optional number fields
+      if (data.distanceToToilet && data.distanceToToilet.trim() !== '') {
+        formData.append('distanceToToilet', data.distanceToToilet);
+      }
+      if (data.distanceToBath && data.distanceToBath.trim() !== '') {
+        formData.append('distanceToBath', data.distanceToBath);
+      }
+      if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
+        formData.append('quietnessLevel', data.quietnessLevel);
+      }
+      if (data.securityLevel && data.securityLevel.trim() !== '') {
+        formData.append('securityLevel', data.securityLevel);
+      }
+      if (data.overallRating && data.overallRating.trim() !== '') {
+        formData.append('overallRating', data.overallRating);
+      }
+      if (data.capacity && data.capacity.trim() !== '') {
+        formData.append('capacity', data.capacity);
+      }
+      if (data.pricePerNight && data.pricePerNight.trim() !== '') {
+        formData.append('pricePerNight', data.pricePerNight);
+      }
+
+      // Handle boolean fields
+      formData.append('hasRoof', data.hasRoof.toString());
+      formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
+      formData.append('isGatedPaid', data.isGatedPaid.toString());
+      formData.append('isFree', data.isFree.toString());
+
+      // Handle array fields
+      formData.append('restrictions', data.restrictions);
+      formData.append('amenities', data.amenities);
 
       if (isEdit) {
         await updateCampingSpot(spot._id, formData);
@@ -258,7 +357,7 @@ export default function CampingSpotForm({
                   id='lat'
                   type='number'
                   step='any'
-                  {...register('lat', { valueAsNumber: true })}
+                  {...register('lat')}
                 />
                 {errors.lat && (
                   <p className='text-sm text-red-500'>{errors.lat.message}</p>
@@ -270,7 +369,7 @@ export default function CampingSpotForm({
                   id='lng'
                   type='number'
                   step='any'
-                  {...register('lng', { valueAsNumber: true })}
+                  {...register('lng')}
                 />
                 {errors.lng && (
                   <p className='text-sm text-red-500'>{errors.lng.message}</p>
@@ -306,12 +405,12 @@ export default function CampingSpotForm({
                 )}
               </div>
               <div>
-                <Label htmlFor='capacity'>収容台数 *</Label>
+                <Label htmlFor='capacity'>収容台数</Label>
                 <Input
                   id='capacity'
-                  type='number'
-                  min='1'
-                  {...register('capacity', { valueAsNumber: true })}
+                  type='text'
+                  placeholder='台数または空欄'
+                  {...register('capacity')}
                 />
                 {errors.capacity && (
                   <p className='text-sm text-red-500'>
@@ -320,12 +419,12 @@ export default function CampingSpotForm({
                 )}
               </div>
               <div>
-                <Label htmlFor='distanceToToilet'>トイレまでの距離 (m) *</Label>
+                <Label htmlFor='distanceToToilet'>トイレまでの距離 (m)</Label>
                 <Input
                   id='distanceToToilet'
-                  type='number'
-                  min='0'
-                  {...register('distanceToToilet', { valueAsNumber: true })}
+                  type='text'
+                  placeholder='距離(m)または空欄'
+                  {...register('distanceToToilet')}
                 />
                 {errors.distanceToToilet && (
                   <p className='text-sm text-red-500'>
@@ -339,23 +438,21 @@ export default function CampingSpotForm({
               <Label htmlFor='distanceToBath'>入浴施設まで距離 (m)</Label>
               <Input
                 id='distanceToBath'
-                type='number'
-                min='0'
-                {...register('distanceToBath', { valueAsNumber: true })}
-                placeholder='入浴施設がない場合は空欄'
+                type='text'
+                {...register('distanceToBath')}
+                placeholder='距離(m)または空欄'
               />
             </div>
 
             {/* Ratings */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
-                <Label htmlFor='quietnessLevel'>静けさレベル (1-5) *</Label>
+                <Label htmlFor='quietnessLevel'>静けさレベル (1-5)</Label>
                 <Input
                   id='quietnessLevel'
-                  type='number'
-                  min='1'
-                  max='5'
-                  {...register('quietnessLevel', { valueAsNumber: true })}
+                  type='text'
+                  placeholder='1-5または空欄'
+                  {...register('quietnessLevel')}
                 />
                 {errors.quietnessLevel && (
                   <p className='text-sm text-red-500'>
@@ -364,13 +461,12 @@ export default function CampingSpotForm({
                 )}
               </div>
               <div>
-                <Label htmlFor='securityLevel'>治安レベル (1-5) *</Label>
+                <Label htmlFor='securityLevel'>治安レベル (1-5)</Label>
                 <Input
                   id='securityLevel'
-                  type='number'
-                  min='1'
-                  max='5'
-                  {...register('securityLevel', { valueAsNumber: true })}
+                  type='text'
+                  placeholder='1-5または空欄'
+                  {...register('securityLevel')}
                 />
                 {errors.securityLevel && (
                   <p className='text-sm text-red-500'>
@@ -379,13 +475,12 @@ export default function CampingSpotForm({
                 )}
               </div>
               <div>
-                <Label htmlFor='overallRating'>総合評価 (1-5) *</Label>
+                <Label htmlFor='overallRating'>総合評価 (1-5)</Label>
                 <Input
                   id='overallRating'
-                  type='number'
-                  min='1'
-                  max='5'
-                  {...register('overallRating', { valueAsNumber: true })}
+                  type='text'
+                  placeholder='1-5または空欄'
+                  {...register('overallRating')}
                 />
                 {errors.overallRating && (
                   <p className='text-sm text-red-500'>
@@ -450,7 +545,7 @@ export default function CampingSpotForm({
                       id='pricePerNight'
                       type='number'
                       min='0'
-                      {...register('pricePerNight', { valueAsNumber: true })}
+                      {...register('pricePerNight')}
                     />
                   </div>
                   <div>
@@ -485,11 +580,11 @@ export default function CampingSpotForm({
             </div>
 
             <div>
-              <Label htmlFor='notes'>備考 *</Label>
+              <Label htmlFor='notes'>備考</Label>
               <Textarea
                 id='notes'
                 {...register('notes')}
-                placeholder='詳細な情報、アクセス方法、注意点など'
+                placeholder='詳細な情報、アクセス方法、注意点など（任意）'
                 rows={4}
               />
               {errors.notes && (

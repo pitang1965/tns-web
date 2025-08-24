@@ -156,7 +156,7 @@ export default function CampingSpotMap({
       markerElement.classList.add('camping-marker-hover');
 
       // Add rating number to marker
-      markerElement.textContent = spot.overallRating.toString();
+      markerElement.textContent = spot.overallRating?.toString() || '?';
 
       const marker = new mapboxgl.Marker(markerElement)
         .setLngLat(spot.coordinates)
@@ -195,10 +195,11 @@ export default function CampingSpotMap({
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on overall rating
-    if (spot.overallRating >= 5) return '#22c55e'; // green
-    if (spot.overallRating >= 4) return '#3b82f6'; // blue
-    if (spot.overallRating >= 3) return '#f59e0b'; // yellow
-    if (spot.overallRating >= 2) return '#f97316'; // orange
+    const rating = spot.overallRating || 1; // デフォルトで1とする
+    if (rating >= 5) return '#22c55e'; // green
+    if (rating >= 4) return '#3b82f6'; // blue
+    if (rating >= 3) return '#f59e0b'; // yellow
+    if (rating >= 2) return '#f97316'; // orange
     return '#ef4444'; // red
   };
 
@@ -209,13 +210,13 @@ export default function CampingSpotMap({
         <div class="space-y-1 text-sm">
           <div><strong>種別:</strong> ${CampingSpotTypeLabels[spot.type]}</div>
           <div><strong>都道府県:</strong> ${spot.prefecture}</div>
-          <div><strong>総合評価:</strong> ${spot.overallRating}/5 ⭐</div>
-          <div><strong>静けさ:</strong> ${spot.quietnessLevel}/5</div>
-          <div><strong>治安:</strong> ${spot.securityLevel}/5</div>
+          ${spot.overallRating ? `<div><strong>総合評価:</strong> ${spot.overallRating}/5 ⭐</div>` : ''}
+          ${spot.quietnessLevel ? `<div><strong>静けさ:</strong> ${spot.quietnessLevel}/5</div>` : ''}
+          ${spot.securityLevel ? `<div><strong>治安:</strong> ${spot.securityLevel}/5</div>` : ''}
           <div><strong>料金:</strong> ${
-            spot.pricing.isFree ? '無料' : `¥${spot.pricing.pricePerNight}/泊`
+            spot.pricing.isFree ? '無料' : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
           }</div>
-          <div><strong>トイレ:</strong> ${spot.distanceToToilet}m</div>
+          ${spot.distanceToToilet ? `<div><strong>トイレ:</strong> ${spot.distanceToToilet}m</div>` : ''}
           ${
             spot.distanceToBath
               ? `<div><strong>入浴施設:</strong> ${spot.distanceToBath}m</div>`

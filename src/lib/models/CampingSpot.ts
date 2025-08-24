@@ -5,12 +5,12 @@ export interface ICampingSpot extends Document {
   coordinates: [number, number]; // [lng, lat]
   prefecture: string;
   address?: string;
-  type: 'roadside_station' | 'paid_parking' | 'sa_pa' | 'park' | 'shrine_temple' | 'beach' | 'mountain' | 'other';
-  distanceToToilet: number; // meters
+  type: 'roadside_station' | 'paid_parking' | 'sa_pa' | 'park' | 'shrine_temple' | 'beach' | 'mountain' | 'rv_park' | 'convenience_store' | 'other';
+  distanceToToilet?: number; // meters
   distanceToBath?: number; // meters, null if no bath nearby
-  quietnessLevel: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
-  securityLevel: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
-  overallRating: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
+  quietnessLevel?: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
+  securityLevel?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
+  overallRating?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
   hasRoof: boolean;
   hasPowerOutlet: boolean;
   isGatedPaid: boolean;
@@ -19,10 +19,10 @@ export interface ICampingSpot extends Document {
     pricePerNight?: number;
     priceNote?: string;
   };
-  capacity: number; // number of vehicles
+  capacity?: number; // number of vehicles
   restrictions: string[];
   amenities: string[];
-  notes: string;
+  notes?: string;
   isVerified: boolean;
   submittedBy?: string;
   lastVerified?: Date;
@@ -60,11 +60,10 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   type: {
     type: String,
     required: true,
-    enum: ['roadside_station', 'paid_parking', 'sa_pa', 'park', 'shrine_temple', 'beach', 'mountain', 'other'],
+    enum: ['roadside_station', 'paid_parking', 'sa_pa', 'park', 'shrine_temple', 'beach', 'mountain', 'rv_park', 'convenience_store', 'other'],
   },
   distanceToToilet: {
     type: Number,
-    required: true,
     min: 0,
   },
   distanceToBath: {
@@ -73,19 +72,16 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   },
   quietnessLevel: {
     type: Number,
-    required: true,
     min: 1,
     max: 5,
   },
   securityLevel: {
     type: Number,
-    required: true,
     min: 1,
     max: 5,
   },
   overallRating: {
     type: Number,
-    required: true,
     min: 1,
     max: 5,
   },
@@ -121,9 +117,7 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   },
   capacity: {
     type: Number,
-    required: true,
     min: 1,
-    default: 1,
   },
   restrictions: [{
     type: String,
@@ -135,7 +129,6 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   }],
   notes: {
     type: String,
-    required: true,
     trim: true,
   },
   isVerified: {

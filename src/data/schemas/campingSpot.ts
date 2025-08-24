@@ -8,6 +8,8 @@ export const CampingSpotTypeSchema = z.enum([
   'shrine_temple',
   'beach',
   'mountain',
+  'rv_park',
+  'convenience_store',
   'other'
 ]);
 
@@ -28,19 +30,19 @@ export const CampingSpotSchema = z.object({
   prefecture: z.string().min(1, '都道府県を選択してください').trim(),
   address: z.string().trim().optional(),
   type: CampingSpotTypeSchema,
-  distanceToToilet: z.number().min(0, 'トイレまでの距離は0以上で入力してください'),
+  distanceToToilet: z.number().min(0, 'トイレまでの距離は0以上で入力してください').optional(),
   distanceToBath: z.number().min(0).optional(),
-  quietnessLevel: z.number().int().min(1).max(5),
-  securityLevel: z.number().int().min(1).max(5),
-  overallRating: z.number().int().min(1).max(5),
+  quietnessLevel: z.number().int().min(1).max(5).optional(),
+  securityLevel: z.number().int().min(1).max(5).optional(),
+  overallRating: z.number().int().min(1).max(5).optional(),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
   isGatedPaid: z.boolean().default(false),
   pricing: CampingSpotPricingSchema,
-  capacity: z.number().int().min(1, '収容台数は1以上で入力してください').default(1),
+  capacity: z.number().int().min(1, '収容台数は1以上で入力してください').optional(),
   restrictions: z.array(z.string().trim()).default([]),
   amenities: z.array(z.string().trim()).default([]),
-  notes: z.string().min(1, '備考を入力してください').trim(),
+  notes: z.string().trim().optional(),
   isVerified: z.boolean().default(false),
   submittedBy: z.string().trim().optional(),
   lastVerified: z.date().optional(),
@@ -70,30 +72,30 @@ export const CampingSpotCSVSchema = z.object({
   type: z.string().refine((val) => CampingSpotTypeSchema.safeParse(val).success, {
     message: "有効な種別を選択してください",
   }),
-  distanceToToilet: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "トイレまでの距離は0以上の数値で入力してください",
-  }),
+  distanceToToilet: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "トイレまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
   distanceToBath: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "入浴施設までの距離は空欄または0以上の数値で入力してください",
   }).optional().default(''),
   quietnessLevel: z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "静けさレベルは1-5の整数で入力してください",
-  }),
+    message: "静けさレベルは空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   securityLevel: z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "治安レベルは1-5の整数で入力してください",
-  }),
+    message: "治安レベルは空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   overallRating: z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "総合評価は1-5の整数で入力してください",
-  }),
+    message: "総合評価は空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   hasRoof: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "屋根付きはtrue/falseで入力してください",
   }),
@@ -112,13 +114,13 @@ export const CampingSpotCSVSchema = z.object({
   priceNote: z.string().trim().optional().default(''),
   capacity: z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1);
   }, {
-    message: "収容台数は1以上の整数で入力してください",
-  }),
+    message: "収容台数は空欄または1以上の整数で入力してください",
+  }).optional().default(''),
   restrictions: z.string().trim().optional().default(''),
   amenities: z.string().trim().optional().default(''),
-  notes: z.string().min(1).trim(),
+  notes: z.string().trim().optional().default(''),
 });
 
 // CSV import schema with Japanese headers
@@ -135,30 +137,30 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   'タイプ': z.string().refine((val) => CampingSpotTypeSchema.safeParse(val).success, {
     message: "有効な種別を選択してください",
   }),
-  'トイレまでの距離(m)': z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "トイレまでの距離は0以上の数値で入力してください",
-  }),
+  'トイレまでの距離(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+    message: "トイレまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
   'お風呂までの距離(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "入浴施設までの距離は空欄または0以上の数値で入力してください",
   }).optional().default(''),
   '静寂レベル(1-5)': z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "静けさレベルは1-5の整数で入力してください",
-  }),
+    message: "静けさレベルは空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   '治安レベル(1-5)': z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "治安レベルは1-5の整数で入力してください",
-  }),
+    message: "治安レベルは空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   '総合評価(1-5)': z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
   }, {
-    message: "総合評価は1-5の整数で入力してください",
-  }),
+    message: "総合評価は空欄または1-5の整数で入力してください",
+  }).optional().default(''),
   '屋根あり(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
     message: "屋根付きはtrue/falseで入力してください",
   }),
@@ -177,13 +179,13 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   '料金備考': z.string().trim().optional().default(''),
   '収容台数': z.string().refine((val) => {
     const num = Number(val);
-    return !isNaN(num) && Number.isInteger(num) && num >= 1;
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1);
   }, {
-    message: "収容台数は1以上の整数で入力してください",
-  }),
+    message: "収容台数は空欄または1以上の整数で入力してください",
+  }).optional().default(''),
   '制限事項': z.string().trim().optional().default(''),
   '設備': z.string().trim().optional().default(''),
-  '備考': z.string().min(1).trim(),
+  '備考': z.string().trim().optional().default(''),
 });
 
 // Filter schema for search functionality
@@ -224,11 +226,11 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     prefecture: csvRow.prefecture,
     address: csvRow.address || undefined,
     type: csvRow.type as CampingSpotType,
-    distanceToToilet: Number(csvRow.distanceToToilet),
+    distanceToToilet: csvRow.distanceToToilet ? Number(csvRow.distanceToToilet) : undefined,
     distanceToBath: csvRow.distanceToBath ? Number(csvRow.distanceToBath) : undefined,
-    quietnessLevel: Number(csvRow.quietnessLevel) as 1 | 2 | 3 | 4 | 5,
-    securityLevel: Number(csvRow.securityLevel) as 1 | 2 | 3 | 4 | 5,
-    overallRating: Number(csvRow.overallRating) as 1 | 2 | 3 | 4 | 5,
+    quietnessLevel: csvRow.quietnessLevel ? Number(csvRow.quietnessLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
+    securityLevel: csvRow.securityLevel ? Number(csvRow.securityLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
+    overallRating: csvRow.overallRating ? Number(csvRow.overallRating) as 1 | 2 | 3 | 4 | 5 : undefined,
     hasRoof: csvRow.hasRoof === 'true',
     hasPowerOutlet: csvRow.hasPowerOutlet === 'true',
     isGatedPaid: csvRow.isGatedPaid === 'true',
@@ -237,10 +239,10 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
       pricePerNight: csvRow.pricePerNight ? Number(csvRow.pricePerNight) : undefined,
       priceNote: csvRow.priceNote || undefined,
     },
-    capacity: Number(csvRow.capacity),
+    capacity: csvRow.capacity ? Number(csvRow.capacity) : undefined,
     restrictions: csvRow.restrictions ? csvRow.restrictions.split(',').map(r => r.trim()).filter(r => r) : [],
     amenities: csvRow.amenities ? csvRow.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
-    notes: csvRow.notes,
+    notes: csvRow.notes || undefined,
     isVerified: false,
   };
 }
@@ -253,11 +255,11 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     prefecture: csvRow['都道府県'],
     address: csvRow['住所'] || undefined,
     type: csvRow['タイプ'] as CampingSpotType,
-    distanceToToilet: Number(csvRow['トイレまでの距離(m)']),
+    distanceToToilet: csvRow['トイレまでの距離(m)'] ? Number(csvRow['トイレまでの距離(m)']) : undefined,
     distanceToBath: csvRow['お風呂までの距離(m)'] ? Number(csvRow['お風呂までの距離(m)']) : undefined,
-    quietnessLevel: Number(csvRow['静寂レベル(1-5)']) as 1 | 2 | 3 | 4 | 5,
-    securityLevel: Number(csvRow['治安レベル(1-5)']) as 1 | 2 | 3 | 4 | 5,
-    overallRating: Number(csvRow['総合評価(1-5)']) as 1 | 2 | 3 | 4 | 5,
+    quietnessLevel: csvRow['静寂レベル(1-5)'] ? Number(csvRow['静寂レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
+    securityLevel: csvRow['治安レベル(1-5)'] ? Number(csvRow['治安レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
+    overallRating: csvRow['総合評価(1-5)'] ? Number(csvRow['総合評価(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
     hasRoof: csvRow['屋根あり(true/false)'] === 'true',
     hasPowerOutlet: csvRow['電源あり(true/false)'] === 'true',
     isGatedPaid: csvRow['有料ゲート付き(true/false)'] === 'true',
@@ -266,10 +268,10 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
       pricePerNight: csvRow['1泊料金'] ? Number(csvRow['1泊料金']) : undefined,
       priceNote: csvRow['料金備考'] || undefined,
     },
-    capacity: Number(csvRow['収容台数']),
+    capacity: csvRow['収容台数'] ? Number(csvRow['収容台数']) : undefined,
     restrictions: csvRow['制限事項'] ? csvRow['制限事項'].split(',').map(r => r.trim()).filter(r => r) : [],
     amenities: csvRow['設備'] ? csvRow['設備'].split(',').map(a => a.trim()).filter(a => a) : [],
-    notes: csvRow['備考'],
+    notes: csvRow['備考'] || undefined,
     isVerified: false,
   };
 }
@@ -283,6 +285,8 @@ export const CampingSpotTypeLabels: Record<CampingSpotType, string> = {
   shrine_temple: '神社・寺',
   beach: '海岸・浜辺',
   mountain: '山間部',
+  rv_park: 'RVパーク',
+  convenience_store: 'コンビニ',
   other: 'その他',
 };
 

@@ -187,21 +187,21 @@ export default function CampingSpotsAdminPage() {
             spot.prefecture,
             spot.address || '',
             spot.type,
-            spot.distanceToToilet,
+            spot.distanceToToilet || '',
             spot.distanceToBath || '',
-            spot.quietnessLevel,
-            spot.securityLevel,
-            spot.overallRating,
+            spot.quietnessLevel || '',
+            spot.securityLevel || '',
+            spot.overallRating || '',
             spot.hasRoof,
             spot.hasPowerOutlet,
             spot.isGatedPaid,
             spot.pricing.isFree,
             spot.pricing.pricePerNight || '',
             spot.pricing.priceNote || '',
-            spot.capacity,
+            spot.capacity || '',
             spot.restrictions.join(','),
             spot.amenities.join(','),
-            spot.notes,
+            spot.notes || '',
           ]
             .map((field) => {
               // Handle fields that might contain commas by quoting them
@@ -473,9 +473,11 @@ export default function CampingSpotsAdminPage() {
                                   ? '無料'
                                   : `¥${spot.pricing.pricePerNight}`}
                               </Badge>
-                              <Badge variant='outline'>
-                                評価 {spot.overallRating}/5
-                              </Badge>
+                              {spot.overallRating && (
+                                <Badge variant='outline'>
+                                  評価 {spot.overallRating}/5
+                                </Badge>
+                              )}
                               {spot.isVerified && (
                                 <Badge variant='default'>確認済み</Badge>
                               )}
@@ -506,6 +508,7 @@ export default function CampingSpotsAdminPage() {
 
       {showForm && (
         <CampingSpotForm
+          key={selectedSpot?._id || 'new'} 
           spot={selectedSpot}
           onClose={handleFormClose}
           onSuccess={handleFormSuccess}
