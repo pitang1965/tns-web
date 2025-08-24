@@ -10,11 +10,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Info, Search, BookHeart, CircleUser } from 'lucide-react';
+import { Info, Search, BookHeart, CircleUser, MapPin } from 'lucide-react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export function BurgerMenu() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
+
+  // Check if user is admin
+  const isAdmin = user?.email &&
+    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
+      .map(email => email.trim())
+      .includes(user.email);
 
   const handleItemClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -76,6 +84,18 @@ export function BurgerMenu() {
             旅程
           </Link>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href='/admin/camping-spots'
+              className='flex items-center'
+              onClick={(e) => handleItemClick(e, '/admin/camping-spots')}
+            >
+              <MapPin className='mr-1' />
+              車中泊場所
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/account'

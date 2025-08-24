@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
-import { Info, Search, BookHeart, CircleUser } from 'lucide-react';
+import { Info, Search, BookHeart, CircleUser, MapPin } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 const activeClassNames =
@@ -36,6 +36,12 @@ export function Navigation() {
     return <LoadingSpinner />;
   }
 
+  // Check if user is admin
+  const isAdmin = user?.email && 
+    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
+      .map(email => email.trim())
+      .includes(user.email);
+
   return (
     <div className='flex items-center space-x-4'>
       <NavLink href='/'>
@@ -50,6 +56,12 @@ export function Navigation() {
         <BookHeart className='mr-1' />
         旅程
       </NavLink>
+      {isAdmin && (
+        <NavLink href='/admin/camping-spots'>
+          <MapPin className='mr-1' />
+          車中泊場所
+        </NavLink>
+      )}
       {user && (
         <NavLink href='/account'>
           <CircleUser className='mr-1' />

@@ -86,6 +86,12 @@ export default function ClientHome() {
               旅程をX（Twitter）で共有するボタンを実装
             </Text>
           </li>
+          <li>
+            <Text>
+              <span className='font-semibold'>車中泊スポットマップ:</span>{' '}
+              開発中...
+            </Text>
+          </li>
         </ul>
 
         <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md mt-6'>
