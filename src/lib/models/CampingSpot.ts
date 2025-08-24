@@ -15,7 +15,7 @@ export interface ICampingSpot extends Document {
   overallRating?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
   hasRoof: boolean;
   hasPowerOutlet: boolean;
-  isGatedPaid: boolean;
+  hasGate: boolean;
   pricing: {
     isFree: boolean;
     pricePerNight?: number;
@@ -105,7 +105,7 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     required: true,
     default: false,
   },
-  isGatedPaid: {
+  hasGate: {
     type: Boolean,
     required: true,
     default: false,

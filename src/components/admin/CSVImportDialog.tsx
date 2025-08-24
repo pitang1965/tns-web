@@ -97,7 +97,7 @@ export default function CSVImportDialog({
       '総合評価(1-5)',
       '屋根あり(true/false)',
       '電源あり(true/false)',
-      '有料ゲート付き(true/false)',
+      'ゲート付き(true/false)',
       '無料(true/false)',
       '1泊料金',
       '料金備考',
@@ -123,7 +123,7 @@ export default function CSVImportDialog({
       '',                     // 総合評価(1-5) - 任意
       'true',                 // 屋根あり(true/false)
       'false',                // 電源あり(true/false)
-      'false',                // 有料ゲート付き(true/false)
+      'false',                // ゲート付き(true/false)
       'true',                 // 無料(true/false)
       '',                     // 1泊料金
       '',                     // 料金備考

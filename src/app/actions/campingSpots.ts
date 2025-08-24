@@ -164,7 +164,7 @@ export async function createCampingSpot(data: FormData) {
       : undefined,
     hasRoof: formObject.hasRoof === 'true',
     hasPowerOutlet: formObject.hasPowerOutlet === 'true',
-    isGatedPaid: formObject.isGatedPaid === 'true',
+    hasGate: formObject.hasGate === 'true',
     pricing: {
       isFree: formObject.isFree === 'true',
       pricePerNight: formObject.pricePerNight
@@ -251,7 +251,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
       : undefined,
     hasRoof: formObject.hasRoof === 'true',
     hasPowerOutlet: formObject.hasPowerOutlet === 'true',
-    isGatedPaid: formObject.isGatedPaid === 'true',
+    hasGate: formObject.hasGate === 'true',
     pricing: {
       isFree: formObject.isFree === 'true',
       pricePerNight: formObject.pricePerNight

@@ -240,7 +240,7 @@ export default function CampingSpotMap({
                 : ''
             }
             ${
-              spot.isGatedPaid
+              spot.hasGate
                 ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">ゲート付き</span>'
                 : ''
             }

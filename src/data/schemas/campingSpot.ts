@@ -39,7 +39,7 @@ export const CampingSpotSchema = z.object({
   overallRating: z.number().int().min(1).max(5).optional(),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
-  isGatedPaid: z.boolean().default(false),
+  hasGate: z.boolean().default(false),
   pricing: CampingSpotPricingSchema,
   capacity: z.number().int().min(1, '収容台数は1以上で入力してください').optional(),
   restrictions: z.array(z.string().trim()).default([]),
@@ -110,8 +110,8 @@ export const CampingSpotCSVSchema = z.object({
   hasPowerOutlet: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "電源はtrue/falseで入力してください",
   }),
-  isGatedPaid: z.string().refine((val) => val === 'true' || val === 'false', {
-    message: "ゲート付き有料はtrue/falseで入力してください",
+  hasGate: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "ゲーツ付きはtrue/falseで入力してください",
   }),
   isFree: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "無料はtrue/falseで入力してください",
@@ -181,8 +181,8 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   '電源あり(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
     message: "電源はtrue/falseで入力してください",
   }),
-  '有料ゲート付き(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
-    message: "ゲート付き有料はtrue/falseで入力してください",
+  'ゲート付き(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "ゲート付きはtrue/falseで入力してください",
   }),
   '無料(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
     message: "無料はtrue/falseで入力してください",
@@ -249,7 +249,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     overallRating: csvRow.overallRating ? Number(csvRow.overallRating) as 1 | 2 | 3 | 4 | 5 : undefined,
     hasRoof: csvRow.hasRoof === 'true',
     hasPowerOutlet: csvRow.hasPowerOutlet === 'true',
-    isGatedPaid: csvRow.isGatedPaid === 'true',
+    hasGate: csvRow.hasGate === 'true',
     pricing: {
       isFree: csvRow.isFree === 'true',
       pricePerNight: csvRow.pricePerNight ? Number(csvRow.pricePerNight) : undefined,
@@ -280,7 +280,7 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     overallRating: csvRow['総合評価(1-5)'] ? Number(csvRow['総合評価(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
     hasRoof: csvRow['屋根あり(true/false)'] === 'true',
     hasPowerOutlet: csvRow['電源あり(true/false)'] === 'true',
-    isGatedPaid: csvRow['有料ゲート付き(true/false)'] === 'true',
+    hasGate: csvRow['ゲート付き(true/false)'] === 'true',
     pricing: {
       isFree: csvRow['無料(true/false)'] === 'true',
       pricePerNight: csvRow['1泊料金'] ? Number(csvRow['1泊料金']) : undefined,

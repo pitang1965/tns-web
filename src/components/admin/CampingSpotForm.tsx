@@ -51,7 +51,7 @@ type CampingSpotFormData = {
   overallRating?: string;
   hasRoof: boolean;
   hasPowerOutlet: boolean;
-  isGatedPaid: boolean;
+  hasGate: boolean;
   isFree: boolean;
   pricePerNight?: string;
   priceNote?: string;
@@ -94,7 +94,7 @@ export default function CampingSpotForm({
       overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      isGatedPaid: false,
+      hasGate: false,
       isFree: true,
       pricePerNight: '',
       priceNote: '',
@@ -124,7 +124,7 @@ export default function CampingSpotForm({
         overallRating: spot.overallRating?.toString() || '',
         hasRoof: spot.hasRoof,
         hasPowerOutlet: spot.hasPowerOutlet,
-        isGatedPaid: spot.isGatedPaid,
+        hasGate: spot.hasGate,
         isFree: spot.pricing.isFree,
         pricePerNight: spot.pricing.pricePerNight?.toString() || '',
         priceNote: spot.pricing.priceNote || '',
@@ -158,7 +158,7 @@ export default function CampingSpotForm({
         overallRating: '',
         hasRoof: false,
         hasPowerOutlet: false,
-        isGatedPaid: false,
+        hasGate: false,
         isFree: true,
         pricePerNight: '',
         priceNote: '',
@@ -229,7 +229,7 @@ export default function CampingSpotForm({
       // Handle boolean fields
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      formData.append('isGatedPaid', data.isGatedPaid.toString());
+      formData.append('hasGate', data.hasGate.toString());
       formData.append('isFree', data.isFree.toString());
 
       // Handle array fields
@@ -529,13 +529,13 @@ export default function CampingSpotForm({
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Checkbox
-                    id='isGatedPaid'
-                    checked={watch('isGatedPaid')}
+                    id='hasGate'
+                    checked={watch('hasGate')}
                     onCheckedChange={(checked) =>
-                      setValue('isGatedPaid', !!checked)
+                      setValue('hasGate', !!checked)
                     }
                   />
-                  <label htmlFor='isGatedPaid'>ゲート付き有料</label>
+                  <label htmlFor='hasGate'>ゲート付き</label>
                 </div>
               </div>
             </div>
