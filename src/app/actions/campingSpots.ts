@@ -203,9 +203,10 @@ export async function createCampingSpot(data: FormData) {
 
   // Handle nested pricing object
   if (cleanData.pricing) {
-    cleanData.pricing = Object.fromEntries(
+    const cleanPricing = Object.fromEntries(
       Object.entries(cleanData.pricing as any).filter(([key, value]) => value !== undefined)
     );
+    cleanData.pricing = cleanPricing as typeof cleanData.pricing;
   }
 
   const newSpot = new CampingSpot(cleanData);
