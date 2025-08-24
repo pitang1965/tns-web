@@ -8,9 +8,11 @@ import mongoose from 'mongoose';
 import {
   CampingSpotSchema,
   CampingSpotFilter,
-  CampingSpotCSV,
+  CampingSpotCSVJapanese,
   csvRowToCampingSpot,
+  csvJapaneseRowToCampingSpot,
   CampingSpotCSVSchema,
+  CampingSpotCSVJapaneseSchema,
 } from '@/data/schemas/campingSpot';
 
 // Helper function to check admin authorization
@@ -291,6 +293,11 @@ export async function importCampingSpotsFromCSV(csvData: string) {
     errors: [] as { row: number; error: string; data: any }[],
   };
 
+  // Check if headers are in Japanese or English
+  const isJapaneseHeaders = headers.includes('スポット名');
+  console.log('Headers detected:', headers);
+  console.log('Is Japanese headers:', isJapaneseHeaders);
+
   for (let i = 1; i < lines.length; i++) {
     try {
       const values = parseCSVRow(lines[i]);
@@ -305,11 +312,19 @@ export async function importCampingSpotsFromCSV(csvData: string) {
         rowData[header] = value;
       });
 
-      // Validate CSV row
-      const validatedCSVData = CampingSpotCSVSchema.parse(rowData);
+      // Validate CSV row and convert to CampingSpot format
+      let campingSpotData: any;
 
-      // Convert to CampingSpot format
-      const campingSpotData = csvRowToCampingSpot(validatedCSVData);
+      if (isJapaneseHeaders) {
+        // Validate with Japanese schema
+        const validatedCSVData = CampingSpotCSVJapaneseSchema.parse(rowData);
+        campingSpotData = csvJapaneseRowToCampingSpot(validatedCSVData);
+      } else {
+        // Validate with English schema
+        const validatedCSVData = CampingSpotCSVSchema.parse(rowData);
+        campingSpotData = csvRowToCampingSpot(validatedCSVData);
+      }
+
       campingSpotData.submittedBy = user.email;
 
       // Check for duplicates (within 100m)

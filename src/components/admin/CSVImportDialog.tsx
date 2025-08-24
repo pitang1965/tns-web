@@ -82,56 +82,56 @@ export default function CSVImportDialog({
 
   const downloadTemplate = () => {
     const headers = [
-      'name',
-      'lat',
-      'lng',
-      'prefecture',
-      'address',
-      'type',
-      'distanceToToilet',
-      'distanceToBath',
-      'quietnessLevel',
-      'securityLevel',
-      'overallRating',
-      'hasRoof',
-      'hasPowerOutlet',
-      'isGatedPaid',
-      'isFree',
-      'pricePerNight',
-      'priceNote',
-      'capacity',
-      'restrictions',
-      'amenities',
-      'notes',
+      'スポット名',
+      '緯度',
+      '経度',
+      '都道府県',
+      '住所',
+      'タイプ',
+      'トイレまでの距離(m)',
+      'お風呂までの距離(m)',
+      '静寂レベル(1-5)',
+      '治安レベル(1-5)',
+      '総合評価(1-5)',
+      '屋根あり(true/false)',
+      '電源あり(true/false)',
+      '有料ゲート付き(true/false)',
+      '無料(true/false)',
+      '1泊料金',
+      '料金備考',
+      '収容台数',
+      '制限事項',
+      '設備',
+      '備考',
     ];
 
     const sampleData = [
-      '道の駅サンプル',
-      '35.6762',
-      '139.6503',
-      '東京都',
-      '東京都千代田区',
-      'roadside_station',
-      '50',
-      '1000',
-      '4',
-      '5',
-      '4',
-      'true',
-      'false',
-      'false',
-      'true',
-      '',
-      '',
-      '10',
-      '大型車不可',
-      'トイレ,自販機',
-      '24時間利用可能',
+      '道の駅サンプル',        // スポット名
+      '35.6762',              // 緯度
+      '139.6503',             // 経度
+      '東京都',               // 都道府県
+      '東京都千代田区',       // 住所
+      'roadside_station',     // タイプ
+      '50',                   // トイレまでの距離(m)
+      '1000',                 // お風呂までの距離(m)
+      '4',                    // 静寂レベル(1-5)
+      '5',                    // 治安レベル(1-5)
+      '4',                    // 総合評価(1-5)
+      'true',                 // 屋根あり(true/false)
+      'false',                // 電源あり(true/false)
+      'false',                // 有料ゲート付き(true/false)
+      'true',                 // 無料(true/false)
+      '',                     // 1泊料金
+      '',                     // 料金備考
+      '10',                   // 収容台数
+      '大型車不可',           // 制限事項
+      'トイレ,自販機',        // 設備
+      '駐車場は24時間利用可能です',       // 備考
     ];
 
     const csvContent = [headers.join(','), sampleData.join(',')].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'camping-spots-template.csv';
