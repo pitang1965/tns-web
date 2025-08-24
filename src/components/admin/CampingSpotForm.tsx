@@ -252,11 +252,29 @@ export default function CampingSpotForm({
       onSuccess();
     } catch (error) {
       console.error('Save error:', error);
+
+      let errorMessage = isEdit
+        ? 'スポットの更新に失敗しました'
+        : 'スポットの作成に失敗しました';
+
+      // Zodエラーの場合、詳細なメッセージを取得
+      if (error instanceof Error && error.name === 'ZodError') {
+        try {
+          const zodError = JSON.parse(error.message);
+          if (Array.isArray(zodError) && zodError.length > 0) {
+            errorMessage = zodError[0].message;
+          }
+        } catch (parseError) {
+          // JSONパースに失敗した場合は元のメッセージを使用
+        }
+      } else if (error instanceof Error) {
+        // その他のエラーの場合はメッセージをそのまま表示
+        errorMessage = error.message;
+      }
+
       toast({
         title: 'エラー',
-        description: isEdit
-          ? 'スポットの更新に失敗しました'
-          : 'スポットの作成に失敗しました',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
