@@ -341,14 +341,6 @@ export default function CampingSpotForm({
               </div>
             </div>
 
-            <div>
-              <Label htmlFor='address'>住所</Label>
-              <Input
-                id='address'
-                {...register('address')}
-                placeholder='住所（任意）'
-              />
-            </div>
 
             {/* Coordinates */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -366,6 +358,15 @@ export default function CampingSpotForm({
                   <p className='text-sm text-red-500'>{errors.lng.message}</p>
                 )}
               </div>
+            </div>
+
+            <div>
+              <Label htmlFor='address'>住所</Label>
+              <Input
+                id='address'
+                {...register('address')}
+                placeholder='住所（任意）'
+              />
             </div>
 
             {/* Type and Basic Properties */}
@@ -411,6 +412,40 @@ export default function CampingSpotForm({
               </div>
             </div>
 
+            {/* Pricing */}
+            <div className='space-y-3'>
+              <Label>費用</Label>
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='isFree'
+                  checked={isFree}
+                  onCheckedChange={(checked) => setValue('isFree', !!checked)}
+                />
+                <label htmlFor='isFree'>無料</label>
+              </div>
+              {!isFree && (
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <Label htmlFor='pricePerNight'>一泊料金 (円)</Label>
+                    <Input
+                      id='pricePerNight'
+                      type='number'
+                      min='0'
+                      {...register('pricePerNight')}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor='priceNote'>料金備考</Label>
+                    <Input
+                      id='priceNote'
+                      {...register('priceNote')}
+                      placeholder='料金に関する備考'
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div>
                 <Label htmlFor='distanceToToilet'>トイレまでの距離 (m)</Label>
@@ -446,15 +481,6 @@ export default function CampingSpotForm({
                   placeholder='距離(m)または空欄'
                 />
               </div>
-            </div>
-            <div>
-              <Label htmlFor='elevation'>標高 (m)</Label>
-              <Input
-                id='elevation'
-                type='text'
-                {...register('elevation')}
-                placeholder='標高(m)または空欄'
-              />
             </div>
 
             {/* Ratings */}
@@ -503,6 +529,18 @@ export default function CampingSpotForm({
               </div>
             </div>
 
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div>
+                <Label htmlFor='elevation'>標高 (m)</Label>
+                <Input
+                  id='elevation'
+                  type='text'
+                  {...register('elevation')}
+                  placeholder='標高(m)または空欄'
+                />
+              </div>
+            </div>
+
             {/* Features */}
             <div className='space-y-3'>
               <Label>設備・特徴</Label>
@@ -540,38 +578,6 @@ export default function CampingSpotForm({
               </div>
             </div>
 
-            {/* Pricing */}
-            <div className='space-y-4'>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='isFree'
-                  checked={isFree}
-                  onCheckedChange={(checked) => setValue('isFree', !!checked)}
-                />
-                <label htmlFor='isFree'>無料</label>
-              </div>
-              {!isFree && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
-                    <Label htmlFor='pricePerNight'>一泊料金 (円)</Label>
-                    <Input
-                      id='pricePerNight'
-                      type='number'
-                      min='0'
-                      {...register('pricePerNight')}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor='priceNote'>料金備考</Label>
-                    <Input
-                      id='priceNote'
-                      {...register('priceNote')}
-                      placeholder='料金に関する備考'
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* Additional Info */}
             <div>
