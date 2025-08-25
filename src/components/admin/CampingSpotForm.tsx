@@ -83,8 +83,8 @@ export default function CampingSpotForm({
     // resolver: zodResolver(...), // Disabled for now to fix build issues
     defaultValues: {
       name: '',
-      lat: '35.6895',
-      lng: '139.6917',
+      lat: '35.3325289',　// 相模湾
+      lng: '139.5631214',　// 相模湾
       prefecture: '',
       address: '',
       url: '',
@@ -149,8 +149,8 @@ export default function CampingSpotForm({
       // 新規作成の場合はデフォルト値にリセット
       reset({
         name: '',
-        lat: '35.6895',
-        lng: '139.6917',
+        lat: '35.3325289',
+        lng: '139.5631214',
         prefecture: '',
         address: '',
         url: '',

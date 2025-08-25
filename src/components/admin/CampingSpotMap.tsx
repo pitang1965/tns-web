@@ -59,7 +59,7 @@ export default function CampingSpotMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [139.6917, 35.6895], // Tokyo center
+      center: [139.5631214, 35.332528935], // 相模湾
       zoom: 5,
     });
 
