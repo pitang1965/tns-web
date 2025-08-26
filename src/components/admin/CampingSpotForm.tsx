@@ -258,7 +258,7 @@ export default function CampingSpotForm({
         : 'スポットの作成に失敗しました';
 
       // Zodエラーの場合、詳細なメッセージを取得
-      if (error instanceof Error && error.name === 'ZodError') {
+      if (error instanceof Error && (error.name === 'ZodError' || error.message.includes('ZodError'))) {
         try {
           const zodError = JSON.parse(error.message);
           if (Array.isArray(zodError) && zodError.length > 0) {
