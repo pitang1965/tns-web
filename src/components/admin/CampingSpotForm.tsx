@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { X, Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,32 +37,70 @@ interface CampingSpotFormProps {
   onSuccess: () => void;
 }
 
-type CampingSpotFormData = {
-  name: string;
-  lat: string;
-  lng: string;
-  prefecture: string;
-  address?: string;
-  url?: string;
-  type: CampingSpotType;
-  distanceToToilet?: string;
-  distanceToBath?: string;
-  distanceToConvenience?: string;
-  elevation?: string;
-  quietnessLevel?: string;
-  securityLevel?: string;
-  overallRating?: string;
-  hasRoof: boolean;
-  hasPowerOutlet: boolean;
-  hasGate: boolean;
-  isFree: boolean;
-  pricePerNight?: string;
-  priceNote?: string;
-  capacity?: string;
-  restrictions: string;
-  amenities: string;
-  notes?: string;
-};
+const CampingSpotFormSchema = z.object({
+  name: z.string().min(1, '名称を入力してください'),
+  lat: z.string().min(1, '緯度を入力してください').refine(
+    (val) => !isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90,
+    { message: '有効な緯度を入力してください（-90〜90）' }
+  ),
+  lng: z.string().min(1, '経度を入力してください').refine(
+    (val) => !isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180,
+    { message: '有効な経度を入力してください（-180〜180）' }
+  ),
+  prefecture: z.string().min(1, '都道府県を選択してください'),
+  address: z.string().optional(),
+  url: z.string().optional().refine(
+    (val) => !val || /^https?:\/\/.+/.test(val),
+    { message: '有効なURLを入力してください' }
+  ),
+  type: z.enum(['roadside_station', 'paid_parking', 'sa_pa', 'park', 'beach', 'mountain', 'rv_park', 'convenience_store', 'other'] as const),
+  distanceToToilet: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+  distanceToBath: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+  distanceToConvenience: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+  elevation: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+  quietnessLevel: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
+    { message: '1〜5の数値を入力してください' }
+  ),
+  securityLevel: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
+    { message: '1〜5の数値を入力してください' }
+  ),
+  overallRating: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
+    { message: '1〜5の数値を入力してください' }
+  ),
+  hasRoof: z.boolean(),
+  hasPowerOutlet: z.boolean(),
+  hasGate: z.boolean(),
+  isFree: z.boolean(),
+  pricePerNight: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+  priceNote: z.string().optional(),
+  capacity: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1),
+    { message: '有効な数値を入力してください（1以上）' }
+  ),
+  restrictions: z.string(),
+  amenities: z.string(),
+  notes: z.string().optional(),
+});
+
+type CampingSpotFormData = z.infer<typeof CampingSpotFormSchema>;
 
 export default function CampingSpotForm({
   spot,
@@ -80,7 +120,7 @@ export default function CampingSpotForm({
     reset,
     formState: { errors },
   } = useForm<CampingSpotFormData>({
-    // resolver: zodResolver(...), // Disabled for now to fix build issues
+    resolver: zodResolver(CampingSpotFormSchema),
     defaultValues: {
       name: '',
       lat: '35.3325289',　// 相模湾
@@ -378,6 +418,9 @@ export default function CampingSpotForm({
                   {...register('address')}
                   placeholder='住所（任意）'
                 />
+                {errors.address && (
+                  <p className='text-sm text-red-500'>{errors.address.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor='url'>URL</Label>
@@ -387,6 +430,9 @@ export default function CampingSpotForm({
                   {...register('url')}
                   placeholder='URL（任意）'
                 />
+                {errors.url && (
+                  <p className='text-sm text-red-500'>{errors.url.message}</p>
+                )}
               </div>
             </div>
 
@@ -421,7 +467,8 @@ export default function CampingSpotForm({
                 <Label htmlFor='capacity'>収容台数</Label>
                 <Input
                   id='capacity'
-                  type='text'
+                  type='number'
+                  min='1'
                   placeholder='台数または空欄'
                   {...register('capacity')}
                 />
@@ -472,7 +519,8 @@ export default function CampingSpotForm({
                 <Label htmlFor='distanceToToilet'>トイレまでの距離 (m)</Label>
                 <Input
                   id='distanceToToilet'
-                  type='text'
+                  type='number'
+                  min='0'
                   placeholder='距離(m)または空欄'
                   {...register('distanceToToilet')}
                 />
@@ -488,19 +536,27 @@ export default function CampingSpotForm({
                 </Label>
                 <Input
                   id='distanceToConvenience'
-                  type='text'
+                  type='number'
+                  min='0'
                   {...register('distanceToConvenience')}
                   placeholder='距離(m)または空欄'
                 />
+                {errors.distanceToConvenience && (
+                  <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
+                )}
               </div>
               <div>
                 <Label htmlFor='distanceToBath'>入浴施設までの距離 (m)</Label>
                 <Input
                   id='distanceToBath'
-                  type='text'
+                  type='number'
+                  min='0'
                   {...register('distanceToBath')}
                   placeholder='距離(m)または空欄'
                 />
+                {errors.distanceToBath && (
+                  <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
+                )}
               </div>
             </div>
 
@@ -510,7 +566,9 @@ export default function CampingSpotForm({
                 <Label htmlFor='quietnessLevel'>静けさレベル (1-5)</Label>
                 <Input
                   id='quietnessLevel'
-                  type='text'
+                  type='number'
+                  min='1'
+                  max='5'
                   placeholder='1-5または空欄'
                   {...register('quietnessLevel')}
                 />
@@ -524,7 +582,9 @@ export default function CampingSpotForm({
                 <Label htmlFor='securityLevel'>治安レベル (1-5)</Label>
                 <Input
                   id='securityLevel'
-                  type='text'
+                  type='number'
+                  min='1'
+                  max='5'
                   placeholder='1-5または空欄'
                   {...register('securityLevel')}
                 />
@@ -538,7 +598,9 @@ export default function CampingSpotForm({
                 <Label htmlFor='overallRating'>総合評価 (1-5)</Label>
                 <Input
                   id='overallRating'
-                  type='text'
+                  type='number'
+                  min='1'
+                  max='5'
                   placeholder='1-5または空欄'
                   {...register('overallRating')}
                 />
@@ -555,10 +617,14 @@ export default function CampingSpotForm({
                 <Label htmlFor='elevation'>標高 (m)</Label>
                 <Input
                   id='elevation'
-                  type='text'
+                  type='number'
+                  min='0'
                   {...register('elevation')}
                   placeholder='標高(m)または空欄'
                 />
+                {errors.elevation && (
+                  <p className='text-sm text-red-500'>{errors.elevation.message}</p>
+                )}
               </div>
             </div>
 
@@ -608,6 +674,9 @@ export default function CampingSpotForm({
                 {...register('restrictions')}
                 placeholder='制限事項をカンマ区切りで入力'
               />
+              {errors.restrictions && (
+                <p className='text-sm text-red-500'>{errors.restrictions.message}</p>
+              )}
             </div>
 
             <div>
@@ -617,6 +686,9 @@ export default function CampingSpotForm({
                 {...register('amenities')}
                 placeholder='その他設備をカンマ区切りで入力'
               />
+              {errors.amenities && (
+                <p className='text-sm text-red-500'>{errors.amenities.message}</p>
+              )}
             </div>
 
             <div>
