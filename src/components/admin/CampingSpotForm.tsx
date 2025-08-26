@@ -31,6 +31,7 @@ import {
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
+import { Map } from 'lucide-react';
 
 interface CampingSpotFormProps {
   spot?: CampingSpotWithId | null;
@@ -331,6 +332,23 @@ export default function CampingSpotForm({
     }
   };
 
+  const showOnMap = () => {
+    const lat = watch('lat');
+    const lng = watch('lng');
+    
+    if (!lat || !lng) {
+      toast({
+        title: '地図で表示',
+        description: '緯度・経度を入力してください',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const url = `https://www.google.com/maps/place/${lat},${lng}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
@@ -411,13 +429,23 @@ export default function CampingSpotForm({
                   )}
                 </div>
               </div>
-              <div className='flex justify-start'>
+              <div className='flex justify-start gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(latitude, longitude) => {
                     setValue('lat', latitude);
                     setValue('lng', longitude);
                   }}
                 />
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  className='flex items-center gap-2 text-sm h-8'
+                  onClick={showOnMap}
+                >
+                  <Map className='w-4 h-4' />
+                  地図で表示
+                </Button>
               </div>
             </div>
 
