@@ -30,6 +30,7 @@ import {
   updateCampingSpot,
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
+import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
 
 interface CampingSpotFormProps {
   spot?: CampingSpotWithId | null;
@@ -393,20 +394,30 @@ export default function CampingSpotForm({
 
 
             {/* Coordinates */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div>
-                <Label htmlFor='lat'>緯度 *</Label>
-                <Input id='lat' type='number' step='any' {...register('lat')} />
-                {errors.lat && (
-                  <p className='text-sm text-red-500'>{errors.lat.message}</p>
-                )}
+            <div className='space-y-4'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div>
+                  <Label htmlFor='lat'>緯度 *</Label>
+                  <Input id='lat' type='number' step='any' {...register('lat')} />
+                  {errors.lat && (
+                    <p className='text-sm text-red-500'>{errors.lat.message}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor='lng'>経度 *</Label>
+                  <Input id='lng' type='number' step='any' {...register('lng')} />
+                  {errors.lng && (
+                    <p className='text-sm text-red-500'>{errors.lng.message}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <Label htmlFor='lng'>経度 *</Label>
-                <Input id='lng' type='number' step='any' {...register('lng')} />
-                {errors.lng && (
-                  <p className='text-sm text-red-500'>{errors.lng.message}</p>
-                )}
+              <div className='flex justify-start'>
+                <CoordinatesFromClipboardButton
+                  onCoordinatesExtracted={(latitude, longitude) => {
+                    setValue('lat', latitude);
+                    setValue('lng', longitude);
+                  }}
+                />
               </div>
             </div>
 
