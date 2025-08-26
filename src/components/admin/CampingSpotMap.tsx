@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import {
   CampingSpotWithId,
@@ -14,6 +15,11 @@ import {
   setupJapaneseLabels,
   setupPOIFilters,
 } from '@/lib/mapboxIcons';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface CampingSpotMapProps {
@@ -32,6 +38,7 @@ export default function CampingSpotMap({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   // Initialize map
@@ -269,17 +276,28 @@ export default function CampingSpotMap({
   return (
     <div className='relative'>
       <div ref={mapContainer} className='h-[600px] w-full rounded-lg' />
-      <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-md border dark:border-gray-600'>
-        <h4 className='font-semibold mb-2 text-gray-900 dark:text-gray-100'>
-          操作方法
-        </h4>
-        <div className='text-sm space-y-1 text-gray-700 dark:text-gray-300'>
-          <div>• マーカーをクリック: スポット編集</div>
-          <div>• 地図をダブルクリック: 新規作成</div>
-          <div>
-            • マーカーの色: 評価（緑=5点、青=4点、黄=3点、橙=2点、赤=1点）
-          </div>
-        </div>
+      <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600'>
+        <Collapsible open={isInstructionsOpen} onOpenChange={setIsInstructionsOpen}>
+          <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
+            <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
+              操作方法
+            </h4>
+            {isInstructionsOpen ? (
+              <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+            ) : (
+              <ChevronDown className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+            )}
+          </CollapsibleTrigger>
+          <CollapsibleContent className='px-3 pb-3'>
+            <div className='text-sm space-y-1 text-gray-700 dark:text-gray-300'>
+              <div>• マーカーをクリック: スポット編集</div>
+              <div>• 地図をダブルクリック: 新規作成</div>
+              <div>
+                • マーカーの色: 評価（緑=5点、青=4点、黄=3点、橙=2点、赤=1点）
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
       <div className='absolute bottom-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600'>
         <div className='text-xs text-gray-600 dark:text-gray-400'>
