@@ -19,6 +19,14 @@ npm run lint         # Run ESLint
 npm run init-db      # Initialize MongoDB database with sample data
 ```
 
+## Development Server Requirements
+
+**IMPORTANT**: Always use http://localhost:3000 for development server
+- The application is configured for port 3000 only
+- Using other ports (3001, 3002, etc.) will cause CORS errors with Auth0 authentication
+- If port 3000 is occupied, stop the conflicting process first before starting the dev server
+- Never allow Next.js to automatically switch to alternative ports
+
 ## Architecture
 
 ### Tech Stack
