@@ -97,45 +97,9 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     type: Number,
     min: 0,
   },
-  nearbyToiletCoordinates: {
-    type: [Number],
-    validate: {
-      validator: function(v: number[]) {
-        if (!v) return true; // optional field
-        return v.length === 2
-          &&
-               v[0] >= -180 && v[0] <= 180 && // longitude
-               v[1] >= -90 && v[1] <= 90;     // latitude
-      },
-      message: 'Toilet coordinates must be [longitude, latitude] within valid ranges'
-    }
-  },
-  nearbyConvenienceCoordinates: {
-    type: [Number],
-    validate: {
-      validator: function(v: number[]) {
-        if (!v) return true; // optional field
-        return v.length === 2
-          &&
-               v[0] >= -180 && v[0] <= 180 && // longitude
-               v[1] >= -90 && v[1] <= 90;     // latitude
-      },
-      message: 'Convenience store coordinates must be [longitude, latitude] within valid ranges'
-    }
-  },
-  nearbyBathCoordinates: {
-    type: [Number],
-    validate: {
-      validator: function(v: number[]) {
-        if (!v) return true; // optional field
-        return v.length === 2
-          &&
-               v[0] >= -180 && v[0] <= 180 && // longitude
-               v[1] >= -90 && v[1] <= 90;     // latitude
-      },
-      message: 'Bath facility coordinates must be [longitude, latitude] within valid ranges'
-    }
-  },
+  nearbyToiletCoordinates: [Number],
+  nearbyConvenienceCoordinates: [Number],
+  nearbyBathCoordinates: [Number],
   elevation: {
     type: Number,
     min: 0,
@@ -214,6 +178,33 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   },
 }, {
   timestamps: true,
+});
+
+// Pre-save validation for coordinate fields
+campingSpotSchema.pre('save', function(next) {
+  // Validate coordinate fields only if they exist and are not empty
+  const validateCoordinates = (coords: number[], fieldName: string) => {
+    if (coords && coords.length > 0) {
+      if (coords.length !== 2) {
+        return new Error(`${fieldName} must have exactly 2 elements [longitude, latitude]`);
+      }
+      if (coords[0] < -180 || coords[0] > 180 || coords[1] < -90 || coords[1] > 90) {
+        return new Error(`${fieldName} must be within valid ranges: longitude (-180 to 180), latitude (-90 to 90)`);
+      }
+    }
+    return null;
+  };
+
+  const toiletError = validateCoordinates(this.nearbyToiletCoordinates, 'nearbyToiletCoordinates');
+  if (toiletError) return next(toiletError);
+
+  const convenienceError = validateCoordinates(this.nearbyConvenienceCoordinates, 'nearbyConvenienceCoordinates');
+  if (convenienceError) return next(convenienceError);
+
+  const bathError = validateCoordinates(this.nearbyBathCoordinates, 'nearbyBathCoordinates');
+  if (bathError) return next(bathError);
+
+  next();
 });
 
 // Indexes for efficient filtering and geospatial queries

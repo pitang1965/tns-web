@@ -31,7 +31,8 @@ import {
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
-import { Map } from 'lucide-react';
+import { Map, Calculator } from 'lucide-react';
+import { calculateDistanceFromStrings } from '@/lib/utils/distance';
 
 interface CampingSpotFormProps {
   spot?: CampingSpotWithId | null;
@@ -183,6 +184,64 @@ export default function CampingSpotForm({
 
   const isFree = watch('isFree');
 
+  // Watch coordinates for automatic distance calculation
+  const spotLat = watch('lat');
+  const spotLng = watch('lng');
+  const toiletLat = watch('nearbyToiletLat');
+  const toiletLng = watch('nearbyToiletLng');
+  const convenienceLat = watch('nearbyConvenienceLat');
+  const convenienceLng = watch('nearbyConvenienceLng');
+  const bathLat = watch('nearbyBathLat');
+  const bathLng = watch('nearbyBathLng');
+
+  // Auto-calculate distances when coordinates change
+  const calculateAndSetDistance = (facilityType: 'toilet' | 'convenience' | 'bath') => {
+    if (!spotLat || !spotLng) {
+      toast({
+        title: '距離計算',
+        description: 'スポットの座標を先に入力してください',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    let facilityLat: string, facilityLng: string, distanceField: string;
+
+    switch (facilityType) {
+      case 'toilet':
+        facilityLat = toiletLat || '';
+        facilityLng = toiletLng || '';
+        distanceField = 'distanceToToilet';
+        break;
+      case 'convenience':
+        facilityLat = convenienceLat || '';
+        facilityLng = convenienceLng || '';
+        distanceField = 'distanceToConvenience';
+        break;
+      case 'bath':
+        facilityLat = bathLat || '';
+        facilityLng = bathLng || '';
+        distanceField = 'distanceToBath';
+        break;
+    }
+
+    const distance = calculateDistanceFromStrings(spotLat, spotLng, facilityLat, facilityLng);
+
+    if (distance !== null) {
+      setValue(distanceField as any, distance.toString());
+      toast({
+        title: '距離計算完了',
+        description: `${Math.round(distance)}mで設定しました`,
+      });
+    } else {
+      toast({
+        title: '距離計算エラー',
+        description: '有効な座標を入力してください',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
     if (spot) {
@@ -197,12 +256,12 @@ export default function CampingSpotForm({
         distanceToToilet: spot.distanceToToilet?.toString() || '',
         distanceToBath: spot.distanceToBath?.toString() || '',
         distanceToConvenience: spot.distanceToConvenience?.toString() || '',
-        nearbyToiletLat: spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[1].toString() : '',
-        nearbyToiletLng: spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[0].toString() : '',
-        nearbyConvenienceLat: spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[1].toString() : '',
-        nearbyConvenienceLng: spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[0].toString() : '',
-        nearbyBathLat: spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1].toString() : '',
-        nearbyBathLng: spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0].toString() : '',
+        nearbyToiletLat: spot.nearbyToiletCoordinates && spot.nearbyToiletCoordinates.length >= 2 ? spot.nearbyToiletCoordinates[1].toString() : '',
+        nearbyToiletLng: spot.nearbyToiletCoordinates && spot.nearbyToiletCoordinates.length >= 2 ? spot.nearbyToiletCoordinates[0].toString() : '',
+        nearbyConvenienceLat: spot.nearbyConvenienceCoordinates && spot.nearbyConvenienceCoordinates.length >= 2 ? spot.nearbyConvenienceCoordinates[1].toString() : '',
+        nearbyConvenienceLng: spot.nearbyConvenienceCoordinates && spot.nearbyConvenienceCoordinates.length >= 2 ? spot.nearbyConvenienceCoordinates[0].toString() : '',
+        nearbyBathLat: spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2 ? spot.nearbyBathCoordinates[1].toString() : '',
+        nearbyBathLng: spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2 ? spot.nearbyBathCoordinates[0].toString() : '',
         elevation: spot.elevation?.toString() || '',
         quietnessLevel: spot.quietnessLevel?.toString() || '',
         securityLevel: spot.securityLevel?.toString() || '',
@@ -313,24 +372,24 @@ export default function CampingSpotForm({
       if (data.elevation && data.elevation.trim() !== '') {
         formData.append('elevation', data.elevation);
       }
-      
+
       // Handle nearby coordinates
-      if (data.nearbyToiletLat && data.nearbyToiletLng && 
+      if (data.nearbyToiletLat && data.nearbyToiletLng &&
           data.nearbyToiletLat.trim() !== '' && data.nearbyToiletLng.trim() !== '') {
         formData.append('nearbyToiletLat', data.nearbyToiletLat);
         formData.append('nearbyToiletLng', data.nearbyToiletLng);
       }
-      if (data.nearbyConvenienceLat && data.nearbyConvenienceLng && 
+      if (data.nearbyConvenienceLat && data.nearbyConvenienceLng &&
           data.nearbyConvenienceLat.trim() !== '' && data.nearbyConvenienceLng.trim() !== '') {
         formData.append('nearbyConvenienceLat', data.nearbyConvenienceLat);
         formData.append('nearbyConvenienceLng', data.nearbyConvenienceLng);
       }
-      if (data.nearbyBathLat && data.nearbyBathLng && 
+      if (data.nearbyBathLat && data.nearbyBathLng &&
           data.nearbyBathLat.trim() !== '' && data.nearbyBathLng.trim() !== '') {
         formData.append('nearbyBathLat', data.nearbyBathLat);
         formData.append('nearbyBathLng', data.nearbyBathLng);
       }
-      
+
       if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
         formData.append('quietnessLevel', data.quietnessLevel);
       }
@@ -407,7 +466,7 @@ export default function CampingSpotForm({
   const showOnMap = () => {
     const lat = watch('lat');
     const lng = watch('lng');
-    
+
     if (!lat || !lng) {
       toast({
         title: '地図で表示',
@@ -774,7 +833,6 @@ export default function CampingSpotForm({
             <div className='space-y-6'>
               <div>
                 <Label className='text-lg font-semibold'>近くの施設の情報</Label>
-                
                 <div className='space-y-6 mt-4'>
                   {/* トイレ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
@@ -782,13 +840,25 @@ export default function CampingSpotForm({
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToToilet'>距離 (m)</Label>
-                        <Input
-                          id='distanceToToilet'
-                          type='number'
-                          min='0'
-                          placeholder='距離(m)または空欄'
-                          {...register('distanceToToilet')}
-                        />
+                        <div className='flex gap-2'>
+                          <Input
+                            id='distanceToToilet'
+                            type='number'
+                            min='0'
+                            placeholder='距離(m)または空欄'
+                            {...register('distanceToToilet')}
+                          />
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => calculateAndSetDistance('toilet')}
+                            className='px-2'
+                            title='座標から距離を自動計算'
+                          >
+                            <Calculator className='w-4 h-4' />
+                          </Button>
+                        </div>
                         {errors.distanceToToilet && (
                           <p className='text-sm text-red-500'>
                             {errors.distanceToToilet.message}
@@ -830,13 +900,25 @@ export default function CampingSpotForm({
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToConvenience'>距離 (m)</Label>
-                        <Input
-                          id='distanceToConvenience'
-                          type='number'
-                          min='0'
-                          {...register('distanceToConvenience')}
-                          placeholder='距離(m)または空欄'
-                        />
+                        <div className='flex gap-2'>
+                          <Input
+                            id='distanceToConvenience'
+                            type='number'
+                            min='0'
+                            {...register('distanceToConvenience')}
+                            placeholder='距離(m)または空欄'
+                          />
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => calculateAndSetDistance('convenience')}
+                            className='px-2'
+                            title='座標から距離を自動計算'
+                          >
+                            <Calculator className='w-4 h-4' />
+                          </Button>
+                        </div>
                         {errors.distanceToConvenience && (
                           <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
                         )}
@@ -876,13 +958,25 @@ export default function CampingSpotForm({
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToBath'>距離 (m)</Label>
-                        <Input
-                          id='distanceToBath'
-                          type='number'
-                          min='0'
-                          {...register('distanceToBath')}
-                          placeholder='距離(m)または空欄'
-                        />
+                        <div className='flex gap-2'>
+                          <Input
+                            id='distanceToBath'
+                            type='number'
+                            min='0'
+                            {...register('distanceToBath')}
+                            placeholder='距離(m)または空欄'
+                          />
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            onClick={() => calculateAndSetDistance('bath')}
+                            className='px-2'
+                            title='座標から距離を自動計算'
+                          >
+                            <Calculator className='w-4 h-4' />
+                          </Button>
+                        </div>
                         {errors.distanceToBath && (
                           <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
                         )}

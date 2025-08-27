@@ -158,7 +158,9 @@ export async function createCampingSpot(data: FormData) {
       formObject.nearbyToiletLat &&
       formObject.nearbyToiletLng &&
       formObject.nearbyToiletLat.trim() !== '' &&
-      formObject.nearbyToiletLng.trim() !== ''
+      formObject.nearbyToiletLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyToiletLat)) &&
+      !isNaN(Number(formObject.nearbyToiletLng))
         ? [
             Number(formObject.nearbyToiletLng),
             Number(formObject.nearbyToiletLat),
@@ -168,7 +170,9 @@ export async function createCampingSpot(data: FormData) {
       formObject.nearbyConvenienceLat &&
       formObject.nearbyConvenienceLng &&
       formObject.nearbyConvenienceLat.trim() !== '' &&
-      formObject.nearbyConvenienceLng.trim() !== ''
+      formObject.nearbyConvenienceLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
+      !isNaN(Number(formObject.nearbyConvenienceLng))
         ? [
             Number(formObject.nearbyConvenienceLng),
             Number(formObject.nearbyConvenienceLat),
@@ -178,7 +182,9 @@ export async function createCampingSpot(data: FormData) {
       formObject.nearbyBathLat &&
       formObject.nearbyBathLng &&
       formObject.nearbyBathLat.trim() !== '' &&
-      formObject.nearbyBathLng.trim() !== ''
+      formObject.nearbyBathLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyBathLat)) &&
+      !isNaN(Number(formObject.nearbyBathLng))
         ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
         : undefined,
     elevation:
@@ -252,7 +258,19 @@ export async function createCampingSpot(data: FormData) {
     cleanData.pricing = cleanPricing as typeof cleanData.pricing;
   }
 
-  const newSpot = new CampingSpot(cleanData);
+  // Explicitly remove coordinate fields if they are undefined to prevent Mongoose from creating empty arrays
+  const finalData = { ...cleanData };
+  if (!cleanData.nearbyToiletCoordinates) {
+    delete finalData.nearbyToiletCoordinates;
+  }
+  if (!cleanData.nearbyConvenienceCoordinates) {
+    delete finalData.nearbyConvenienceCoordinates;
+  }
+  if (!cleanData.nearbyBathCoordinates) {
+    delete finalData.nearbyBathCoordinates;
+  }
+
+  const newSpot = new CampingSpot(finalData);
   await newSpot.save();
 
   revalidatePath('/admin/camping-spots');
@@ -289,7 +307,9 @@ export async function updateCampingSpot(id: string, data: FormData) {
       formObject.nearbyToiletLat &&
       formObject.nearbyToiletLng &&
       formObject.nearbyToiletLat.trim() !== '' &&
-      formObject.nearbyToiletLng.trim() !== ''
+      formObject.nearbyToiletLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyToiletLat)) &&
+      !isNaN(Number(formObject.nearbyToiletLng))
         ? [
             Number(formObject.nearbyToiletLng),
             Number(formObject.nearbyToiletLat),
@@ -299,7 +319,9 @@ export async function updateCampingSpot(id: string, data: FormData) {
       formObject.nearbyConvenienceLat &&
       formObject.nearbyConvenienceLng &&
       formObject.nearbyConvenienceLat.trim() !== '' &&
-      formObject.nearbyConvenienceLng.trim() !== ''
+      formObject.nearbyConvenienceLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
+      !isNaN(Number(formObject.nearbyConvenienceLng))
         ? [
             Number(formObject.nearbyConvenienceLng),
             Number(formObject.nearbyConvenienceLat),
@@ -309,7 +331,9 @@ export async function updateCampingSpot(id: string, data: FormData) {
       formObject.nearbyBathLat &&
       formObject.nearbyBathLng &&
       formObject.nearbyBathLat.trim() !== '' &&
-      formObject.nearbyBathLng.trim() !== ''
+      formObject.nearbyBathLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyBathLat)) &&
+      !isNaN(Number(formObject.nearbyBathLng))
         ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
         : undefined,
     elevation:
@@ -363,6 +387,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
         ? formObject.notes.trim()
         : undefined,
   };
+
 
   // Validate the data
   const validatedData = CampingSpotSchema.parse(spotData);
