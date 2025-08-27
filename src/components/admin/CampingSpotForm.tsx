@@ -774,19 +774,72 @@ export default function CampingSpotForm({
             {/* 近くの施設の情報 */}
             <div className='space-y-6'>
               <div>
-                <Label className='text-lg font-semibold'>近くの施設の情報</Label>
+                <div className='flex items-center gap-2'>
+                  {watch('name') && (
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='sm'
+                      onClick={() => {
+                        const lat = watch('lat');
+                        const lng = watch('lng');
+                        if (!lat || !lng) {
+                          toast({
+                            title: '地図で表示',
+                            description: '緯度・経度を入力してください',
+                            variant: 'destructive',
+                          });
+                          return;
+                        }
+                        const url = `https://www.google.com/maps?q=${lat},${lng}`;
+                        window.open(url, '_blank');
+                      }}
+                      className='p-1 h-auto'
+                      title='地図で表示'
+                    >
+                      <Map className='w-4 h-4' />
+                    </Button>
+                  )}
+                  <Label className='text-lg font-semibold'>
+                    {watch('name') ? `「${watch('name')}」の近くの施設の情報` : '近くの施設の情報'}
+                  </Label>
+                </div>
                 <div className='space-y-6 mt-4'>
                   {/* トイレ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
                     <div className='flex items-center justify-between mb-3'>
                       <Label className='text-md font-medium'>トイレ</Label>
-                      <CoordinatesFromClipboardButton
-                        onCoordinatesExtracted={(lat, lng) => {
-                          setValue('nearbyToiletLat', lat);
-                          setValue('nearbyToiletLng', lng);
-                        }}
-                        className='ml-auto'
-                      />
+                      <div className='flex gap-2'>
+                        <CoordinatesFromClipboardButton
+                          onCoordinatesExtracted={(lat, lng) => {
+                            setValue('nearbyToiletLat', lat);
+                            setValue('nearbyToiletLng', lng);
+                          }}
+                        />
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            const lat = watch('nearbyToiletLat');
+                            const lng = watch('nearbyToiletLng');
+                            if (!lat || !lng) {
+                              toast({
+                                title: '地図で表示',
+                                description: 'トイレの緯度・経度を入力してください',
+                                variant: 'destructive',
+                              });
+                              return;
+                            }
+                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+                            window.open(url, '_blank');
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Map className='w-4 h-4' />
+                          地図で表示
+                        </Button>
+                      </div>
                     </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
@@ -837,13 +890,37 @@ export default function CampingSpotForm({
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
                     <div className='flex items-center justify-between mb-3'>
                       <Label className='text-md font-medium'>コンビニ</Label>
-                      <CoordinatesFromClipboardButton
-                        onCoordinatesExtracted={(lat, lng) => {
-                          setValue('nearbyConvenienceLat', lat);
-                          setValue('nearbyConvenienceLng', lng);
-                        }}
-                        className='ml-auto'
-                      />
+                      <div className='flex gap-2'>
+                        <CoordinatesFromClipboardButton
+                          onCoordinatesExtracted={(lat, lng) => {
+                            setValue('nearbyConvenienceLat', lat);
+                            setValue('nearbyConvenienceLng', lng);
+                          }}
+                        />
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            const lat = watch('nearbyConvenienceLat');
+                            const lng = watch('nearbyConvenienceLng');
+                            if (!lat || !lng) {
+                              toast({
+                                title: '地図で表示',
+                                description: 'コンビニの緯度・経度を入力してください',
+                                variant: 'destructive',
+                              });
+                              return;
+                            }
+                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+                            window.open(url, '_blank');
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Map className='w-4 h-4' />
+                          地図で表示
+                        </Button>
+                      </div>
                     </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
@@ -892,13 +969,37 @@ export default function CampingSpotForm({
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
                     <div className='flex items-center justify-between mb-3'>
                       <Label className='text-md font-medium'>入浴施設</Label>
-                      <CoordinatesFromClipboardButton
-                        onCoordinatesExtracted={(lat, lng) => {
-                          setValue('nearbyBathLat', lat);
-                          setValue('nearbyBathLng', lng);
-                        }}
-                        className='ml-auto'
-                      />
+                      <div className='flex gap-2'>
+                        <CoordinatesFromClipboardButton
+                          onCoordinatesExtracted={(lat, lng) => {
+                            setValue('nearbyBathLat', lat);
+                            setValue('nearbyBathLng', lng);
+                          }}
+                        />
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            const lat = watch('nearbyBathLat');
+                            const lng = watch('nearbyBathLng');
+                            if (!lat || !lng) {
+                              toast({
+                                title: '地図で表示',
+                                description: '入浴施設の緯度・経度を入力してください',
+                                variant: 'destructive',
+                              });
+                              return;
+                            }
+                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
+                            window.open(url, '_blank');
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Map className='w-4 h-4' />
+                          地図で表示
+                        </Button>
+                      </div>
                     </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
