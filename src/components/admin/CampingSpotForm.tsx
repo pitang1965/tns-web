@@ -31,8 +31,7 @@ import {
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
-import { Map, Calculator } from 'lucide-react';
-import { calculateDistanceFromStrings } from '@/lib/utils/distance';
+import { Map } from 'lucide-react';
 
 interface CampingSpotFormProps {
   spot?: CampingSpotWithId | null;
@@ -184,63 +183,6 @@ export default function CampingSpotForm({
 
   const isFree = watch('isFree');
 
-  // Watch coordinates for automatic distance calculation
-  const spotLat = watch('lat');
-  const spotLng = watch('lng');
-  const toiletLat = watch('nearbyToiletLat');
-  const toiletLng = watch('nearbyToiletLng');
-  const convenienceLat = watch('nearbyConvenienceLat');
-  const convenienceLng = watch('nearbyConvenienceLng');
-  const bathLat = watch('nearbyBathLat');
-  const bathLng = watch('nearbyBathLng');
-
-  // Auto-calculate distances when coordinates change
-  const calculateAndSetDistance = (facilityType: 'toilet' | 'convenience' | 'bath') => {
-    if (!spotLat || !spotLng) {
-      toast({
-        title: '距離計算',
-        description: 'スポットの座標を先に入力してください',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    let facilityLat: string, facilityLng: string, distanceField: string;
-
-    switch (facilityType) {
-      case 'toilet':
-        facilityLat = toiletLat || '';
-        facilityLng = toiletLng || '';
-        distanceField = 'distanceToToilet';
-        break;
-      case 'convenience':
-        facilityLat = convenienceLat || '';
-        facilityLng = convenienceLng || '';
-        distanceField = 'distanceToConvenience';
-        break;
-      case 'bath':
-        facilityLat = bathLat || '';
-        facilityLng = bathLng || '';
-        distanceField = 'distanceToBath';
-        break;
-    }
-
-    const distance = calculateDistanceFromStrings(spotLat, spotLng, facilityLat, facilityLng);
-
-    if (distance !== null) {
-      setValue(distanceField as any, distance.toString());
-      toast({
-        title: '距離計算完了',
-        description: `${Math.round(distance)}mで設定しました`,
-      });
-    } else {
-      toast({
-        title: '距離計算エラー',
-        description: '有効な座標を入力してください',
-        variant: 'destructive',
-      });
-    }
-  };
 
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
@@ -836,29 +778,26 @@ export default function CampingSpotForm({
                 <div className='space-y-6 mt-4'>
                   {/* トイレ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <Label className='text-md font-medium'>トイレ</Label>
+                    <div className='flex items-center justify-between mb-3'>
+                      <Label className='text-md font-medium'>トイレ</Label>
+                      <CoordinatesFromClipboardButton
+                        onCoordinatesExtracted={(lat, lng) => {
+                          setValue('nearbyToiletLat', lat);
+                          setValue('nearbyToiletLng', lng);
+                        }}
+                        className='ml-auto'
+                      />
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToToilet'>距離 (m)</Label>
-                        <div className='flex gap-2'>
-                          <Input
-                            id='distanceToToilet'
-                            type='number'
-                            min='0'
-                            placeholder='距離(m)または空欄'
-                            {...register('distanceToToilet')}
-                          />
-                          <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            onClick={() => calculateAndSetDistance('toilet')}
-                            className='px-2'
-                            title='座標から距離を自動計算'
-                          >
-                            <Calculator className='w-4 h-4' />
-                          </Button>
-                        </div>
+                        <Input
+                          id='distanceToToilet'
+                          type='number'
+                          min='0'
+                          placeholder='距離(m)または空欄'
+                          {...register('distanceToToilet')}
+                        />
                         {errors.distanceToToilet && (
                           <p className='text-sm text-red-500'>
                             {errors.distanceToToilet.message}
@@ -896,29 +835,26 @@ export default function CampingSpotForm({
 
                   {/* コンビニ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <Label className='text-md font-medium'>コンビニ</Label>
+                    <div className='flex items-center justify-between mb-3'>
+                      <Label className='text-md font-medium'>コンビニ</Label>
+                      <CoordinatesFromClipboardButton
+                        onCoordinatesExtracted={(lat, lng) => {
+                          setValue('nearbyConvenienceLat', lat);
+                          setValue('nearbyConvenienceLng', lng);
+                        }}
+                        className='ml-auto'
+                      />
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToConvenience'>距離 (m)</Label>
-                        <div className='flex gap-2'>
-                          <Input
-                            id='distanceToConvenience'
-                            type='number'
-                            min='0'
-                            {...register('distanceToConvenience')}
-                            placeholder='距離(m)または空欄'
-                          />
-                          <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            onClick={() => calculateAndSetDistance('convenience')}
-                            className='px-2'
-                            title='座標から距離を自動計算'
-                          >
-                            <Calculator className='w-4 h-4' />
-                          </Button>
-                        </div>
+                        <Input
+                          id='distanceToConvenience'
+                          type='number'
+                          min='0'
+                          {...register('distanceToConvenience')}
+                          placeholder='距離(m)または空欄'
+                        />
                         {errors.distanceToConvenience && (
                           <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
                         )}
@@ -954,29 +890,26 @@ export default function CampingSpotForm({
 
                   {/* 入浴施設情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <Label className='text-md font-medium'>入浴施設</Label>
+                    <div className='flex items-center justify-between mb-3'>
+                      <Label className='text-md font-medium'>入浴施設</Label>
+                      <CoordinatesFromClipboardButton
+                        onCoordinatesExtracted={(lat, lng) => {
+                          setValue('nearbyBathLat', lat);
+                          setValue('nearbyBathLng', lng);
+                        }}
+                        className='ml-auto'
+                      />
+                    </div>
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
                       <div>
                         <Label htmlFor='distanceToBath'>距離 (m)</Label>
-                        <div className='flex gap-2'>
-                          <Input
-                            id='distanceToBath'
-                            type='number'
-                            min='0'
-                            {...register('distanceToBath')}
-                            placeholder='距離(m)または空欄'
-                          />
-                          <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            onClick={() => calculateAndSetDistance('bath')}
-                            className='px-2'
-                            title='座標から距離を自動計算'
-                          >
-                            <Calculator className='w-4 h-4' />
-                          </Button>
-                        </div>
+                        <Input
+                          id='distanceToBath'
+                          type='number'
+                          min='0'
+                          {...register('distanceToBath')}
+                          placeholder='距離(m)または空欄'
+                        />
                         {errors.distanceToBath && (
                           <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
                         )}
