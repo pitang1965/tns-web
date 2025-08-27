@@ -51,8 +51,13 @@ export default function CampingSpotMap({
       style.id = 'camping-marker-styles';
       style.textContent = `
         .camping-marker-hover:hover {
-          box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 4px rgba(255,255,255,0.8) !important;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 0 6px rgba(255,255,255,0.9), 0 0 0 8px rgba(59,130,246,0.5) !important;
           z-index: 1000 !important;
+          transition: all 0.2s ease-out !important;
+        }
+        .camping-marker-hover {
+          transition: all 0.2s ease-out !important;
+          cursor: pointer !important;
         }
       `;
       document.head.appendChild(style);
