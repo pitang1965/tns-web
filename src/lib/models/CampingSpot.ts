@@ -195,13 +195,13 @@ campingSpotSchema.pre('save', function(next) {
     return null;
   };
 
-  const toiletError = validateCoordinates(this.nearbyToiletCoordinates, 'nearbyToiletCoordinates');
+  const toiletError = validateCoordinates(this.nearbyToiletCoordinates || [], 'nearbyToiletCoordinates');
   if (toiletError) return next(toiletError);
 
-  const convenienceError = validateCoordinates(this.nearbyConvenienceCoordinates, 'nearbyConvenienceCoordinates');
+  const convenienceError = validateCoordinates(this.nearbyConvenienceCoordinates || [], 'nearbyConvenienceCoordinates');
   if (convenienceError) return next(convenienceError);
 
-  const bathError = validateCoordinates(this.nearbyBathCoordinates, 'nearbyBathCoordinates');
+  const bathError = validateCoordinates(this.nearbyBathCoordinates || [], 'nearbyBathCoordinates');
   if (bathError) return next(bathError);
 
   next();
