@@ -33,6 +33,18 @@ export const CampingSpotSchema = z.object({
   distanceToToilet: z.number().min(0, 'トイレまでの距離は0以上で入力してください').optional(),
   distanceToBath: z.number().min(0).optional(),
   distanceToConvenience: z.number().min(0).optional(),
+  nearbyToiletCoordinates: z.tuple([
+    z.number().min(-180).max(180), // longitude
+    z.number().min(-90).max(90)    // latitude
+  ]).optional(),
+  nearbyConvenienceCoordinates: z.tuple([
+    z.number().min(-180).max(180), // longitude
+    z.number().min(-90).max(90)    // latitude
+  ]).optional(),
+  nearbyBathCoordinates: z.tuple([
+    z.number().min(-180).max(180), // longitude
+    z.number().min(-90).max(90)    // latitude
+  ]).optional(),
   elevation: z.number().min(0).optional(),
   quietnessLevel: z.number().int().min(1).max(5).optional(),
   securityLevel: z.number().int().min(1).max(5).optional(),
@@ -93,6 +105,24 @@ export const CampingSpotCSVSchema = z.object({
   }).optional().default(''),
   distanceToConvenience: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "コンビニまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  nearbyToiletLat: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "トイレの緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  nearbyToiletLng: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "トイレの経度は空欄または数値で入力してください",
+  }).optional().default(''),
+  nearbyConvenienceLat: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "コンビニの緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  nearbyConvenienceLng: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "コンビニの経度は空欄または数値で入力してください",
+  }).optional().default(''),
+  nearbyBathLat: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "入浴施設の緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  nearbyBathLng: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "入浴施設の経度は空欄または数値で入力してください",
   }).optional().default(''),
   elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "標高は空欄または0以上の数値で入力してください",
@@ -175,6 +205,24 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   }).optional().default(''),
   'コンビニまでの距離(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "コンビニまでの距離は空欄または0以上の数値で入力してください",
+  }).optional().default(''),
+  'トイレ緯度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "トイレの緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  'トイレ経度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "トイレの経度は空欄または数値で入力してください",
+  }).optional().default(''),
+  'コンビニ緯度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "コンビニの緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  'コンビニ経度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "コンビニの経度は空欄または数値で入力してください",
+  }).optional().default(''),
+  'お風呂緯度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "入浴施設の緯度は空欄または数値で入力してください",
+  }).optional().default(''),
+  'お風呂経度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
+    message: "入浴施設の経度は空欄または数値で入力してください",
   }).optional().default(''),
   '標高(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "標高は空欄または0以上の数値で入力してください",
@@ -266,6 +314,12 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     distanceToToilet: csvRow.distanceToToilet ? Number(csvRow.distanceToToilet) : undefined,
     distanceToBath: csvRow.distanceToBath ? Number(csvRow.distanceToBath) : undefined,
     distanceToConvenience: csvRow.distanceToConvenience ? Number(csvRow.distanceToConvenience) : undefined,
+    nearbyToiletCoordinates: (csvRow.nearbyToiletLat && csvRow.nearbyToiletLng) 
+      ? [Number(csvRow.nearbyToiletLng), Number(csvRow.nearbyToiletLat)] : undefined,
+    nearbyConvenienceCoordinates: (csvRow.nearbyConvenienceLat && csvRow.nearbyConvenienceLng) 
+      ? [Number(csvRow.nearbyConvenienceLng), Number(csvRow.nearbyConvenienceLat)] : undefined,
+    nearbyBathCoordinates: (csvRow.nearbyBathLat && csvRow.nearbyBathLng) 
+      ? [Number(csvRow.nearbyBathLng), Number(csvRow.nearbyBathLat)] : undefined,
     elevation: csvRow.elevation ? Number(csvRow.elevation) : undefined,
     quietnessLevel: csvRow.quietnessLevel ? Number(csvRow.quietnessLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
     securityLevel: csvRow.securityLevel ? Number(csvRow.securityLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
@@ -298,6 +352,12 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     distanceToToilet: csvRow['トイレまでの距離(m)'] ? Number(csvRow['トイレまでの距離(m)']) : undefined,
     distanceToBath: csvRow['お風呂までの距離(m)'] ? Number(csvRow['お風呂までの距離(m)']) : undefined,
     distanceToConvenience: csvRow['コンビニまでの距離(m)'] ? Number(csvRow['コンビニまでの距離(m)']) : undefined,
+    nearbyToiletCoordinates: (csvRow['トイレ緯度'] && csvRow['トイレ経度']) 
+      ? [Number(csvRow['トイレ経度']), Number(csvRow['トイレ緯度'])] : undefined,
+    nearbyConvenienceCoordinates: (csvRow['コンビニ緯度'] && csvRow['コンビニ経度']) 
+      ? [Number(csvRow['コンビニ経度']), Number(csvRow['コンビニ緯度'])] : undefined,
+    nearbyBathCoordinates: (csvRow['お風呂緯度'] && csvRow['お風呂経度']) 
+      ? [Number(csvRow['お風呂経度']), Number(csvRow['お風呂緯度'])] : undefined,
     elevation: csvRow['標高(m)'] ? Number(csvRow['標高(m)']) : undefined,
     quietnessLevel: csvRow['静寂レベル(1-5)'] ? Number(csvRow['静寂レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
     securityLevel: csvRow['治安レベル(1-5)'] ? Number(csvRow['治安レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,

@@ -141,27 +141,62 @@ export async function createCampingSpot(data: FormData) {
   const spotData = {
     ...formObject,
     coordinates: [Number(formObject.lng), Number(formObject.lat)],
-    distanceToToilet: formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
-      ? Number(formObject.distanceToToilet)
-      : undefined,
-    distanceToBath: formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
-      ? Number(formObject.distanceToBath)
-      : undefined,
-    distanceToConvenience: formObject.distanceToConvenience && formObject.distanceToConvenience.trim() !== ''
-      ? Number(formObject.distanceToConvenience)
-      : undefined,
-    elevation: formObject.elevation && formObject.elevation.trim() !== ''
-      ? Number(formObject.elevation)
-      : undefined,
-    quietnessLevel: formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
-      ? Number(formObject.quietnessLevel)
-      : undefined,
-    securityLevel: formObject.securityLevel && formObject.securityLevel.trim() !== ''
-      ? Number(formObject.securityLevel)
-      : undefined,
-    overallRating: formObject.overallRating && formObject.overallRating.trim() !== ''
-      ? Number(formObject.overallRating)
-      : undefined,
+    distanceToToilet:
+      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
+        ? Number(formObject.distanceToToilet)
+        : undefined,
+    distanceToBath:
+      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
+        ? Number(formObject.distanceToBath)
+        : undefined,
+    distanceToConvenience:
+      formObject.distanceToConvenience &&
+      formObject.distanceToConvenience.trim() !== ''
+        ? Number(formObject.distanceToConvenience)
+        : undefined,
+    nearbyToiletCoordinates:
+      formObject.nearbyToiletLat &&
+      formObject.nearbyToiletLng &&
+      formObject.nearbyToiletLat.trim() !== '' &&
+      formObject.nearbyToiletLng.trim() !== ''
+        ? [
+            Number(formObject.nearbyToiletLng),
+            Number(formObject.nearbyToiletLat),
+          ]
+        : undefined,
+    nearbyConvenienceCoordinates:
+      formObject.nearbyConvenienceLat &&
+      formObject.nearbyConvenienceLng &&
+      formObject.nearbyConvenienceLat.trim() !== '' &&
+      formObject.nearbyConvenienceLng.trim() !== ''
+        ? [
+            Number(formObject.nearbyConvenienceLng),
+            Number(formObject.nearbyConvenienceLat),
+          ]
+        : undefined,
+    nearbyBathCoordinates:
+      formObject.nearbyBathLat &&
+      formObject.nearbyBathLng &&
+      formObject.nearbyBathLat.trim() !== '' &&
+      formObject.nearbyBathLng.trim() !== ''
+        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
+        : undefined,
+    elevation:
+      formObject.elevation && formObject.elevation.trim() !== ''
+        ? Number(formObject.elevation)
+        : undefined,
+    quietnessLevel:
+      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
+        ? Number(formObject.quietnessLevel)
+        : undefined,
+    securityLevel:
+      formObject.securityLevel && formObject.securityLevel.trim() !== ''
+        ? Number(formObject.securityLevel)
+        : undefined,
+    overallRating:
+      formObject.overallRating && formObject.overallRating.trim() !== ''
+        ? Number(formObject.overallRating)
+        : undefined,
     hasRoof: formObject.hasRoof === 'true',
     hasPowerOutlet: formObject.hasPowerOutlet === 'true',
     hasGate: formObject.hasGate === 'true',
@@ -172,9 +207,10 @@ export async function createCampingSpot(data: FormData) {
         : undefined,
       priceNote: formObject.priceNote || undefined,
     },
-    capacity: formObject.capacity && formObject.capacity.trim() !== ''
-      ? Number(formObject.capacity)
-      : undefined,
+    capacity:
+      formObject.capacity && formObject.capacity.trim() !== ''
+        ? Number(formObject.capacity)
+        : undefined,
     restrictions: formObject.restrictions
       ? String(formObject.restrictions)
           .split(',')
@@ -187,12 +223,14 @@ export async function createCampingSpot(data: FormData) {
           .map((a) => a.trim())
           .filter((a) => a)
       : [],
-    url: formObject.url && formObject.url.trim() !== ''
-      ? formObject.url.trim()
-      : undefined,
-    notes: formObject.notes && formObject.notes.trim() !== ''
-      ? formObject.notes.trim()
-      : undefined,
+    url:
+      formObject.url && formObject.url.trim() !== ''
+        ? formObject.url.trim()
+        : undefined,
+    notes:
+      formObject.notes && formObject.notes.trim() !== ''
+        ? formObject.notes.trim()
+        : undefined,
     submittedBy: user.email,
   };
 
@@ -207,7 +245,9 @@ export async function createCampingSpot(data: FormData) {
   // Handle nested pricing object
   if (cleanData.pricing) {
     const cleanPricing = Object.fromEntries(
-      Object.entries(cleanData.pricing as any).filter(([key, value]) => value !== undefined)
+      Object.entries(cleanData.pricing as any).filter(
+        ([key, value]) => value !== undefined
+      )
     );
     cleanData.pricing = cleanPricing as typeof cleanData.pricing;
   }
@@ -232,27 +272,62 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const spotData = {
     ...formObject,
     coordinates: [Number(formObject.lng), Number(formObject.lat)],
-    distanceToToilet: formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
-      ? Number(formObject.distanceToToilet)
-      : undefined,
-    distanceToBath: formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
-      ? Number(formObject.distanceToBath)
-      : undefined,
-    distanceToConvenience: formObject.distanceToConvenience && formObject.distanceToConvenience.trim() !== ''
-      ? Number(formObject.distanceToConvenience)
-      : undefined,
-    elevation: formObject.elevation && formObject.elevation.trim() !== ''
-      ? Number(formObject.elevation)
-      : undefined,
-    quietnessLevel: formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
-      ? Number(formObject.quietnessLevel)
-      : undefined,
-    securityLevel: formObject.securityLevel && formObject.securityLevel.trim() !== ''
-      ? Number(formObject.securityLevel)
-      : undefined,
-    overallRating: formObject.overallRating && formObject.overallRating.trim() !== ''
-      ? Number(formObject.overallRating)
-      : undefined,
+    distanceToToilet:
+      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
+        ? Number(formObject.distanceToToilet)
+        : undefined,
+    distanceToBath:
+      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
+        ? Number(formObject.distanceToBath)
+        : undefined,
+    distanceToConvenience:
+      formObject.distanceToConvenience &&
+      formObject.distanceToConvenience.trim() !== ''
+        ? Number(formObject.distanceToConvenience)
+        : undefined,
+    nearbyToiletCoordinates:
+      formObject.nearbyToiletLat &&
+      formObject.nearbyToiletLng &&
+      formObject.nearbyToiletLat.trim() !== '' &&
+      formObject.nearbyToiletLng.trim() !== ''
+        ? [
+            Number(formObject.nearbyToiletLng),
+            Number(formObject.nearbyToiletLat),
+          ]
+        : undefined,
+    nearbyConvenienceCoordinates:
+      formObject.nearbyConvenienceLat &&
+      formObject.nearbyConvenienceLng &&
+      formObject.nearbyConvenienceLat.trim() !== '' &&
+      formObject.nearbyConvenienceLng.trim() !== ''
+        ? [
+            Number(formObject.nearbyConvenienceLng),
+            Number(formObject.nearbyConvenienceLat),
+          ]
+        : undefined,
+    nearbyBathCoordinates:
+      formObject.nearbyBathLat &&
+      formObject.nearbyBathLng &&
+      formObject.nearbyBathLat.trim() !== '' &&
+      formObject.nearbyBathLng.trim() !== ''
+        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
+        : undefined,
+    elevation:
+      formObject.elevation && formObject.elevation.trim() !== ''
+        ? Number(formObject.elevation)
+        : undefined,
+    quietnessLevel:
+      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
+        ? Number(formObject.quietnessLevel)
+        : undefined,
+    securityLevel:
+      formObject.securityLevel && formObject.securityLevel.trim() !== ''
+        ? Number(formObject.securityLevel)
+        : undefined,
+    overallRating:
+      formObject.overallRating && formObject.overallRating.trim() !== ''
+        ? Number(formObject.overallRating)
+        : undefined,
     hasRoof: formObject.hasRoof === 'true',
     hasPowerOutlet: formObject.hasPowerOutlet === 'true',
     hasGate: formObject.hasGate === 'true',
@@ -263,9 +338,10 @@ export async function updateCampingSpot(id: string, data: FormData) {
         : undefined,
       priceNote: formObject.priceNote || undefined,
     },
-    capacity: formObject.capacity && formObject.capacity.trim() !== ''
-      ? Number(formObject.capacity)
-      : undefined,
+    capacity:
+      formObject.capacity && formObject.capacity.trim() !== ''
+        ? Number(formObject.capacity)
+        : undefined,
     restrictions: formObject.restrictions
       ? String(formObject.restrictions)
           .split(',')
@@ -278,12 +354,14 @@ export async function updateCampingSpot(id: string, data: FormData) {
           .map((a) => a.trim())
           .filter((a) => a)
       : [],
-    url: formObject.url && formObject.url.trim() !== ''
-      ? formObject.url.trim()
-      : undefined,
-    notes: formObject.notes && formObject.notes.trim() !== ''
-      ? formObject.notes.trim()
-      : undefined,
+    url:
+      formObject.url && formObject.url.trim() !== ''
+        ? formObject.url.trim()
+        : undefined,
+    notes:
+      formObject.notes && formObject.notes.trim() !== ''
+        ? formObject.notes.trim()
+        : undefined,
   };
 
   // Validate the data
@@ -294,9 +372,23 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const unsetFields: any = {};
 
   // Handle optional fields that should be unset when undefined
-  const optionalFields = ['distanceToToilet', 'distanceToBath', 'distanceToConvenience', 'elevation', 'quietnessLevel', 'securityLevel', 'overallRating', 'capacity', 'url', 'notes'];
+  const optionalFields = [
+    'distanceToToilet',
+    'distanceToBath',
+    'distanceToConvenience',
+    'nearbyToiletCoordinates',
+    'nearbyConvenienceCoordinates',
+    'nearbyBathCoordinates',
+    'elevation',
+    'quietnessLevel',
+    'securityLevel',
+    'overallRating',
+    'capacity',
+    'url',
+    'notes',
+  ];
 
-  Object.keys(validatedData).forEach(key => {
+  Object.keys(validatedData).forEach((key) => {
     const value = (validatedData as any)[key];
     if (key === 'pricing') {
       // Skip pricing here, handle it separately below
@@ -320,16 +412,25 @@ export async function updateCampingSpot(id: string, data: FormData) {
     updateOperations.$set['pricing.isFree'] = validatedData.pricing.isFree;
 
     // Handle optional pricing fields
-    if (validatedData.pricing.pricePerNight === undefined || validatedData.pricing.pricePerNight === null) {
+    if (
+      validatedData.pricing.pricePerNight === undefined ||
+      validatedData.pricing.pricePerNight === null
+    ) {
       unsetFields['pricing.pricePerNight'] = '';
     } else {
-      updateOperations.$set['pricing.pricePerNight'] = validatedData.pricing.pricePerNight;
+      updateOperations.$set['pricing.pricePerNight'] =
+        validatedData.pricing.pricePerNight;
     }
 
-    if (validatedData.pricing.priceNote === undefined || validatedData.pricing.priceNote === null || validatedData.pricing.priceNote === '') {
+    if (
+      validatedData.pricing.priceNote === undefined ||
+      validatedData.pricing.priceNote === null ||
+      validatedData.pricing.priceNote === ''
+    ) {
       unsetFields['pricing.priceNote'] = '';
     } else {
-      updateOperations.$set['pricing.priceNote'] = validatedData.pricing.priceNote;
+      updateOperations.$set['pricing.priceNote'] =
+        validatedData.pricing.priceNote;
     }
   }
 
@@ -338,9 +439,13 @@ export async function updateCampingSpot(id: string, data: FormData) {
     updateOperations.$unset = unsetFields;
   }
 
-  const updatedSpot = await CampingSpot.findByIdAndUpdate(id, updateOperations, {
-    new: true,
-  });
+  const updatedSpot = await CampingSpot.findByIdAndUpdate(
+    id,
+    updateOperations,
+    {
+      new: true,
+    }
+  );
 
   if (!updatedSpot) {
     throw new Error('Camping spot not found');

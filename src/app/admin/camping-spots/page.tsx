@@ -170,6 +170,12 @@ export default function CampingSpotsAdminPage() {
         'distanceToToilet',
         'distanceToBath',
         'distanceToConvenience',
+        'nearbyToiletLat',
+        'nearbyToiletLng',
+        'nearbyConvenienceLat',
+        'nearbyConvenienceLng',
+        'nearbyBathLat',
+        'nearbyBathLng',
         'elevation',
         'quietnessLevel',
         'securityLevel',
@@ -199,6 +205,12 @@ export default function CampingSpotsAdminPage() {
             spot.distanceToToilet || '',
             spot.distanceToBath || '',
             spot.distanceToConvenience || '',
+            spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[1] : '', // nearbyToiletLat
+            spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[0] : '', // nearbyToiletLng
+            spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[1] : '', // nearbyConvenienceLat
+            spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[0] : '', // nearbyConvenienceLng
+            spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1] : '', // nearbyBathLat
+            spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0] : '', // nearbyBathLng
             spot.elevation || '',
             spot.quietnessLevel || '',
             spot.securityLevel || '',

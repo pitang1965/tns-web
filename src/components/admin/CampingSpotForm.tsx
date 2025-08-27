@@ -68,6 +68,30 @@ const CampingSpotFormSchema = z.object({
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
   ),
+  nearbyToiletLat: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
+    { message: '有効な緯度を入力してください（-90〜90）' }
+  ),
+  nearbyToiletLng: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
+    { message: '有効な経度を入力してください（-180〜180）' }
+  ),
+  nearbyConvenienceLat: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
+    { message: '有効な緯度を入力してください（-90〜90）' }
+  ),
+  nearbyConvenienceLng: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
+    { message: '有効な経度を入力してください（-180〜180）' }
+  ),
+  nearbyBathLat: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
+    { message: '有効な緯度を入力してください（-90〜90）' }
+  ),
+  nearbyBathLng: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
+    { message: '有効な経度を入力してください（-180〜180）' }
+  ),
   elevation: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
@@ -133,6 +157,14 @@ export default function CampingSpotForm({
       type: 'other' as CampingSpotType,
       distanceToToilet: '',
       distanceToBath: '',
+      distanceToConvenience: '',
+      nearbyToiletLat: '',
+      nearbyToiletLng: '',
+      nearbyConvenienceLat: '',
+      nearbyConvenienceLng: '',
+      nearbyBathLat: '',
+      nearbyBathLng: '',
+      elevation: '',
       quietnessLevel: '',
       securityLevel: '',
       overallRating: '',
@@ -164,6 +196,14 @@ export default function CampingSpotForm({
         type: spot.type,
         distanceToToilet: spot.distanceToToilet?.toString() || '',
         distanceToBath: spot.distanceToBath?.toString() || '',
+        distanceToConvenience: spot.distanceToConvenience?.toString() || '',
+        nearbyToiletLat: spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[1].toString() : '',
+        nearbyToiletLng: spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[0].toString() : '',
+        nearbyConvenienceLat: spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[1].toString() : '',
+        nearbyConvenienceLng: spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[0].toString() : '',
+        nearbyBathLat: spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1].toString() : '',
+        nearbyBathLng: spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0].toString() : '',
+        elevation: spot.elevation?.toString() || '',
         quietnessLevel: spot.quietnessLevel?.toString() || '',
         securityLevel: spot.securityLevel?.toString() || '',
         overallRating: spot.overallRating?.toString() || '',
@@ -176,7 +216,7 @@ export default function CampingSpotForm({
         capacity: spot.capacity?.toString() || '',
         restrictions: spot.restrictions.join(', '),
         amenities: spot.amenities.join(', '),
-        notes: spot.notes || '',
+        notes: spot.notes || ''
       };
       console.log('Setting form values:', {
         quietnessLevel: formValues.quietnessLevel,
@@ -199,6 +239,14 @@ export default function CampingSpotForm({
         type: 'other' as CampingSpotType,
         distanceToToilet: '',
         distanceToBath: '',
+        distanceToConvenience: '',
+        nearbyToiletLat: '',
+        nearbyToiletLng: '',
+        nearbyConvenienceLat: '',
+        nearbyConvenienceLng: '',
+        nearbyBathLat: '',
+        nearbyBathLng: '',
+        elevation: '',
         quietnessLevel: '',
         securityLevel: '',
         overallRating: '',
@@ -211,7 +259,7 @@ export default function CampingSpotForm({
         capacity: '',
         restrictions: '',
         amenities: '',
-        notes: '',
+        notes: ''
       });
     }
   }, [spot, reset]);
@@ -259,6 +307,30 @@ export default function CampingSpotForm({
       if (data.distanceToBath && data.distanceToBath.trim() !== '') {
         formData.append('distanceToBath', data.distanceToBath);
       }
+      if (data.distanceToConvenience && data.distanceToConvenience.trim() !== '') {
+        formData.append('distanceToConvenience', data.distanceToConvenience);
+      }
+      if (data.elevation && data.elevation.trim() !== '') {
+        formData.append('elevation', data.elevation);
+      }
+      
+      // Handle nearby coordinates
+      if (data.nearbyToiletLat && data.nearbyToiletLng && 
+          data.nearbyToiletLat.trim() !== '' && data.nearbyToiletLng.trim() !== '') {
+        formData.append('nearbyToiletLat', data.nearbyToiletLat);
+        formData.append('nearbyToiletLng', data.nearbyToiletLng);
+      }
+      if (data.nearbyConvenienceLat && data.nearbyConvenienceLng && 
+          data.nearbyConvenienceLat.trim() !== '' && data.nearbyConvenienceLng.trim() !== '') {
+        formData.append('nearbyConvenienceLat', data.nearbyConvenienceLat);
+        formData.append('nearbyConvenienceLng', data.nearbyConvenienceLng);
+      }
+      if (data.nearbyBathLat && data.nearbyBathLng && 
+          data.nearbyBathLat.trim() !== '' && data.nearbyBathLng.trim() !== '') {
+        formData.append('nearbyBathLat', data.nearbyBathLat);
+        formData.append('nearbyBathLng', data.nearbyBathLng);
+      }
+      
       if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
         formData.append('quietnessLevel', data.quietnessLevel);
       }
@@ -553,51 +625,6 @@ export default function CampingSpotForm({
               )}
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div>
-                <Label htmlFor='distanceToToilet'>トイレまでの距離 (m)</Label>
-                <Input
-                  id='distanceToToilet'
-                  type='number'
-                  min='0'
-                  placeholder='距離(m)または空欄'
-                  {...register('distanceToToilet')}
-                />
-                {errors.distanceToToilet && (
-                  <p className='text-sm text-red-500'>
-                    {errors.distanceToToilet.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='distanceToConvenience'>
-                  コンビニまでの距離 (m)
-                </Label>
-                <Input
-                  id='distanceToConvenience'
-                  type='number'
-                  min='0'
-                  {...register('distanceToConvenience')}
-                  placeholder='距離(m)または空欄'
-                />
-                {errors.distanceToConvenience && (
-                  <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='distanceToBath'>入浴施設までの距離 (m)</Label>
-                <Input
-                  id='distanceToBath'
-                  type='number'
-                  min='0'
-                  {...register('distanceToBath')}
-                  placeholder='距離(m)または空欄'
-                />
-                {errors.distanceToBath && (
-                  <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
-                )}
-              </div>
-            </div>
 
             {/* Ratings */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
@@ -741,6 +768,155 @@ export default function CampingSpotForm({
               {errors.notes && (
                 <p className='text-sm text-red-500'>{errors.notes.message}</p>
               )}
+            </div>
+
+            {/* 近くの施設の情報 */}
+            <div className='space-y-6'>
+              <div>
+                <Label className='text-lg font-semibold'>近くの施設の情報</Label>
+                
+                <div className='space-y-6 mt-4'>
+                  {/* トイレ情報 */}
+                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
+                    <Label className='text-md font-medium'>トイレ</Label>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+                      <div>
+                        <Label htmlFor='distanceToToilet'>距離 (m)</Label>
+                        <Input
+                          id='distanceToToilet'
+                          type='number'
+                          min='0'
+                          placeholder='距離(m)または空欄'
+                          {...register('distanceToToilet')}
+                        />
+                        {errors.distanceToToilet && (
+                          <p className='text-sm text-red-500'>
+                            {errors.distanceToToilet.message}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyToiletLat'>緯度</Label>
+                        <Input
+                          id='nearbyToiletLat'
+                          type='number'
+                          step='any'
+                          placeholder='緯度（任意）'
+                          {...register('nearbyToiletLat')}
+                        />
+                        {errors.nearbyToiletLat && (
+                          <p className='text-sm text-red-500'>{errors.nearbyToiletLat.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyToiletLng'>経度</Label>
+                        <Input
+                          id='nearbyToiletLng'
+                          type='number'
+                          step='any'
+                          placeholder='経度（任意）'
+                          {...register('nearbyToiletLng')}
+                        />
+                        {errors.nearbyToiletLng && (
+                          <p className='text-sm text-red-500'>{errors.nearbyToiletLng.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* コンビニ情報 */}
+                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
+                    <Label className='text-md font-medium'>コンビニ</Label>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+                      <div>
+                        <Label htmlFor='distanceToConvenience'>距離 (m)</Label>
+                        <Input
+                          id='distanceToConvenience'
+                          type='number'
+                          min='0'
+                          {...register('distanceToConvenience')}
+                          placeholder='距離(m)または空欄'
+                        />
+                        {errors.distanceToConvenience && (
+                          <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyConvenienceLat'>緯度</Label>
+                        <Input
+                          id='nearbyConvenienceLat'
+                          type='number'
+                          step='any'
+                          placeholder='緯度（任意）'
+                          {...register('nearbyConvenienceLat')}
+                        />
+                        {errors.nearbyConvenienceLat && (
+                          <p className='text-sm text-red-500'>{errors.nearbyConvenienceLat.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyConvenienceLng'>経度</Label>
+                        <Input
+                          id='nearbyConvenienceLng'
+                          type='number'
+                          step='any'
+                          placeholder='経度（任意）'
+                          {...register('nearbyConvenienceLng')}
+                        />
+                        {errors.nearbyConvenienceLng && (
+                          <p className='text-sm text-red-500'>{errors.nearbyConvenienceLng.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 入浴施設情報 */}
+                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
+                    <Label className='text-md font-medium'>入浴施設</Label>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+                      <div>
+                        <Label htmlFor='distanceToBath'>距離 (m)</Label>
+                        <Input
+                          id='distanceToBath'
+                          type='number'
+                          min='0'
+                          {...register('distanceToBath')}
+                          placeholder='距離(m)または空欄'
+                        />
+                        {errors.distanceToBath && (
+                          <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyBathLat'>緯度</Label>
+                        <Input
+                          id='nearbyBathLat'
+                          type='number'
+                          step='any'
+                          placeholder='緯度（任意）'
+                          {...register('nearbyBathLat')}
+                        />
+                        {errors.nearbyBathLat && (
+                          <p className='text-sm text-red-500'>{errors.nearbyBathLat.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label htmlFor='nearbyBathLng'>経度</Label>
+                        <Input
+                          id='nearbyBathLng'
+                          type='number'
+                          step='any'
+                          placeholder='経度（任意）'
+                          {...register('nearbyBathLng')}
+                        />
+                        {errors.nearbyBathLng && (
+                          <p className='text-sm text-red-500'>{errors.nearbyBathLng.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Submit Buttons */}

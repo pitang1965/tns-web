@@ -10,6 +10,9 @@ export interface ICampingSpot extends Document {
   distanceToToilet?: number; // meters
   distanceToBath?: number; // meters
   distanceToConvenience?: number; // meters
+  nearbyToiletCoordinates?: [number, number]; // [lng, lat]
+  nearbyConvenienceCoordinates?: [number, number]; // [lng, lat]
+  nearbyBathCoordinates?: [number, number]; // [lng, lat]
   elevation?: number; // meters, null if no bath nearby
   quietnessLevel?: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
   securityLevel?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
@@ -93,6 +96,45 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   distanceToConvenience: {
     type: Number,
     min: 0,
+  },
+  nearbyToiletCoordinates: {
+    type: [Number],
+    validate: {
+      validator: function(v: number[]) {
+        if (!v) return true; // optional field
+        return v.length === 2
+          &&
+               v[0] >= -180 && v[0] <= 180 && // longitude
+               v[1] >= -90 && v[1] <= 90;     // latitude
+      },
+      message: 'Toilet coordinates must be [longitude, latitude] within valid ranges'
+    }
+  },
+  nearbyConvenienceCoordinates: {
+    type: [Number],
+    validate: {
+      validator: function(v: number[]) {
+        if (!v) return true; // optional field
+        return v.length === 2
+          &&
+               v[0] >= -180 && v[0] <= 180 && // longitude
+               v[1] >= -90 && v[1] <= 90;     // latitude
+      },
+      message: 'Convenience store coordinates must be [longitude, latitude] within valid ranges'
+    }
+  },
+  nearbyBathCoordinates: {
+    type: [Number],
+    validate: {
+      validator: function(v: number[]) {
+        if (!v) return true; // optional field
+        return v.length === 2
+          &&
+               v[0] >= -180 && v[0] <= 180 && // longitude
+               v[1] >= -90 && v[1] <= 90;     // latitude
+      },
+      message: 'Bath facility coordinates must be [longitude, latitude] within valid ranges'
+    }
   },
   elevation: {
     type: Number,
