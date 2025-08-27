@@ -289,22 +289,28 @@ export default function CampingSpotsAdminPage() {
 
   return (
     <div className='container mx-auto p-6 space-y-6'>
-      <div className='flex justify-between items-center'>
-        <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
-        <div className='flex gap-2'>
-          <Button onClick={() => setShowImportDialog(true)} variant='outline' className='hidden md:flex'>
-            <Upload className='w-4 h-4 mr-2' />
-            CSVインポート
-          </Button>
-          <Button onClick={exportToCSV} variant='outline' className='hidden md:flex'>
-            <Download className='w-4 h-4 mr-2' />
-            CSVエクスポート
-          </Button>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className='w-4 h-4 mr-2' />
-            新規追加
-          </Button>
+      <div className='space-y-4'>
+        <div className='flex justify-between items-center'>
+          <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
+          <div className='flex gap-2'>
+            <Button onClick={() => setShowImportDialog(true)} variant='outline' className='hidden md:flex'>
+              <Upload className='w-4 h-4 mr-2' />
+              CSVインポート
+            </Button>
+            <Button onClick={exportToCSV} variant='outline' className='hidden md:flex'>
+              <Download className='w-4 h-4 mr-2' />
+              CSVエクスポート
+            </Button>
+            <Button onClick={() => setShowForm(true)} className='hidden md:flex'>
+              <Plus className='w-4 h-4 mr-2' />
+              新規追加
+            </Button>
+          </div>
         </div>
+        <Button onClick={() => setShowForm(true)} className='md:hidden w-full'>
+          <Plus className='w-4 h-4 mr-2' />
+          新規追加
+        </Button>
       </div>
 
       <div className='w-full'>
