@@ -162,6 +162,9 @@ export default function CampingSpotMap({
         font-weight: bold;
         font-size: 12px;
         transition: box-shadow 0.2s ease;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       `;
 
       // Add CSS hover effect with unique class
@@ -170,7 +173,13 @@ export default function CampingSpotMap({
       // Add rating number to marker
       markerElement.textContent = spot.overallRating?.toString() || '?';
 
-      const marker = new mapboxgl.Marker(markerElement)
+      // Add simple tooltip using title attribute
+      markerElement.title = spot.name;
+
+      const marker = new mapboxgl.Marker({
+        element: markerElement,
+        anchor: 'center'
+      })
         .setLngLat(spot.coordinates)
         .addTo(map.current!);
 
