@@ -292,11 +292,11 @@ export default function CampingSpotsAdminPage() {
       <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
         <div className='flex gap-2'>
-          <Button onClick={() => setShowImportDialog(true)} variant='outline'>
+          <Button onClick={() => setShowImportDialog(true)} variant='outline' className='hidden md:flex'>
             <Upload className='w-4 h-4 mr-2' />
             CSVインポート
           </Button>
-          <Button onClick={exportToCSV} variant='outline'>
+          <Button onClick={exportToCSV} variant='outline' className='hidden md:flex'>
             <Download className='w-4 h-4 mr-2' />
             CSVエクスポート
           </Button>
