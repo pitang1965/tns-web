@@ -38,7 +38,7 @@ export default function CampingSpotMap({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isInstructionsOpen, setIsInstructionsOpen] = useState(true);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   // Initialize map
