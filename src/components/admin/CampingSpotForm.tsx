@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { X, Save, Trash2, Copy } from 'lucide-react';
+import { X, Save, Trash2, Copy, Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -265,6 +265,39 @@ export default function CampingSpotForm({
     }
   }, [spot, reset]);
 
+  // デバイスタイプを検出する関数
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
+
+  // 2点間のルート検索を開く関数
+  const openRoute = (fromLat: string, fromLng: string, toLat: string, toLng: string) => {
+    if (!fromLat || !fromLng || !toLat || !toLng) {
+      toast({
+        title: 'エラー',
+        description: '座標が設定されていません',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Google Maps の directions URL を構築
+    let url = `https://www.google.com/maps/dir/${fromLat},${fromLng}/${toLat},${toLng}`;
+    
+    // パラメータを追加
+    url += '?travelmode=driving';
+    
+    if (isMobileDevice()) {
+      // モバイルの場合は同じタブで開く
+      window.location.href = url;
+    } else {
+      // PCの場合は新しいタブで開く
+      window.open(url, '_blank');
+    }
+  };
+
   const onSubmit = async (data: CampingSpotFormData) => {
     try {
       setLoading(true);
@@ -502,7 +535,7 @@ export default function CampingSpotForm({
                   )}
                 </div>
               </div>
-              <div className='flex justify-start gap-2'>
+              <div className='flex flex-col sm:flex-row justify-start gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(latitude, longitude) => {
                     setValue('lat', latitude);
@@ -774,7 +807,7 @@ export default function CampingSpotForm({
             {/* 近くの施設の情報 */}
             <div className='space-y-6'>
               <div>
-                <div className='flex items-center gap-2'>
+                <div className='flex flex-col sm:flex-row sm:items-center gap-2'>
                   {watch('name') && (
                     <Button
                       type='button'
@@ -794,7 +827,7 @@ export default function CampingSpotForm({
                         const url = `https://www.google.com/maps?q=${lat},${lng}`;
                         window.open(url, '_blank');
                       }}
-                      className='p-1 h-auto'
+                      className='p-1 h-auto self-start sm:self-center'
                       title='地図で表示'
                     >
                       <Map className='w-4 h-4' />
@@ -834,9 +867,9 @@ export default function CampingSpotForm({
                 <div className='space-y-6 mt-4'>
                   {/* トイレ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex items-center justify-between mb-3'>
+                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
                       <Label className='text-md font-medium'>トイレ</Label>
-                      <div className='flex gap-2'>
+                      <div className='flex flex-col sm:flex-row gap-2'>
                         <CoordinatesFromClipboardButton
                           onCoordinatesExtracted={(lat, lng) => {
                             setValue('nearbyToiletLat', lat);
@@ -865,6 +898,23 @@ export default function CampingSpotForm({
                         >
                           <Map className='w-4 h-4' />
                           地図で表示
+                        </Button>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            openRoute(
+                              watch('lat') || '',
+                              watch('lng') || '',
+                              watch('nearbyToiletLat') || '',
+                              watch('nearbyToiletLng') || ''
+                            );
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Route className='w-4 h-4' />
+                          ルート検索
                         </Button>
                       </div>
                     </div>
@@ -915,9 +965,9 @@ export default function CampingSpotForm({
 
                   {/* コンビニ情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex items-center justify-between mb-3'>
+                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
                       <Label className='text-md font-medium'>コンビニ</Label>
-                      <div className='flex gap-2'>
+                      <div className='flex flex-col sm:flex-row gap-2'>
                         <CoordinatesFromClipboardButton
                           onCoordinatesExtracted={(lat, lng) => {
                             setValue('nearbyConvenienceLat', lat);
@@ -946,6 +996,23 @@ export default function CampingSpotForm({
                         >
                           <Map className='w-4 h-4' />
                           地図で表示
+                        </Button>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            openRoute(
+                              watch('lat') || '',
+                              watch('lng') || '',
+                              watch('nearbyConvenienceLat') || '',
+                              watch('nearbyConvenienceLng') || ''
+                            );
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Route className='w-4 h-4' />
+                          ルート検索
                         </Button>
                       </div>
                     </div>
@@ -994,9 +1061,9 @@ export default function CampingSpotForm({
 
                   {/* 入浴施設情報 */}
                   <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex items-center justify-between mb-3'>
+                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
                       <Label className='text-md font-medium'>入浴施設</Label>
-                      <div className='flex gap-2'>
+                      <div className='flex flex-col sm:flex-row gap-2'>
                         <CoordinatesFromClipboardButton
                           onCoordinatesExtracted={(lat, lng) => {
                             setValue('nearbyBathLat', lat);
@@ -1025,6 +1092,23 @@ export default function CampingSpotForm({
                         >
                           <Map className='w-4 h-4' />
                           地図で表示
+                        </Button>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          onClick={() => {
+                            openRoute(
+                              watch('lat') || '',
+                              watch('lng') || '',
+                              watch('nearbyBathLat') || '',
+                              watch('nearbyBathLng') || ''
+                            );
+                          }}
+                          className='flex items-center gap-1'
+                        >
+                          <Route className='w-4 h-4' />
+                          ルート検索
                         </Button>
                       </div>
                     </div>
