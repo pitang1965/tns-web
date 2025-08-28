@@ -173,125 +173,86 @@ export default function CampingSpotMap({
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    // Create a map of current spots by ID for quick lookup
-    const currentSpotIds = new Set(spots.map(spot => spot._id));
-    const existingMarkerIds = new Set(markersRef.current.map((_, index) => spots[index]?._id).filter(Boolean));
-
-    // Create a map to track markers by spot ID for efficient lookups
-    const markersBySpotId = new Map<string, { marker: mapboxgl.Marker; index: number }>();
-    markersRef.current.forEach((marker, index) => {
-      const lngLat = marker.getLngLat();
-      const spot = spots.find(s => 
-        Math.abs(s.coordinates[0] - lngLat.lng) < 0.00001 && 
-        Math.abs(s.coordinates[1] - lngLat.lat) < 0.00001
-      );
-      if (spot && spot._id) {
-        markersBySpotId.set(spot._id, { marker, index });
-      }
+    // Check if markers are visible on the map
+    const markersVisibleOnMap = markersRef.current.filter(marker => {
+      const element = marker.getElement();
+      return element && element.parentNode && document.contains(element);
     });
 
-    // Remove markers for spots that no longer exist
-    markersRef.current = markersRef.current.filter((marker) => {
-      const lngLat = marker.getLngLat();
-      const spotExists = spots.some(spot => 
-        Math.abs(spot.coordinates[0] - lngLat.lng) < 0.00001 && 
-        Math.abs(spot.coordinates[1] - lngLat.lat) < 0.00001
-      );
-      if (!spotExists) {
-        marker.remove();
-        return false;
-      }
-      return true;
-    });
+    // Always recreate markers if they're not visible or count doesn't match
+    if (markersVisibleOnMap.length === spots.length) {
+      return; // No need to recreate markers
+    }
 
-    // Add or update markers for current spots
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+
+    // Add new markers
     spots.forEach((spot) => {
-      const existingMarkerInfo = spot._id ? markersBySpotId.get(spot._id) : undefined;
+      const markerColor = getMarkerColor(spot);
 
-      if (existingMarkerInfo) {
-        // Update existing marker
-        const { marker: existingMarker } = existingMarkerInfo;
-        const markerElement = existingMarker.getElement();
-        const markerColor = getMarkerColor(spot);
+      // Create marker element
+      const markerElement = document.createElement('div');
+      markerElement.className = 'camping-spot-marker';
+      markerElement.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: ${markerColor};
+        border: 3px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+        transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        will-change: transform, opacity;
+        transform: translateZ(0);
+        opacity: ${isMapMoving ? '0' : '1'};
+      `;
 
-        // Update marker appearance
-        markerElement.style.backgroundColor = markerColor;
-        markerElement.textContent = spot.overallRating?.toString() || '?';
-        markerElement.title = spot.name;
+      // Add CSS hover effect with unique class
+      markerElement.classList.add('camping-marker-hover');
 
-        // Update popup
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          closeButton: true,
-          closeOnClick: false,
-        }).setHTML(createPopupHTML(spot));
-        existingMarker.setPopup(popup);
-      } else {
-        // Create new marker
-        const markerColor = getMarkerColor(spot);
+      // Add rating number to marker
+      markerElement.textContent = spot.overallRating?.toString() || '?';
 
-        // Create marker element
-        const markerElement = document.createElement('div');
-        markerElement.className = 'camping-spot-marker';
-        markerElement.style.cssText = `
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background-color: ${markerColor};
-          border: 3px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 12px;
-          transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease;
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          will-change: transform, opacity;
-          transform: translateZ(0);
-          opacity: ${isMapMoving ? '0' : '1'};
-        `;
+      // Add simple tooltip using title attribute
+      markerElement.title = spot.name;
 
-        // Add CSS hover effect with unique class
-        markerElement.classList.add('camping-marker-hover');
+      const marker = new mapboxgl.Marker({
+        element: markerElement,
+        anchor: 'center'
+      })
+        .setLngLat(spot.coordinates)
+        .addTo(map.current!);
 
-        // Add rating number to marker
-        markerElement.textContent = spot.overallRating?.toString() || '?';
+      // Create popup
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        closeButton: true,
+        closeOnClick: false,
+      }).setHTML(createPopupHTML(spot));
 
-        // Add simple tooltip using title attribute
-        markerElement.title = spot.name;
+      marker.setPopup(popup);
 
-        const marker = new mapboxgl.Marker({
-          element: markerElement,
-          anchor: 'center'
-        })
-          .setLngLat(spot.coordinates)
-          .addTo(map.current!);
+      // Click event
+      markerElement.addEventListener('click', () => {
+        onSpotSelect(spot);
+      });
 
-        // Create popup
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          closeButton: true,
-          closeOnClick: false,
-        }).setHTML(createPopupHTML(spot));
-
-        marker.setPopup(popup);
-
-        // Click event
-        markerElement.addEventListener('click', () => {
-          onSpotSelect(spot);
-        });
-
-        markersRef.current.push(marker);
-      }
+      markersRef.current.push(marker);
     });
 
-    // Fit map to show all spots if there are any (but only on initial load or significant changes)
-    if (spots.length > 0 && !existingMarkerIds.size) {
+    // Fit map to show all spots if there are any
+    if (spots.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       spots.forEach((spot) => {
         bounds.extend(spot.coordinates);
