@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { X, Save, Trash2 } from 'lucide-react';
+import { X, Save, Trash2, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -801,7 +801,34 @@ export default function CampingSpotForm({
                     </Button>
                   )}
                   <Label className='text-lg font-semibold'>
-                    {watch('name') ? `「${watch('name')}」の近くの施設の情報` : '近くの施設の情報'}
+                    {watch('name') ? (
+                      <span>
+                        「
+                        <span
+                          className="cursor-pointer hover:bg-yellow-200 hover:text-gray-800 px-1 rounded transition-colors inline-flex items-center gap-1"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(watch('name'));
+                              toast({
+                                title: 'コピー完了',
+                                description: `「${watch('name')}」をクリップボードにコピーしました`,
+                              });
+                            } catch (error) {
+                              toast({
+                                title: 'エラー',
+                                description: 'クリップボードへのコピーに失敗しました',
+                                variant: 'destructive',
+                              });
+                            }
+                          }}
+                          title="クリックしてコピー"
+                        >
+                          {watch('name')}
+                          <Copy className="w-3 h-3 ml-1 opacity-60" />
+                        </span>
+                        」の近くの施設の情報
+                      </span>
+                    ) : '近くの施設の情報'}
                   </Label>
                 </div>
                 <div className='space-y-6 mt-4'>
