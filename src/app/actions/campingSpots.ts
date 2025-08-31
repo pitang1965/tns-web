@@ -42,6 +42,81 @@ async function ensureDbConnection() {
   }
 }
 
+// Public function for general users (no authentication required)
+export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
+  await ensureDbConnection();
+
+  const query: any = {};
+
+  if (filter) {
+    if (filter.prefecture) {
+      query.prefecture = filter.prefecture;
+    }
+
+    if (filter.type && filter.type.length > 0) {
+      query.type = { $in: filter.type };
+    }
+
+    if (filter.maxDistanceToToilet !== undefined) {
+      query.distanceToToilet = { $lte: filter.maxDistanceToToilet };
+    }
+
+    if (filter.maxDistanceToBath !== undefined) {
+      query.distanceToBath = { $lte: filter.maxDistanceToBath };
+    }
+
+    if (filter.minQuietnessLevel !== undefined) {
+      query.quietnessLevel = { $gte: filter.minQuietnessLevel };
+    }
+
+    if (filter.minSecurityLevel !== undefined) {
+      query.securityLevel = { $gte: filter.minSecurityLevel };
+    }
+
+    if (filter.minOverallRating !== undefined) {
+      query.overallRating = { $gte: filter.minOverallRating };
+    }
+
+    if (filter.hasRoof !== undefined) {
+      query.hasRoof = filter.hasRoof;
+    }
+
+    if (filter.hasPowerOutlet !== undefined) {
+      query.hasPowerOutlet = filter.hasPowerOutlet;
+    }
+
+    if (filter.isGatedPaid !== undefined) {
+      query.isGatedPaid = filter.isGatedPaid;
+    }
+
+    if (filter.isFreeOnly) {
+      query['pricing.isFree'] = true;
+    }
+
+    if (filter.maxPricePerNight !== undefined) {
+      query.$or = [
+        { 'pricing.isFree': true },
+        { 'pricing.pricePerNight': { $lte: filter.maxPricePerNight } },
+      ];
+    }
+
+    if (filter.bounds) {
+      query.coordinates = {
+        $geoWithin: {
+          $box: [
+            [filter.bounds.west, filter.bounds.south],
+            [filter.bounds.east, filter.bounds.north],
+          ],
+        },
+      };
+    }
+  }
+
+  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
+
+  return JSON.parse(JSON.stringify(spots));
+}
+
 export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
   await ensureDbConnection();

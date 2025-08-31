@@ -25,7 +25,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 interface ShachuHakuMapProps {
   spots: CampingSpotWithId[];
   onSpotSelect: (spot: CampingSpotWithId) => void;
-  onCreateSpot: (coordinates: [number, number]) => void;
+  onCreateSpot?: (coordinates: [number, number]) => void;
+  readonly?: boolean;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -34,6 +35,7 @@ export default function ShachuHakuMap({
   spots,
   onSpotSelect,
   onCreateSpot,
+  readonly = false,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -44,14 +46,14 @@ export default function ShachuHakuMap({
 
   // Hide/show markers during map movement
   const hideMarkers = useCallback(() => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '0';
     });
   }, []);
 
   const showMarkers = useCallback(() => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '1';
     });
@@ -62,16 +64,16 @@ export default function ShachuHakuMap({
     if (!mapContainer.current || map.current || !MAPBOX_TOKEN) return;
 
     // Add CSS for hover effect and popup styles
-    if (!document.getElementById('camping-marker-styles')) {
+    if (!document.getElementById('shachu-haku-marker-styles')) {
       const style = document.createElement('style');
-      style.id = 'camping-marker-styles';
+      style.id = 'shachu-haku-marker-styles';
       style.textContent = `
-        .camping-marker-hover:hover {
+        .shachu-haku-marker-hover:hover {
           box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 0 6px rgba(255,255,255,0.9), 0 0 0 8px rgba(59,130,246,0.5) !important;
           z-index: 1000 !important;
           transition: all 0.2s ease-out !important;
         }
-        .camping-marker-hover {
+        .shachu-haku-marker-hover {
           transition: all 0.2s ease-out !important;
           cursor: pointer !important;
         }
@@ -151,11 +153,13 @@ export default function ShachuHakuMap({
       }
     });
 
-    // Add double-click event for creating new spots
-    map.current.on('dblclick', (e) => {
-      const { lng, lat } = e.lngLat;
-      onCreateSpot([lng, lat]);
-    });
+    // Add double-click event for creating new spots (admin only)
+    if (!readonly && onCreateSpot) {
+      map.current.on('dblclick', (e) => {
+        const { lng, lat } = e.lngLat;
+        onCreateSpot([lng, lat]);
+      });
+    }
 
     // Add map movement event listeners to hide/show markers
     map.current.on('movestart', () => {
@@ -178,6 +182,18 @@ export default function ShachuHakuMap({
       showMarkers();
     });
 
+    // Close all popups when clicking on the map (not on markers)
+    map.current.on('click', () => {
+      // Close all existing popups
+      const existingPopups = document.querySelectorAll('.mapboxgl-popup');
+      existingPopups.forEach((popup) => {
+        const closeButton = popup.querySelector('.mapboxgl-popup-close-button') as HTMLElement;
+        if (closeButton) {
+          closeButton.click();
+        }
+      });
+    });
+
     // Add controls
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
     map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
@@ -188,19 +204,19 @@ export default function ShachuHakuMap({
         map.current = null;
       }
       // Clean up styles when component unmounts
-      const styleElement = document.getElementById('camping-marker-styles');
+      const styleElement = document.getElementById('shachu-haku-marker-styles');
       if (styleElement) {
         styleElement.remove();
       }
     };
-  }, [onCreateSpot, hideMarkers, showMarkers]);
+  }, [onCreateSpot, hideMarkers, showMarkers, readonly]);
 
   // Update markers when spots change
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
     // Check if markers are visible on the map
-    const markersVisibleOnMap = markersRef.current.filter(marker => {
+    const markersVisibleOnMap = markersRef.current.filter((marker) => {
       const element = marker.getElement();
       return element && element.parentNode && document.contains(element);
     });
@@ -220,7 +236,7 @@ export default function ShachuHakuMap({
 
       // Create marker element
       const markerElement = document.createElement('div');
-      markerElement.className = 'camping-spot-marker';
+      markerElement.className = 'shachu-haku-spot-marker';
       markerElement.style.cssText = `
         width: 30px;
         height: 30px;
@@ -245,7 +261,7 @@ export default function ShachuHakuMap({
       `;
 
       // Add CSS hover effect with unique class
-      markerElement.classList.add('camping-marker-hover');
+      markerElement.classList.add('shachu-haku-marker-hover');
 
       // Add rating number to marker
       markerElement.textContent = spot.overallRating?.toString() || '?';
@@ -255,7 +271,7 @@ export default function ShachuHakuMap({
 
       const marker = new mapboxgl.Marker({
         element: markerElement,
-        anchor: 'center'
+        anchor: 'center',
       })
         .setLngLat(spot.coordinates)
         .addTo(map.current!);
@@ -265,14 +281,31 @@ export default function ShachuHakuMap({
         offset: 25,
         closeButton: true,
         closeOnClick: false,
-        className: 'custom-popup'
-      }).setHTML(createPopupHTML(spot));
+        className: 'custom-popup',
+      }).setHTML(createPopupHTML(spot, readonly));
 
       marker.setPopup(popup);
 
       // Click event
-      markerElement.addEventListener('click', () => {
-        onSpotSelect(spot);
+      markerElement.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent map click event from firing
+        
+        // Close all existing popups first
+        const existingPopups = document.querySelectorAll('.mapboxgl-popup');
+        existingPopups.forEach((popup) => {
+          const closeButton = popup.querySelector('.mapboxgl-popup-close-button') as HTMLElement;
+          if (closeButton) {
+            closeButton.click();
+          }
+        });
+        
+        // Then show this marker's popup
+        marker.togglePopup();
+        
+        // For admin mode, also call the spot selection handler
+        if (!readonly) {
+          onSpotSelect(spot);
+        }
       });
 
       markersRef.current.push(marker);
@@ -290,7 +323,7 @@ export default function ShachuHakuMap({
         maxZoom: 10,
       });
     }
-  }, [spots, mapLoaded, onSpotSelect]);
+  }, [spots, mapLoaded, onSpotSelect, readonly]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on overall rating
@@ -302,26 +335,53 @@ export default function ShachuHakuMap({
     return '#ef4444'; // red
   };
 
-  const createPopupHTML = (spot: CampingSpotWithId): string => {
+  const createPopupHTML = (
+    spot: CampingSpotWithId,
+    isReadonly: boolean
+  ): string => {
     const isNotesLong = spot.notes && spot.notes.length > 100;
-    const truncatedNotes = isNotesLong 
-      ? spot.notes.substring(0, 100) + '...' 
+    const truncatedNotes = isNotesLong
+      ? spot.notes.substring(0, 100) + '...'
       : spot.notes;
     const spotId = `spot-${spot._id}`;
-    
+
     return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(280px, 50vw, 400px); max-height: 70vh; overflow-y: auto;">
-        <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${spot.name}</h3>
+        <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${
+          spot.name
+        }</h3>
         <div class="space-y-1 text-sm text-gray-700">
-          <div><strong class="text-gray-900">種別:</strong> ${CampingSpotTypeLabels[spot.type]}</div>
-          <div><strong class="text-gray-900">都道府県:</strong> ${spot.prefecture}</div>
-          ${spot.overallRating ? `<div><strong class="text-gray-900">総合評価:</strong> ${spot.overallRating}/5 ⭐</div>` : ''}
-          ${spot.quietnessLevel ? `<div><strong class="text-gray-900">静けさ:</strong> ${spot.quietnessLevel}/5</div>` : ''}
-          ${spot.securityLevel ? `<div><strong class="text-gray-900">治安:</strong> ${spot.securityLevel}/5</div>` : ''}
-          <div><strong class="text-gray-900">料金:</strong> ${
-            spot.pricing.isFree ? '無料' : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
+          <div><strong class="text-gray-900">種別:</strong> ${
+            CampingSpotTypeLabels[spot.type]
           }</div>
-          ${spot.distanceToToilet ? `<div><strong class="text-gray-900">トイレ:</strong> ${spot.distanceToToilet}m</div>` : ''}
+          <div><strong class="text-gray-900">都道府県:</strong> ${
+            spot.prefecture
+          }</div>
+          ${
+            spot.overallRating
+              ? `<div><strong class="text-gray-900">総合評価:</strong> ${spot.overallRating}/5 ⭐</div>`
+              : ''
+          }
+          ${
+            spot.quietnessLevel
+              ? `<div><strong class="text-gray-900">静けさ:</strong> ${spot.quietnessLevel}/5</div>`
+              : ''
+          }
+          ${
+            spot.securityLevel
+              ? `<div><strong class="text-gray-900">治安:</strong> ${spot.securityLevel}/5</div>`
+              : ''
+          }
+          <div><strong class="text-gray-900">料金:</strong> ${
+            spot.pricing.isFree
+              ? '無料'
+              : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
+          }</div>
+          ${
+            spot.distanceToToilet
+              ? `<div><strong class="text-gray-900">トイレ:</strong> ${spot.distanceToToilet}m</div>`
+              : ''
+          }
           ${
             spot.distanceToBath
               ? `<div><strong class="text-gray-900">入浴施設:</strong> ${spot.distanceToBath}m</div>`
@@ -332,7 +392,11 @@ export default function ShachuHakuMap({
               ? `<div><strong class="text-gray-900">コンビニ:</strong> ${spot.distanceToConvenience}m</div>`
               : ''
           }
-          ${spot.elevation ? `<div><strong class="text-gray-900">標高:</strong> ${spot.elevation}m</div>` : ''}
+          ${
+            spot.elevation
+              ? `<div><strong class="text-gray-900">標高:</strong> ${spot.elevation}m</div>`
+              : ''
+          }
           <div class="flex gap-1 mt-2 flex-wrap">
             ${
               spot.hasRoof
@@ -355,12 +419,18 @@ export default function ShachuHakuMap({
               ? `<div class="mt-2 text-gray-700">
                   <strong class="text-gray-900">備考:</strong> 
                   <span class="break-words">
-                    <span id="${spotId}-short"${isNotesLong ? '' : ' style="display: none;"'}>${truncatedNotes}</span>
-                    <span id="${spotId}-full" style="display: ${isNotesLong ? 'none' : 'inline'};">${spot.notes}</span>
+                    <span id="${spotId}-short"${
+                  isNotesLong ? '' : ' style="display: none;"'
+                }>${truncatedNotes}</span>
+                    <span id="${spotId}-full" style="display: ${
+                  isNotesLong ? 'none' : 'inline'
+                };">${spot.notes}</span>
                   </span>
-                  ${isNotesLong ? `
-                    <button 
-                      id="${spotId}-toggle" 
+                  ${
+                    isNotesLong
+                      ? `
+                    <button
+                      id="${spotId}-toggle"
                       onclick="
                         const short = document.getElementById('${spotId}-short');
                         const full = document.getElementById('${spotId}-full');
@@ -374,10 +444,12 @@ export default function ShachuHakuMap({
                           full.style.display = 'none';
                           btn.textContent = 'もっと見る';
                         }
-                      " 
+                      "
                       class="ml-1 text-blue-600 hover:text-blue-800 underline text-xs cursor-pointer"
                     >もっと見る</button>
-                  ` : ''}
+                  `
+                      : ''
+                  }
                 </div>`
               : ''
           }
@@ -398,7 +470,10 @@ export default function ShachuHakuMap({
     <div className='relative'>
       <div ref={mapContainer} className='h-[600px] w-full rounded-lg' />
       <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600'>
-        <Collapsible open={isInstructionsOpen} onOpenChange={setIsInstructionsOpen}>
+        <Collapsible
+          open={isInstructionsOpen}
+          onOpenChange={setIsInstructionsOpen}
+        >
           <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
             <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
               操作方法
@@ -411,9 +486,14 @@ export default function ShachuHakuMap({
           </CollapsibleTrigger>
           <CollapsibleContent className='px-3 pb-3'>
             <div className='text-sm space-y-1 text-gray-700 dark:text-gray-300'>
-              <div>• マーカーをクリック: スポット編集</div>
-              <div>• 地図をダブルクリック: 新規作成</div>
-              <div>• マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 → 赤=1点・未評価(?)</div>
+              <div>
+                • マーカーをクリック: スポット{readonly ? '詳細表示' : '編集'}
+              </div>
+              {!readonly && <div>• 地図をダブルクリック: 新規作成</div>}
+              <div>
+                • マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 →
+                赤=1点・未評価(?)
+              </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
