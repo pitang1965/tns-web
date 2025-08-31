@@ -17,11 +17,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: '旅のしおり',
   description:
-    '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
+    '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
   openGraph: {
     title: '旅のしおり',
     description:
-      '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+      '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
     images: [
       {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
