@@ -304,11 +304,11 @@ export default function ShachuHakuMap({
 
   const createPopupHTML = (spot: CampingSpotWithId): string => {
     const isNotesLong = spot.notes && spot.notes.length > 100;
-    const truncatedNotes = isNotesLong 
-      ? spot.notes.substring(0, 100) + '...' 
+    const truncatedNotes = isNotesLong
+      ? spot.notes?.substring(0, 100) + '...'
       : spot.notes;
     const spotId = `spot-${spot._id}`;
-    
+
     return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(280px, 50vw, 400px); max-height: 70vh; overflow-y: auto;">
         <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${spot.name}</h3>
@@ -353,14 +353,14 @@ export default function ShachuHakuMap({
           ${
             spot.notes
               ? `<div class="mt-2 text-gray-700">
-                  <strong class="text-gray-900">備考:</strong> 
+                  <strong class="text-gray-900">備考:</strong>
                   <span class="break-words">
                     <span id="${spotId}-short"${isNotesLong ? '' : ' style="display: none;"'}>${truncatedNotes}</span>
                     <span id="${spotId}-full" style="display: ${isNotesLong ? 'none' : 'inline'};">${spot.notes}</span>
                   </span>
                   ${isNotesLong ? `
-                    <button 
-                      id="${spotId}-toggle" 
+                    <button
+                      id="${spotId}-toggle"
                       onclick="
                         const short = document.getElementById('${spotId}-short');
                         const full = document.getElementById('${spotId}-full');
@@ -374,7 +374,7 @@ export default function ShachuHakuMap({
                           full.style.display = 'none';
                           btn.textContent = 'もっと見る';
                         }
-                      " 
+                      "
                       class="ml-1 text-blue-600 hover:text-blue-800 underline text-xs cursor-pointer"
                     >もっと見る</button>
                   ` : ''}

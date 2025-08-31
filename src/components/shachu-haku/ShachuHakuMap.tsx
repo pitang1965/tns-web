@@ -341,7 +341,7 @@ export default function ShachuHakuMap({
   ): string => {
     const isNotesLong = spot.notes && spot.notes.length > 100;
     const truncatedNotes = isNotesLong
-      ? spot.notes.substring(0, 100) + '...'
+      ? spot.notes?.substring(0, 100) + '...'
       : spot.notes;
     const spotId = `spot-${spot._id}`;
 
