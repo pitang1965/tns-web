@@ -32,8 +32,8 @@ import {
 } from '@/data/schemas/campingSpot';
 
 // Dynamically import the map component to avoid SSR issues
-const CampingSpotMap = dynamic(
-  () => import('@/components/admin/CampingSpotMap'),
+const ShachuHakuMap = dynamic(
+  () => import('@/components/admin/ShachuHakuMap'),
   {
     ssr: false,
     loading: () => (
@@ -49,8 +49,8 @@ const CSVImportDialog = dynamic(
   }
 );
 
-const CampingSpotForm = dynamic(
-  () => import('@/components/admin/CampingSpotForm'),
+const ShachuHakuForm = dynamic(
+  () => import('@/components/admin/ShachuHakuForm'),
   {
     ssr: false,
   }
@@ -94,7 +94,7 @@ const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
   return 'bg-red-500 hover:bg-red-600'; // 2001円以上：赤色
 };
 
-export default function CampingSpotsAdminPage() {
+export default function ShachuHakuAdminPage() {
   const { user, isLoading } = useUser();
   const { toast } = useToast();
 
@@ -142,7 +142,7 @@ export default function CampingSpotsAdminPage() {
     } catch (error) {
       toast({
         title: 'エラー',
-        description: 'スポットの読み込みに失敗しました',
+        description: '車中泊スポットの読み込みに失敗しました',
         variant: 'destructive',
       });
       console.error('Error loading spots:', error);
@@ -171,8 +171,8 @@ export default function CampingSpotsAdminPage() {
     toast({
       title: '成功',
       description: selectedSpot
-        ? 'スポットを更新しました'
-        : 'スポットを作成しました',
+        ? '車中泊スポットを更新しました'
+        : '車中泊スポットを作成しました',
     });
   };
 
@@ -180,7 +180,7 @@ export default function CampingSpotsAdminPage() {
     loadSpots();
     toast({
       title: 'インポート完了',
-      description: `${result.success}件のスポットをインポートしました`,
+      description: `${result.success}件の車中泊スポットをインポートしました`,
     });
     if (result.errors.length > 0) {
       toast({
@@ -245,8 +245,12 @@ export default function CampingSpotsAdminPage() {
             spot.distanceToConvenience || '',
             spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[1] : '', // nearbyToiletLat
             spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[0] : '', // nearbyToiletLng
-            spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[1] : '', // nearbyConvenienceLat
-            spot.nearbyConvenienceCoordinates ? spot.nearbyConvenienceCoordinates[0] : '', // nearbyConvenienceLng
+            spot.nearbyConvenienceCoordinates
+              ? spot.nearbyConvenienceCoordinates[1]
+              : '', // nearbyConvenienceLat
+            spot.nearbyConvenienceCoordinates
+              ? spot.nearbyConvenienceCoordinates[0]
+              : '', // nearbyConvenienceLng
             spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1] : '', // nearbyBathLat
             spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0] : '', // nearbyBathLng
             spot.elevation || '',
@@ -283,7 +287,7 @@ export default function CampingSpotsAdminPage() {
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `camping-spots-${
+      link.download = `shachu-haku-spots-${
         new Date().toISOString().split('T')[0]
       }.csv`;
       link.click();
@@ -331,15 +335,26 @@ export default function CampingSpotsAdminPage() {
         <div className='flex justify-between items-center'>
           <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
           <div className='flex gap-2'>
-            <Button onClick={() => setShowImportDialog(true)} variant='outline' className='hidden md:flex'>
+            <Button
+              onClick={() => setShowImportDialog(true)}
+              variant='outline'
+              className='hidden md:flex'
+            >
               <Upload className='w-4 h-4 mr-2' />
               CSVインポート
             </Button>
-            <Button onClick={exportToCSV} variant='outline' className='hidden md:flex'>
+            <Button
+              onClick={exportToCSV}
+              variant='outline'
+              className='hidden md:flex'
+            >
               <Download className='w-4 h-4 mr-2' />
               CSVエクスポート
             </Button>
-            <Button onClick={() => setShowForm(true)} className='hidden md:flex'>
+            <Button
+              onClick={() => setShowForm(true)}
+              className='hidden md:flex'
+            >
               <Plus className='w-4 h-4 mr-2' />
               新規追加
             </Button>
@@ -382,7 +397,7 @@ export default function CampingSpotsAdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CampingSpotMap
+                <ShachuHakuMap
                   spots={filteredSpots}
                   onSpotSelect={handleSpotSelect}
                   onCreateSpot={(coordinates) => {
@@ -435,15 +450,15 @@ export default function CampingSpotsAdminPage() {
                       className='pl-10'
                     />
                   </div>
-                  <Select 
+                  <Select
                     value={prefectureFilter}
                     onValueChange={setPrefectureFilter}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="全都道府県" />
+                      <SelectValue placeholder='全都道府県' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">全都道府県</SelectItem>
+                      <SelectItem value='all'>全都道府県</SelectItem>
                       {PrefectureOptions.map((prefecture) => (
                         <SelectItem key={prefecture} value={prefecture}>
                           {prefecture}
@@ -451,15 +466,12 @@ export default function CampingSpotsAdminPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Select 
-                    value={typeFilter}
-                    onValueChange={setTypeFilter}
-                  >
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger>
-                      <SelectValue placeholder="全種別" />
+                      <SelectValue placeholder='全種別' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">全種別</SelectItem>
+                      <SelectItem value='all'>全種別</SelectItem>
                       {Object.entries(CampingSpotTypeLabels).map(
                         ([key, label]) => (
                           <SelectItem key={key} value={key}>
@@ -512,14 +524,16 @@ export default function CampingSpotsAdminPage() {
             {/* Spots List */}
             <Card>
               <CardHeader>
-                <CardTitle>スポット一覧 ({filteredSpots.length}件)</CardTitle>
+                <CardTitle>
+                  車中泊スポット一覧 ({filteredSpots.length}件)
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {loading ? (
                   <div className='text-center py-8'>読み込み中...</div>
                 ) : filteredSpots.length === 0 ? (
                   <div className='text-center py-8 text-gray-500'>
-                    条件に一致するスポットがありません
+                    条件に一致する車中泊スポットがありません
                   </div>
                 ) : (
                   <div className='space-y-4'>
@@ -537,20 +551,29 @@ export default function CampingSpotsAdminPage() {
                             <p className='text-gray-600'>{spot.address}</p>
                             <div className='flex gap-2 mt-2 flex-wrap'>
                               <Badge
-                                className={`${getTypeColor(spot.type)} text-white`}
+                                className={`${getTypeColor(
+                                  spot.type
+                                )} text-white`}
                               >
                                 {CampingSpotTypeLabels[spot.type]}
                               </Badge>
                               <Badge
-                                className={`${getPricingColor(spot.pricing.isFree, spot.pricing.pricePerNight)} text-white`}
+                                className={`${getPricingColor(
+                                  spot.pricing.isFree,
+                                  spot.pricing.pricePerNight
+                                )} text-white`}
                               >
                                 {spot.pricing.isFree
                                   ? '無料'
-                                  : `¥${spot.pricing.pricePerNight || '未設定'}`}
+                                  : `¥${
+                                      spot.pricing.pricePerNight || '未設定'
+                                    }`}
                               </Badge>
                               {spot.overallRating && (
                                 <Badge
-                                  className={`${getRatingColor(spot.overallRating)} text-white`}
+                                  className={`${getRatingColor(
+                                    spot.overallRating
+                                  )} text-white`}
                                 >
                                   評価 {spot.overallRating}/5 ⭐
                                 </Badge>
@@ -586,8 +609,8 @@ export default function CampingSpotsAdminPage() {
       </div>
 
       {showForm && (
-        <CampingSpotForm
-          key={selectedSpot?._id || 'new'} 
+        <ShachuHakuForm
+          key={selectedSpot?._id || 'new'}
           spot={selectedSpot}
           onClose={handleFormClose}
           onSuccess={handleFormSuccess}

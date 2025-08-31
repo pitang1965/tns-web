@@ -87,9 +87,9 @@ export function BurgerMenu() {
         {isAdmin && (
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <Link
-              href='/admin/camping-spots'
+              href='/admin/shachu-haku'
               className='flex items-center'
-              onClick={(e) => handleItemClick(e, '/admin/camping-spots')}
+              onClick={(e) => handleItemClick(e, '/admin/shachu-haku')}
             >
               <MapPin className='mr-1' />
               車中泊場所

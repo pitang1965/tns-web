@@ -33,13 +33,13 @@ import {
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
 import { Map } from 'lucide-react';
 
-interface CampingSpotFormProps {
+interface ShachuHakuFormProps {
   spot?: CampingSpotWithId | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const CampingSpotFormSchema = z.object({
+const ShachuHakuFormSchema = z.object({
   name: z.string().min(1, '名称を入力してください'),
   lat: z.string().min(1, '緯度を入力してください').refine(
     (val) => !isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90,
@@ -126,13 +126,13 @@ const CampingSpotFormSchema = z.object({
   notes: z.string().optional(),
 });
 
-type CampingSpotFormData = z.infer<typeof CampingSpotFormSchema>;
+type ShachuHakuFormData = z.infer<typeof ShachuHakuFormSchema>;
 
-export default function CampingSpotForm({
+export default function ShachuHakuForm({
   spot,
   onClose,
   onSuccess,
-}: CampingSpotFormProps) {
+}: ShachuHakuFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -145,8 +145,8 @@ export default function CampingSpotForm({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<CampingSpotFormData>({
-    resolver: zodResolver(CampingSpotFormSchema),
+  } = useForm<ShachuHakuFormData>({
+    resolver: zodResolver(ShachuHakuFormSchema),
     defaultValues: {
       name: '',
       lat: '35.3325289',　// 相模湾
@@ -298,7 +298,7 @@ export default function CampingSpotForm({
     }
   };
 
-  const onSubmit = async (data: CampingSpotFormData) => {
+  const onSubmit = async (data: ShachuHakuFormData) => {
     try {
       setLoading(true);
 

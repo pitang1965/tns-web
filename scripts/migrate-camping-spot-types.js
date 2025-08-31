@@ -1,5 +1,5 @@
 /**
- * マイグレーションスクリプト：キャンプスポットタイプの変更
+ * マイグレーションスクリプト：車中泊スポットタイプの変更
  * 既存データを以下のように変換：
  * - paid_parking → parking_lot
  * - park → parking_lot
@@ -13,7 +13,7 @@ const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://localhost:27017/tns-web';
 
 async function migrateCampingSpotTypes() {
-  console.log('キャンプスポットタイプのマイグレーションを開始します...');
+  console.log('車中泊スポットタイプのマイグレーションを開始します...');
 
   const client = new MongoClient(MONGODB_URI);
 

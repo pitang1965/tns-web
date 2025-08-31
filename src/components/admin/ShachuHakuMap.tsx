@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/collapsible';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface CampingSpotMapProps {
+interface ShachuHakuMapProps {
   spots: CampingSpotWithId[];
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onCreateSpot: (coordinates: [number, number]) => void;
@@ -30,11 +30,11 @@ interface CampingSpotMapProps {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-export default function CampingSpotMap({
+export default function ShachuHakuMap({
   spots,
   onSpotSelect,
   onCreateSpot,
-}: CampingSpotMapProps) {
+}: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);

@@ -57,7 +57,7 @@ export function Navigation() {
         旅程
       </NavLink>
       {isAdmin && (
-        <NavLink href='/admin/camping-spots'>
+        <NavLink href='/admin/shachu-haku'>
           <MapPin className='mr-1' />
           車中泊場所
         </NavLink>
