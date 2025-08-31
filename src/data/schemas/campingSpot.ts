@@ -2,13 +2,10 @@ import { z } from 'zod';
 
 export const CampingSpotTypeSchema = z.enum([
   'roadside_station',
-  'paid_parking',
   'sa_pa',
-  'park',
-  'beach',
-  'mountain',
   'rv_park',
   'convenience_store',
+  'parking_lot',
   'other'
 ]);
 
@@ -381,13 +378,10 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
 // Type labels for UI
 export const CampingSpotTypeLabels: Record<CampingSpotType, string> = {
   roadside_station: '道の駅',
-  paid_parking: '有料駐車場',
   sa_pa: 'SA/PA',
-  park: '公園',
-  beach: '海岸・浜辺',
-  mountain: '山間部',
   rv_park: 'RVパーク',
   convenience_store: 'コンビニ',
+  parking_lot: '駐車場',
   other: 'その他',
 };
 
