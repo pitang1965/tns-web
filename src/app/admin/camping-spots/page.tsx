@@ -56,6 +56,44 @@ const CampingSpotForm = dynamic(
   }
 );
 
+// スポットタイプごとの色分け関数
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case 'roadside_station':
+      return 'bg-blue-600 hover:bg-blue-700';
+    case 'sa_pa':
+      return 'bg-purple-600 hover:bg-purple-700';
+    case 'rv_park':
+      return 'bg-emerald-600 hover:bg-emerald-700';
+    case 'convenience_store':
+      return 'bg-cyan-600 hover:bg-cyan-700';
+    case 'parking_lot':
+      return 'bg-slate-600 hover:bg-slate-700';
+    case 'other':
+      return 'bg-gray-600 hover:bg-gray-700';
+    default:
+      return 'bg-gray-500 hover:bg-gray-600';
+  }
+};
+
+// 評価レベルごとの色分け関数
+const getRatingColor = (rating: number) => {
+  if (rating >= 5) return 'bg-green-600 hover:bg-green-700';
+  if (rating >= 4) return 'bg-blue-600 hover:bg-blue-700';
+  if (rating >= 3) return 'bg-yellow-600 hover:bg-yellow-700';
+  if (rating >= 2) return 'bg-orange-600 hover:bg-orange-700';
+  return 'bg-red-600 hover:bg-red-700';
+};
+
+// 料金レベルごとの色分け関数
+const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
+  if (isFree) return 'bg-green-500 hover:bg-green-600'; // 無料：緑色
+  if (!pricePerNight) return 'bg-gray-500 hover:bg-gray-600'; // 料金未設定：グレー
+  if (pricePerNight <= 1000) return 'bg-yellow-500 hover:bg-yellow-600'; // 1000円以下：黄色
+  if (pricePerNight <= 2000) return 'bg-orange-500 hover:bg-orange-600'; // 1001-2000円：オレンジ色
+  return 'bg-red-500 hover:bg-red-600'; // 2001円以上：赤色
+};
+
 export default function CampingSpotsAdminPage() {
   const { user, isLoading } = useUser();
   const { toast } = useToast();
@@ -497,26 +535,30 @@ export default function CampingSpotsAdminPage() {
                               {spot.name}
                             </h3>
                             <p className='text-gray-600'>{spot.address}</p>
-                            <div className='flex gap-2 mt-2'>
-                              <Badge variant='secondary'>
+                            <div className='flex gap-2 mt-2 flex-wrap'>
+                              <Badge
+                                className={`${getTypeColor(spot.type)} text-white`}
+                              >
                                 {CampingSpotTypeLabels[spot.type]}
                               </Badge>
                               <Badge
-                                variant={
-                                  spot.pricing.isFree ? 'default' : 'outline'
-                                }
+                                className={`${getPricingColor(spot.pricing.isFree, spot.pricing.pricePerNight)} text-white`}
                               >
                                 {spot.pricing.isFree
                                   ? '無料'
-                                  : `¥${spot.pricing.pricePerNight}`}
+                                  : `¥${spot.pricing.pricePerNight || '未設定'}`}
                               </Badge>
                               {spot.overallRating && (
-                                <Badge variant='outline'>
-                                  評価 {spot.overallRating}/5
+                                <Badge
+                                  className={`${getRatingColor(spot.overallRating)} text-white`}
+                                >
+                                  評価 {spot.overallRating}/5 ⭐
                                 </Badge>
                               )}
                               {spot.isVerified && (
-                                <Badge variant='default'>確認済み</Badge>
+                                <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
+                                  ✓ 確認済み
+                                </Badge>
                               )}
                             </div>
                           </div>
