@@ -117,6 +117,9 @@ export default function ShachuHakuAdminPage() {
   const [typeFilter, setTypeFilter] = useState('all');
 
   const filteredSpots = useMemo(() => {
+    if (!spots || !Array.isArray(spots)) {
+      return [];
+    }
     return spots.filter((spot) => {
       if (
         searchTerm &&
