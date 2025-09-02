@@ -147,6 +147,54 @@ export default function ShachuHakuPage() {
       </div>
 
       <div className='w-full'>
+        {/* Common Filters */}
+        <Card className='mb-6'>
+          <CardContent className='pt-6'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='relative'>
+                <Search className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
+                <Input
+                  placeholder='名前で検索...'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className='pl-10'
+                />
+              </div>
+              <Select
+                value={prefectureFilter}
+                onValueChange={setPrefectureFilter}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='全都道府県' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>全都道府県</SelectItem>
+                  {PrefectureOptions.map((prefecture) => (
+                    <SelectItem key={prefecture} value={prefecture}>
+                      {prefecture}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder='全種別' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>全種別</SelectItem>
+                  {Object.entries(CampingSpotTypeLabels).map(
+                    ([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Tab Navigation */}
         <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
           <Button
@@ -169,60 +217,6 @@ export default function ShachuHakuPage() {
         {/* Map Tab Content */}
         {activeTab === 'map' && (
           <div className='space-y-4'>
-            {/* Filters for Map View */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Filter className='w-5 h-5' />
-                  フィルター
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                  <div className='relative'>
-                    <Search className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
-                    <Input
-                      placeholder='名前で検索...'
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className='pl-10'
-                    />
-                  </div>
-                  <Select
-                    value={prefectureFilter}
-                    onValueChange={setPrefectureFilter}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='全都道府県' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='all'>全都道府県</SelectItem>
-                      {PrefectureOptions.map((prefecture) => (
-                        <SelectItem key={prefecture} value={prefecture}>
-                          {prefecture}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='全種別' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='all'>全種別</SelectItem>
-                      {Object.entries(CampingSpotTypeLabels).map(
-                        ([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            {label}
-                          </SelectItem>
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
@@ -244,59 +238,6 @@ export default function ShachuHakuPage() {
         {/* List Tab Content */}
         {activeTab === 'list' && (
           <div className='space-y-4'>
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Filter className='w-5 h-5' />
-                  フィルター
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                  <div className='relative'>
-                    <Search className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
-                    <Input
-                      placeholder='名前で検索...'
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className='pl-10'
-                    />
-                  </div>
-                  <Select
-                    value={prefectureFilter}
-                    onValueChange={setPrefectureFilter}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='全都道府県' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='all'>全都道府県</SelectItem>
-                      {PrefectureOptions.map((prefecture) => (
-                        <SelectItem key={prefecture} value={prefecture}>
-                          {prefecture}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='全種別' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='all'>全種別</SelectItem>
-                      {Object.entries(CampingSpotTypeLabels).map(
-                        ([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            {label}
-                          </SelectItem>
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Stats */}
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
