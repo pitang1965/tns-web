@@ -67,6 +67,7 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 
 ## .env.local の設定
 
+### Auth0
 - `AUTH0_SECRET`:
   - Auth0 SDK が使用する秘密鍵。セッションの暗号化などに使用される。
 - `AUTH0_BASE_URL`:
@@ -86,11 +87,36 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `AUTH0_SCOPE'`:
   - アプリケーションが要求する権限（スコープ）を指定する。複数のスコープはスペースで区切る。
   - 例：`openid profile email read:shows`
+
+### 地図
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
   - Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
+
+### データベース
 - `MONGODB_URI`:
   - MongoDB データベースに接続するための接続文字列。
   - データベースのホスト、ポート、認証情報、データベース名などを含む。
+
+### モニタリング・分析
+- `SENTRY_AUTH_TOKEN`:
+  - Sentry のビルド時認証トークン。ソースマップのアップロードなどに使用される。
+- `NEXT_PUBLIC_GA_ID`:
+  - Google Analytics の測定 ID。ウェブサイトのトラフィック分析に使用される。
+  - 例: `G-XXXXXXXXXX`
+
+### 広告
+- `NEXT_PUBLIC_ADSENSE_CLIENT_ID`:
+  - Google AdSense のクライアント ID。広告の表示に使用される。
+  - 例: `ca-pub-XXXXXXXXXXXXXXXX`
+
+### 管理者
+- `ADMIN_EMAILS`:
+  - 管理者のメールアドレス一覧（サーバーサイド用）。カンマ区切りで複数指定可能。
+  - 例: `admin@example.com,admin2@example.com`
+- `NEXT_PUBLIC_ADMIN_EMAILS`:
+  - 管理者のメールアドレス一覧（クライアントサイド用）。カンマ区切りで複数指定可能。
+  - 例: `admin@example.com,admin2@example.com`
+
 
 ## Docker で動かす場合
 
