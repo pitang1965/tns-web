@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["ES2020", "DOM"],
+    "types": ["node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
