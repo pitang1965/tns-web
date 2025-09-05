@@ -7,6 +7,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { AdSense } from '@/components/layout/AdSense';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -81,6 +82,7 @@ export default function RootLayout({
               <div className='flex flex-col min-h-screen bg-background text-foreground'>
                 <ItineraryUrlTracker />
                 <Header />
+                <AdSense />
                 <main className='flex-1 relative'>
                   <div className='pt-12 pb-16'>{children}</div>
                   <Toaster />
