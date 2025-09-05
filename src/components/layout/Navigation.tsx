@@ -56,12 +56,10 @@ export function Navigation() {
         <BookHeart className='mr-1' />
         旅程
       </NavLink>
-      {isAdmin && (
-        <NavLink href='/admin/shachu-haku'>
-          <MapPin className='mr-1' />
-          車中泊場所
-        </NavLink>
-      )}
+      <NavLink href={isAdmin ? '/admin/shachu-haku' : '/shachu-haku'}>
+        <MapPin className='mr-1' />
+        車中泊場所
+      </NavLink>
       {user && (
         <NavLink href='/account'>
           <CircleUser className='mr-1' />

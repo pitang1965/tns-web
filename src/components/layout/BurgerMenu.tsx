@@ -84,18 +84,16 @@ export function BurgerMenu() {
             旅程
           </Link>
         </DropdownMenuItem>
-        {isAdmin && (
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <Link
-              href='/admin/shachu-haku'
-              className='flex items-center'
-              onClick={(e) => handleItemClick(e, '/admin/shachu-haku')}
-            >
-              <MapPin className='mr-1' />
-              車中泊場所
-            </Link>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Link
+            href={isAdmin ? '/admin/shachu-haku' : '/shachu-haku'}
+            className='flex items-center'
+            onClick={(e) => handleItemClick(e, isAdmin ? '/admin/shachu-haku' : '/shachu-haku')}
+          >
+            <MapPin className='mr-1' />
+            車中泊場所
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/account'
