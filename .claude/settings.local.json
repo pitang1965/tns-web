@@ -4,7 +4,10 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
       "WebFetch(domain:syachuhaku.fxtec.info)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\app/**)",
+      "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\components\\layout/**)",
+      "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\.claude/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
