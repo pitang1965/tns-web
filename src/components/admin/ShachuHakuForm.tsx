@@ -1,28 +1,15 @@
 'use client';
 
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { X, Save, Trash2, Copy, Route } from 'lucide-react';
+import { X, Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   CampingSpotWithId,
-  CampingSpotTypeLabels,
-  PrefectureOptions,
   CampingSpotType,
 } from '@/data/schemas/campingSpot';
 import {
@@ -30,8 +17,13 @@ import {
   updateCampingSpot,
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
-import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
-import { Map } from 'lucide-react';
+import { ShachuHakuFormSchema, ShachuHakuFormData } from './validationSchemas';
+import { BasicInfoFields } from './BasicInfoFields';
+import { PricingFields } from './PricingFields';
+import { RatingFields } from './RatingFields';
+import { FeatureFields } from './FeatureFields';
+import { NearbyFacilityFields } from './NearbyFacilityFields';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
 interface ShachuHakuFormProps {
   spot?: CampingSpotWithId | null;
@@ -39,94 +31,6 @@ interface ShachuHakuFormProps {
   onSuccess: () => void;
 }
 
-const ShachuHakuFormSchema = z.object({
-  name: z.string().min(1, '名称を入力してください'),
-  lat: z.string().min(1, '緯度を入力してください').refine(
-    (val) => !isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90,
-    { message: '有効な緯度を入力してください（-90〜90）' }
-  ),
-  lng: z.string().min(1, '経度を入力してください').refine(
-    (val) => !isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180,
-    { message: '有効な経度を入力してください（-180〜180）' }
-  ),
-  prefecture: z.string().min(1, '都道府県を選択してください'),
-  address: z.string().optional(),
-  url: z.string().optional().refine(
-    (val) => !val || /^https?:\/\/.+/.test(val),
-    { message: '有効なURLを入力してください' }
-  ),
-  type: z.enum(['roadside_station', 'sa_pa', 'rv_park', 'convenience_store', 'parking_lot', 'other'] as const),
-  distanceToToilet: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
-  ),
-  distanceToBath: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
-  ),
-  distanceToConvenience: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
-  ),
-  nearbyToiletLat: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
-    { message: '有効な緯度を入力してください（-90〜90）' }
-  ),
-  nearbyToiletLng: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
-    { message: '有効な経度を入力してください（-180〜180）' }
-  ),
-  nearbyConvenienceLat: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
-    { message: '有効な緯度を入力してください（-90〜90）' }
-  ),
-  nearbyConvenienceLng: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
-    { message: '有効な経度を入力してください（-180〜180）' }
-  ),
-  nearbyBathLat: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90),
-    { message: '有効な緯度を入力してください（-90〜90）' }
-  ),
-  nearbyBathLng: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
-    { message: '有効な経度を入力してください（-180〜180）' }
-  ),
-  elevation: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
-  ),
-  quietnessLevel: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-    { message: '1〜5の数値を入力してください' }
-  ),
-  securityLevel: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-    { message: '1〜5の数値を入力してください' }
-  ),
-  overallRating: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-    { message: '1〜5の数値を入力してください' }
-  ),
-  hasRoof: z.boolean(),
-  hasPowerOutlet: z.boolean(),
-  hasGate: z.boolean(),
-  isFree: z.boolean(),
-  pricePerNight: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
-  ),
-  priceNote: z.string().optional(),
-  capacity: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1),
-    { message: '有効な数値を入力してください（1以上）' }
-  ),
-  restrictions: z.string(),
-  amenities: z.string(),
-  notes: z.string().optional(),
-});
-
-type ShachuHakuFormData = z.infer<typeof ShachuHakuFormSchema>;
 
 export default function ShachuHakuForm({
   spot,
@@ -180,9 +84,6 @@ export default function ShachuHakuForm({
       notes: '',
     },
   });
-
-  const isFree = watch('isFree');
-
 
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
@@ -265,38 +166,6 @@ export default function ShachuHakuForm({
     }
   }, [spot, reset]);
 
-  // デバイスタイプを検出する関数
-  const isMobileDevice = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-  };
-
-  // 2点間のルート検索を開く関数
-  const openRoute = (fromLat: string, fromLng: string, toLat: string, toLng: string) => {
-    if (!fromLat || !fromLng || !toLat || !toLng) {
-      toast({
-        title: 'エラー',
-        description: '座標が設定されていません',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Google Maps の directions URL を構築
-    let url = `https://www.google.com/maps/dir/${fromLat},${fromLng}/${toLat},${toLng}`;
-    
-    // パラメータを追加
-    url += '?travelmode=driving';
-    
-    if (isMobileDevice()) {
-      // モバイルの場合は同じタブで開く
-      window.location.href = url;
-    } else {
-      // PCの場合は新しいタブで開く
-      window.open(url, '_blank');
-    }
-  };
 
   const onSubmit = async (data: ShachuHakuFormData) => {
     try {
@@ -438,23 +307,6 @@ export default function ShachuHakuForm({
     }
   };
 
-  const showOnMap = () => {
-    const lat = watch('lat');
-    const lng = watch('lng');
-
-    if (!lat || !lng) {
-      toast({
-        title: '地図で表示',
-        description: '緯度・経度を入力してください',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const url = `https://www.google.com/maps/place/${lat},${lng}`;
-    window.open(url, '_blank');
-  };
-
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
@@ -478,685 +330,39 @@ export default function ShachuHakuForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-            {/* Basic Info */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div>
-                <Label htmlFor='name'>名称 *</Label>
-                <Input
-                  id='name'
-                  {...register('name')}
-                  placeholder='スポット名を入力'
-                />
-                {errors.name && (
-                  <p className='text-sm text-red-500'>{errors.name.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='prefecture'>都道府県 *</Label>
-                <Select
-                  onValueChange={(value) => setValue('prefecture', value)}
-                  defaultValue={spot?.prefecture}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='都道府県を選択' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PrefectureOptions.map((prefecture) => (
-                      <SelectItem key={prefecture} value={prefecture}>
-                        {prefecture}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.prefecture && (
-                  <p className='text-sm text-red-500'>
-                    {errors.prefecture.message}
-                  </p>
-                )}
-              </div>
-            </div>
+            <BasicInfoFields
+              spot={spot}
+              register={register}
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+            />
 
+            <PricingFields
+              register={register}
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+            />
 
-            {/* Coordinates */}
-            <div className='space-y-4'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <Label htmlFor='lat'>緯度 *</Label>
-                  <Input id='lat' type='number' step='any' {...register('lat')} />
-                  {errors.lat && (
-                    <p className='text-sm text-red-500'>{errors.lat.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor='lng'>経度 *</Label>
-                  <Input id='lng' type='number' step='any' {...register('lng')} />
-                  {errors.lng && (
-                    <p className='text-sm text-red-500'>{errors.lng.message}</p>
-                  )}
-                </div>
-              </div>
-              <div className='flex flex-col sm:flex-row justify-start gap-2'>
-                <CoordinatesFromClipboardButton
-                  onCoordinatesExtracted={(latitude, longitude) => {
-                    setValue('lat', latitude);
-                    setValue('lng', longitude);
-                  }}
-                />
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  className='flex items-center gap-2 text-sm h-8'
-                  onClick={showOnMap}
-                >
-                  <Map className='w-4 h-4' />
-                  地図で表示
-                </Button>
-              </div>
-            </div>
+            <RatingFields
+              register={register}
+              errors={errors}
+            />
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div>
-                <Label htmlFor='address'>住所</Label>
-                <Input
-                  id='address'
-                  {...register('address')}
-                  placeholder='住所（任意）'
-                />
-                {errors.address && (
-                  <p className='text-sm text-red-500'>{errors.address.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='url'>URL</Label>
-                <Input
-                  id='url'
-                  type='url'
-                  {...register('url')}
-                  placeholder='URL（任意）'
-                />
-                {errors.url && (
-                  <p className='text-sm text-red-500'>{errors.url.message}</p>
-                )}
-              </div>
-            </div>
+            <FeatureFields
+              register={register}
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+            />
 
-            {/* Type and Basic Properties */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div>
-                <Label htmlFor='type'>種別 *</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setValue('type', value as CampingSpotType)
-                  }
-                  defaultValue={spot?.type}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='種別を選択' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(CampingSpotTypeLabels).map(
-                      ([key, label]) => (
-                        <SelectItem key={key} value={key}>
-                          {label}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-                {errors.type && (
-                  <p className='text-sm text-red-500'>{errors.type.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='capacity'>収容台数</Label>
-                <Input
-                  id='capacity'
-                  type='number'
-                  min='1'
-                  placeholder='台数または空欄'
-                  {...register('capacity')}
-                />
-                {errors.capacity && (
-                  <p className='text-sm text-red-500'>
-                    {errors.capacity.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Pricing */}
-            <div className='space-y-3'>
-              <Label>費用</Label>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='isFree'
-                  checked={isFree}
-                  onCheckedChange={(checked) => setValue('isFree', !!checked)}
-                />
-                <label htmlFor='isFree'>無料</label>
-              </div>
-              {!isFree && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
-                    <Label htmlFor='pricePerNight'>一泊料金 (円)</Label>
-                    <Input
-                      id='pricePerNight'
-                      type='number'
-                      min='0'
-                      {...register('pricePerNight')}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor='priceNote'>料金備考</Label>
-                    <Input
-                      id='priceNote'
-                      {...register('priceNote')}
-                      placeholder='料金に関する備考'
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-
-            {/* Ratings */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div>
-                <Label htmlFor='quietnessLevel'>静けさレベル (1-5)</Label>
-                <Input
-                  id='quietnessLevel'
-                  type='number'
-                  min='1'
-                  max='5'
-                  placeholder='1-5または空欄'
-                  {...register('quietnessLevel')}
-                />
-                {errors.quietnessLevel && (
-                  <p className='text-sm text-red-500'>
-                    {errors.quietnessLevel.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='securityLevel'>治安レベル (1-5)</Label>
-                <Input
-                  id='securityLevel'
-                  type='number'
-                  min='1'
-                  max='5'
-                  placeholder='1-5または空欄'
-                  {...register('securityLevel')}
-                />
-                {errors.securityLevel && (
-                  <p className='text-sm text-red-500'>
-                    {errors.securityLevel.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor='overallRating'>総合評価 (1-5)</Label>
-                <Input
-                  id='overallRating'
-                  type='number'
-                  min='1'
-                  max='5'
-                  placeholder='1-5または空欄'
-                  {...register('overallRating')}
-                />
-                {errors.overallRating && (
-                  <p className='text-sm text-red-500'>
-                    {errors.overallRating.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div>
-                <Label htmlFor='elevation'>標高 (m)</Label>
-                <Input
-                  id='elevation'
-                  type='number'
-                  min='0'
-                  {...register('elevation')}
-                  placeholder='標高(m)または空欄'
-                />
-                {errors.elevation && (
-                  <p className='text-sm text-red-500'>{errors.elevation.message}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className='space-y-3'>
-              <Label>設備・特徴</Label>
-              <div className='flex flex-wrap gap-4'>
-                <div className='flex items-center space-x-2'>
-                  <Checkbox
-                    id='hasRoof'
-                    checked={watch('hasRoof')}
-                    onCheckedChange={(checked) =>
-                      setValue('hasRoof', !!checked)
-                    }
-                  />
-                  <label htmlFor='hasRoof'>屋根付き</label>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Checkbox
-                    id='hasPowerOutlet'
-                    checked={watch('hasPowerOutlet')}
-                    onCheckedChange={(checked) =>
-                      setValue('hasPowerOutlet', !!checked)
-                    }
-                  />
-                  <label htmlFor='hasPowerOutlet'>電源あり</label>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Checkbox
-                    id='hasGate'
-                    checked={watch('hasGate')}
-                    onCheckedChange={(checked) =>
-                      setValue('hasGate', !!checked)
-                    }
-                  />
-                  <label htmlFor='hasGate'>ゲート付き</label>
-                </div>
-              </div>
-            </div>
-
-
-            {/* Additional Info */}
-            <div>
-              <Label htmlFor='restrictions'>制限事項</Label>
-              <Input
-                id='restrictions'
-                {...register('restrictions')}
-                placeholder='制限事項をカンマ区切りで入力'
-              />
-              {errors.restrictions && (
-                <p className='text-sm text-red-500'>{errors.restrictions.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor='amenities'>その他設備</Label>
-              <Input
-                id='amenities'
-                {...register('amenities')}
-                placeholder='その他設備をカンマ区切りで入力'
-              />
-              {errors.amenities && (
-                <p className='text-sm text-red-500'>{errors.amenities.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor='notes'>備考</Label>
-              <Textarea
-                id='notes'
-                {...register('notes')}
-                placeholder='詳細な情報、アクセス方法、注意点など（任意）'
-                rows={4}
-              />
-              {errors.notes && (
-                <p className='text-sm text-red-500'>{errors.notes.message}</p>
-              )}
-            </div>
-
-            {/* 近くの施設の情報 */}
-            <div className='space-y-6'>
-              <div>
-                <div className='flex flex-col sm:flex-row sm:items-center gap-2'>
-                  {watch('name') && (
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='sm'
-                      onClick={() => {
-                        const lat = watch('lat');
-                        const lng = watch('lng');
-                        if (!lat || !lng) {
-                          toast({
-                            title: '地図で表示',
-                            description: '緯度・経度を入力してください',
-                            variant: 'destructive',
-                          });
-                          return;
-                        }
-                        const url = `https://www.google.com/maps?q=${lat},${lng}`;
-                        window.open(url, '_blank');
-                      }}
-                      className='p-1 h-auto self-start sm:self-center'
-                      title='地図で表示'
-                    >
-                      <Map className='w-4 h-4' />
-                    </Button>
-                  )}
-                  <Label className='text-lg font-semibold'>
-                    {watch('name') ? (
-                      <span>
-                        「
-                        <span
-                          className="cursor-pointer hover:bg-yellow-200 hover:text-gray-800 px-1 rounded transition-colors inline-flex items-center gap-1"
-                          onClick={async () => {
-                            try {
-                              await navigator.clipboard.writeText(watch('name'));
-                              toast({
-                                title: 'コピー完了',
-                                description: `「${watch('name')}」をクリップボードにコピーしました`,
-                              });
-                            } catch (error) {
-                              toast({
-                                title: 'エラー',
-                                description: 'クリップボードへのコピーに失敗しました',
-                                variant: 'destructive',
-                              });
-                            }
-                          }}
-                          title="クリックしてコピー"
-                        >
-                          {watch('name')}
-                          <Copy className="w-3 h-3 ml-1 opacity-60" />
-                        </span>
-                        」の近くの施設の情報
-                      </span>
-                    ) : '近くの施設の情報'}
-                  </Label>
-                </div>
-                <div className='space-y-6 mt-4'>
-                  {/* トイレ情報 */}
-                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-                      <Label className='text-md font-medium'>トイレ</Label>
-                      <div className='flex flex-col sm:flex-row gap-2'>
-                        <CoordinatesFromClipboardButton
-                          onCoordinatesExtracted={(lat, lng) => {
-                            setValue('nearbyToiletLat', lat);
-                            setValue('nearbyToiletLng', lng);
-                          }}
-                        />
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            const lat = watch('nearbyToiletLat');
-                            const lng = watch('nearbyToiletLng');
-                            if (!lat || !lng) {
-                              toast({
-                                title: '地図で表示',
-                                description: 'トイレの緯度・経度を入力してください',
-                                variant: 'destructive',
-                              });
-                              return;
-                            }
-                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
-                            window.open(url, '_blank');
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Map className='w-4 h-4' />
-                          地図で表示
-                        </Button>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            openRoute(
-                              watch('lat') || '',
-                              watch('lng') || '',
-                              watch('nearbyToiletLat') || '',
-                              watch('nearbyToiletLng') || ''
-                            );
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Route className='w-4 h-4' />
-                          ルート検索
-                        </Button>
-                      </div>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
-                      <div>
-                        <Label htmlFor='distanceToToilet'>距離 (m)</Label>
-                        <Input
-                          id='distanceToToilet'
-                          type='number'
-                          min='0'
-                          placeholder='距離(m)または空欄'
-                          {...register('distanceToToilet')}
-                        />
-                        {errors.distanceToToilet && (
-                          <p className='text-sm text-red-500'>
-                            {errors.distanceToToilet.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyToiletLat'>緯度</Label>
-                        <Input
-                          id='nearbyToiletLat'
-                          type='number'
-                          step='any'
-                          placeholder='緯度（任意）'
-                          {...register('nearbyToiletLat')}
-                        />
-                        {errors.nearbyToiletLat && (
-                          <p className='text-sm text-red-500'>{errors.nearbyToiletLat.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyToiletLng'>経度</Label>
-                        <Input
-                          id='nearbyToiletLng'
-                          type='number'
-                          step='any'
-                          placeholder='経度（任意）'
-                          {...register('nearbyToiletLng')}
-                        />
-                        {errors.nearbyToiletLng && (
-                          <p className='text-sm text-red-500'>{errors.nearbyToiletLng.message}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* コンビニ情報 */}
-                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-                      <Label className='text-md font-medium'>コンビニ</Label>
-                      <div className='flex flex-col sm:flex-row gap-2'>
-                        <CoordinatesFromClipboardButton
-                          onCoordinatesExtracted={(lat, lng) => {
-                            setValue('nearbyConvenienceLat', lat);
-                            setValue('nearbyConvenienceLng', lng);
-                          }}
-                        />
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            const lat = watch('nearbyConvenienceLat');
-                            const lng = watch('nearbyConvenienceLng');
-                            if (!lat || !lng) {
-                              toast({
-                                title: '地図で表示',
-                                description: 'コンビニの緯度・経度を入力してください',
-                                variant: 'destructive',
-                              });
-                              return;
-                            }
-                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
-                            window.open(url, '_blank');
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Map className='w-4 h-4' />
-                          地図で表示
-                        </Button>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            openRoute(
-                              watch('lat') || '',
-                              watch('lng') || '',
-                              watch('nearbyConvenienceLat') || '',
-                              watch('nearbyConvenienceLng') || ''
-                            );
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Route className='w-4 h-4' />
-                          ルート検索
-                        </Button>
-                      </div>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
-                      <div>
-                        <Label htmlFor='distanceToConvenience'>距離 (m)</Label>
-                        <Input
-                          id='distanceToConvenience'
-                          type='number'
-                          min='0'
-                          {...register('distanceToConvenience')}
-                          placeholder='距離(m)または空欄'
-                        />
-                        {errors.distanceToConvenience && (
-                          <p className='text-sm text-red-500'>{errors.distanceToConvenience.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyConvenienceLat'>緯度</Label>
-                        <Input
-                          id='nearbyConvenienceLat'
-                          type='number'
-                          step='any'
-                          placeholder='緯度（任意）'
-                          {...register('nearbyConvenienceLat')}
-                        />
-                        {errors.nearbyConvenienceLat && (
-                          <p className='text-sm text-red-500'>{errors.nearbyConvenienceLat.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyConvenienceLng'>経度</Label>
-                        <Input
-                          id='nearbyConvenienceLng'
-                          type='number'
-                          step='any'
-                          placeholder='経度（任意）'
-                          {...register('nearbyConvenienceLng')}
-                        />
-                        {errors.nearbyConvenienceLng && (
-                          <p className='text-sm text-red-500'>{errors.nearbyConvenienceLng.message}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 入浴施設情報 */}
-                  <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-                      <Label className='text-md font-medium'>入浴施設</Label>
-                      <div className='flex flex-col sm:flex-row gap-2'>
-                        <CoordinatesFromClipboardButton
-                          onCoordinatesExtracted={(lat, lng) => {
-                            setValue('nearbyBathLat', lat);
-                            setValue('nearbyBathLng', lng);
-                          }}
-                        />
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            const lat = watch('nearbyBathLat');
-                            const lng = watch('nearbyBathLng');
-                            if (!lat || !lng) {
-                              toast({
-                                title: '地図で表示',
-                                description: '入浴施設の緯度・経度を入力してください',
-                                variant: 'destructive',
-                              });
-                              return;
-                            }
-                            const url = `https://www.google.com/maps?q=${lat},${lng}`;
-                            window.open(url, '_blank');
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Map className='w-4 h-4' />
-                          地図で表示
-                        </Button>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          onClick={() => {
-                            openRoute(
-                              watch('lat') || '',
-                              watch('lng') || '',
-                              watch('nearbyBathLat') || '',
-                              watch('nearbyBathLng') || ''
-                            );
-                          }}
-                          className='flex items-center gap-1'
-                        >
-                          <Route className='w-4 h-4' />
-                          ルート検索
-                        </Button>
-                      </div>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
-                      <div>
-                        <Label htmlFor='distanceToBath'>距離 (m)</Label>
-                        <Input
-                          id='distanceToBath'
-                          type='number'
-                          min='0'
-                          {...register('distanceToBath')}
-                          placeholder='距離(m)または空欄'
-                        />
-                        {errors.distanceToBath && (
-                          <p className='text-sm text-red-500'>{errors.distanceToBath.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyBathLat'>緯度</Label>
-                        <Input
-                          id='nearbyBathLat'
-                          type='number'
-                          step='any'
-                          placeholder='緯度（任意）'
-                          {...register('nearbyBathLat')}
-                        />
-                        {errors.nearbyBathLat && (
-                          <p className='text-sm text-red-500'>{errors.nearbyBathLat.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor='nearbyBathLng'>経度</Label>
-                        <Input
-                          id='nearbyBathLng'
-                          type='number'
-                          step='any'
-                          placeholder='経度（任意）'
-                          {...register('nearbyBathLng')}
-                        />
-                        {errors.nearbyBathLng && (
-                          <p className='text-sm text-red-500'>{errors.nearbyBathLng.message}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <NearbyFacilityFields
+              register={register}
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+            />
 
             {/* Submit Buttons */}
             <div className='flex justify-end gap-2'>
@@ -1172,36 +378,13 @@ export default function ShachuHakuForm({
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60'>
-          <Card className='w-full max-w-md'>
-            <CardHeader>
-              <CardTitle className='text-red-600'>削除確認</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className='mb-4'>
-                「{spot?.name}」を削除しますか？この操作は取り消せません。
-              </p>
-              <div className='flex justify-end gap-2'>
-                <Button
-                  variant='outline'
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={loading}
-                >
-                  キャンセル
-                </Button>
-                <Button
-                  variant='destructive'
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  削除
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <DeleteConfirmDialog
+          spot={spot}
+          loading={loading}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       )}
     </div>
   );
