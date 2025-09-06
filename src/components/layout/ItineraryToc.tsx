@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { H3, Text, SmallText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
@@ -36,6 +36,8 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const searchParams = useSearchParams();
 
   const [metadata, setMetadata] = useAtom(itineraryMetadataAtom);
+  const [topOffset, setTopOffset] = useState(192); // デフォルト値
+  const [headerHeight, setHeaderHeight] = useState(64); // ヘッダー高さ
 
   // コンポーネントがマウントされたときに初期データをロード
   useEffect(() => {
@@ -43,6 +45,59 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
       setMetadata(initialItinerary as ItineraryMetadata);
     }
   }, [initialItinerary, setMetadata]);
+
+  // 動的にヘッダー＋広告の高さを計算し、スクロールに応じて調整
+  useEffect(() => {
+    const calculateOffset = () => {
+      const header = document.querySelector('header');
+      const adContainer = document.querySelector('[class*="adsbygoogle"]')?.closest('div');
+
+      if (header) {
+        const hHeight = header.offsetHeight;
+        setHeaderHeight(hHeight);
+
+        if (adContainer) {
+          const adHeight = adContainer.offsetHeight;
+          const scrollY = window.scrollY;
+          const adBottom = adContainer.offsetTop + adHeight;
+
+          // スクロール位置に応じて目次の位置を滑らかに調整
+          const adTop = adContainer.offsetTop;
+
+          if (scrollY + hHeight >= adBottom) {
+            // 広告が完全に隠れた場合はヘッダー直下に配置
+            setTopOffset(hHeight + 16);
+          } else if (scrollY <= adTop) {
+            // 広告が完全に見える場合は広告の下に配置
+            setTopOffset(hHeight + adHeight + 16);
+          } else {
+            // 広告が部分的に見える場合は、見える部分の下に配置
+            const visibleAdHeight = adBottom - (scrollY + hHeight);
+            setTopOffset(hHeight + Math.max(0, visibleAdHeight) + 16);
+          }
+        } else {
+          setTopOffset(hHeight + 16);
+        }
+      }
+    };
+
+    // 初回計算
+    calculateOffset();
+
+    // 広告が読み込まれた後に再計算
+    const timer = setTimeout(calculateOffset, 2000);
+
+    // スクロールとリサイズ時に再計算
+    const handleScroll = () => calculateOffset();
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', calculateOffset);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', calculateOffset);
+    };
+  }, []);
 
   const handleDayClick = (dayNumber: number) => {
     // 現在のURLを取得
@@ -59,7 +114,13 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
 
   return (
     <div className='w-80 shrink-0'>
-      <div className='fixed w-80 top-16 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg max-h-[calc(100vh-80px)] overflow-y-auto'>
+      <div 
+        className='fixed w-80 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-y-auto'
+        style={{
+          top: `${topOffset}px`,
+          maxHeight: `calc(100vh - ${topOffset + 32}px)`
+        }}
+      >
         <div className='p-4'>
           <H3>目次</H3>
           {summaries.length > 0 ? (
