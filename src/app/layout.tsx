@@ -11,6 +11,7 @@ import { AdSense } from '@/components/layout/AdSense';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import ItineraryUrlTracker from '@/components/common/ItineraryUrlTracker';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -79,16 +80,18 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <div className='flex flex-col min-h-screen bg-background text-foreground'>
-                <ItineraryUrlTracker />
-                <Header />
-                <AdSense />
-                <main className='flex-1 relative'>
-                  <div className='pt-12 pb-16'>{children}</div>
-                  <Toaster />
-                </main>
-                <Footer />
-              </div>
+              <TooltipProvider>
+                <div className='flex flex-col min-h-screen bg-background text-foreground'>
+                  <ItineraryUrlTracker />
+                  <Header />
+                  <AdSense />
+                  <main className='flex-1 relative'>
+                    <div className='pt-12 pb-16'>{children}</div>
+                    <Toaster />
+                  </main>
+                  <Footer />
+                </div>
+              </TooltipProvider>
             </ThemeProvider>
           </UserProvider>
         </ErrorBoundary>
