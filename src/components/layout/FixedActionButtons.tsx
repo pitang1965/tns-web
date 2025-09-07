@@ -6,8 +6,8 @@ import {
   Save,
   Trash,
   ArrowLeft,
-  Check,
   Share2,
+  BookPlus,
 } from 'lucide-react';
 import { formatDateWithWeekday } from '@/lib/date';
 
@@ -177,7 +177,7 @@ export function FixedActionButtons({
               disabled={disabled}
               type='button'
             >
-              <Check className='h-5 w-5' />
+              <BookPlus className='h-5 w-5' />
             </Button>
           )}
         </>
