@@ -5,6 +5,7 @@ export type ShareData = {
   dayIndex: number;
   date?: string;
   id?: string;
+  isPublic?: boolean;
 };
 
 /**

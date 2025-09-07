@@ -44,6 +44,9 @@ export function FixedActionButtons({
     }
   };
 
+  // 共有ボタンが無効かどうかを判定
+  const isShareDisabled = disabled || (shareData && shareData.isPublic === false);
+
   return (
     <div className='fixed top-16 right-4 flex gap-2 z-50'>
       {/* 共通: 戻るボタン（詳細・編集・新規作成のすべてで利用可能） */}
@@ -69,9 +72,10 @@ export function FixedActionButtons({
               onClick={onShare}
               size='icon'
               variant='secondary'
-              className='rounded-full shadow-lg'
-              disabled={disabled}
+              className={`rounded-full shadow-lg ${isShareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isShareDisabled}
               type='button'
+              title={shareData.isPublic === false ? '公開設定を有効にしてください' : '旅程を共有'}
             >
               <Share2 className='h-5 w-5' />
             </Button>

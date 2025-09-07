@@ -140,6 +140,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
               dayIndex: dayParamHook.selectedDay + 1,
               date: currentDayPlan.date || undefined,
               id: metadata.id,
+              isPublic: metadata.isPublic,
             }}
           />
 
