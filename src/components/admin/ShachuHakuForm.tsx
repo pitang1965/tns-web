@@ -23,6 +23,7 @@ import { PricingFields } from './PricingFields';
 import { RatingFields } from './RatingFields';
 import { FeatureFields } from './FeatureFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
+import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
 interface ShachuHakuFormProps {
@@ -363,6 +364,8 @@ export default function ShachuHakuForm({
               setValue={setValue}
               errors={errors}
             />
+
+            <FacilitiesMap watch={watch} />
 
             {/* Submit Buttons */}
             <div className='flex justify-end gap-2'>
