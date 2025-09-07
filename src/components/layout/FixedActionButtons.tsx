@@ -9,7 +9,7 @@ import {
   Share2,
   BookPlus,
 } from 'lucide-react';
-import { formatDateWithWeekday } from '@/lib/date';
+import { handleShare, type ShareData } from '@/lib/shareUtils';
 
 export type FixedActionButtonsProps = {
   mode?: 'detail' | 'edit' | 'create';
@@ -21,13 +21,8 @@ export type FixedActionButtonsProps = {
   onCreate?: (e: React.MouseEvent) => void;
   customButtons?: React.ReactNode;
   disabled?: boolean;
-  // Twitter共有用のプロパティを修正
-  shareData?: {
-    title: string;
-    dayIndex: number;
-    date?: string;
-    id?: string;
-  };
+  // 共有用のプロパティ
+  shareData?: ShareData;
 };
 
 export function FixedActionButtons({
@@ -42,25 +37,11 @@ export function FixedActionButtons({
   shareData,
   disabled = false,
 }: FixedActionButtonsProps) {
-  // X(Twitter)共有機能
-  const handleShareToTwitter = () => {
-    if (!shareData || !shareData.id) return;
-
-    const { title, dayIndex, date, id } = shareData;
-
-    // 日付をフォーマット（dateがundefinedの場合は空文字列を使用）
-    const formattedDate = date ? formatDateWithWeekday(date) : '';
-
-    // ツイート内容の作成
-    const tweetText = encodeURIComponent(
-      `${title} ${dayIndex}日目: ${formattedDate}の旅程です。\nhttps://tabi.over40web.club/itineraries/${id}?day=${dayIndex}`
-    );
-
-    // X(Twitter)共有URLを作成
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
-
-    // 新しいウィンドウでTwitter共有画面を開く
-    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  // 共有機能
+  const onShare = () => {
+    if (shareData) {
+      handleShare(shareData);
+    }
   };
 
   return (
@@ -82,13 +63,13 @@ export function FixedActionButtons({
       {/* 詳細モード */}
       {mode === 'detail' && (
         <>
-          {/* X(Twitter)共有ボタン - 詳細モードでのみ表示 */}
+          {/* 共有ボタン - 詳細モードでのみ表示 */}
           {shareData && shareData.id && (
             <Button
-              onClick={handleShareToTwitter}
+              onClick={onShare}
               size='icon'
               variant='secondary'
-              className='rounded-full shadow-lg bg-blue-500 hover:bg-blue-600 text-white'
+              className='rounded-full shadow-lg'
               disabled={disabled}
               type='button'
             >
