@@ -38,11 +38,12 @@ export const generateMetadata = async ({
     };
   }
 
-  // dayパラメータがある場合は日数を表示
+  // dayパラメータがある場合は日数を表示（ただし旅程が1日の場合は表示しない）
   const dayParam = searchParams.day
     ? parseInt(searchParams.day as string)
     : null;
-  const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
+  const totalDays = itinerary.dayPlans?.length || 1;
+  const dayDisplay = dayParam && totalDays > 1 ? ` ${dayParam}日目` : '';
 
   // 旅程のタイトルと説明を使用
   const title = `${itinerary.title}${dayDisplay} | 旅のしおり`;
