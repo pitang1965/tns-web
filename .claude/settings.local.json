@@ -8,7 +8,9 @@
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\app/**)",
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\components\\layout/**)",
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\.claude/**)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "mcp__mongodb-readonly__list-collections",
+      "mcp__mongodb-readonly__aggregate"
     ]
   },
   "enableAllProjectMcpServers": true,

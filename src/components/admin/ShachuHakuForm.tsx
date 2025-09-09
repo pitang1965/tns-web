@@ -70,12 +70,19 @@ export default function ShachuHakuForm({
       nearbyBathLat: '',
       nearbyBathLng: '',
       elevation: '',
+      // 新評価システム（客観的データ）
+      securityHasGate: false,
+      securityHasLighting: false,
+      securityHasStaff: false,
+      nightNoiseHasNoiseIssues: false,
+      nightNoiseNearBusyRoad: false,
+      nightNoiseIsQuietArea: false,
+      // 旧評価システム（段階的廃止予定）
       quietnessLevel: '',
       securityLevel: '',
       overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      hasGate: false,
       isFree: true,
       pricePerNight: '',
       priceNote: '',
@@ -107,12 +114,19 @@ export default function ShachuHakuForm({
         nearbyBathLat: spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2 ? spot.nearbyBathCoordinates[1].toString() : '',
         nearbyBathLng: spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2 ? spot.nearbyBathCoordinates[0].toString() : '',
         elevation: spot.elevation?.toString() || '',
-        quietnessLevel: spot.quietnessLevel?.toString() || '',
-        securityLevel: spot.securityLevel?.toString() || '',
-        overallRating: spot.overallRating?.toString() || '',
+        // 新評価システム（客観的データ）
+        securityHasGate: spot.security?.hasGate || false,
+        securityHasLighting: spot.security?.hasLighting || false,
+        securityHasStaff: spot.security?.hasStaff || false,
+        nightNoiseHasNoiseIssues: spot.nightNoise?.hasNoiseIssues || false,
+        nightNoiseNearBusyRoad: spot.nightNoise?.nearBusyRoad || false,
+        nightNoiseIsQuietArea: spot.nightNoise?.isQuietArea || false,
+        // 旧評価システム（段階的廃止予定） - レガシーデータとの互換性のため
+        quietnessLevel: (spot as any).quietnessLevel?.toString() || '',
+        securityLevel: (spot as any).securityLevel?.toString() || '',
+        overallRating: (spot as any).overallRating?.toString() || '',
         hasRoof: spot.hasRoof,
         hasPowerOutlet: spot.hasPowerOutlet,
-        hasGate: spot.hasGate,
         isFree: spot.pricing.isFree,
         pricePerNight: spot.pricing.pricePerNight?.toString() || '',
         priceNote: spot.pricing.priceNote || '',
@@ -150,12 +164,19 @@ export default function ShachuHakuForm({
         nearbyBathLat: '',
         nearbyBathLng: '',
         elevation: '',
+        // 新評価システム（客観的データ）
+        securityHasGate: false,
+        securityHasLighting: false,
+        securityHasStaff: false,
+        nightNoiseHasNoiseIssues: false,
+        nightNoiseNearBusyRoad: false,
+        nightNoiseIsQuietArea: false,
+        // 旧評価システム（段階的廃止予定）
         quietnessLevel: '',
         securityLevel: '',
         overallRating: '',
         hasRoof: false,
         hasPowerOutlet: false,
-        hasGate: false,
         isFree: true,
         pricePerNight: '',
         priceNote: '',
@@ -235,6 +256,15 @@ export default function ShachuHakuForm({
         formData.append('nearbyBathLng', data.nearbyBathLng);
       }
 
+      // 新評価システム（客観的データ）
+      formData.append('securityHasGate', data.securityHasGate.toString());
+      formData.append('securityHasLighting', data.securityHasLighting.toString());
+      formData.append('securityHasStaff', data.securityHasStaff.toString());
+      formData.append('nightNoiseHasNoiseIssues', data.nightNoiseHasNoiseIssues.toString());
+      formData.append('nightNoiseNearBusyRoad', data.nightNoiseNearBusyRoad.toString());
+      formData.append('nightNoiseIsQuietArea', data.nightNoiseIsQuietArea.toString());
+
+      // 旧評価システム（段階的廃止予定）
       if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
         formData.append('quietnessLevel', data.quietnessLevel);
       }
@@ -254,7 +284,6 @@ export default function ShachuHakuForm({
       // Handle boolean fields
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      formData.append('hasGate', data.hasGate.toString());
       formData.append('isFree', data.isFree.toString());
 
       // Handle array fields

@@ -30,6 +30,10 @@ import {
   CampingSpotTypeLabels,
   PrefectureOptions,
 } from '@/data/schemas/campingSpot';
+import {
+  calculateSecurityLevel,
+  calculateQuietnessLevel,
+} from '@/lib/campingSpotUtils';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -218,12 +222,16 @@ export default function ShachuHakuAdminPage() {
         'nearbyBathLat',
         'nearbyBathLng',
         'elevation',
-        'quietnessLevel',
-        'securityLevel',
-        'overallRating',
+        'securityHasGate',
+        'securityHasLighting',
+        'securityHasStaff',
+        'nightNoiseHasNoiseIssues',
+        'nightNoiseNearBusyRoad',
+        'nightNoiseIsQuietArea',
+        'calculatedQuietnessLevel',
+        'calculatedSecurityLevel',
         'hasRoof',
         'hasPowerOutlet',
-        'hasGate',
         'isFree',
         'pricePerNight',
         'priceNote',
@@ -257,12 +265,18 @@ export default function ShachuHakuAdminPage() {
             spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1] : '', // nearbyBathLat
             spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0] : '', // nearbyBathLng
             spot.elevation || '',
-            spot.quietnessLevel || '',
-            spot.securityLevel || '',
-            spot.overallRating || '',
+            // New objective data fields
+            spot.security?.hasGate || false,
+            spot.security?.hasLighting || false,
+            spot.security?.hasStaff || false,
+            spot.nightNoise?.hasNoiseIssues || false,
+            spot.nightNoise?.nearBusyRoad || false,
+            spot.nightNoise?.isQuietArea || false,
+            // Calculated levels (backward compatibility)
+            calculateQuietnessLevel(spot),
+            calculateSecurityLevel(spot),
             spot.hasRoof,
             spot.hasPowerOutlet,
-            spot.hasGate,
             spot.pricing.isFree,
             spot.pricing.pricePerNight || '',
             spot.pricing.priceNote || '',
@@ -567,15 +581,20 @@ export default function ShachuHakuAdminPage() {
                                       spot.pricing.pricePerNight || '未設定'
                                     }`}
                               </Badge>
-                              {spot.overallRating && (
-                                <Badge
-                                  className={`${getRatingColor(
-                                    spot.overallRating
-                                  )} text-white`}
-                                >
-                                  評価 {spot.overallRating}/5 ⭐
-                                </Badge>
-                              )}
+                              <Badge
+                                className={`${getRatingColor(
+                                  calculateSecurityLevel(spot)
+                                )} text-white`}
+                              >
+                                治安 {calculateSecurityLevel(spot)}/5 🔒
+                              </Badge>
+                              <Badge
+                                className={`${getRatingColor(
+                                  calculateQuietnessLevel(spot)
+                                )} text-white`}
+                              >
+                                静けさ {calculateQuietnessLevel(spot)}/5 🔇
+                              </Badge>
                               {spot.isVerified && (
                                 <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
                                   ✓ 確認済み

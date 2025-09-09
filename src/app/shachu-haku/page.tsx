@@ -21,6 +21,10 @@ import {
   CampingSpotTypeLabels,
   PrefectureOptions,
 } from '@/data/schemas/campingSpot';
+import {
+  calculateSecurityLevel,
+  calculateQuietnessLevel,
+} from '@/lib/campingSpotUtils';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -323,15 +327,20 @@ export default function ShachuHakuPage() {
                                       spot.pricing.pricePerNight || '未設定'
                                     }`}
                               </Badge>
-                              {spot.overallRating && (
-                                <Badge
-                                  className={`${getRatingColor(
-                                    spot.overallRating
-                                  )} text-white`}
-                                >
-                                  評価 {spot.overallRating}/5 ⭐
-                                </Badge>
-                              )}
+                              <Badge
+                                className={`${getRatingColor(
+                                  calculateSecurityLevel(spot)
+                                )} text-white`}
+                              >
+                                治安 {calculateSecurityLevel(spot)}/5 🔒
+                              </Badge>
+                              <Badge
+                                className={`${getRatingColor(
+                                  calculateQuietnessLevel(spot)
+                                )} text-white`}
+                              >
+                                静けさ {calculateQuietnessLevel(spot)}/5 🔇
+                              </Badge>
                               {spot.isVerified && (
                                 <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
                                   ✓ 確認済み
@@ -408,15 +417,20 @@ export default function ShachuHakuPage() {
                         ? '無料'
                         : `¥${selectedSpot.pricing.pricePerNight || '未設定'}`}
                     </Badge>
-                    {selectedSpot.overallRating && (
-                      <Badge
-                        className={`${getRatingColor(
-                          selectedSpot.overallRating
-                        )} text-white`}
-                      >
-                        評価 {selectedSpot.overallRating}/5 ⭐
-                      </Badge>
-                    )}
+                    <Badge
+                      className={`${getRatingColor(
+                        calculateSecurityLevel(selectedSpot)
+                      )} text-white`}
+                    >
+                      治安 {calculateSecurityLevel(selectedSpot)}/5 🔒
+                    </Badge>
+                    <Badge
+                      className={`${getRatingColor(
+                        calculateQuietnessLevel(selectedSpot)
+                      )} text-white`}
+                    >
+                      静けさ {calculateQuietnessLevel(selectedSpot)}/5 🔇
+                    </Badge>
                   </div>
                 </div>
 

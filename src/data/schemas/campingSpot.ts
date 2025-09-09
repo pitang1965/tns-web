@@ -1,5 +1,19 @@
 import { z } from 'zod';
 
+// Security features schema
+export const CampingSpotSecuritySchema = z.object({
+  hasGate: z.boolean().default(false),
+  hasLighting: z.boolean().default(false),
+  hasStaff: z.boolean().default(false),
+});
+
+// Night noise factors schema
+export const CampingSpotNightNoiseSchema = z.object({
+  hasNoiseIssues: z.boolean().default(false),
+  nearBusyRoad: z.boolean().default(false),
+  isQuietArea: z.boolean().default(false),
+});
+
 export const CampingSpotTypeSchema = z.enum([
   'roadside_station',
   'sa_pa',
@@ -43,12 +57,10 @@ export const CampingSpotSchema = z.object({
     z.number().min(-90).max(90)    // latitude
   ]).optional(),
   elevation: z.number().min(0).optional(),
-  quietnessLevel: z.number().int().min(1).max(5).optional(),
-  securityLevel: z.number().int().min(1).max(5).optional(),
-  overallRating: z.number().int().min(1).max(5).optional(),
+  security: CampingSpotSecuritySchema.default({}),
+  nightNoise: CampingSpotNightNoiseSchema.default({}),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
-  hasGate: z.boolean().default(false),
   pricing: CampingSpotPricingSchema,
   capacity: z.number().int().min(1, '収容台数は1以上で入力してください').optional(),
   restrictions: z.array(z.string().trim()).default([]),
@@ -124,23 +136,23 @@ export const CampingSpotCSVSchema = z.object({
   elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "標高は空欄または0以上の数値で入力してください",
   }).optional().default(''),
-  quietnessLevel: z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "静けさレベルは空欄または1-5の整数で入力してください",
+  hasGateField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "ゲート有無はtrue/false/空欄で入力してください",
   }).optional().default(''),
-  securityLevel: z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "治安レベルは空欄または1-5の整数で入力してください",
+  hasLightingField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "照明有無はtrue/false/空欄で入力してください",
   }).optional().default(''),
-  overallRating: z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "総合評価は空欄または1-5の整数で入力してください",
+  hasStaffField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "管理人・職員有無はtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  hasNoiseIssuesField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "夜間騒音問題はtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  nearBusyRoadField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "交通量多い道路近くはtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  isQuietAreaField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "静かなエリアはtrue/false/空欄で入力してください",
   }).optional().default(''),
   hasRoof: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "屋根付きはtrue/falseで入力してください",
@@ -224,23 +236,23 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   '標高(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
     message: "標高は空欄または0以上の数値で入力してください",
   }).optional().default(''),
-  '静寂レベル(1-5)': z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "静けさレベルは空欄または1-5の整数で入力してください",
+  'セキュリティ-ゲート有無(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "ゲート有無はtrue/false/空欄で入力してください",
   }).optional().default(''),
-  '治安レベル(1-5)': z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "治安レベルは空欄または1-5の整数で入力してください",
+  'セキュリティ-照明十分(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "照明有無はtrue/false/空欄で入力してください",
   }).optional().default(''),
-  '総合評価(1-5)': z.string().refine((val) => {
-    const num = Number(val);
-    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1 && num <= 5);
-  }, {
-    message: "総合評価は空欄または1-5の整数で入力してください",
+  'セキュリティ-管理人職員有無(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "管理人・職員有無はtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  '夜間騒音-騒音問題有無(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "夜間騒音問題はtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  '夜間騒音-交通量多い道路近く(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "交通量多い道路近くはtrue/false/空欄で入力してください",
+  }).optional().default(''),
+  '夜間騒音-静かなエリア(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
+    message: "静かなエリアはtrue/false/空欄で入力してください",
   }).optional().default(''),
   '屋根あり(true/false)': z.string().refine((val) => val === 'true' || val === 'false', {
     message: "屋根付きはtrue/falseで入力してください",
@@ -277,7 +289,6 @@ export const CampingSpotFilterSchema = z.object({
   maxDistanceToBath: z.number().min(0).optional(),
   minQuietnessLevel: z.number().int().min(1).max(5).optional(),
   minSecurityLevel: z.number().int().min(1).max(5).optional(),
-  minOverallRating: z.number().int().min(1).max(5).optional(),
   hasRoof: z.boolean().optional(),
   hasPowerOutlet: z.boolean().optional(),
   isGatedPaid: z.boolean().optional(),
@@ -298,6 +309,8 @@ export type CampingSpotCSV = z.infer<typeof CampingSpotCSVSchema>;
 export type CampingSpotCSVJapanese = z.infer<typeof CampingSpotCSVJapaneseSchema>;
 export type CampingSpotFilter = z.infer<typeof CampingSpotFilterSchema>;
 export type CampingSpotType = z.infer<typeof CampingSpotTypeSchema>;
+export type CampingSpotSecurity = z.infer<typeof CampingSpotSecuritySchema>;
+export type CampingSpotNightNoise = z.infer<typeof CampingSpotNightNoiseSchema>;
 
 // Helper function to convert CSV row to CampingSpot (English headers)
 export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
@@ -318,12 +331,18 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     nearbyBathCoordinates: (csvRow.nearbyBathLat && csvRow.nearbyBathLng) 
       ? [Number(csvRow.nearbyBathLng), Number(csvRow.nearbyBathLat)] : undefined,
     elevation: csvRow.elevation ? Number(csvRow.elevation) : undefined,
-    quietnessLevel: csvRow.quietnessLevel ? Number(csvRow.quietnessLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
-    securityLevel: csvRow.securityLevel ? Number(csvRow.securityLevel) as 1 | 2 | 3 | 4 | 5 : undefined,
-    overallRating: csvRow.overallRating ? Number(csvRow.overallRating) as 1 | 2 | 3 | 4 | 5 : undefined,
+    security: {
+      hasGate: csvRow.hasGateField === 'true',
+      hasLighting: csvRow.hasLightingField === 'true',
+      hasStaff: csvRow.hasStaffField === 'true',
+    },
+    nightNoise: {
+      hasNoiseIssues: csvRow.hasNoiseIssuesField === 'true',
+      nearBusyRoad: csvRow.nearBusyRoadField === 'true',
+      isQuietArea: csvRow.isQuietAreaField === 'true',
+    },
     hasRoof: csvRow.hasRoof === 'true',
     hasPowerOutlet: csvRow.hasPowerOutlet === 'true',
-    hasGate: csvRow.hasGate === 'true',
     pricing: {
       isFree: csvRow.isFree === 'true',
       pricePerNight: csvRow.pricePerNight ? Number(csvRow.pricePerNight) : undefined,
@@ -356,12 +375,18 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
     nearbyBathCoordinates: (csvRow['お風呂緯度'] && csvRow['お風呂経度']) 
       ? [Number(csvRow['お風呂経度']), Number(csvRow['お風呂緯度'])] : undefined,
     elevation: csvRow['標高(m)'] ? Number(csvRow['標高(m)']) : undefined,
-    quietnessLevel: csvRow['静寂レベル(1-5)'] ? Number(csvRow['静寂レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
-    securityLevel: csvRow['治安レベル(1-5)'] ? Number(csvRow['治安レベル(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
-    overallRating: csvRow['総合評価(1-5)'] ? Number(csvRow['総合評価(1-5)']) as 1 | 2 | 3 | 4 | 5 : undefined,
+    security: {
+      hasGate: csvRow['セキュリティ-ゲート有無(true/false)'] === 'true',
+      hasLighting: csvRow['セキュリティ-照明十分(true/false)'] === 'true',
+      hasStaff: csvRow['セキュリティ-管理人職員有無(true/false)'] === 'true',
+    },
+    nightNoise: {
+      hasNoiseIssues: csvRow['夜間騒音-騒音問題有無(true/false)'] === 'true',
+      nearBusyRoad: csvRow['夜間騒音-交通量多い道路近く(true/false)'] === 'true',
+      isQuietArea: csvRow['夜間騒音-静かなエリア(true/false)'] === 'true',
+    },
     hasRoof: csvRow['屋根あり(true/false)'] === 'true',
     hasPowerOutlet: csvRow['電源あり(true/false)'] === 'true',
-    hasGate: csvRow['ゲート付き(true/false)'] === 'true',
     pricing: {
       isFree: csvRow['無料(true/false)'] === 'true',
       pricePerNight: csvRow['1泊料金'] ? Number(csvRow['1泊料金']) : undefined,

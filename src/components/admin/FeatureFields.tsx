@@ -41,16 +41,6 @@ export function FeatureFields({ register, watch, setValue, errors }: FeatureFiel
             />
             <label htmlFor='hasPowerOutlet'>電源あり</label>
           </div>
-          <div className='flex items-center space-x-2'>
-            <Checkbox
-              id='hasGate'
-              checked={watch('hasGate')}
-              onCheckedChange={(checked) =>
-                setValue('hasGate', !!checked)
-              }
-            />
-            <label htmlFor='hasGate'>ゲート付き</label>
-          </div>
         </div>
       </div>
 

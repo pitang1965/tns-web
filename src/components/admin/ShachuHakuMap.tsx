@@ -8,6 +8,10 @@ import {
   CampingSpotTypeLabels,
 } from '@/data/schemas/campingSpot';
 import {
+  calculateSecurityLevel,
+  calculateQuietnessLevel,
+} from '@/lib/campingSpotUtils';
+import {
   suppressImageWarnings,
   handleMapError,
   preRegisterKnownIcons,
@@ -247,8 +251,8 @@ export default function ShachuHakuMap({
       // Add CSS hover effect with unique class
       markerElement.classList.add('camping-marker-hover');
 
-      // Add rating number to marker
-      markerElement.textContent = spot.overallRating?.toString() || '?';
+      // Add security level number to marker
+      markerElement.textContent = calculateSecurityLevel(spot).toString();
 
       // Add simple tooltip using title attribute
       markerElement.title = spot.name;
@@ -293,8 +297,8 @@ export default function ShachuHakuMap({
   }, [spots, mapLoaded, onSpotSelect]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
-    // Color based on overall rating
-    const rating = spot.overallRating || 1; // デフォルトで1とする
+    // Color based on calculated security level
+    const rating = calculateSecurityLevel(spot);
     if (rating >= 5) return '#22c55e'; // green
     if (rating >= 4) return '#3b82f6'; // blue
     if (rating >= 3) return '#f59e0b'; // yellow
@@ -315,9 +319,8 @@ export default function ShachuHakuMap({
         <div class="space-y-1 text-sm text-gray-700">
           <div><strong class="text-gray-900">種別:</strong> ${CampingSpotTypeLabels[spot.type]}</div>
           <div><strong class="text-gray-900">都道府県:</strong> ${spot.prefecture}</div>
-          ${spot.overallRating ? `<div><strong class="text-gray-900">総合評価:</strong> ${spot.overallRating}/5 ⭐</div>` : ''}
-          ${spot.quietnessLevel ? `<div><strong class="text-gray-900">静けさ:</strong> ${spot.quietnessLevel}/5</div>` : ''}
-          ${spot.securityLevel ? `<div><strong class="text-gray-900">治安:</strong> ${spot.securityLevel}/5</div>` : ''}
+          <div><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(spot)}/5 🔒</div>
+          <div><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(spot)}/5 🔇</div>
           <div><strong class="text-gray-900">料金:</strong> ${
             spot.pricing.isFree ? '無料' : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
           }</div>
@@ -342,11 +345,6 @@ export default function ShachuHakuMap({
             ${
               spot.hasPowerOutlet
                 ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">電源</span>'
-                : ''
-            }
-            ${
-              spot.hasGate
-                ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">ゲート付き</span>'
                 : ''
             }
           </div>

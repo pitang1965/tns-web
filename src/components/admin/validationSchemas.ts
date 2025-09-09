@@ -59,6 +59,14 @@ export const ShachuHakuFormSchema = z.object({
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
   ),
+  // 新評価システム（客観的データ） - フラット構造
+  securityHasGate: z.boolean().default(false),
+  securityHasLighting: z.boolean().default(false),
+  securityHasStaff: z.boolean().default(false),
+  nightNoiseHasNoiseIssues: z.boolean().default(false),
+  nightNoiseNearBusyRoad: z.boolean().default(false),
+  nightNoiseIsQuietArea: z.boolean().default(false),
+  // 旧評価システム（段階的廃止予定）
   quietnessLevel: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
     { message: '1〜5の数値を入力してください' }
@@ -73,7 +81,6 @@ export const ShachuHakuFormSchema = z.object({
   ),
   hasRoof: z.boolean(),
   hasPowerOutlet: z.boolean(),
-  hasGate: z.boolean(),
   isFree: z.boolean(),
   pricePerNight: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),

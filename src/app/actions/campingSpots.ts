@@ -42,6 +42,110 @@ async function ensureDbConnection() {
   }
 }
 
+// Helper function to convert FormData to CampingSpot format
+function convertFormDataToCampingSpot(formObject: Record<string, any>) {
+  return {
+    ...formObject,
+    coordinates: [Number(formObject.lng), Number(formObject.lat)],
+    distanceToToilet:
+      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
+        ? Number(formObject.distanceToToilet)
+        : undefined,
+    distanceToBath:
+      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
+        ? Number(formObject.distanceToBath)
+        : undefined,
+    distanceToConvenience:
+      formObject.distanceToConvenience &&
+      formObject.distanceToConvenience.trim() !== ''
+        ? Number(formObject.distanceToConvenience)
+        : undefined,
+    nearbyToiletCoordinates:
+      formObject.nearbyToiletLat &&
+      formObject.nearbyToiletLng &&
+      formObject.nearbyToiletLat.trim() !== '' &&
+      formObject.nearbyToiletLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyToiletLat)) &&
+      !isNaN(Number(formObject.nearbyToiletLng))
+        ? [
+            Number(formObject.nearbyToiletLng),
+            Number(formObject.nearbyToiletLat),
+          ]
+        : undefined,
+    nearbyConvenienceCoordinates:
+      formObject.nearbyConvenienceLat &&
+      formObject.nearbyConvenienceLng &&
+      formObject.nearbyConvenienceLat.trim() !== '' &&
+      formObject.nearbyConvenienceLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
+      !isNaN(Number(formObject.nearbyConvenienceLng))
+        ? [
+            Number(formObject.nearbyConvenienceLng),
+            Number(formObject.nearbyConvenienceLat),
+          ]
+        : undefined,
+    nearbyBathCoordinates:
+      formObject.nearbyBathLat &&
+      formObject.nearbyBathLng &&
+      formObject.nearbyBathLat.trim() !== '' &&
+      formObject.nearbyBathLng.trim() !== '' &&
+      !isNaN(Number(formObject.nearbyBathLat)) &&
+      !isNaN(Number(formObject.nearbyBathLng))
+        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
+        : undefined,
+    elevation:
+      formObject.elevation && formObject.elevation.trim() !== ''
+        ? Number(formObject.elevation)
+        : undefined,
+    // 新評価システム（客観的データ）
+    security: {
+      hasGate: formObject.securityHasGate === 'true',
+      hasLighting: formObject.securityHasLighting === 'true',
+      hasStaff: formObject.securityHasStaff === 'true',
+    },
+    nightNoise: {
+      hasNoiseIssues: formObject.nightNoiseHasNoiseIssues === 'true',
+      nearBusyRoad: formObject.nightNoiseNearBusyRoad === 'true',
+      isQuietArea: formObject.nightNoiseIsQuietArea === 'true',
+    },
+    // 旧評価システム（段階的廃止予定）
+    quietnessLevel:
+      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
+        ? Number(formObject.quietnessLevel)
+        : undefined,
+    securityLevel:
+      formObject.securityLevel && formObject.securityLevel.trim() !== ''
+        ? Number(formObject.securityLevel)
+        : undefined,
+    overallRating:
+      formObject.overallRating && formObject.overallRating.trim() !== ''
+        ? Number(formObject.overallRating)
+        : undefined,
+    hasRoof: formObject.hasRoof === 'true',
+    hasPowerOutlet: formObject.hasPowerOutlet === 'true',
+    pricing: {
+      isFree: formObject.isFree === 'true',
+      pricePerNight: formObject.pricePerNight
+        ? Number(formObject.pricePerNight)
+        : undefined,
+      priceNote: formObject.priceNote || undefined,
+    },
+    capacity:
+      formObject.capacity && formObject.capacity.trim() !== ''
+        ? Number(formObject.capacity)
+        : undefined,
+    restrictions: formObject.restrictions
+      ? formObject.restrictions.split(',').map((r: string) => r.trim()).filter((r: string) => r)
+      : [],
+    amenities: formObject.amenities
+      ? formObject.amenities.split(',').map((a: string) => a.trim()).filter((a: string) => a)
+      : [],
+    notes: formObject.notes || undefined,
+    submittedBy: formObject.submittedBy,
+    isVerified: false,
+  };
+}
+
 // Public function for general users (no authentication required)
 export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
   await ensureDbConnection();
@@ -73,9 +177,6 @@ export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
       query.securityLevel = { $gte: filter.minSecurityLevel };
     }
 
-    if (filter.minOverallRating !== undefined) {
-      query.overallRating = { $gte: filter.minOverallRating };
-    }
 
     if (filter.hasRoof !== undefined) {
       query.hasRoof = filter.hasRoof;
@@ -148,9 +249,6 @@ export async function getCampingSpots(filter?: CampingSpotFilter) {
       query.securityLevel = { $gte: filter.minSecurityLevel };
     }
 
-    if (filter.minOverallRating !== undefined) {
-      query.overallRating = { $gte: filter.minOverallRating };
-    }
 
     if (filter.hasRoof !== undefined) {
       query.hasRoof = filter.hasRoof;
@@ -212,108 +310,11 @@ export async function createCampingSpot(data: FormData) {
     formObject[key] = value;
   });
 
-  // Convert form data to proper types
-  const spotData = {
+  // Convert form data to proper types using helper function
+  const spotData = convertFormDataToCampingSpot({
     ...formObject,
-    coordinates: [Number(formObject.lng), Number(formObject.lat)],
-    distanceToToilet:
-      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
-        ? Number(formObject.distanceToToilet)
-        : undefined,
-    distanceToBath:
-      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
-        ? Number(formObject.distanceToBath)
-        : undefined,
-    distanceToConvenience:
-      formObject.distanceToConvenience &&
-      formObject.distanceToConvenience.trim() !== ''
-        ? Number(formObject.distanceToConvenience)
-        : undefined,
-    nearbyToiletCoordinates:
-      formObject.nearbyToiletLat &&
-      formObject.nearbyToiletLng &&
-      formObject.nearbyToiletLat.trim() !== '' &&
-      formObject.nearbyToiletLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyToiletLat)) &&
-      !isNaN(Number(formObject.nearbyToiletLng))
-        ? [
-            Number(formObject.nearbyToiletLng),
-            Number(formObject.nearbyToiletLat),
-          ]
-        : undefined,
-    nearbyConvenienceCoordinates:
-      formObject.nearbyConvenienceLat &&
-      formObject.nearbyConvenienceLng &&
-      formObject.nearbyConvenienceLat.trim() !== '' &&
-      formObject.nearbyConvenienceLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
-      !isNaN(Number(formObject.nearbyConvenienceLng))
-        ? [
-            Number(formObject.nearbyConvenienceLng),
-            Number(formObject.nearbyConvenienceLat),
-          ]
-        : undefined,
-    nearbyBathCoordinates:
-      formObject.nearbyBathLat &&
-      formObject.nearbyBathLng &&
-      formObject.nearbyBathLat.trim() !== '' &&
-      formObject.nearbyBathLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyBathLat)) &&
-      !isNaN(Number(formObject.nearbyBathLng))
-        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
-        : undefined,
-    elevation:
-      formObject.elevation && formObject.elevation.trim() !== ''
-        ? Number(formObject.elevation)
-        : undefined,
-    quietnessLevel:
-      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
-        ? Number(formObject.quietnessLevel)
-        : undefined,
-    securityLevel:
-      formObject.securityLevel && formObject.securityLevel.trim() !== ''
-        ? Number(formObject.securityLevel)
-        : undefined,
-    overallRating:
-      formObject.overallRating && formObject.overallRating.trim() !== ''
-        ? Number(formObject.overallRating)
-        : undefined,
-    hasRoof: formObject.hasRoof === 'true',
-    hasPowerOutlet: formObject.hasPowerOutlet === 'true',
-    hasGate: formObject.hasGate === 'true',
-    pricing: {
-      isFree: formObject.isFree === 'true',
-      pricePerNight: formObject.pricePerNight
-        ? Number(formObject.pricePerNight)
-        : undefined,
-      priceNote: formObject.priceNote || undefined,
-    },
-    capacity:
-      formObject.capacity && formObject.capacity.trim() !== ''
-        ? Number(formObject.capacity)
-        : undefined,
-    restrictions: formObject.restrictions
-      ? String(formObject.restrictions)
-          .split(',')
-          .map((r) => r.trim())
-          .filter((r) => r)
-      : [],
-    amenities: formObject.amenities
-      ? String(formObject.amenities)
-          .split(',')
-          .map((a) => a.trim())
-          .filter((a) => a)
-      : [],
-    url:
-      formObject.url && formObject.url.trim() !== ''
-        ? formObject.url.trim()
-        : undefined,
-    notes:
-      formObject.notes && formObject.notes.trim() !== ''
-        ? formObject.notes.trim()
-        : undefined,
     submittedBy: user.email,
-  };
+  });
 
   // Validate the data
   const validatedData = CampingSpotSchema.parse(spotData);
@@ -361,107 +362,8 @@ export async function updateCampingSpot(id: string, data: FormData) {
     formObject[key] = value;
   });
 
-  // Convert form data to proper types
-  const spotData = {
-    ...formObject,
-    coordinates: [Number(formObject.lng), Number(formObject.lat)],
-    distanceToToilet:
-      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
-        ? Number(formObject.distanceToToilet)
-        : undefined,
-    distanceToBath:
-      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
-        ? Number(formObject.distanceToBath)
-        : undefined,
-    distanceToConvenience:
-      formObject.distanceToConvenience &&
-      formObject.distanceToConvenience.trim() !== ''
-        ? Number(formObject.distanceToConvenience)
-        : undefined,
-    nearbyToiletCoordinates:
-      formObject.nearbyToiletLat &&
-      formObject.nearbyToiletLng &&
-      formObject.nearbyToiletLat.trim() !== '' &&
-      formObject.nearbyToiletLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyToiletLat)) &&
-      !isNaN(Number(formObject.nearbyToiletLng))
-        ? [
-            Number(formObject.nearbyToiletLng),
-            Number(formObject.nearbyToiletLat),
-          ]
-        : undefined,
-    nearbyConvenienceCoordinates:
-      formObject.nearbyConvenienceLat &&
-      formObject.nearbyConvenienceLng &&
-      formObject.nearbyConvenienceLat.trim() !== '' &&
-      formObject.nearbyConvenienceLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
-      !isNaN(Number(formObject.nearbyConvenienceLng))
-        ? [
-            Number(formObject.nearbyConvenienceLng),
-            Number(formObject.nearbyConvenienceLat),
-          ]
-        : undefined,
-    nearbyBathCoordinates:
-      formObject.nearbyBathLat &&
-      formObject.nearbyBathLng &&
-      formObject.nearbyBathLat.trim() !== '' &&
-      formObject.nearbyBathLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyBathLat)) &&
-      !isNaN(Number(formObject.nearbyBathLng))
-        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
-        : undefined,
-    elevation:
-      formObject.elevation && formObject.elevation.trim() !== ''
-        ? Number(formObject.elevation)
-        : undefined,
-    quietnessLevel:
-      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
-        ? Number(formObject.quietnessLevel)
-        : undefined,
-    securityLevel:
-      formObject.securityLevel && formObject.securityLevel.trim() !== ''
-        ? Number(formObject.securityLevel)
-        : undefined,
-    overallRating:
-      formObject.overallRating && formObject.overallRating.trim() !== ''
-        ? Number(formObject.overallRating)
-        : undefined,
-    hasRoof: formObject.hasRoof === 'true',
-    hasPowerOutlet: formObject.hasPowerOutlet === 'true',
-    hasGate: formObject.hasGate === 'true',
-    pricing: {
-      isFree: formObject.isFree === 'true',
-      pricePerNight: formObject.pricePerNight
-        ? Number(formObject.pricePerNight)
-        : undefined,
-      priceNote: formObject.priceNote || undefined,
-    },
-    capacity:
-      formObject.capacity && formObject.capacity.trim() !== ''
-        ? Number(formObject.capacity)
-        : undefined,
-    restrictions: formObject.restrictions
-      ? String(formObject.restrictions)
-          .split(',')
-          .map((r) => r.trim())
-          .filter((r) => r)
-      : [],
-    amenities: formObject.amenities
-      ? String(formObject.amenities)
-          .split(',')
-          .map((a) => a.trim())
-          .filter((a) => a)
-      : [],
-    url:
-      formObject.url && formObject.url.trim() !== ''
-        ? formObject.url.trim()
-        : undefined,
-    notes:
-      formObject.notes && formObject.notes.trim() !== ''
-        ? formObject.notes.trim()
-        : undefined,
-  };
+  // Convert form data to proper types using helper function
+  const spotData = convertFormDataToCampingSpot(formObject);
 
 
   // Validate the data
@@ -490,8 +392,8 @@ export async function updateCampingSpot(id: string, data: FormData) {
 
   Object.keys(validatedData).forEach((key) => {
     const value = (validatedData as any)[key];
-    if (key === 'pricing') {
-      // Skip pricing here, handle it separately below
+    if (key === 'pricing' || key === 'security' || key === 'nightNoise') {
+      // Skip nested objects here, handle them separately below
       return;
     }
 
@@ -532,6 +434,20 @@ export async function updateCampingSpot(id: string, data: FormData) {
       updateOperations.$set['pricing.priceNote'] =
         validatedData.pricing.priceNote;
     }
+  }
+
+  // Handle nested security fields
+  if (validatedData.security) {
+    updateOperations.$set['security.hasGate'] = validatedData.security.hasGate;
+    updateOperations.$set['security.hasLighting'] = validatedData.security.hasLighting;
+    updateOperations.$set['security.hasStaff'] = validatedData.security.hasStaff;
+  }
+
+  // Handle nested nightNoise fields
+  if (validatedData.nightNoise) {
+    updateOperations.$set['nightNoise.hasNoiseIssues'] = validatedData.nightNoise.hasNoiseIssues;
+    updateOperations.$set['nightNoise.nearBusyRoad'] = validatedData.nightNoise.nearBusyRoad;
+    updateOperations.$set['nightNoise.isQuietArea'] = validatedData.nightNoise.isQuietArea;
   }
 
   // Add $unset operation if there are fields to unset
