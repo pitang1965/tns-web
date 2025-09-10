@@ -467,7 +467,7 @@ export default function ShachuHakuMap({
   return (
     <div className='relative'>
       <div ref={mapContainer} className='h-[600px] w-full rounded-lg' />
-      <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600'>
+      <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
         <Collapsible
           open={isInstructionsOpen}
           onOpenChange={setIsInstructionsOpen}
