@@ -41,13 +41,13 @@ export function TabBar() {
   }
 
   // Check if user is admin
-  const isAdmin = user?.email && 
+  const isAdmin = user?.email &&
     process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
       .map(email => email.trim())
       .includes(user.email);
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 bg-background text-foreground shadow-top'>
+    <nav className='fixed bottom-0 left-0 right-0 bg-background text-foreground shadow-top z-50'>
       <div className='flex justify-around py-2'>
         <TabLink href='/' icon={<Info />} label='情報' />
         <TabLink href='/search' icon={<Search />} label='検索' />

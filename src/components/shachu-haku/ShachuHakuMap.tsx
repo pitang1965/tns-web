@@ -107,6 +107,18 @@ export default function ShachuHakuMap({
           background-color: #f3f4f6 !important;
           color: #111827 !important;
         }
+        /* Mapbox UI elements z-index adjustments */
+        .mapboxgl-ctrl-bottom-left,
+        .mapboxgl-ctrl-bottom-right {
+          z-index: 10 !important;
+        }
+        .mapboxgl-ctrl-top-left,
+        .mapboxgl-ctrl-top-right {
+          z-index: 30 !important;
+        }
+        .mapboxgl-popup {
+          z-index: 40 !important;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -483,11 +495,6 @@ export default function ShachuHakuMap({
             </div>
           </CollapsibleContent>
         </Collapsible>
-      </div>
-      <div className='absolute bottom-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600'>
-        <div className='text-xs text-gray-600 dark:text-gray-400'>
-          スポット数: {spots.length}
-        </div>
       </div>
     </div>
   );
