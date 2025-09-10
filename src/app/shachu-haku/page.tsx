@@ -229,11 +229,17 @@ export default function ShachuHakuPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ShachuHakuMap
-                  spots={filteredSpots}
-                  onSpotSelect={handleSpotSelect}
-                  readonly={true}
-                />
+                {loading ? (
+                  <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
+                    <div className='text-gray-500'>地図データを読み込み中...</div>
+                  </div>
+                ) : (
+                  <ShachuHakuMap
+                    spots={filteredSpots}
+                    onSpotSelect={handleSpotSelect}
+                    readonly={true}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>

@@ -462,32 +462,38 @@ export default function ShachuHakuAdminPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ShachuHakuMap
-                  spots={filteredSpots}
-                  onSpotSelect={handleSpotSelect}
-                  onCreateSpot={(coordinates) => {
-                    setSelectedSpot({
-                      coordinates,
-                      name: '',
-                      prefecture: '',
-                      type: 'other',
-                      distanceToToilet: 0,
-                      quietnessLevel: 3,
-                      securityLevel: 3,
-                      overallRating: 3,
-                      hasRoof: false,
-                      hasPowerOutlet: false,
-                      hasGate: false,
-                      pricing: { isFree: true },
-                      capacity: 1,
-                      restrictions: [],
-                      amenities: [],
-                      notes: '',
-                      isVerified: false,
-                    } as any);
-                    setShowForm(true);
-                  }}
-                />
+                {loading ? (
+                  <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
+                    <div className='text-gray-500'>地図データを読み込み中...</div>
+                  </div>
+                ) : (
+                  <ShachuHakuMap
+                    spots={filteredSpots}
+                    onSpotSelect={handleSpotSelect}
+                    onCreateSpot={(coordinates) => {
+                      setSelectedSpot({
+                        coordinates,
+                        name: '',
+                        prefecture: '',
+                        type: 'other',
+                        distanceToToilet: 0,
+                        quietnessLevel: 3,
+                        securityLevel: 3,
+                        overallRating: 3,
+                        hasRoof: false,
+                        hasPowerOutlet: false,
+                        hasGate: false,
+                        pricing: { isFree: true },
+                        capacity: 1,
+                        restrictions: [],
+                        amenities: [],
+                        notes: '',
+                        isVerified: false,
+                      } as any);
+                      setShowForm(true);
+                    }}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>
