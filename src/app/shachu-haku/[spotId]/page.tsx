@@ -45,13 +45,16 @@ export const generateMetadata = async ({
       : spot.pricing.pricePerNight
       ? `¥${spot.pricing.pricePerNight}`
       : '料金未設定';
+    const description = `${spot.prefecture}の${typeLabel}「${spot.name}」の車中泊スポット情報。${priceInfo}。${spot.address}`;
     const url = `https://tabi.over40web.club/shachu-haku/${params.spotId}`;
 
     return {
       title: title,
+      description: description,
       keywords: `車中泊,${spot.prefecture},${typeLabel},${spot.name},旅のしおり`,
       openGraph: {
         title: title,
+        description: description,
         url: url,
         images: [
           {
