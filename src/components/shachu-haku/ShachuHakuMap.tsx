@@ -203,7 +203,9 @@ export default function ShachuHakuMap({
       // Close all existing popups
       const existingPopups = document.querySelectorAll('.mapboxgl-popup');
       existingPopups.forEach((popup) => {
-        const closeButton = popup.querySelector('.mapboxgl-popup-close-button') as HTMLElement;
+        const closeButton = popup.querySelector(
+          '.mapboxgl-popup-close-button'
+        ) as HTMLElement;
         if (closeButton) {
           closeButton.click();
         }
@@ -305,19 +307,21 @@ export default function ShachuHakuMap({
       // Click event
       markerElement.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent map click event from firing
-        
+
         // Close all existing popups first
         const existingPopups = document.querySelectorAll('.mapboxgl-popup');
         existingPopups.forEach((popup) => {
-          const closeButton = popup.querySelector('.mapboxgl-popup-close-button') as HTMLElement;
+          const closeButton = popup.querySelector(
+            '.mapboxgl-popup-close-button'
+          ) as HTMLElement;
           if (closeButton) {
             closeButton.click();
           }
         });
-        
+
         // Then show this marker's popup
         marker.togglePopup();
-        
+
         // For admin mode, also call the spot selection handler
         if (!readonly) {
           onSpotSelect(spot);
@@ -355,14 +359,8 @@ export default function ShachuHakuMap({
     spot: CampingSpotWithId,
     isReadonly: boolean
   ): string => {
-    const isNotesLong = spot.notes && spot.notes.length > 100;
-    const truncatedNotes = isNotesLong
-      ? spot.notes?.substring(0, 100) + '...'
-      : spot.notes;
-    const spotId = `spot-${spot._id}`;
-
     return `
-      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(280px, 50vw, 400px); max-height: 70vh; overflow-y: auto;">
+      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px);">
         <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${
           spot.name
         }</h3>
@@ -370,87 +368,27 @@ export default function ShachuHakuMap({
           <div><strong class="text-gray-900">種別:</strong> ${
             CampingSpotTypeLabels[spot.type]
           }</div>
-          <div><strong class="text-gray-900">都道府県:</strong> ${
-            spot.prefecture
-          }</div>
-          <div><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(spot)}/5 🔒</div>
-          <div><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(spot)}/5 🔇</div>
+          <div class="flex justify-between items-center">
+            <span><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(
+              spot
+            )}/5 🔒</span>
+            <span><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(
+              spot
+            )}/5 🔇</span>
+          </div>
           <div><strong class="text-gray-900">料金:</strong> ${
             spot.pricing.isFree
               ? '無料'
               : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
           }</div>
-          ${
-            spot.distanceToToilet
-              ? `<div><strong class="text-gray-900">トイレ:</strong> ${spot.distanceToToilet}m</div>`
-              : ''
-          }
-          ${
-            spot.distanceToBath
-              ? `<div><strong class="text-gray-900">入浴施設:</strong> ${spot.distanceToBath}m</div>`
-              : ''
-          }
-          ${
-            spot.distanceToConvenience
-              ? `<div><strong class="text-gray-900">コンビニ:</strong> ${spot.distanceToConvenience}m</div>`
-              : ''
-          }
-          ${
-            spot.elevation
-              ? `<div><strong class="text-gray-900">標高:</strong> ${spot.elevation}m</div>`
-              : ''
-          }
-          <div class="flex gap-1 mt-2 flex-wrap">
-            ${
-              spot.hasRoof
-                ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">屋根付き</span>'
-                : ''
-            }
-            ${
-              spot.hasPowerOutlet
-                ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">電源</span>'
-                : ''
-            }
+          <div class="mt-3 pt-2 border-t border-gray-200">
+            <button
+              onclick="window.location.href='/shachu-haku/${spot._id}'"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+            >
+              もっと見る
+            </button>
           </div>
-          ${
-            spot.notes
-              ? `<div class="mt-2 text-gray-700">
-                  <strong class="text-gray-900">備考:</strong> 
-                  <span class="break-words">
-                    <span id="${spotId}-short"${
-                  isNotesLong ? '' : ' style="display: none;"'
-                }>${truncatedNotes}</span>
-                    <span id="${spotId}-full" style="display: ${
-                  isNotesLong ? 'none' : 'inline'
-                };">${spot.notes}</span>
-                  </span>
-                  ${
-                    isNotesLong
-                      ? `
-                    <button
-                      id="${spotId}-toggle"
-                      onclick="
-                        const short = document.getElementById('${spotId}-short');
-                        const full = document.getElementById('${spotId}-full');
-                        const btn = document.getElementById('${spotId}-toggle');
-                        if (full.style.display === 'none') {
-                          short.style.display = 'none';
-                          full.style.display = 'inline';
-                          btn.textContent = '閉じる';
-                        } else {
-                          short.style.display = 'inline';
-                          full.style.display = 'none';
-                          btn.textContent = 'もっと見る';
-                        }
-                      "
-                      class="ml-1 text-blue-600 hover:text-blue-800 underline text-xs cursor-pointer"
-                    >もっと見る</button>
-                  `
-                      : ''
-                  }
-                </div>`
-              : ''
-          }
         </div>
       </div>
     `;
