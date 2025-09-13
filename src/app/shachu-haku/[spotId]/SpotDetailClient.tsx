@@ -9,12 +9,20 @@ import {
   Zap,
   Shield,
   Volume2,
+  Navigation,
+  Map,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -80,6 +88,41 @@ interface SpotDetailClientProps {
 export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const { toast } = useToast();
 
+  const openCurrentLocationRoute = () => {
+    const [longitude, latitude] = spot.coordinates;
+
+    if (
+      typeof navigator !== 'undefined' &&
+      /iPhone|iPad|iPod/i.test(navigator.userAgent)
+    ) {
+      // iOS: Google Maps app を優先
+      const mapUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
+      window.location.href = mapUrl;
+
+      // フォールバック: Google Maps Web
+      setTimeout(() => {
+        window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+      }, 2000);
+    } else if (
+      typeof navigator !== 'undefined' &&
+      /Android/i.test(navigator.userAgent)
+    ) {
+      // Android: Google Maps Navigation
+      const mapUrl = `google.navigation:q=${latitude},${longitude}&mode=d`;
+      window.location.href = mapUrl;
+    } else {
+      // Desktop or other: Open in new tab
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+      window.open(url, '_blank');
+    }
+  };
+
+  const showOnMap = () => {
+    const [longitude, latitude] = spot.coordinates;
+    const url = `https://www.google.com/maps/place/${latitude},${longitude}`;
+    window.open(url, '_blank');
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     const title = `${spot.name} - 車中泊スポット`;
@@ -118,25 +161,44 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   return (
     <div className='container mx-auto p-6 space-y-6'>
       {/* ヘッダー */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-4'>
+      <div className='space-y-4'>
+        {/* 戻るボタン */}
+        <div>
           <Link href='/shachu-haku'>
             <Button variant='outline' size='sm'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               地図に戻る
             </Button>
           </Link>
+        </div>
+
+        {/* タイトルとボタン */}
+        <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4'>
           <div>
             <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
               {spot.name}
             </h1>
             <p className='text-gray-600 dark:text-gray-400'>{spot.address}</p>
           </div>
+          <div className='flex flex-wrap gap-2'>
+            <Button
+              onClick={openCurrentLocationRoute}
+              variant='outline'
+              size='sm'
+            >
+              <Navigation className='w-4 h-4 mr-2' />
+              ルート検索
+            </Button>
+            <Button onClick={showOnMap} variant='outline' size='sm'>
+              <Map className='w-4 h-4 mr-2' />
+              地図で表示
+            </Button>
+            <Button onClick={handleShare} variant='outline' size='sm'>
+              <Share2 className='w-4 h-4 mr-2' />
+              共有
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleShare} variant='outline'>
-          <Share2 className='w-4 h-4 mr-2' />
-          共有
-        </Button>
       </div>
 
       {/* バッジ */}
