@@ -411,7 +411,7 @@ export default function ShachuHakuMap({
             <div className='text-sm space-y-1 text-gray-700 dark:text-gray-300'>
               <div>• マーカーをクリック: スポット編集</div>
               <div>• 地図をダブルクリック: 新規作成</div>
-              <div>• マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 → 赤=1点・未評価(?)</div>
+              <div>• マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 → 赤=1点</div>
             </div>
           </CollapsibleContent>
         </Collapsible>

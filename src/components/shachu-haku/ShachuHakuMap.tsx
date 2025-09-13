@@ -428,7 +428,7 @@ export default function ShachuHakuMap({
               {!readonly && <div>• 地図をダブルクリック: 新規作成</div>}
               <div>
                 • マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 →
-                赤=1点・未評価(?)
+                赤=1点
               </div>
             </div>
           </CollapsibleContent>
