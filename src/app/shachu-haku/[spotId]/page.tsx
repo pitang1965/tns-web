@@ -68,7 +68,7 @@ export const generateMetadata = async ({
         type: 'website',
       },
       twitter: {
-        card: 'summary_large_image',
+        card: 'summary',
       },
     };
   } catch (error) {
@@ -91,7 +91,7 @@ export const generateMetadata = async ({
         type: 'website',
       },
       twitter: {
-        card: 'summary_large_image',
+        card: 'summary',
       },
     };
   }
