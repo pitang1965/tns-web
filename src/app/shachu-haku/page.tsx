@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     url: 'https://tabi.over40web.club/shachu-haku',
     images: [
       {
-        url: 'https://tabi.over40web.club/touge.webp',
+        url: 'https://tabi.over40web.club/shachu-haku.webp',
         width: 1200,
-        height: 628,
-        alt: '車中泊スポット検索 - 旅のしおり',
+        height: 629,
+        alt: '車中泊スポット - 旅のしおり',
       },
     ],
     locale: 'ja_JP',

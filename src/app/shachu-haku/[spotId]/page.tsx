@@ -23,10 +23,10 @@ export const generateMetadata = async ({
           description: '指定された車中泊スポットの情報が見つかりませんでした。',
           images: [
             {
-              url: 'https://tabi.over40web.club/touge.webp',
+              url: 'https://tabi.over40web.club/shachu-haku.webp',
               width: 1200,
-              height: 628,
-              alt: '旅のしおり - 車中泊スポット検索',
+              height: 629,
+              alt: '車中泊スポット - 旅のしおり',
             },
           ],
           locale: 'ja_JP',
@@ -58,9 +58,9 @@ export const generateMetadata = async ({
         url: url,
         images: [
           {
-            url: 'https://tabi.over40web.club/touge.webp',
+            url: 'https://tabi.over40web.club/shachu-haku.webp',
             width: 1200,
-            height: 628,
+            height: 629,
             alt: `${spot.name} - 車中泊スポット`,
           },
         ],
@@ -81,10 +81,10 @@ export const generateMetadata = async ({
         description: '車中泊スポットの詳細情報をご覧いただけます。',
         images: [
           {
-            url: 'https://tabi.over40web.club/touge.webp',
+            url: 'https://tabi.over40web.club/shachu-haku.webp',
             width: 1200,
-            height: 628,
-            alt: '旅のしおり - 車中泊スポット検索',
+            height: 629,
+            alt: '夜の車中泊スポット - 旅のしおり',
           },
         ],
         locale: 'ja_JP',
