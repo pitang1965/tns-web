@@ -142,7 +142,7 @@ export default function ShachuHakuClient() {
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
-        <div className='flex justify-between items-center'>
+        <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-2'>
           <h1 className='text-3xl font-bold'>車中泊スポット</h1>
           <div className='text-sm text-gray-600'>
             ログイン不要で車中泊スポットを検索・閲覧できます
