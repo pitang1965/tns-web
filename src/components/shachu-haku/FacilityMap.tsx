@@ -12,6 +12,7 @@ import {
   setupJapaneseLabels,
   setupPOIFilters,
 } from '@/lib/mapboxIcons';
+import { isInAppBrowser } from '@/lib/browserDetection';
 import {
   Collapsible,
   CollapsibleContent,
@@ -191,8 +192,20 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       zoom: 14,
     });
 
-    // エラーハンドラの設定
-    map.current.on('error', handleMapError);
+    // エラーハンドラの設定（In-App Browser対応）
+    map.current.on('error', (error) => {
+      // In-App BrowserでのpostMessageエラーを無視
+      if (
+        isInAppBrowser() &&
+        error.error &&
+        error.error.message &&
+        error.error.message.includes('postMessage')
+      ) {
+        console.log('Suppressed postMessage error in In-App Browser');
+        return;
+      }
+      handleMapError(error);
+    });
 
     // スタイルが読み込まれる前に、既知の不足アイコンを事前登録
     map.current.on('styledata', () => {
@@ -308,7 +321,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
 
   const createFacilityPopupHTML = (facility: FacilityMarker): string => {
     const style = getMarkerStyle(facility.type);
-    
+
     return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
         <div class="flex items-center gap-2 mb-2">
@@ -334,7 +347,9 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   if (!MAPBOX_TOKEN) {
     return (
       <div className='h-[400px] bg-gray-100 flex items-center justify-center rounded-lg'>
-        <p className='text-gray-600 dark:text-gray-400'>Mapboxトークンが設定されていません</p>
+        <p className='text-gray-600 dark:text-gray-400'>
+          Mapboxトークンが設定されていません
+        </p>
       </div>
     );
   }
@@ -342,7 +357,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   return (
     <div className='relative'>
       <div ref={mapContainer} className='h-[400px] w-full rounded-lg' />
-      
+
       {/* 凡例 */}
       <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
         <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
@@ -359,26 +374,37 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
           <CollapsibleContent className='px-3 pb-3'>
             <div className='space-y-2'>
               {legendItems.map((item) => {
-                const facilityExists = facilityMarkers.some(f => f.type === item.type);
+                const facilityExists = facilityMarkers.some(
+                  (f) => f.type === item.type
+                );
                 return (
                   <div
                     key={item.type}
                     className={`flex items-center gap-2 text-sm ${
-                      facilityExists 
-                        ? 'text-gray-700 dark:text-gray-300' 
+                      facilityExists
+                        ? 'text-gray-700 dark:text-gray-300'
                         : 'text-gray-400 dark:text-gray-500'
                     }`}
                   >
                     <div
                       className='w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs'
-                      style={{ backgroundColor: facilityExists ? item.color : '#e5e7eb' }}
+                      style={{
+                        backgroundColor: facilityExists
+                          ? item.color
+                          : '#e5e7eb',
+                      }}
                     >
                       <span style={{ fontSize: '10px' }}>{item.icon}</span>
                     </div>
                     <span>{item.label}</span>
                     {facilityExists && item.type !== 'camping' && (
                       <span className='text-xs text-gray-500 dark:text-gray-400'>
-                        ({facilityMarkers.find(f => f.type === item.type)?.distance}m)
+                        (
+                        {
+                          facilityMarkers.find((f) => f.type === item.type)
+                            ?.distance
+                        }
+                        m)
                       </span>
                     )}
                   </div>

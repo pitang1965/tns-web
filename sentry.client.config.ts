@@ -28,4 +28,33 @@ Sentry.init({
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  // Filter out known In-App Browser errors
+  beforeSend(event) {
+    // Filter out postMessage errors from In-App Browsers (Facebook, Instagram, etc.)
+    if (event.exception?.values?.[0]?.value?.includes('postMessage: Java object is gone')) {
+      return null; // Don't send this error to Sentry
+    }
+
+    // Filter out other common In-App Browser WebView errors
+    const errorMessage = event.exception?.values?.[0]?.value?.toLowerCase();
+    if (errorMessage?.includes('java object is gone') ||
+        errorMessage?.includes('webview') && errorMessage?.includes('gone')) {
+      return null;
+    }
+
+    // Add browser context for debugging
+    if (typeof navigator !== 'undefined') {
+      event.contexts = event.contexts || {};
+      event.contexts.browser_details = {
+        userAgent: navigator.userAgent,
+        isFacebookBrowser: /FBAN|FBAV/.test(navigator.userAgent),
+        isInstagramBrowser: /Instagram/.test(navigator.userAgent),
+        isLineBrowser: /Line/.test(navigator.userAgent),
+        isTwitterBrowser: /Twitter/.test(navigator.userAgent),
+      };
+    }
+
+    return event;
+  },
 });

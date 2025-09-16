@@ -31,6 +31,13 @@ import {
   calculateSecurityLevel,
   calculateQuietnessLevel,
 } from '@/lib/campingSpotUtils';
+import {
+  isFacebookBrowser,
+  isInAppBrowser,
+  safeWindowOpen,
+  safeSocialShare,
+  safeClipboardWrite,
+} from '@/lib/browserDetection';
 
 // Dynamically import the map components to avoid SSR issues
 const FacilityMap = dynamic(
@@ -91,67 +98,104 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const openCurrentLocationRoute = () => {
     const [longitude, latitude] = spot.coordinates;
 
-    if (
-      typeof navigator !== 'undefined' &&
-      /iPhone|iPad|iPod/i.test(navigator.userAgent)
-    ) {
-      // iOS: Google Maps app を優先
-      const mapUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
-      window.location.href = mapUrl;
+    try {
+      if (
+        typeof navigator !== 'undefined' &&
+        /iPhone|iPad|iPod/i.test(navigator.userAgent)
+      ) {
+        // iOS: Google Maps app を優先
+        const mapUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
 
-      // フォールバック: Google Maps Web
-      setTimeout(() => {
-        window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-      }, 2000);
-    } else if (
-      typeof navigator !== 'undefined' &&
-      /Android/i.test(navigator.userAgent)
-    ) {
-      // Android: Google Maps Navigation
-      const mapUrl = `google.navigation:q=${latitude},${longitude}&mode=d`;
-      window.location.href = mapUrl;
-    } else {
-      // Desktop or other: Open in new tab
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-      window.open(url, '_blank');
+        // In-App Browserでは直接的なlocation.href変更を避ける
+        if (isInAppBrowser()) {
+          safeWindowOpen(mapUrl, '_self');
+
+          // フォールバック: Google Maps Web（遅延なし）
+          setTimeout(() => {
+            const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+            safeWindowOpen(webUrl, '_blank');
+          }, 500);
+        } else {
+          window.location.href = mapUrl;
+
+          // フォールバック: Google Maps Web
+          setTimeout(() => {
+            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+          }, 2000);
+        }
+      } else if (
+        typeof navigator !== 'undefined' &&
+        /Android/i.test(navigator.userAgent)
+      ) {
+        // Android: Google Maps Navigation
+        const mapUrl = `google.navigation:q=${latitude},${longitude}&mode=d`;
+
+        if (isInAppBrowser()) {
+          safeWindowOpen(mapUrl, '_self');
+        } else {
+          window.location.href = mapUrl;
+        }
+      } else {
+        // Desktop or other: Open in new tab
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+        safeWindowOpen(url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening route:', error);
+
+      // 最終フォールバック: Google Maps Web
+      const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
+      safeWindowOpen(fallbackUrl, '_blank');
+
+      toast({
+        title: '注意',
+        description: 'ルート検索を外部ブラウザで開きます',
+      });
     }
   };
 
   const showOnMap = () => {
     const [longitude, latitude] = spot.coordinates;
     const url = `https://www.google.com/maps/place/${latitude},${longitude}`;
-    window.open(url, '_blank');
+    safeWindowOpen(url, '_blank');
   };
 
   const handleShare = async () => {
     const url = window.location.href;
     const title = `${spot.name} - 車中泊スポット`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          url,
-        });
-      } catch (error) {
-        // ユーザーがキャンセルした場合などはエラーを無視
-        console.log('Share cancelled');
-      }
+    // In-App Browserの警告表示（Facebook等）
+    if (isFacebookBrowser()) {
+      toast({
+        title: 'ブラウザ環境について',
+        description: 'Facebook内ブラウザでは一部機能が制限されます。外部ブラウザでの閲覧を推奨します。',
+        duration: 5000,
+      });
+    }
+
+    // 安全なソーシャル共有を試行
+    const shareSuccess = await safeSocialShare({ title, url });
+
+    if (shareSuccess) {
+      // 共有成功
+      return;
+    }
+
+    // Web Share API非対応またはエラーの場合はクリップボードにコピー
+    const clipboardSuccess = await safeClipboardWrite(url);
+
+    if (clipboardSuccess) {
+      toast({
+        title: '共有リンクをコピーしました',
+        description: 'URLがクリップボードにコピーされました',
+      });
     } else {
-      // Web Share API非対応の場合はクリップボードにコピー
-      try {
-        await navigator.clipboard.writeText(url);
-        toast({
-          title: '共有リンクをコピーしました',
-          description: 'URLがクリップボードにコピーされました',
-        });
-      } catch (error) {
-        toast({
-          title: 'エラー',
-          description: 'URLのコピーに失敗しました',
-          variant: 'destructive',
-        });
-      }
+      // 最終フォールバック: 手動コピー用のアラート
+      toast({
+        title: '共有リンク',
+        description: `以下のURLを手動でコピーしてください: ${url}`,
+        duration: 10000,
+      });
     }
   };
 
