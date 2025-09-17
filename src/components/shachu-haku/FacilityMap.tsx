@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
@@ -40,44 +40,56 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // 施設マーカーのデータを生成
-  const facilityMarkers: FacilityMarker[] = [
-    {
-      coordinates: spot.coordinates,
-      type: 'camping',
-      name: spot.name,
-    },
-    ...(spot.nearbyToiletCoordinates
-      ? [
-          {
-            coordinates: spot.nearbyToiletCoordinates,
-            type: 'toilet' as const,
-            name: 'トイレ',
-            distance: spot.distanceToToilet,
-          },
-        ]
-      : []),
-    ...(spot.nearbyConvenienceCoordinates
-      ? [
-          {
-            coordinates: spot.nearbyConvenienceCoordinates,
-            type: 'convenience' as const,
-            name: 'コンビニ',
-            distance: spot.distanceToConvenience,
-          },
-        ]
-      : []),
-    ...(spot.nearbyBathCoordinates
-      ? [
-          {
-            coordinates: spot.nearbyBathCoordinates,
-            type: 'bath' as const,
-            name: '入浴施設',
-            distance: spot.distanceToBath,
-          },
-        ]
-      : []),
-  ];
+  // 施設マーカーのデータを生成（useMemoでメモ化してre-renderを防ぐ）
+  const facilityMarkers: FacilityMarker[] = useMemo(
+    () => [
+      {
+        coordinates: spot.coordinates,
+        type: 'camping',
+        name: spot.name,
+      },
+      ...(spot.nearbyToiletCoordinates
+        ? [
+            {
+              coordinates: spot.nearbyToiletCoordinates,
+              type: 'toilet' as const,
+              name: 'トイレ',
+              distance: spot.distanceToToilet,
+            },
+          ]
+        : []),
+      ...(spot.nearbyConvenienceCoordinates
+        ? [
+            {
+              coordinates: spot.nearbyConvenienceCoordinates,
+              type: 'convenience' as const,
+              name: 'コンビニ',
+              distance: spot.distanceToConvenience,
+            },
+          ]
+        : []),
+      ...(spot.nearbyBathCoordinates
+        ? [
+            {
+              coordinates: spot.nearbyBathCoordinates,
+              type: 'bath' as const,
+              name: '入浴施設',
+              distance: spot.distanceToBath,
+            },
+          ]
+        : []),
+    ],
+    [
+      spot.coordinates,
+      spot.name,
+      spot.nearbyToiletCoordinates,
+      spot.distanceToToilet,
+      spot.nearbyConvenienceCoordinates,
+      spot.distanceToConvenience,
+      spot.nearbyBathCoordinates,
+      spot.distanceToBath,
+    ]
+  );
 
   // マーカーの色とアイコンを取得
   const getMarkerStyle = (type: string) => {
