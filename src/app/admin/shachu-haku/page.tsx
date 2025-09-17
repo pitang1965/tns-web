@@ -618,6 +618,11 @@ export default function ShachuHakuAdminPage() {
                                 </Badge>
                               )}
                             </div>
+                            {spot.notes && (
+                              <p className='text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2'>
+                                {spot.notes}
+                              </p>
+                            )}
                           </div>
                           <div className='flex gap-2'>
                             <Button
