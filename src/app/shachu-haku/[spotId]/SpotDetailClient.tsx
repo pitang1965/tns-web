@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   Share2,
@@ -94,6 +95,8 @@ interface SpotDetailClientProps {
 
 export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const isFromList = searchParams.get('from') === 'list';
 
   const openCurrentLocationRoute = () => {
     const [longitude, latitude] = spot.coordinates;
@@ -208,10 +211,10 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
       <div className='space-y-4'>
         {/* 戻るボタン */}
         <div>
-          <Link href='/shachu-haku'>
+          <Link href={isFromList ? '/shachu-haku?tab=list' : '/shachu-haku'}>
             <Button variant='outline' size='sm'>
               <ArrowLeft className='w-4 h-4 mr-2' />
-              地図に戻る
+              {isFromList ? '一覧に戻る' : '地図に戻る'}
             </Button>
           </Link>
         </div>

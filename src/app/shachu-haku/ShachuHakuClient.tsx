@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,13 +77,19 @@ const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
 };
 
 export default function ShachuHakuClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [spots, setSpots] = useState<CampingSpotWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
     null
   );
-  const [activeTab, setActiveTab] = useState<'map' | 'list'>('map');
+  const [activeTab, setActiveTab] = useState<'map' | 'list'>(() => {
+    // URLパラメータからタブを決定
+    const tabParam = searchParams.get('tab');
+    return tabParam === 'list' ? 'list' : 'map';
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [prefectureFilter, setPrefectureFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -139,6 +146,18 @@ export default function ShachuHakuClient() {
     setSelectedSpot(spot);
   };
 
+  const handleNavigateToSpotDetail = (spotId: string) => {
+    // 個別ページに遷移（一覧表示からの遷移を示すパラメータを追加）
+    router.push(`/shachu-haku/${spotId}?from=list`);
+  };
+
+  const handleTabChange = (tab: 'map' | 'list') => {
+    setActiveTab(tab);
+    // URLパラメータを更新
+    const url = tab === 'list' ? '/shachu-haku?tab=list' : '/shachu-haku';
+    router.replace(url);
+  };
+
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
@@ -186,13 +205,11 @@ export default function ShachuHakuClient() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(
-                    ([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    )
-                  )}
+                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -203,7 +220,7 @@ export default function ShachuHakuClient() {
         <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
-            onClick={() => setActiveTab('map')}
+            onClick={() => handleTabChange('map')}
             className='rounded-b-none'
           >
             <MapPin className='w-4 h-4 mr-2' />
@@ -211,7 +228,7 @@ export default function ShachuHakuClient() {
           </Button>
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
-            onClick={() => setActiveTab('list')}
+            onClick={() => handleTabChange('list')}
             className='rounded-b-none'
           >
             一覧表示
@@ -231,7 +248,9 @@ export default function ShachuHakuClient() {
               <CardContent>
                 {loading ? (
                   <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-                    <div className='text-gray-500'>地図データを読み込み中...</div>
+                    <div className='text-gray-500'>
+                      地図データを読み込み中...
+                    </div>
                   </div>
                 ) : (
                   <ShachuHakuMap
@@ -248,7 +267,6 @@ export default function ShachuHakuClient() {
         {/* List Tab Content */}
         {activeTab === 'list' && (
           <div className='space-y-4'>
-
             {/* Stats */}
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               <Card>
@@ -365,7 +383,7 @@ export default function ShachuHakuClient() {
                               variant='outline'
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleListSpotSelect(spot);
+                                handleNavigateToSpotDetail(spot._id);
                               }}
                             >
                               <Info className='w-4 h-4' />
