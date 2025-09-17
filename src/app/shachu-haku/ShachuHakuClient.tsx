@@ -163,7 +163,7 @@ export default function ShachuHakuClient() {
       <div className='space-y-4'>
         <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-2'>
           <h1 className='text-3xl font-bold'>車中泊スポット</h1>
-          <div className='text-sm text-gray-600'>
+          <div className='text-sm text-gray-600 dark:text-gray-300'>
             ログイン不要で車中泊スポットを検索・閲覧できます
           </div>
         </div>
@@ -274,7 +274,9 @@ export default function ShachuHakuClient() {
                   <div className='text-2xl font-bold text-blue-600'>
                     {spots?.length || 0}
                   </div>
-                  <div className='text-sm text-gray-600'>総スポット数</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    総スポット数
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -282,7 +284,9 @@ export default function ShachuHakuClient() {
                   <div className='text-2xl font-bold text-green-600'>
                     {spots?.filter((s) => s.pricing.isFree).length || 0}
                   </div>
-                  <div className='text-sm text-gray-600'>無料スポット</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    無料スポット
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -290,7 +294,9 @@ export default function ShachuHakuClient() {
                   <div className='text-2xl font-bold text-yellow-600'>
                     {spots?.filter((s) => s.isVerified).length || 0}
                   </div>
-                  <div className='text-sm text-gray-600'>確認済み</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    確認済み
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -298,7 +304,9 @@ export default function ShachuHakuClient() {
                   <div className='text-2xl font-bold text-purple-600'>
                     {spots ? new Set(spots.map((s) => s.prefecture)).size : 0}
                   </div>
-                  <div className='text-sm text-gray-600'>都道府県数</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    都道府県数
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -330,7 +338,9 @@ export default function ShachuHakuClient() {
                             <h3 className='font-semibold text-lg'>
                               {spot.name}
                             </h3>
-                            <p className='text-gray-600'>{spot.address}</p>
+                            <p className='text-gray-600 dark:text-gray-300'>
+                              {spot.address}
+                            </p>
                             <div className='flex gap-2 mt-2 flex-wrap'>
                               <Badge
                                 className={`${getTypeColor(
@@ -372,7 +382,7 @@ export default function ShachuHakuClient() {
                               )}
                             </div>
                             {spot.notes && (
-                              <p className='text-sm text-gray-500 mt-2 line-clamp-2'>
+                              <p className='text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2'>
                                 {spot.notes}
                               </p>
                             )}
@@ -420,7 +430,7 @@ export default function ShachuHakuClient() {
               <div className='space-y-4'>
                 <div>
                   <h4 className='font-semibold'>基本情報</h4>
-                  <p className='text-sm text-gray-600'>
+                  <p className='text-sm text-gray-600 dark:text-gray-300'>
                     {selectedSpot.address}
                   </p>
                   <div className='flex gap-2 mt-2'>
@@ -461,7 +471,7 @@ export default function ShachuHakuClient() {
                 {selectedSpot.notes && (
                   <div>
                     <h4 className='font-semibold'>備考</h4>
-                    <p className='text-sm text-gray-700'>
+                    <p className='text-sm text-gray-700 dark:text-gray-300'>
                       {selectedSpot.notes}
                     </p>
                   </div>

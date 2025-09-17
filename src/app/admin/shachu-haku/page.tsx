@@ -338,8 +338,10 @@ export default function ShachuHakuAdminPage() {
     return (
       <div className='flex flex-col justify-center items-center h-screen space-y-4'>
         <h1 className='text-2xl font-bold text-red-600'>アクセス拒否</h1>
-        <p className='text-gray-600'>この機能は管理者のみ利用可能です。</p>
-        <p className='text-sm text-gray-500'>
+        <p className='text-gray-600 dark:text-gray-300'>
+          この機能は管理者のみ利用可能です。
+        </p>
+        <p className='text-sm text-gray-500 dark:text-gray-400'>
           管理者権限が必要な場合は、システム管理者にお問い合わせください。
         </p>
       </div>
@@ -419,13 +421,11 @@ export default function ShachuHakuAdminPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(
-                    ([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    )
-                  )}
+                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -464,7 +464,9 @@ export default function ShachuHakuAdminPage() {
               <CardContent>
                 {loading ? (
                   <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-                    <div className='text-gray-500'>地図データを読み込み中...</div>
+                    <div className='text-gray-500 dark:text-gray-400'>
+                      地図データを読み込み中...
+                    </div>
                   </div>
                 ) : (
                   <ShachuHakuMap
@@ -502,7 +504,6 @@ export default function ShachuHakuAdminPage() {
         {/* List Tab Content */}
         {activeTab === 'list' && (
           <div className='space-y-4'>
-
             {/* Stats */}
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               <Card>
@@ -510,7 +511,9 @@ export default function ShachuHakuAdminPage() {
                   <div className='text-2xl font-bold text-blue-600'>
                     {spots.length}
                   </div>
-                  <div className='text-sm text-gray-600'>総スポット数</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    総スポット数
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -518,7 +521,9 @@ export default function ShachuHakuAdminPage() {
                   <div className='text-2xl font-bold text-green-600'>
                     {spots.filter((s) => s.pricing.isFree).length}
                   </div>
-                  <div className='text-sm text-gray-600'>無料スポット</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    無料スポット
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -526,7 +531,9 @@ export default function ShachuHakuAdminPage() {
                   <div className='text-2xl font-bold text-yellow-600'>
                     {spots.filter((s) => s.isVerified).length}
                   </div>
-                  <div className='text-sm text-gray-600'>確認済み</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    確認済み
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -534,7 +541,9 @@ export default function ShachuHakuAdminPage() {
                   <div className='text-2xl font-bold text-purple-600'>
                     {new Set(spots.map((s) => s.prefecture)).size}
                   </div>
-                  <div className='text-sm text-gray-600'>都道府県数</div>
+                  <div className='text-sm text-gray-600 dark:text-gray-300'>
+                    都道府県数
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -550,7 +559,7 @@ export default function ShachuHakuAdminPage() {
                 {loading ? (
                   <div className='text-center py-8'>読み込み中...</div>
                 ) : filteredSpots.length === 0 ? (
-                  <div className='text-center py-8 text-gray-500'>
+                  <div className='text-center py-8 text-gray-500 dark:text-gray-400'>
                     条件に一致する車中泊スポットがありません
                   </div>
                 ) : (
@@ -566,7 +575,9 @@ export default function ShachuHakuAdminPage() {
                             <h3 className='font-semibold text-lg'>
                               {spot.name}
                             </h3>
-                            <p className='text-gray-600'>{spot.address}</p>
+                            <p className='text-gray-600 dark:text-gray-300'>
+                              {spot.address}
+                            </p>
                             <div className='flex gap-2 mt-2 flex-wrap'>
                               <Badge
                                 className={`${getTypeColor(
