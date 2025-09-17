@@ -85,23 +85,30 @@ export default function ShachuHakuMap({
           padding: 0 !important;
           background: transparent !important;
           box-shadow: none !important;
+          position: relative !important;
+          overflow: visible !important;
         }
         .custom-popup .mapboxgl-popup-tip {
           display: block !important;
         }
         .custom-popup .mapboxgl-popup-close-button {
-          font-size: 20px !important;
-          width: 30px !important;
-          height: 30px !important;
-          line-height: 30px !important;
+          position: absolute !important;
+          font-size: 18px !important;
+          width: 28px !important;
+          height: 28px !important;
+          line-height: 26px !important;
           background-color: white !important;
           color: #374151 !important;
           border-radius: 50% !important;
-          right: 8px !important;
+          left: 8px !important;
           top: 8px !important;
           font-weight: bold !important;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-          border: none !important;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+          border: 1px solid #e5e7eb !important;
+          z-index: 100 !important;
+          text-align: center !important;
+          padding: 0 !important;
+          margin: 0 !important;
         }
         .custom-popup .mapboxgl-popup-close-button:hover {
           background-color: #f3f4f6 !important;
@@ -360,7 +367,7 @@ export default function ShachuHakuMap({
     isReadonly: boolean
   ): string => {
     return `
-      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px);">
+      <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
         <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${
           spot.name
         }</h3>
