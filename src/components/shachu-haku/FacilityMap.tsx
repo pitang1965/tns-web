@@ -441,6 +441,17 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
                 const facilityExists = facilityMarkers.some(
                   (f) => f.type === item.type
                 );
+
+                // 距離データを取得（座標の有無に関わらず）
+                let distance: number | undefined;
+                if (item.type === 'toilet') {
+                  distance = spot.distanceToToilet;
+                } else if (item.type === 'convenience') {
+                  distance = spot.distanceToConvenience;
+                } else if (item.type === 'bath') {
+                  distance = spot.distanceToBath;
+                }
+
                 return (
                   <div
                     key={item.type}
@@ -461,14 +472,9 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
                       <span style={{ fontSize: '10px' }}>{item.icon}</span>
                     </div>
                     <span>{item.label}</span>
-                    {facilityExists && item.type !== 'camping' && (
+                    {item.type !== 'camping' && distance != null && (
                       <span className='text-xs text-gray-500 dark:text-gray-400'>
-                        (
-                        {
-                          facilityMarkers.find((f) => f.type === item.type)
-                            ?.distance
-                        }
-                        m)
+                        ({distance}m)
                       </span>
                     )}
                   </div>
