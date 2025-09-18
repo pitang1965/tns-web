@@ -40,15 +40,42 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
+  // 座標の有効性をチェック
+  const isValidCoordinate = (
+    coords: [number, number] | undefined | null
+  ): coords is [number, number] => {
+    return (
+      coords != null &&
+      Array.isArray(coords) &&
+      coords.length === 2 &&
+      typeof coords[0] === 'number' &&
+      typeof coords[1] === 'number' &&
+      !isNaN(coords[0]) &&
+      !isNaN(coords[1]) &&
+      isFinite(coords[0]) &&
+      isFinite(coords[1]) &&
+      coords[0] >= -180 &&
+      coords[0] <= 180 &&
+      coords[1] >= -90 &&
+      coords[1] <= 90
+    );
+  };
+
   // 施設マーカーのデータを生成（useMemoでメモ化してre-renderを防ぐ）
   const facilityMarkers: FacilityMarker[] = useMemo(
     () => [
-      {
-        coordinates: spot.coordinates,
-        type: 'camping',
-        name: spot.name,
-      },
-      ...(spot.nearbyToiletCoordinates
+      // メインの車中泊スポット（有効な座標の場合のみ）
+      ...(isValidCoordinate(spot.coordinates)
+        ? [
+            {
+              coordinates: spot.coordinates,
+              type: 'camping' as const,
+              name: spot.name,
+            },
+          ]
+        : []),
+      // 近隣トイレ（有効な座標の場合のみ）
+      ...(isValidCoordinate(spot.nearbyToiletCoordinates)
         ? [
             {
               coordinates: spot.nearbyToiletCoordinates,
@@ -58,7 +85,8 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
             },
           ]
         : []),
-      ...(spot.nearbyConvenienceCoordinates
+      // 近隣コンビニ（有効な座標の場合のみ）
+      ...(isValidCoordinate(spot.nearbyConvenienceCoordinates)
         ? [
             {
               coordinates: spot.nearbyConvenienceCoordinates,
@@ -68,7 +96,8 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
             },
           ]
         : []),
-      ...(spot.nearbyBathCoordinates
+      // 近隣入浴施設（有効な座標の場合のみ）
+      ...(isValidCoordinate(spot.nearbyBathCoordinates)
         ? [
             {
               coordinates: spot.nearbyBathCoordinates,
@@ -190,6 +219,12 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         }
       `;
       document.head.appendChild(style);
+    }
+
+    // 座標の有効性チェック
+    if (!isValidCoordinate(spot.coordinates)) {
+      console.error('Invalid coordinates for spot:', spot.coordinates);
+      return;
     }
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -362,6 +397,23 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         <p className='text-gray-600 dark:text-gray-400'>
           Mapboxトークンが設定されていません
         </p>
+      </div>
+    );
+  }
+
+  // 有効な座標がない場合のエラー表示
+  if (!isValidCoordinate(spot.coordinates)) {
+    return (
+      <div className='h-[400px] bg-gray-100 flex items-center justify-center rounded-lg'>
+        <div className='text-center'>
+          <p className='text-gray-600 dark:text-gray-400 mb-2'>
+            地図情報が正しく設定されていません
+          </p>
+          <p className='text-sm text-gray-500 dark:text-gray-500'>
+            座標データ: [{spot.coordinates?.[0] || 'N/A'},{' '}
+            {spot.coordinates?.[1] || 'N/A'}]
+          </p>
+        </div>
       </div>
     );
   }

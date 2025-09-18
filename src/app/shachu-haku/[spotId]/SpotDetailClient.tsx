@@ -98,7 +98,38 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const searchParams = useSearchParams();
   const isFromList = searchParams.get('from') === 'list';
 
+  // 座標の有効性をチェック
+  const isValidCoordinate = (
+    coords: [number, number] | undefined | null
+  ): coords is [number, number] => {
+    return (
+      coords != null &&
+      Array.isArray(coords) &&
+      coords.length === 2 &&
+      typeof coords[0] === 'number' &&
+      typeof coords[1] === 'number' &&
+      !isNaN(coords[0]) &&
+      !isNaN(coords[1]) &&
+      isFinite(coords[0]) &&
+      isFinite(coords[1]) &&
+      coords[0] >= -180 &&
+      coords[0] <= 180 &&
+      coords[1] >= -90 &&
+      coords[1] <= 90
+    );
+  };
+
   const openCurrentLocationRoute = () => {
+    if (!isValidCoordinate(spot.coordinates)) {
+      toast({
+        title: 'エラー',
+        description:
+          '座標情報が正しく設定されていないため、ルート検索を実行できません。',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const [longitude, latitude] = spot.coordinates;
 
     try {
@@ -158,6 +189,16 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   };
 
   const showOnMap = () => {
+    if (!isValidCoordinate(spot.coordinates)) {
+      toast({
+        title: 'エラー',
+        description:
+          '座標情報が正しく設定されていないため、地図を表示できません。',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const [longitude, latitude] = spot.coordinates;
     const url = `https://www.google.com/maps/place/${latitude},${longitude}`;
     safeWindowOpen(url, '_blank');
@@ -171,7 +212,8 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
     if (isFacebookBrowser()) {
       toast({
         title: 'ブラウザ環境について',
-        description: 'Facebook内ブラウザでは一部機能が制限されます。外部ブラウザでの閲覧を推奨します。',
+        description:
+          'Facebook内ブラウザでは一部機能が制限されます。外部ブラウザでの閲覧を推奨します。',
         duration: 5000,
       });
     }
@@ -372,7 +414,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               <CardTitle>周辺施設</CardTitle>
             </CardHeader>
             <CardContent className='space-y-3'>
-              {spot.distanceToToilet && (
+              {spot.distanceToToilet != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
                     トイレまで
@@ -382,7 +424,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                   </span>
                 </div>
               )}
-              {spot.distanceToBath && (
+              {spot.distanceToBath != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
                     入浴施設まで
@@ -392,7 +434,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                   </span>
                 </div>
               )}
-              {spot.distanceToConvenience && (
+              {spot.distanceToConvenience != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
                     コンビニまで
