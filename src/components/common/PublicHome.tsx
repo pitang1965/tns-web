@@ -40,6 +40,7 @@ export default function ClientHome() {
           Maps連携により効率的な旅程管理を実現します。
           カーナビゲーション（Android Auto・Apple
           CarPlay）との連携を前提に設計されており、旅行中の移動をスムーズにサポートします。
+          また、車中泊スポットの情報も提供し、快適な旅を支援します。    
         </Text>
 
         <H2 className='mt-8 mb-4'>主な機能</H2>
