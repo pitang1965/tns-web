@@ -89,7 +89,7 @@ export default function ClientHome() {
           <li>
             <Text>
               <span className='font-semibold'>車中泊スポットマップ:</span>{' '}
-              開発中...
+              データ入力中...
             </Text>
           </li>
         </ul>
