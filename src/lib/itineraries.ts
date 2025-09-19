@@ -80,9 +80,9 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
 export async function getPublicItineraries(): Promise<
   ClientItineraryDocument[]
 > {
-  const db = await getDatabase();
-
   try {
+    const db = await getDatabase();
+
     const itineraries = await db
       .collection<ServerItineraryDocument>('itineraries')
       .find({ isPublic: true })
@@ -92,6 +92,8 @@ export async function getPublicItineraries(): Promise<
     return itineraries.map(toClientItinerary);
   } catch (error) {
     console.error('Error in getPublicItineraries:', error);
+    // Facebook Webview やネットワークエラーに対するフォールバック
+    // 空配列を返してページは正常に表示させる
     return [];
   }
 }

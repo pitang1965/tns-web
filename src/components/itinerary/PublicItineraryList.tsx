@@ -25,7 +25,14 @@ export const PublicItineraryList: React.FC<Props> = ({
           <PublicItineraryItem key={itinerary.id} itinerary={itinerary} />
         ))
       ) : (
-        <LargeText>公開されている旅程はまだありません。</LargeText>
+        <div className='col-span-full text-center py-8'>
+          <LargeText className='text-gray-600'>
+            現在公開されている旅程がありません。
+          </LargeText>
+          <p className='text-sm text-gray-500 mt-2'>
+            データの読み込みに問題がある場合は、しばらくしてから再度お試しください。
+          </p>
+        </div>
       )}
     </div>
   );
