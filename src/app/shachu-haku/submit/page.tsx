@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import CampingSpotSubmissionForm from '@/components/public/CampingSpotSubmissionForm';
+import CampingSpotSubmissionForm from '@/components/shachu-haku/CampingSpotSubmissionForm';
 
 export const metadata: Metadata = {
   title: '車中泊スポット情報の投稿 | 旅のしおり',

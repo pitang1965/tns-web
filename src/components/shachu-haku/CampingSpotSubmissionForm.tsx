@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -26,7 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { MapPin, Send, Info } from 'lucide-react';
+import { Send, Info, MapPin } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -172,15 +172,11 @@ export default function CampingSpotSubmissionForm({
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
-          車中泊スポット情報の投稿
-        </CardTitle>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-start gap-2">
             <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-800">
-              <p className="font-medium mb-1">投稿について</p>
+              <p className="font-medium mb-1">注意</p>
               <ul className="space-y-1 text-blue-700">
                 <li>• 投稿された情報は管理者が確認後に公開されます</li>
                 <li>• 正確な情報の提供にご協力ください</li>
@@ -243,11 +239,11 @@ export default function CampingSpotSubmissionForm({
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>スポットタイプ *</FormLabel>
+                      <FormLabel>種別 *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="タイプを選択" />
+                            <SelectValue placeholder="車中泊場所の種別を選択" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
