@@ -93,15 +93,31 @@ export function safeWindowOpen(
   if (typeof window === 'undefined') return null;
 
   try {
+    // Facebook WebViewなどでは特別な処理が必要
+    if (isFacebookBrowser()) {
+      // Facebook WebViewでは新しいタブが開けないことが多いため、現在のウィンドウで開く
+      window.location.href = url;
+      return null;
+    }
+
     return window.open(url, target, features);
   } catch (error) {
-    console.warn('window.open failed, falling back to location change:', error);
+    console.warn('window.open failed, falling back to location change:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      url,
+      target,
+      userAgent: navigator?.userAgent || 'Unknown',
+    });
 
     // フォールバック: 現在のウィンドウでページを開く
-    if (target === '_blank') {
-      window.location.href = url;
-    } else {
-      window.location.assign(url);
+    try {
+      if (target === '_blank') {
+        window.location.href = url;
+      } else {
+        window.location.assign(url);
+      }
+    } catch (fallbackError) {
+      console.error('Even fallback navigation failed:', fallbackError);
     }
     return null;
   }
@@ -118,12 +134,24 @@ export function safeSocialShare(data: ShareData): Promise<boolean> {
       return;
     }
 
+    // Facebook WebViewでは共有機能が制限されることが多い
+    if (isFacebookBrowser()) {
+      console.warn('Social share may be limited in Facebook WebView');
+    }
+
     // In-App Browserでは制限がある場合があるため、エラーハンドリングを強化
     navigator
       .share(data)
-      .then(() => resolve(true))
+      .then(() => {
+        console.log('Social share successful');
+        resolve(true);
+      })
       .catch((error) => {
-        console.warn('Social share failed:', error);
+        console.warn('Social share failed:', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          data,
+          userAgent: navigator?.userAgent || 'Unknown',
+        });
         resolve(false);
       });
   });

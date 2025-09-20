@@ -103,6 +103,7 @@ interface SpotDetailPageProps {
 
 export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
   if (!params?.spotId) {
+    console.error('SpotDetailPage: No spotId provided in params');
     notFound();
   }
 
@@ -110,12 +111,26 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
     const spot = await getCampingSpotById(params.spotId);
 
     if (!spot) {
+      console.error('SpotDetailPage: Spot not found for ID:', params.spotId);
       notFound();
     }
 
     return <SpotDetailClient spot={spot} />;
   } catch (error) {
-    console.error('Error loading spot:', error);
+    // Enhanced error logging for debugging Facebook WebView issues
+    console.error('SpotDetailPage: Error loading spot:', {
+      spotId: params.spotId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+      timestamp: new Date().toISOString(),
+    });
+
+    // For Facebook WebView and other In-App browsers, provide more specific error handling
+    if (typeof navigator !== 'undefined' && /FBAN|FBAV|Instagram|Line|Twitter/.test(navigator.userAgent)) {
+      console.warn('SpotDetailPage: Error occurred in In-App Browser environment');
+    }
+
     notFound();
   }
 }

@@ -32,13 +32,50 @@ async function checkAdminAuth() {
   return session.user;
 }
 
-// Helper function to ensure database connection
+// Helper function to ensure database connection with enhanced error handling
 async function ensureDbConnection() {
-  if (mongoose.connection.readyState === 0) {
-    // Connect to the same database as itineraries (itinerary_db)
-    const uri = process.env.MONGODB_URI!;
-    const dbName = 'itinerary_db';
-    await mongoose.connect(uri, { dbName });
+  try {
+    if (mongoose.connection.readyState === 0) {
+      // Connect to the same database as itineraries (itinerary_db)
+      const uri = process.env.MONGODB_URI!;
+      const dbName = 'itinerary_db';
+
+      // Enhanced connection options for stability in various environments
+      await mongoose.connect(uri, {
+        dbName,
+        connectTimeoutMS: 10000, // 10 seconds
+        socketTimeoutMS: 45000, // 45 seconds
+        serverSelectionTimeoutMS: 10000, // 10 seconds
+        maxPoolSize: 10, // Maintain up to 10 socket connections
+        minPoolSize: 2, // Maintain a minimum of 2 socket connections
+      });
+
+      console.log('MongoDB connection established successfully');
+    } else if (mongoose.connection.readyState === 2) {
+      // Connection is connecting, wait for it
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('MongoDB connection timeout'));
+        }, 15000);
+
+        mongoose.connection.once('connected', () => {
+          clearTimeout(timeout);
+          resolve(undefined);
+        });
+
+        mongoose.connection.once('error', (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Failed to establish MongoDB connection:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      readyState: mongoose.connection.readyState,
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+    });
+    throw new Error(`Database connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -291,14 +328,40 @@ export async function getCampingSpots(filter?: CampingSpotFilter) {
 }
 
 export async function getCampingSpotById(id: string) {
-  await ensureDbConnection();
+  try {
+    // Validate input
+    if (!id || typeof id !== 'string' || id.trim() === '') {
+      throw new Error('Invalid spot ID provided');
+    }
 
-  const spot = await CampingSpot.findById(id).lean();
-  if (!spot) {
-    throw new Error('Camping spot not found');
+    // Ensure database connection with timeout
+    await ensureDbConnection();
+
+    // Find the spot with proper error handling
+    const spot = await CampingSpot.findById(id).lean().exec();
+
+    if (!spot) {
+      throw new Error(`Camping spot not found for ID: ${id}`);
+    }
+
+    // Return properly serialized data
+    return JSON.parse(JSON.stringify(spot));
+  } catch (error) {
+    // Log detailed error information for debugging
+    console.error('Error in getCampingSpotById:', {
+      id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+    });
+
+    // Always throw a proper Error object, never undefined
+    if (error instanceof Error) {
+      throw error;
+    } else {
+      throw new Error(`Failed to retrieve camping spot: ${String(error)}`);
+    }
   }
-
-  return JSON.parse(JSON.stringify(spot));
 }
 
 export async function createCampingSpot(data: FormData) {
