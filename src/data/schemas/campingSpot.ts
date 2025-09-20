@@ -183,7 +183,7 @@ export const CampingSpotCSVSchema = z.object({
 
 // CSV import schema with Japanese headers
 export const CampingSpotCSVJapaneseSchema = z.object({
-  'スポット名': z.string().min(1).trim(),
+  '名称': z.string().min(1).trim(),
   '緯度': z.string().refine((val) => !isNaN(Number(val)), {
     message: "緯度は数値で入力してください",
   }),
@@ -302,9 +302,46 @@ export const CampingSpotFilterSchema = z.object({
   }).optional(),
 });
 
+// Public submission schema (simplified for non-admin users)
+export const CampingSpotSubmissionSchema = z.object({
+  name: z.string().min(1, '名称を入力してください').trim(),
+  coordinates: z.tuple([
+    z.number().min(-180).max(180), // longitude
+    z.number().min(-90).max(90)    // latitude
+  ], {
+    required_error: '座標を指定してください',
+  }),
+  prefecture: z.string().min(1, '都道府県を選択してください').trim(),
+  address: z.string().trim().optional(),
+  url: z.string().url('有効なURLを入力してください').trim().optional(),
+  type: CampingSpotTypeSchema.default('other'),
+  hasRoof: z.boolean().default(false),
+  hasPowerOutlet: z.boolean().default(false),
+  isFree: z.boolean().default(true),
+  pricePerNight: z.number().min(0).optional(),
+  priceNote: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+  submitterEmail: z.string().email('有効なメールアドレスを入力してください').optional(),
+  submitterName: z.string().trim().optional(),
+  status: z.enum(['pending', 'approved', 'rejected']).default('pending'),
+  submittedAt: z.date().default(() => new Date()),
+  reviewedAt: z.date().optional(),
+  reviewedBy: z.string().optional(),
+  reviewNotes: z.string().optional(),
+});
+
+// For server-side operations (with MongoDB _id)
+export const CampingSpotSubmissionWithIdSchema = CampingSpotSubmissionSchema.extend({
+  _id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 // Type exports
 export type CampingSpot = z.infer<typeof CampingSpotSchema>;
 export type CampingSpotWithId = z.infer<typeof CampingSpotWithIdSchema>;
+export type CampingSpotSubmission = z.infer<typeof CampingSpotSubmissionSchema>;
+export type CampingSpotSubmissionWithId = z.infer<typeof CampingSpotSubmissionWithIdSchema>;
 export type CampingSpotCSV = z.infer<typeof CampingSpotCSVSchema>;
 export type CampingSpotCSVJapanese = z.infer<typeof CampingSpotCSVJapaneseSchema>;
 export type CampingSpotFilter = z.infer<typeof CampingSpotFilterSchema>;
@@ -359,7 +396,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
 // Helper function to convert Japanese CSV row to CampingSpot
 export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): CampingSpot {
   return {
-    name: csvRow['スポット名'],
+    name: csvRow['名称'],
     coordinates: [Number(csvRow['経度']), Number(csvRow['緯度'])],
     prefecture: csvRow['都道府県'],
     address: csvRow['住所'] || undefined,

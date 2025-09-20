@@ -10,7 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Info, Search, BookHeart, CircleUser, MapPin } from 'lucide-react';
+import {
+  Info,
+  Search,
+  BookHeart,
+  CircleUser,
+  MapPin,
+  Plus,
+} from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 export function BurgerMenu() {
@@ -19,9 +26,10 @@ export function BurgerMenu() {
   const { user } = useUser();
 
   // Check if user is admin
-  const isAdmin = user?.email &&
+  const isAdmin =
+    user?.email &&
     process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map(email => email.trim())
+      .map((email) => email.trim())
       .includes(user.email);
 
   const handleItemClick = (
@@ -88,10 +96,25 @@ export function BurgerMenu() {
           <Link
             href={isAdmin ? '/admin/shachu-haku' : '/shachu-haku'}
             className='flex items-center'
-            onClick={(e) => handleItemClick(e, isAdmin ? '/admin/shachu-haku' : '/shachu-haku')}
+            onClick={(e) =>
+              handleItemClick(
+                e,
+                isAdmin ? '/admin/shachu-haku' : '/shachu-haku'
+              )
+            }
           >
             <MapPin className='mr-1' />
-            車中泊場所
+            車中泊スポット
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Link
+            href='/shachu-haku/submit'
+            className='flex items-center'
+            onClick={(e) => handleItemClick(e, '/shachu-haku/submit')}
+          >
+            <Plus className='mr-1' />
+            スポット投稿
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

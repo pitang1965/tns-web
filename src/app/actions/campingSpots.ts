@@ -521,7 +521,7 @@ export async function importCampingSpotsFromCSV(csvData: string) {
   };
 
   // Check if headers are in Japanese or English
-  const isJapaneseHeaders = headers.includes('スポット名');
+  const isJapaneseHeaders = headers.includes('名称');
 
   for (let i = 1; i < lines.length; i++) {
     try {

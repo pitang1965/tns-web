@@ -82,7 +82,7 @@ export default function CSVImportDialog({
 
   const downloadTemplate = () => {
     const headers = [
-      'スポット名',
+      '名称',
       '緯度',
       '経度',
       '都道府県',
@@ -115,7 +115,7 @@ export default function CSVImportDialog({
     ];
 
     const sampleData = [
-      '道の駅サンプル',        // スポット名
+      '道の駅サンプル',        // 名称
       '35.6762',              // 緯度
       '139.6503',             // 経度
       '東京都',               // 都道府県

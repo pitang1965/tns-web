@@ -1,7 +1,12 @@
 'use client';
 
 // 基本情報入力フィールド
-import { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors } from 'react-hook-form';
+import {
+  UseFormRegister,
+  UseFormWatch,
+  UseFormSetValue,
+  FieldErrors,
+} from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,7 +36,13 @@ interface BasicInfoFieldsProps {
   errors: FieldErrors<ShachuHakuFormData>;
 }
 
-export function BasicInfoFields({ spot, register, watch, setValue, errors }: BasicInfoFieldsProps) {
+export function BasicInfoFields({
+  spot,
+  register,
+  watch,
+  setValue,
+  errors,
+}: BasicInfoFieldsProps) {
   const { toast } = useToast();
 
   const showOnMap = () => {
@@ -57,11 +68,7 @@ export function BasicInfoFields({ spot, register, watch, setValue, errors }: Bas
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
           <Label htmlFor='name'>名称 *</Label>
-          <Input
-            id='name'
-            {...register('name')}
-            placeholder='スポット名を入力'
-          />
+          <Input id='name' {...register('name')} placeholder='名称を入力' />
           {errors.name && (
             <p className='text-sm text-red-500'>{errors.name.message}</p>
           )}
@@ -84,9 +91,7 @@ export function BasicInfoFields({ spot, register, watch, setValue, errors }: Bas
             </SelectContent>
           </Select>
           {errors.prefecture && (
-            <p className='text-sm text-red-500'>
-              {errors.prefecture.message}
-            </p>
+            <p className='text-sm text-red-500'>{errors.prefecture.message}</p>
           )}
         </div>
       </div>
@@ -169,13 +174,11 @@ export function BasicInfoFields({ spot, register, watch, setValue, errors }: Bas
               <SelectValue placeholder='種別を選択' />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(CampingSpotTypeLabels).map(
-                ([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
-                )
-              )}
+              {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.type && (
@@ -192,9 +195,7 @@ export function BasicInfoFields({ spot, register, watch, setValue, errors }: Bas
             {...register('capacity')}
           />
           {errors.capacity && (
-            <p className='text-sm text-red-500'>
-              {errors.capacity.message}
-            </p>
+            <p className='text-sm text-red-500'>{errors.capacity.message}</p>
           )}
         </div>
       </div>

@@ -19,11 +19,12 @@ import {
   Upload,
   Download,
   MapPin,
-  Filter,
   Plus,
   Search,
   Edit,
+  Users,
 } from 'lucide-react';
+import Link from 'next/link';
 import { getCampingSpots } from '../../actions/campingSpots';
 import {
   CampingSpotWithId,
@@ -354,6 +355,12 @@ export default function ShachuHakuAdminPage() {
         <div className='flex justify-between items-center'>
           <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
           <div className='flex gap-2'>
+            <Link href='/admin/submissions'>
+              <Button variant='outline' className='hidden md:flex'>
+                <Users className='w-4 h-4 mr-2' />
+                投稿管理
+              </Button>
+            </Link>
             <Button
               onClick={() => setShowImportDialog(true)}
               variant='outline'
