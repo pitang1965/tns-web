@@ -4,7 +4,27 @@ import CampingSpotSubmissionForm from '@/components/shachu-haku/CampingSpotSubmi
 export const metadata: Metadata = {
   title: '車中泊スポット情報の投稿 | 旅のしおり',
   description:
-    '車で泊まれる場所の情報をみんなで教え合って、快適な車中泊を楽しもう。',
+    '車中泊スポットの情報を投稿して、車中泊コミュニティに貢献しませんか。あなたの知っている穴場スポットや便利な施設情報を共有して、みんなで快適な車中泊ライフを楽しみましょう。',
+  keywords: '車中泊,スポット投稿,情報共有,道の駅,SA,PA,RVパーク,キャンプ,旅行,旅のしおり',
+  openGraph: {
+    title: '車中泊スポット情報の投稿 | 旅のしおり',
+    description:
+      '車中泊スポットの情報を投稿して、車中泊コミュニティに貢献しませんか。あなたの知っている穴場スポットや便利な施設情報を共有して、みんなで快適な車中泊ライフを楽しみましょう。',
+    url: 'https://tabi.over40web.club/shachu-haku/submit',
+    images: [
+      {
+        url: 'https://tabi.over40web.club/shachu-haku.webp',
+        width: 1200,
+        height: 629,
+        alt: '車中泊スポット情報投稿 - 旅のしおり',
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+  },
 };
 
 export default function CampingSpotSubmitPage() {
