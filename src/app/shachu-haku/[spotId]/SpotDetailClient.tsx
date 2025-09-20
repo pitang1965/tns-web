@@ -12,6 +12,8 @@ import {
   Volume2,
   Navigation,
   Map,
+  ExternalLink,
+  Plus,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -347,6 +349,35 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               </CardContent>
             </Card>
           )}
+
+          {/* スポット投稿促進 */}
+          <Card className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'>
+            <CardContent className='pt-6'>
+              <div className='text-center space-y-3'>
+                <div className='flex justify-center'>
+                  <div className='p-3 bg-blue-100 dark:bg-blue-800/50 rounded-full'>
+                    <Plus className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+                  </div>
+                </div>
+                <div>
+                  <h3 className='text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2'>
+                    あなたの車中泊スポットを教えてください
+                  </h3>
+                  <p className='text-sm text-blue-700 dark:text-blue-300 mb-4'>
+                    旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
+                    <br />
+                    みんなで情報を共有して、より快適な車中泊を楽しみましょう。
+                  </p>
+                </div>
+                <Link href='/shachu-haku/submit'>
+                  <Button className='bg-blue-600 hover:bg-blue-700 text-white'>
+                    <Plus className='w-4 h-4 mr-2' />
+                    スポット情報を投稿する
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* サイドバー */}
@@ -405,6 +436,22 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                   </div>
                 )}
               </div>
+              {spot.url && (
+                <div className='pt-2 border-t border-gray-200 dark:border-gray-700'>
+                  <div className='font-semibold text-gray-900 dark:text-gray-100 mb-1'>
+                    参考URL
+                  </div>
+                  <a
+                    href={spot.url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm break-all'
+                  >
+                    <ExternalLink className='w-3 h-3 flex-shrink-0' />
+                    公式サイト・詳細情報
+                  </a>
+                </div>
+              )}
             </CardContent>
           </Card>
 
