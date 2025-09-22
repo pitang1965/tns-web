@@ -17,6 +17,7 @@ import {
   CircleUser,
   MapPin,
   Plus,
+  Users,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
@@ -117,6 +118,18 @@ export function BurgerMenu() {
             スポット投稿
           </Link>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href='/admin/submissions'
+              className='flex items-center'
+              onClick={(e) => handleItemClick(e, '/admin/submissions')}
+            >
+              <Users className='mr-1' />
+              投稿管理
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/account'
