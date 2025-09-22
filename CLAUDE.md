@@ -113,3 +113,11 @@ Required environment variables (see README.md for full details):
 - Comprehensive error boundaries and toast notifications
 - Responsive design with mobile-first approach
 - Japanese language support (locale: ja_JP)
+
+### UI Component Guidelines
+
+**shadcn/ui Components:**
+- All shadcn/ui components must be placed in `src/components/ui/` directory
+- When adding new shadcn/ui components, use: `npx shadcn@latest add [component-name]`
+- If components are mistakenly placed in other directories (like `@/components/ui/`), move them to the correct location
+- Clean up any incorrectly created directories after moving components
