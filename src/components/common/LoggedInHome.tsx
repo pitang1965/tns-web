@@ -1,10 +1,12 @@
 import { Suspense } from 'react';
 import { H2 } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
+import { getSession } from '@auth0/nextjs-auth0';
 import UserStats from '@/components/common/UserStats';
 import RecentItineraries from '@/components/common/RecentItineraries';
 import QuickActions from '@/components/common/QuickActions';
 import RecentItineraryViews from '@/components/common/RecentItineraryViews';
+import PremiumBadge from '@/components/common/PremiumBadge';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 type LoggedInHomeProps = {
@@ -13,9 +15,15 @@ type LoggedInHomeProps = {
 
 async function DashboardContent() {
   const itineraries = await getItineraries();
+  const session = await getSession();
 
   return (
     <>
+      {/* Premium Badge */}
+      <div className="flex justify-center lg:justify-start">
+        <PremiumBadge user={session?.user} variant="large" />
+      </div>
+
       {/* Statistics */}
       <UserStats itineraries={itineraries} />
 
