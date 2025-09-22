@@ -1,20 +1,59 @@
-import { H2, LargeText } from '@/components/common/Typography';
-import RecentUrls from '@/components/common/RecentUrls';
+import { Suspense } from 'react';
+import { H2 } from '@/components/common/Typography';
+import { getItineraries } from '@/lib/itineraries';
+import UserStats from '@/components/common/UserStats';
+import RecentItineraries from '@/components/common/RecentItineraries';
+import QuickActions from '@/components/common/QuickActions';
+import RecentItineraryViews from '@/components/common/RecentItineraryViews';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 type LoggedInHomeProps = {
   userName: string;
 };
 
+async function DashboardContent() {
+  const itineraries = await getItineraries();
+
+  return (
+    <>
+      {/* Statistics */}
+      <UserStats itineraries={itineraries} />
+
+      {/* Main Content Grid */}
+      <div className='grid gap-6 lg:grid-cols-3'>
+        {/* Left Column */}
+        <div className='lg:col-span-2 space-y-6'>
+          <RecentItineraries itineraries={itineraries} limit={4} />
+          <QuickActions />
+        </div>
+
+        {/* Right Column */}
+        <div className='space-y-6'>
+          <RecentItineraryViews />
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function LoggedInHome({ userName }: LoggedInHomeProps) {
   return (
     <div className='container mx-auto px-4 pt-8 space-y-6'>
-      <div>
-        <H2>ようこそ、{userName}さん！</H2>
-        <LargeText>あなたの保存した旅程は「旅程一覧」にあります。</LargeText>
+      {/* Welcome Header */}
+      <div className='text-center lg:text-left'>
+        <H2>{userName}さんのダッシュボード</H2>
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
-        <RecentUrls />
-        </div>
-      </div>
+
+      {/* Dashboard Content */}
+      <Suspense
+        fallback={
+          <div className='flex justify-center items-center py-12'>
+            <LoadingSpinner />
+          </div>
+        }
+      >
+        <DashboardContent />
+      </Suspense>
+    </div>
   );
 }
