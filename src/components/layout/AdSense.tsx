@@ -21,6 +21,7 @@ export function AdSense() {
         <Script
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
           strategy="afterInteractive"
+          crossOrigin="anonymous"
         />
         <div className='w-full max-w-screen-lg mx-auto'>
           <ins
@@ -30,10 +31,12 @@ export function AdSense() {
             data-ad-format="auto"
             data-full-width-responsive="true"
           />
-          <Script id="adsense-push-header" strategy="afterInteractive">
+          <Script id="adsense-push-header" strategy="lazyOnload">
             {`
               try {
-                (adsbygoogle = window.adsbygoogle || []).push({});
+                if (typeof window !== 'undefined' && window.adsbygoogle) {
+                  (adsbygoogle = window.adsbygoogle || []).push({});
+                }
               } catch (err) {
                 console.error('AdSense initialization error:', err);
               }
