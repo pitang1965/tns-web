@@ -70,10 +70,25 @@ export default function PrivacyPage() {
         </p>
 
         <h2 className='text-2xl font-semibold mt-8 mb-4'>
-          7. お問い合わせ窓口
+          7. アカウントの削除
+        </h2>
+        <p className='mb-4'>
+          アカウントの削除をご希望の場合は、以下の手順で行うことができます：
+        </p>
+        <ol className='list-decimal pl-6 mb-6'>
+          <li>アカウントページにログイン</li>
+          <li>下記のお問い合わせ窓口までアカウント削除をご依頼ください</li>
+          <li>確認後、すべての個人データを完全に削除いたします</li>
+        </ol>
+        <p className='mb-6'>
+          削除されるデータには、プロフィール情報、作成された旅程、ログイン履歴等、すべての個人に関連するデータが含まれます。
+        </p>
+
+        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+          8. お問い合わせ窓口
         </h2>
         <p className='mb-6'>
-          本ポリシーに関するお問い合わせは、下記の連絡先までお願いいたします。
+          本ポリシーに関するお問い合わせやアカウント削除のご依頼は、下記の連絡先までお願いいたします。
         </p>
         <p className='mb-6'>メールアドレス: pitang1965@gmail.com</p>
 
