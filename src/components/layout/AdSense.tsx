@@ -2,12 +2,16 @@
 
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { isPremiumMember } from '@/lib/userUtils';
 
 export function AdSense() {
   const pathname = usePathname();
+  const { user } = useUser();
   const isAdminPage = pathname.startsWith('/admin');
+  const isPremium = isPremiumMember(user);
 
-  if (isAdminPage || !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
+  if (isAdminPage || isPremium || !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
     return null;
   }
 
