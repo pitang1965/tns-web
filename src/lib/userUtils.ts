@@ -1,4 +1,5 @@
 import { UserProfile } from '@auth0/nextjs-auth0/client';
+import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 /**
  * ユーザーが管理者かどうかを判定する
@@ -55,4 +56,58 @@ export function getPremiumMemberLabel(user: UserProfile | undefined): string | n
     default:
       return null;
   }
+}
+
+// 旅程作成制限に関する定数
+export const ITINERARY_LIMITS = {
+  FREE_USER_LIMIT: 10,
+  PREMIUM_UNLIMITED: -1 // -1は無制限を表す
+} as const;
+
+/**
+ * ユーザーの旅程作成制限数を取得する
+ */
+export function getItineraryLimit(user: UserProfile | undefined): number {
+  if (isPremiumMember(user)) {
+    return ITINERARY_LIMITS.PREMIUM_UNLIMITED; // 無制限
+  }
+  return ITINERARY_LIMITS.FREE_USER_LIMIT; // 10個まで
+}
+
+/**
+ * ユーザーが新しい旅程を作成できるかチェックする
+ */
+export function canCreateItinerary(
+  user: UserProfile | undefined,
+  currentItineraryCount: number
+): boolean {
+  const limit = getItineraryLimit(user);
+
+  // プレミアム会員は無制限
+  if (limit === ITINERARY_LIMITS.PREMIUM_UNLIMITED) {
+    return true;
+  }
+
+  // 一般ユーザーは制限数未満まで作成可能
+  return currentItineraryCount < limit;
+}
+
+/**
+ * 旅程作成制限の状況を取得する
+ */
+export function getItineraryLimitStatus(
+  user: UserProfile | undefined,
+  itineraries: ClientItineraryDocument[]
+) {
+  const currentCount = itineraries.length;
+  const limit = getItineraryLimit(user);
+  const canCreate = canCreateItinerary(user, currentCount);
+
+  return {
+    currentCount,
+    limit,
+    canCreate,
+    isPremium: isPremiumMember(user),
+    remaining: limit === ITINERARY_LIMITS.PREMIUM_UNLIMITED ? -1 : Math.max(0, limit - currentCount)
+  };
 }

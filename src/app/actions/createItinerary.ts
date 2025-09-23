@@ -1,8 +1,9 @@
 'use server';
 
-import { createItinerary } from '@/lib/itineraries';
+import { createItinerary, getItineraries } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { getSession } from '@auth0/nextjs-auth0';
+import { canCreateItinerary } from '@/lib/userUtils';
 
 export async function createItineraryAction(data: ClientItineraryInput) {
   try {
@@ -14,6 +15,12 @@ export async function createItineraryAction(data: ClientItineraryInput) {
     // Auth0のユーザー情報の存在チェック
     if (!session.user.sub) {
       throw new Error('ユーザーIDが見つかりません');
+    }
+
+    // 旅程作成制限チェック
+    const existingItineraries = await getItineraries();
+    if (!canCreateItinerary(session.user, existingItineraries.length)) {
+      throw new Error('旅程作成制限に達しています。プレミアム会員になると無制限に作成できます。');
     }
 
     const now = new Date();

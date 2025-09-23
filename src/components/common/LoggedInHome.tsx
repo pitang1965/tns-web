@@ -7,6 +7,7 @@ import RecentItineraries from '@/components/common/RecentItineraries';
 import QuickActions from '@/components/common/QuickActions';
 import RecentItineraryViews from '@/components/common/RecentItineraryViews';
 import PremiumBadge from '@/components/common/PremiumBadge';
+import ItineraryLimitStatus from '@/components/common/ItineraryLimitStatus';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 type LoggedInHomeProps = {
@@ -37,6 +38,7 @@ async function DashboardContent() {
 
         {/* Right Column */}
         <div className='space-y-6'>
+          <ItineraryLimitStatus user={session?.user} itineraries={itineraries} />
           <RecentItineraryViews />
         </div>
       </div>
