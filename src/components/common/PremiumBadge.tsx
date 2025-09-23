@@ -19,7 +19,7 @@ export default function PremiumBadge({
   const memberType = getPremiumMemberType(user);
   const label = getPremiumMemberLabel(user);
 
-  if (!memberType || !label) {
+  if (!label) {
     return null;
   }
 
@@ -42,7 +42,7 @@ export default function PremiumBadge({
       case 'premium':
         return 'bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white';
       default:
-        return 'bg-gray-500 hover:bg-gray-600 text-white';
+        return 'bg-slate-500 hover:bg-slate-600 text-white';
     }
   };
 

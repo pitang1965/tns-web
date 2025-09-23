@@ -6,7 +6,11 @@ import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { H1, LargeText } from '@/components/common/Typography';
 import PremiumBadge from '@/components/common/PremiumBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { isPremiumMember, getPremiumMemberLabel, isAdmin } from '@/lib/userUtils';
+import {
+  isPremiumMember,
+  getPremiumMemberLabel,
+  isAdmin,
+} from '@/lib/userUtils';
 
 type UserInfoProps = {
   label: string;
@@ -49,42 +53,84 @@ export default withPageAuthRequired(function Account() {
                 <h2 className='text-xl font-semibold'>{user.name}</h2>
                 <p className='text-muted-foreground'>{user.email}</p>
                 <div className='mt-2'>
-                  <PremiumBadge user={user} variant="large" />
+                  <PremiumBadge user={user} variant='large' />
                 </div>
               </div>
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t'>
               <UserInfo label='ニックネーム' value={user.nickname} />
-              <UserInfo label='メール認証' value={user.email_verified ? '済み' : '未認証'} />
+              <UserInfo
+                label='メール認証'
+                value={user.email_verified ? '済み' : '未認証'}
+              />
             </div>
           </CardContent>
         </Card>
 
         {/* Premium Status Card */}
-        {isPremiumMember(user) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>プレミアム会員特典</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-3'>
-                <div className='flex items-center gap-2'>
-                  <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                  <span>すべての機能への無制限アクセス</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                  <span>優先サポート</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                  <span>新機能の先行利用</span>
-                </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {isPremiumMember(user)
+                ? 'プレミアム会員特典'
+                : 'プレミアム会員になると'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-3'>
+              <div className='flex items-center gap-2'>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
+                ></div>
+                <span
+                  className={
+                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                  }
+                >
+                  旅程作成数無制限（一般会員は10個まで）
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <div className='flex items-center gap-2'>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
+                ></div>
+                <span
+                  className={
+                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                  }
+                >
+                  優先サポート
+                </span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
+                ></div>
+                <span
+                  className={
+                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                  }
+                >
+                  新機能の先行利用
+                </span>
+              </div>
+            </div>
+            {!isPremiumMember(user) && (
+              <div className='mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md'>
+                <p className='text-sm text-amber-800'>
+                  プレミアム会員へのアップグレード機能は近日公開予定です
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Admin Status Card */}
         {isAdmin(user) && (

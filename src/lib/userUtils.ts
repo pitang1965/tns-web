@@ -54,7 +54,7 @@ export function getPremiumMemberLabel(user: UserProfile | undefined): string | n
     case 'premium':
       return 'プレミアム会員';
     default:
-      return null;
+      return '一般会員';
   }
 }
 
