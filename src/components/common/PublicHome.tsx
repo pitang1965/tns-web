@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import {
   H1,
   H2,
@@ -9,11 +8,6 @@ import {
   Text,
   SmallText,
 } from '@/components/common/Typography';
-
-const DynamicMap = dynamic(() => import('@/components/common/Maps/Map'), {
-  ssr: false,
-  loading: () => <LargeText>地図の読み込み中...</LargeText>,
-});
 
 export default function ClientHome() {
   return (
@@ -90,7 +84,14 @@ export default function ClientHome() {
           <li>
             <Text>
               <span className='font-semibold'>車中泊スポットマップ:</span>{' '}
-              データ入力中...
+              みなさんのおすすめの車中泊スポットを
+              <a
+                href='/shachu-haku/submit'
+                className='text-blue-600 dark:text-blue-400 hover:underline mx-1'
+              >
+                募集中
+              </a>
+              です。
             </Text>
           </li>
         </ul>
@@ -98,16 +99,19 @@ export default function ClientHome() {
         <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md mt-6'>
           <Text className='font-semibold'>ご注意:</Text>
           <Text>※旅程を編集するにはログインが必要です。</Text>
-          <Text>※現在開発中のサービスです。</Text>
         </div>
 
         <SmallText className='text-center mt-8 text-gray-500 dark:text-gray-400'>
-          続行することにより、本アプリの利用規約及びプライバシー及びCookieに関する声明に同意するものとします。
+          続行することにより、本アプリの
+          <a href='/terms' className='text-blue-600 dark:text-blue-400 hover:underline mx-1'>
+            利用規約
+          </a>
+          及び
+          <a href='/privacy' className='text-blue-600 dark:text-blue-400 hover:underline mx-1'>
+            プライバシーに関する声明
+          </a>
+          に同意するものとします。
         </SmallText>
-      </div>
-
-      <div className='w-full max-w-4xl h-96 mt-12 mx-6 rounded-lg overflow-hidden shadow-lg'>
-        <DynamicMap />
       </div>
     </div>
   );
