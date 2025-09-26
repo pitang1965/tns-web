@@ -4,7 +4,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
-import { Info, Search, BookHeart, CircleUser, MapPin, Plus } from 'lucide-react';
+import {
+  Info,
+  Search,
+  BookHeart,
+  CircleUser,
+  MapPin,
+  Plus,
+  Mail,
+} from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 const activeClassNames =
@@ -37,9 +45,10 @@ export function Navigation() {
   }
 
   // Check if user is admin
-  const isAdmin = user?.email && 
+  const isAdmin =
+    user?.email &&
     process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map(email => email.trim())
+      .map((email) => email.trim())
       .includes(user.email);
 
   return (
@@ -63,6 +72,10 @@ export function Navigation() {
       <NavLink href='/shachu-haku/submit'>
         <Plus className='mr-1' />
         スポット投稿
+      </NavLink>
+      <NavLink href='/contact'>
+        <Mail className='mr-1' />
+        お問い合わせ
       </NavLink>
       {user && (
         <NavLink href='/account'>

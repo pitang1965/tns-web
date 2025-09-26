@@ -18,6 +18,7 @@ import {
   MapPin,
   Plus,
   Users,
+  Mail,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
@@ -130,6 +131,16 @@ export function BurgerMenu() {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Link
+            href='/contact'
+            className='flex items-center'
+            onClick={(e) => handleItemClick(e, '/contact')}
+          >
+            <Mail className='mr-1' />
+            お問い合わせ
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/account'

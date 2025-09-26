@@ -53,8 +53,11 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - [React Hook Form](https://react-hook-form.com/) - フォーム状態管理
 - [Zod](https://github.com/colinhacks/zod) - TypeScript ファーストのスキーマバリデーション
 
-- **認証**:
+### 認証
 - [@auth0/nextjs-auth0](https://github.com/auth0/nextjs-auth0) - Auth0 による認証機能
+
+### メール送信
+- [MailerSend](https://www.mailersend.com/) - トランザクショナルメール送信サービス
 
 ### モニタリング
 - [Sentry](https://sentry.io/) - エラー追跡と監視
@@ -110,6 +113,9 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - 例: `ca-pub-XXXXXXXXXXXXXXXX`
 
 ### 管理者
+- `ADMIN_EMAIL`:
+  - お問い合わせフォームの送信先となる管理者のメールアドレス。
+  - 例: `admin@example.com`
 - `ADMIN_EMAILS`:
   - 管理者のメールアドレス一覧（サーバーサイド用）。カンマ区切りで複数指定可能。
   - 例: `admin@example.com,admin2@example.com`
@@ -117,6 +123,30 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - 管理者のメールアドレス一覧（クライアントサイド用）。カンマ区切りで複数指定可能。
   - 例: `admin@example.com,admin2@example.com`
 
+### メール送信（MailerSend）
+- `MAILERSEND_API_TOKEN`:
+  - MailerSendのAPIトークン。お問い合わせフォームやシステム通知メールの送信に使用。
+  - 例: `mlsn.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+- `MAILERSEND_FROM_EMAIL`:
+  - メール送信時の送信者メールアドレス。認証済みドメインのメールアドレスを指定。
+  - 例: `tabi-support@over40web.club`
+- `MAILERSEND_FROM_NAME`:
+  - メール送信時の送信者名。
+  - 例: `旅のしおり`
+
+#### お問い合わせメールの転送フロー
+お問い合わせフォームから送信されたメールは以下の流れで処理されます：
+
+1. **ユーザー送信** → お問い合わせフォーム入力・送信
+2. **MailerSend経由** → `tabi-support@over40web.club` から送信
+3. **ドメイン転送** → Squarespaceで設定されたメール転送（`over40web.club`ドメイン）
+4. **管理者受信** → `tabi-over40webclub-support@googlegroups.com` に転送
+
+**メール転送設定の管理:**
+- ドメインのメール転送は [Squarespace Domains](https://account.squarespace.com/domains/managed/over40web.club/email) で設定・管理
+- `tabi-support@over40web.club` → `tabi-over40webclub-support@googlegroups.com` の転送設定
+
+この設定により、お問い合わせ内容が確実に管理者チームに届きます。
 
 ## Docker で動かす場合
 

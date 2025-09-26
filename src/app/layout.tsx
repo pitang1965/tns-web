@@ -10,7 +10,7 @@ import { Footer } from '@/components/layout/Footer';
 import { AdSense } from '@/components/layout/AdSense';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ItineraryUrlTracker from '@/components/common/ItineraryUrlTracker';
 
