@@ -133,16 +133,6 @@ export function BurgerMenu() {
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <Link
-            href='/shachu-haku/submit'
-            className='flex items-center'
-            onClick={(e) => handleItemClick(e, '/shachu-haku/submit')}
-          >
-            <Plus className='mr-1' />
-            スポット投稿
-          </Link>
-        </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <Link

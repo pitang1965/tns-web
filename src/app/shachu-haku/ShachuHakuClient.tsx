@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { formatDistance } from '@/lib/formatDistance';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MapPin, Filter, Search, Info } from 'lucide-react';
+import { MapPin, Filter, Search, Info, Plus } from 'lucide-react';
 import { getPublicCampingSpots } from '../actions/campingSpots';
 import {
   CampingSpotWithId,
@@ -162,11 +163,19 @@ export default function ShachuHakuClient() {
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
-        <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-2'>
-          <h1 className='text-3xl font-bold'>車中泊スポット</h1>
-          <div className='text-sm text-gray-600 dark:text-gray-300'>
-            ログイン不要で車中泊スポットを検索・閲覧できます
+        <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4'>
+          <div>
+            <h1 className='text-3xl font-bold'>車中泊スポット</h1>
+            <div className='text-sm text-gray-600 dark:text-gray-300 mt-1'>
+              ログイン不要で車中泊スポットを検索・閲覧できます
+            </div>
           </div>
+          <Link href='/shachu-haku/submit'>
+            <Button className='bg-blue-600 hover:bg-blue-700 text-white'>
+              <Plus className='w-4 h-4 mr-2' />
+              スポット投稿
+            </Button>
+          </Link>
         </div>
       </div>
 

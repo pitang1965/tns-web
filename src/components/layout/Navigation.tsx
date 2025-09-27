@@ -100,10 +100,6 @@ export function Navigation() {
           車中泊スポット
         </NavLink>
       )}
-      <NavLink href='/shachu-haku/submit'>
-        <Plus className='mr-1' />
-        スポット投稿
-      </NavLink>
       <NavLink href='/contact'>
         <Mail className='mr-1' />
         お問い合わせ
