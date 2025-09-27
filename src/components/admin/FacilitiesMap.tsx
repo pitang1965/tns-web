@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { formatDistance } from '@/lib/formatDistance';
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import {
   suppressImageWarnings,
   handleMapError,
@@ -11,6 +12,11 @@ import {
   setupJapaneseLabels,
   setupPOIFilters,
 } from '@/lib/mapboxIcons';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { UseFormWatch } from 'react-hook-form';
 import { ShachuHakuFormData } from './validationSchemas';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -34,24 +40,64 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [isLegendOpen, setIsLegendOpen] = useState(true);
 
-  const getFacilityColor = (type: string) => {
+  // マーカーの凡例データ
+  const legendItems = [
+    { type: 'camping', label: '車中泊スポット', icon: '🏕️', color: '#e74c3c' },
+    { type: 'toilet', label: 'トイレ', icon: '🚻', color: '#3498db' },
+    { type: 'convenience', label: 'コンビニ', icon: '🏪', color: '#2ecc71' },
+    { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f39c12' },
+  ];
+
+  // 現在開いているポップアップを閉じる
+  const closeCurrentPopup = () => {
+    if (currentPopupRef.current) {
+      currentPopupRef.current.remove();
+      currentPopupRef.current = null;
+    }
+  };
+
+  const getMarkerStyle = (type: string) => {
     switch (type) {
       case 'camping':
-        return '#e74c3c'; // 赤 - 車中泊スポット
+        return {
+          color: '#e74c3c',
+          icon: '🏕️',
+          size: 24, // 小さめサイズ
+        };
       case 'toilet':
-        return '#3498db'; // 青 - トイレ
+        return {
+          color: '#3498db',
+          icon: '🚻',
+          size: 20, // 小さめサイズ
+        };
       case 'convenience':
-        return '#2ecc71'; // 緑 - コンビニ
+        return {
+          color: '#2ecc71',
+          icon: '🏪',
+          size: 20, // 小さめサイズ
+        };
       case 'bath':
-        return '#f39c12'; // オレンジ - 入浴施設
+        return {
+          color: '#f39c12',
+          icon: '♨️',
+          size: 20, // 小さめサイズ
+        };
       default:
-        return '#95a5a6'; // グレー - デフォルト
+        return {
+          color: '#95a5a6',
+          icon: '📍',
+          size: 20,
+        };
     }
   };
 
   const clearMarkers = () => {
+    // 現在のポップアップを閉じる
+    closeCurrentPopup();
     markersRef.current.forEach((marker) => {
       try {
         marker.remove();
@@ -65,30 +111,70 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const addMarker = (facility: FacilityData) => {
     if (!mapInstance.current) return;
 
+    const style = getMarkerStyle(facility.type);
+
     // マーカー要素を作成
     const markerElement = document.createElement('div');
-    markerElement.style.width = '20px';
-    markerElement.style.height = '20px';
-    markerElement.style.borderRadius = '50%';
-    markerElement.style.backgroundColor = facility.color;
-    markerElement.style.border = '2px solid white';
-    markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-    markerElement.style.cursor = 'pointer';
-    markerElement.title = `${facility.name} (${facility.type})`;
+    markerElement.className = 'admin-facility-marker';
+    markerElement.style.cssText = `
+      width: ${style.size}px;
+      height: ${style.size}px;
+      background-color: ${style.color};
+    `;
+    markerElement.textContent = style.icon;
+    markerElement.title = getTypeLabel(facility.type);
+
+    const popup = new mapboxgl.Popup({
+      offset: 25,
+      closeButton: true,
+      closeOnClick: false,
+      className: 'admin-custom-popup',
+    }).setHTML(createFacilityPopupHTML(facility));
 
     const marker = new mapboxgl.Marker(markerElement)
       .setLngLat([facility.lng, facility.lat])
-      .setPopup(
-        new mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<div class="p-2">
-            <strong>${getTypeLabel(facility.type)}</strong>
-            ${facility.distance ? `<br><span class="text-sm text-gray-600">${formatDistance(facility.distance)}</span>` : ''}
-          </div>`
-        )
-      )
       .addTo(mapInstance.current);
 
+    // クリック時のポップアップ処理
+    markerElement.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // 既存のポップアップを閉じる
+      closeCurrentPopup();
+      // 新しいポップアップを開く
+      popup.setLngLat([facility.lng, facility.lat]).addTo(mapInstance.current!);
+      currentPopupRef.current = popup;
+    });
+
     markersRef.current.push(marker);
+  };
+
+  const createFacilityPopupHTML = (facility: FacilityData): string => {
+    const style = getMarkerStyle(facility.type);
+
+    return `
+      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
+        <div class="flex items-center gap-2 mb-2">
+          <span style="font-size: 20px;">${style.icon}</span>
+          <h3 class="font-semibold text-gray-900">${getTypeLabel(
+            facility.type
+          )}</h3>
+        </div>
+        ${
+          facility.type === 'camping'
+            ? `<div class="text-sm text-gray-600">${facility.name}</div>`
+            : ''
+        }
+        ${
+          facility.distance
+            ? `<div class="text-sm text-gray-600">
+                車中泊スポットから約 <strong>${formatDistance(
+                  facility.distance
+                )}</strong>
+              </div>`
+            : ''
+        }
+      </div>
+    `;
   };
 
   const getTypeLabel = (type: string) => {
@@ -121,7 +207,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: mainLat,
         lng: mainLng,
         name: mainName,
-        color: getFacilityColor('camping'),
+        color: getMarkerStyle('camping').color,
       });
     }
 
@@ -136,7 +222,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: toiletLat,
         lng: toiletLng,
         name: 'トイレ',
-        color: getFacilityColor('toilet'),
+        color: getMarkerStyle('toilet').color,
         distance: toiletDistance || undefined,
       });
     }
@@ -144,7 +230,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     // コンビニ
     const convenienceLat = parseFloat(watch('nearbyConvenienceLat') || '0');
     const convenienceLng = parseFloat(watch('nearbyConvenienceLng') || '0');
-    const convenienceDistance = parseFloat(watch('distanceToConvenience') || '0');
+    const convenienceDistance = parseFloat(
+      watch('distanceToConvenience') || '0'
+    );
 
     if (convenienceLat && convenienceLng) {
       facilities.push({
@@ -152,7 +240,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: convenienceLat,
         lng: convenienceLng,
         name: 'コンビニ',
-        color: getFacilityColor('convenience'),
+        color: getMarkerStyle('convenience').color,
         distance: convenienceDistance || undefined,
       });
     }
@@ -168,7 +256,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: bathLat,
         lng: bathLng,
         name: '入浴施設',
-        color: getFacilityColor('bath'),
+        color: getMarkerStyle('bath').color,
         distance: bathDistance || undefined,
       });
     }
@@ -179,6 +267,59 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   // マップの初期化
   useEffect(() => {
     if (!mapContainer.current || mapInstance.current) return;
+
+    // Add CSS for marker styles
+    if (!document.getElementById('admin-facility-marker-styles')) {
+      const style = document.createElement('style');
+      style.id = 'admin-facility-marker-styles';
+      style.textContent = `
+        .admin-facility-marker {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-size: 12px;
+        }
+        .admin-facility-marker:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .admin-custom-popup .mapboxgl-popup-content {
+          padding: 0 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+        .admin-custom-popup .mapboxgl-popup-tip {
+          display: block !important;
+        }
+        .admin-custom-popup .mapboxgl-popup-close-button {
+          font-size: 18px !important;
+          width: 28px !important;
+          height: 28px !important;
+          line-height: 28px !important;
+          background-color: white !important;
+          color: #374151 !important;
+          border-radius: 50% !important;
+          right: 8px !important;
+          top: 8px !important;
+          font-weight: bold !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+          border: none !important;
+        }
+        .admin-custom-popup .mapboxgl-popup-close-button:hover {
+          background-color: #f3f4f6 !important;
+          color: #111827 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
     try {
       const restoreConsoleWarn = suppressImageWarnings();
@@ -229,6 +370,13 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         }
         mapInstance.current = null;
         setMapLoaded(false);
+      }
+      // Clean up styles when component unmounts
+      const styleElement = document.getElementById(
+        'admin-facility-marker-styles'
+      );
+      if (styleElement) {
+        styleElement.remove();
       }
     };
   }, []);
@@ -282,6 +430,11 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
   const facilities = getFacilitiesWithCoordinates();
 
+  // 施設の存在チェック用のヘルパー関数
+  const facilityExists = (type: string) => {
+    return facilities.some((f) => f.type === type);
+  };
+
   if (facilities.length === 0) {
     return (
       <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
@@ -294,32 +447,82 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   }
 
   return (
-    <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3'>
-        <h3 className='text-lg font-medium'>施設マップ</h3>
-        <div className='flex flex-wrap gap-2 mt-2 sm:mt-0'>
-          <div className='flex items-center gap-1 text-sm'>
-            <div className='w-3 h-3 rounded-full bg-red-500 border border-white'></div>
-            車中泊スポット
-          </div>
-          <div className='flex items-center gap-1 text-sm'>
-            <div className='w-3 h-3 rounded-full bg-blue-500 border border-white'></div>
-            トイレ
-          </div>
-          <div className='flex items-center gap-1 text-sm'>
-            <div className='w-3 h-3 rounded-full bg-green-500 border border-white'></div>
-            コンビニ
-          </div>
-          <div className='flex items-center gap-1 text-sm'>
-            <div className='w-3 h-3 rounded-full bg-orange-500 border border-white'></div>
-            入浴施設
-          </div>
-        </div>
+    <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 relative'>
+      <div className='flex items-center gap-2 mb-3'>
+        <MapPin className='w-5 h-5 text-blue-600 dark:text-blue-400' />
+        <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+          施設マップ
+        </h3>
       </div>
+
       <div
         ref={mapContainer}
         className='w-full h-[300px] rounded-md overflow-hidden border border-gray-300 dark:border-gray-600'
       />
+
+      {/* 凡例 */}
+      <div className='absolute top-16 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
+        <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
+          <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
+            <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
+              凡例
+            </h4>
+            {isLegendOpen ? (
+              <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+            ) : (
+              <ChevronDown className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+            )}
+          </CollapsibleTrigger>
+          <CollapsibleContent className='px-3 pb-3'>
+            <div className='space-y-2'>
+              {legendItems.map((item) => {
+                const exists = facilityExists(item.type);
+
+                // 距離データを取得（座標の有無に関わらず）
+                let distance: number | undefined;
+                if (item.type === 'toilet') {
+                  distance =
+                    parseFloat(watch('distanceToToilet') || '0') || undefined;
+                } else if (item.type === 'convenience') {
+                  distance =
+                    parseFloat(watch('distanceToConvenience') || '0') ||
+                    undefined;
+                } else if (item.type === 'bath') {
+                  distance =
+                    parseFloat(watch('distanceToBath') || '0') || undefined;
+                }
+
+                return (
+                  <div
+                    key={item.type}
+                    className={`flex items-center gap-2 text-sm ${
+                      exists
+                        ? 'text-gray-700 dark:text-gray-300'
+                        : 'text-gray-400 dark:text-gray-500'
+                    }`}
+                  >
+                    <div
+                      className='w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs'
+                      style={{
+                        backgroundColor: exists ? item.color : '#e5e7eb',
+                      }}
+                    >
+                      <span style={{ fontSize: '10px' }}>{item.icon}</span>
+                    </div>
+                    <span>{item.label}</span>
+                    {item.type !== 'camping' && distance && (
+                      <span className='text-xs text-gray-500 dark:text-gray-400'>
+                        ({formatDistance(distance)})
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
       <p className='text-xs text-gray-500 mt-2'>
         マーカーをクリックすると詳細が表示されます
       </p>

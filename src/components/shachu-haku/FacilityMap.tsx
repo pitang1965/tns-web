@@ -40,6 +40,15 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
+
+  // 現在開いているポップアップを閉じる
+  const closeCurrentPopup = () => {
+    if (currentPopupRef.current) {
+      currentPopupRef.current.remove();
+      currentPopupRef.current = null;
+    }
+  };
 
   // 座標の有効性をチェック
   const isValidCoordinate = (
@@ -128,31 +137,31 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         return {
           color: '#3b82f6',
           icon: '🏕️',
-          size: 36,
+          size: 24,
         };
       case 'toilet':
         return {
           color: '#8b5cf6',
           icon: '🚻',
-          size: 32,
+          size: 20,
         };
       case 'convenience':
         return {
           color: '#10b981',
           icon: '🏪',
-          size: 32,
+          size: 20,
         };
       case 'bath':
         return {
           color: '#f59e0b',
           icon: '♨️',
-          size: 32,
+          size: 20,
         };
       default:
         return {
           color: '#6b7280',
           icon: '📍',
-          size: 28,
+          size: 20,
         };
     }
   };
@@ -306,7 +315,8 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    // Clear existing markers
+    // Clear existing markers and current popup
+    closeCurrentPopup();
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
@@ -347,7 +357,11 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       // Click event to show popup
       markerElement.addEventListener('click', (e) => {
         e.stopPropagation();
-        marker.togglePopup();
+        // 既存のポップアップを閉じる
+        closeCurrentPopup();
+        // 新しいポップアップを開く
+        popup.setLngLat(facility.coordinates).addTo(map.current!);
+        currentPopupRef.current = popup;
       });
 
       markersRef.current.push(marker);
@@ -374,18 +388,22 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
         <div class="flex items-center gap-2 mb-2">
           <span style="font-size: 20px;">${style.icon}</span>
-          <h3 class="font-semibold text-gray-900">${facility.name}</h3>
+          <h3 class="font-semibold text-gray-900">${
+            facility.type === 'camping' ? '車中泊スポット' : facility.name
+          }</h3>
         </div>
         ${
-          facility.distance
-            ? `<div class="text-sm text-gray-600">
-                車中泊スポットから約 <strong>${formatDistance(facility.distance)}</strong>
-              </div>`
+          facility.type === 'camping'
+            ? `<div class="text-sm text-gray-600">${facility.name}</div>`
             : ''
         }
         ${
-          facility.type === 'camping'
-            ? '<div class="text-sm text-gray-600">車中泊スポット</div>'
+          facility.distance
+            ? `<div class="text-sm text-gray-600">
+                車中泊スポットから約 <strong>${formatDistance(
+                  facility.distance
+                )}</strong>
+              </div>`
             : ''
         }
       </div>
@@ -428,7 +446,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
           <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
             <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
-              施設マップ
+              凡例
             </h4>
             {isLegendOpen ? (
               <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
