@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
+import mailerSend from '@/lib/mailersend';
 
 // Helper function to ensure database connection
 async function ensureDbConnection() {
@@ -52,6 +53,25 @@ export async function POST(request: NextRequest) {
     // Create new submission
     const newSubmission = new CampingSpotSubmission(validatedData);
     await newSubmission.save();
+
+    // Send email notification to admin
+    if (process.env.MAILERSEND_API_TOKEN && process.env.ADMIN_EMAIL) {
+      try {
+        await mailerSend.sendCampingSpotSubmission({
+          name: validatedData.name,
+          prefecture: validatedData.prefecture,
+          address: validatedData.address,
+          type: validatedData.type,
+          submitterName: validatedData.submitterName,
+          submitterEmail: validatedData.submitterEmail,
+          adminEmail: process.env.ADMIN_EMAIL,
+          submissionId: newSubmission._id.toString(),
+        });
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     return NextResponse.json(
       {
