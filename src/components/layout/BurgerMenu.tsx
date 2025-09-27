@@ -94,21 +94,45 @@ export function BurgerMenu() {
             旅程
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <Link
-            href={isAdmin ? '/admin/shachu-haku' : '/shachu-haku'}
-            className='flex items-center'
-            onClick={(e) =>
-              handleItemClick(
-                e,
-                isAdmin ? '/admin/shachu-haku' : '/shachu-haku'
-              )
-            }
-          >
-            <MapPin className='mr-1' />
-            車中泊スポット
-          </Link>
-        </DropdownMenuItem>
+        {isAdmin ? (
+          <>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Link
+                href='/shachu-haku'
+                className='flex items-center justify-between w-full'
+                onClick={(e) => handleItemClick(e, '/shachu-haku')}
+              >
+                <div className='flex items-center'>
+                  <MapPin className='mr-1' />
+                  車中泊スポット (一般用)
+                </div>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Link
+                href='/admin/shachu-haku'
+                className='flex items-center justify-between w-full'
+                onClick={(e) => handleItemClick(e, '/admin/shachu-haku')}
+              >
+                <div className='flex items-center'>
+                  <MapPin className='mr-1' />
+                  車中泊スポット (管理者用)
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href='/shachu-haku'
+              className='flex items-center'
+              onClick={(e) => handleItemClick(e, '/shachu-haku')}
+            >
+              <MapPin className='mr-1' />
+              車中泊スポット
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/shachu-haku/submit'

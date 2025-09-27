@@ -12,8 +12,15 @@ import {
   MapPin,
   Plus,
   Mail,
+  ChevronDown,
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const activeClassNames =
   'underline decoration-1 underline-offset-4 decoration-current';
@@ -65,10 +72,34 @@ export function Navigation() {
         <BookHeart className='mr-1' />
         旅程
       </NavLink>
-      <NavLink href={isAdmin ? '/admin/shachu-haku' : '/shachu-haku'}>
-        <MapPin className='mr-1' />
-        車中泊スポット
-      </NavLink>
+      {isAdmin ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none'>
+            <MapPin className='mr-1' />
+            車中泊スポット
+            <ChevronDown className='ml-1 h-3 w-3' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild>
+              <Link href='/shachu-haku' className='flex items-center w-full'>
+                <MapPin className='mr-1 h-4 w-4' />
+                一般用
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href='/admin/shachu-haku' className='flex items-center w-full'>
+                <MapPin className='mr-1 h-4 w-4' />
+                管理者用
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <NavLink href='/shachu-haku'>
+          <MapPin className='mr-1' />
+          車中泊スポット
+        </NavLink>
+      )}
       <NavLink href='/shachu-haku/submit'>
         <Plus className='mr-1' />
         スポット投稿
