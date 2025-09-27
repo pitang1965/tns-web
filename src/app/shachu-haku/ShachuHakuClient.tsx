@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { formatDistance } from '@/lib/formatDistance';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -479,14 +480,14 @@ export default function ShachuHakuClient() {
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
                   {selectedSpot.distanceToToilet && (
-                    <div>トイレまで: {selectedSpot.distanceToToilet}m</div>
+                    <div>トイレまで: {formatDistance(selectedSpot.distanceToToilet)}</div>
                   )}
                   {selectedSpot.distanceToBath && (
-                    <div>入浴施設まで: {selectedSpot.distanceToBath}m</div>
+                    <div>入浴施設まで: {formatDistance(selectedSpot.distanceToBath)}</div>
                   )}
                   {selectedSpot.distanceToConvenience && (
                     <div>
-                      コンビニまで: {selectedSpot.distanceToConvenience}m
+                      コンビニまで: {formatDistance(selectedSpot.distanceToConvenience)}
                     </div>
                   )}
                   {selectedSpot.elevation && (

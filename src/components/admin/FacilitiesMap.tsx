@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { formatDistance } from '@/lib/formatDistance';
 import {
   suppressImageWarnings,
   handleMapError,
@@ -26,6 +27,7 @@ interface FacilityData {
   lng: number;
   name: string;
   color: string;
+  distance?: number;
 }
 
 export function FacilitiesMap({ watch }: FacilitiesMapProps) {
@@ -79,10 +81,8 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       .setPopup(
         new mapboxgl.Popup({ offset: 25 }).setHTML(
           `<div class="p-2">
-            <strong>${facility.name}</strong><br>
-            <span class="text-sm text-gray-600">${getTypeLabel(
-              facility.type
-            )}</span>
+            <strong>${getTypeLabel(facility.type)}</strong>
+            ${facility.distance ? `<br><span class="text-sm text-gray-600">${formatDistance(facility.distance)}</span>` : ''}
           </div>`
         )
       )
@@ -128,6 +128,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     // トイレ
     const toiletLat = parseFloat(watch('nearbyToiletLat') || '0');
     const toiletLng = parseFloat(watch('nearbyToiletLng') || '0');
+    const toiletDistance = parseFloat(watch('distanceToToilet') || '0');
 
     if (toiletLat && toiletLng) {
       facilities.push({
@@ -136,12 +137,14 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lng: toiletLng,
         name: 'トイレ',
         color: getFacilityColor('toilet'),
+        distance: toiletDistance || undefined,
       });
     }
 
     // コンビニ
     const convenienceLat = parseFloat(watch('nearbyConvenienceLat') || '0');
     const convenienceLng = parseFloat(watch('nearbyConvenienceLng') || '0');
+    const convenienceDistance = parseFloat(watch('distanceToConvenience') || '0');
 
     if (convenienceLat && convenienceLng) {
       facilities.push({
@@ -150,12 +153,14 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lng: convenienceLng,
         name: 'コンビニ',
         color: getFacilityColor('convenience'),
+        distance: convenienceDistance || undefined,
       });
     }
 
     // 入浴施設
     const bathLat = parseFloat(watch('nearbyBathLat') || '0');
     const bathLng = parseFloat(watch('nearbyBathLng') || '0');
+    const bathDistance = parseFloat(watch('distanceToBath') || '0');
 
     if (bathLat && bathLng) {
       facilities.push({
@@ -164,6 +169,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lng: bathLng,
         name: '入浴施設',
         color: getFacilityColor('bath'),
+        distance: bathDistance || undefined,
       });
     }
 
@@ -264,10 +270,13 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     watch('name'),
     watch('nearbyToiletLat'),
     watch('nearbyToiletLng'),
+    watch('distanceToToilet'),
     watch('nearbyConvenienceLat'),
     watch('nearbyConvenienceLng'),
+    watch('distanceToConvenience'),
     watch('nearbyBathLat'),
     watch('nearbyBathLng'),
+    watch('distanceToBath'),
     mapLoaded,
   ]);
 

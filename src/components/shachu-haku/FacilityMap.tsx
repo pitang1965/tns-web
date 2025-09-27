@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
+import { formatDistance } from '@/lib/formatDistance';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import {
   suppressImageWarnings,
@@ -378,7 +379,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         ${
           facility.distance
             ? `<div class="text-sm text-gray-600">
-                車中泊スポットから約 <strong>${facility.distance}m</strong>
+                車中泊スポットから約 <strong>${formatDistance(facility.distance)}</strong>
               </div>`
             : ''
         }
@@ -474,7 +475,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
                     <span>{item.label}</span>
                     {item.type !== 'camping' && distance != null && (
                       <span className='text-xs text-gray-500 dark:text-gray-400'>
-                        ({distance}m)
+                        ({formatDistance(distance)})
                       </span>
                     )}
                   </div>

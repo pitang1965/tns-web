@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
+import { formatDistance } from '@/lib/formatDistance';
 import {
   ArrowLeft,
   Share2,
@@ -20,12 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -467,7 +463,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                     トイレまで
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {spot.distanceToToilet}m
+                    {formatDistance(spot.distanceToToilet)}
                   </span>
                 </div>
               )}
@@ -477,7 +473,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                     入浴施設まで
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {spot.distanceToBath}m
+                    {formatDistance(spot.distanceToBath)}
                   </span>
                 </div>
               )}
@@ -487,7 +483,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                     コンビニまで
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {spot.distanceToConvenience}m
+                    {formatDistance(spot.distanceToConvenience)}
                   </span>
                 </div>
               )}

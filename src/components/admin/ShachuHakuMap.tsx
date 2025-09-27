@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
+
+import { formatDistance } from '@/lib/formatDistance';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -324,15 +326,15 @@ export default function ShachuHakuMap({
           <div><strong class="text-gray-900">料金:</strong> ${
             spot.pricing.isFree ? '無料' : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
           }</div>
-          ${spot.distanceToToilet ? `<div><strong class="text-gray-900">トイレ:</strong> ${spot.distanceToToilet}m</div>` : ''}
+          ${spot.distanceToToilet ? `<div><strong class="text-gray-900">トイレ:</strong> ${formatDistance(spot.distanceToToilet)}</div>` : ''}
           ${
             spot.distanceToBath
-              ? `<div><strong class="text-gray-900">入浴施設:</strong> ${spot.distanceToBath}m</div>`
+              ? `<div><strong class="text-gray-900">入浴施設:</strong> ${formatDistance(spot.distanceToBath)}</div>`
               : ''
           }
           ${
             spot.distanceToConvenience
-              ? `<div><strong class="text-gray-900">コンビニ:</strong> ${spot.distanceToConvenience}m</div>`
+              ? `<div><strong class="text-gray-900">コンビニ:</strong> ${formatDistance(spot.distanceToConvenience)}</div>`
               : ''
           }
           ${spot.elevation ? `<div><strong class="text-gray-900">標高:</strong> ${spot.elevation}m</div>` : ''}
