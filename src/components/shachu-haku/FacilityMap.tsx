@@ -41,6 +41,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
+  const [isMapMoving, setIsMapMoving] = useState(false);
 
   // 現在開いているポップアップを閉じる
   const closeCurrentPopup = () => {
@@ -48,6 +49,21 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       currentPopupRef.current.remove();
       currentPopupRef.current = null;
     }
+  };
+
+  // Hide/show markers during map movement
+  const hideMarkers = () => {
+    markersRef.current.forEach(marker => {
+      const element = marker.getElement();
+      element.style.opacity = '0';
+    });
+  };
+
+  const showMarkers = () => {
+    markersRef.current.forEach(marker => {
+      const element = marker.getElement();
+      element.style.opacity = '1';
+    });
   };
 
   // 座標の有効性をチェック
@@ -295,6 +311,27 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       }
     });
 
+    // Add map movement event listeners to hide/show markers
+    map.current.on('movestart', () => {
+      setIsMapMoving(true);
+      hideMarkers();
+    });
+
+    map.current.on('zoomstart', () => {
+      setIsMapMoving(true);
+      hideMarkers();
+    });
+
+    map.current.on('moveend', () => {
+      setIsMapMoving(false);
+      showMarkers();
+    });
+
+    map.current.on('zoomend', () => {
+      setIsMapMoving(false);
+      showMarkers();
+    });
+
     // Add controls
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
@@ -331,6 +368,8 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         width: ${style.size}px;
         height: ${style.size}px;
         background-color: ${style.color};
+        opacity: ${isMapMoving ? '0' : '1'};
+        transition: opacity 0.15s ease-in-out;
       `;
       markerElement.textContent = style.icon;
 

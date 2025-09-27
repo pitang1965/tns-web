@@ -43,6 +43,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(true);
+  const [isMapMoving, setIsMapMoving] = useState(false);
 
   // マーカーの凡例データ
   const legendItems = [
@@ -58,6 +59,21 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       currentPopupRef.current.remove();
       currentPopupRef.current = null;
     }
+  };
+
+  // Hide/show markers during map movement
+  const hideMarkers = () => {
+    markersRef.current.forEach(marker => {
+      const element = marker.getElement();
+      element.style.opacity = '0';
+    });
+  };
+
+  const showMarkers = () => {
+    markersRef.current.forEach(marker => {
+      const element = marker.getElement();
+      element.style.opacity = '1';
+    });
   };
 
   const getMarkerStyle = (type: string) => {
@@ -120,6 +136,8 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       width: ${style.size}px;
       height: ${style.size}px;
       background-color: ${style.color};
+      opacity: 1;
+      transition: opacity 0.15s ease-in-out;
     `;
     markerElement.textContent = style.icon;
     markerElement.title = getTypeLabel(facility.type);
@@ -355,6 +373,27 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         } catch (error) {
           console.error('Error setting up map features:', error);
         }
+      });
+
+      // Add map movement event listeners to hide/show markers
+      mapInstance.current.on('movestart', () => {
+        setIsMapMoving(true);
+        hideMarkers();
+      });
+
+      mapInstance.current.on('zoomstart', () => {
+        setIsMapMoving(true);
+        hideMarkers();
+      });
+
+      mapInstance.current.on('moveend', () => {
+        setIsMapMoving(false);
+        showMarkers();
+      });
+
+      mapInstance.current.on('zoomend', () => {
+        setIsMapMoving(false);
+        showMarkers();
       });
     } catch (error) {
       console.error('Failed to initialize map:', error);
