@@ -90,6 +90,12 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `AUTH0_SCOPE'`:
   - アプリケーションが要求する権限（スコープ）を指定する。複数のスコープはスペースで区切る。
   - 例：`openid profile email read:shows`
+- `AUTH0_M2M_CLIENT_ID`:
+  - Auth0 Management API にアクセスするための Machine to Machine Application のクライアント ID。
+  - ユーザー統計取得などの管理機能で使用される。
+- `AUTH0_M2M_CLIENT_SECRET`:
+  - Auth0 Management API にアクセスするための Machine to Machine Application のクライアント秘密鍵。
+  - ユーザー統計取得などの管理機能で使用される。
 
 ### 地図
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:

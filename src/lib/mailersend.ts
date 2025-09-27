@@ -171,6 +171,69 @@ ${data.submitterEmail ? `投稿者メール: ${data.submitterEmail}` : ''}
       html: emailHtml,
     });
   }
+
+  async sendUserRegistrationNotification(data: {
+    userId: string;
+    userEmail: string;
+    userName: string;
+    createdAt?: string;
+    adminEmail: string;
+    userStats?: {
+      total: number;
+      activeUsers: number;
+      newUsersToday: number;
+      newUsersThisWeek: number;
+      newUsersThisMonth: number;
+    } | null;
+  }): Promise<MailerSendResponse> {
+    const userStatsHtml = data.userStats ? `
+      <h3>📊 ユーザー統計</h3>
+      <ul>
+        <li><strong>総ユーザー数:</strong> ${data.userStats.total.toLocaleString()}人</li>
+        <li><strong>今日の新規登録:</strong> ${data.userStats.newUsersToday}人</li>
+        <li><strong>今週の新規登録:</strong> ${data.userStats.newUsersThisWeek}人</li>
+        <li><strong>今月の新規登録:</strong> ${data.userStats.newUsersThisMonth}人</li>
+      </ul>
+    ` : '';
+
+    const emailHtml = `
+      <h2>新しいユーザー登録</h2>
+      <p><strong>ユーザーID:</strong> ${data.userId}</p>
+      <p><strong>ユーザー名:</strong> ${data.userName}</p>
+      <p><strong>メールアドレス:</strong> ${data.userEmail}</p>
+      ${data.createdAt ? `<p><strong>登録日時:</strong> ${new Date(data.createdAt).toLocaleString('ja-JP')}</p>` : ''}
+      ${userStatsHtml}
+      <hr>
+      <p><small>このメールは旅のしおりの新規ユーザー登録時に自動送信されました。</small></p>
+    `;
+
+    const userStatsText = data.userStats ? `
+📊 ユーザー統計
+- 総ユーザー数: ${data.userStats.total.toLocaleString()}人
+- 今日の新規登録: ${data.userStats.newUsersToday}人
+- 今週の新規登録: ${data.userStats.newUsersThisWeek}人
+- 今月の新規登録: ${data.userStats.newUsersThisMonth}人
+` : '';
+
+    const emailText = `
+新しいユーザー登録
+
+ユーザーID: ${data.userId}
+ユーザー名: ${data.userName}
+メールアドレス: ${data.userEmail}
+${data.createdAt ? `登録日時: ${new Date(data.createdAt).toLocaleString('ja-JP')}` : ''}
+${userStatsText}
+---
+このメールは旅のしおりの新規ユーザー登録時に自動送信されました。
+    `;
+
+    return this.sendEmail({
+      to: data.adminEmail,
+      subject: `【新規ユーザー登録】${data.userName}`,
+      text: emailText,
+      html: emailHtml,
+    });
+  }
 }
 
 const mailerSend = new MailerSendClient(
