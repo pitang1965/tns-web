@@ -18,17 +18,15 @@ import {
   Clock,
   User,
   Mail,
-  CheckCircle,
   XCircle,
-  Eye,
   Archive,
+  Edit,
 } from 'lucide-react';
 import {
   CampingSpotSubmissionWithId,
   CampingSpotTypeLabels,
 } from '@/data/schemas/campingSpot';
 import {
-  approveSubmission,
   rejectSubmission,
   deleteSubmission,
 } from '../../app/actions/campingSpotSubmissions';
@@ -36,42 +34,20 @@ import {
 interface SubmissionReviewCardProps {
   submission: CampingSpotSubmissionWithId;
   onUpdate: () => void;
+  onEdit: (submission: CampingSpotSubmissionWithId) => void;
 }
 
 export default function SubmissionReviewCard({
   submission,
   onUpdate,
+  onEdit,
 }: SubmissionReviewCardProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
-  const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const handleApprove = async () => {
-    try {
-      setLoading(true);
-      await approveSubmission(submission._id, reviewNotes);
-      toast({
-        title: '承認完了',
-        description: '投稿を承認し、車中泊スポットとして公開しました。',
-      });
-      setShowApproveDialog(false);
-      setReviewNotes('');
-      onUpdate();
-    } catch (error) {
-      console.error('Approval error:', error);
-      toast({
-        title: 'エラー',
-        description:
-          error instanceof Error ? error.message : '承認に失敗しました',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleReject = async () => {
     if (!reviewNotes.trim()) {
@@ -176,56 +152,14 @@ export default function SubmissionReviewCard({
           <div className='flex gap-2'>
             {submission.status === 'pending' && (
               <>
-                <Dialog
-                  open={showApproveDialog}
-                  onOpenChange={setShowApproveDialog}
+                <Button
+                  size='sm'
+                  className='bg-green-600 hover:bg-green-700'
+                  onClick={() => onEdit(submission)}
                 >
-                  <DialogTrigger asChild>
-                    <Button
-                      size='sm'
-                      className='bg-green-600 hover:bg-green-700'
-                    >
-                      <CheckCircle className='w-4 h-4 mr-1' />
-                      承認
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>投稿を承認</DialogTitle>
-                    </DialogHeader>
-                    <div className='space-y-4'>
-                      <p>
-                        この投稿を承認して車中泊スポットとして公開しますか？
-                      </p>
-                      <div>
-                        <label className='text-sm font-medium'>
-                          承認コメント（任意）
-                        </label>
-                        <Textarea
-                          value={reviewNotes}
-                          onChange={(e) => setReviewNotes(e.target.value)}
-                          placeholder='承認に関するコメント...'
-                          rows={3}
-                        />
-                      </div>
-                      <div className='flex gap-2'>
-                        <Button
-                          onClick={handleApprove}
-                          disabled={loading}
-                          className='bg-green-600 hover:bg-green-700'
-                        >
-                          {loading ? '処理中...' : '承認する'}
-                        </Button>
-                        <Button
-                          variant='outline'
-                          onClick={() => setShowApproveDialog(false)}
-                        >
-                          キャンセル
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                  <Edit className='w-4 h-4 mr-1' />
+                  編集して承認
+                </Button>
 
                 <Dialog
                   open={showRejectDialog}

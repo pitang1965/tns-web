@@ -190,3 +190,32 @@ export async function deleteSubmission(id: string) {
 
   return { success: true };
 }
+
+// Function to approve submission without creating camping spot (for edit workflow)
+export async function approveSubmissionWithoutCreating(
+  id: string,
+  reviewNotes?: string
+) {
+  const user = await checkAdminAuth();
+  await ensureDbConnection();
+
+  const submission = await CampingSpotSubmission.findById(id);
+  if (!submission) {
+    throw new Error('Submission not found');
+  }
+
+  if (submission.status !== 'pending') {
+    throw new Error('Submission is not pending');
+  }
+
+  // Update submission status only (camping spot already created separately)
+  submission.status = 'approved';
+  submission.reviewedAt = new Date();
+  submission.reviewedBy = user.email;
+  submission.reviewNotes = reviewNotes;
+  await submission.save();
+
+  revalidatePath('/admin/submissions');
+
+  return { success: true };
+}

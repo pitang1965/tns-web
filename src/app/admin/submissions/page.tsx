@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,14 @@ import { RefreshCw, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
 import { CampingSpotSubmissionWithId } from '@/data/schemas/campingSpot';
 import { getCampingSpotSubmissions } from '../../../app/actions/campingSpotSubmissions';
 import SubmissionReviewCard from '@/components/admin/SubmissionReviewCard';
+
+// Dynamically import the form component to avoid SSR issues
+const SubmissionEditForm = dynamic(
+  () => import('@/components/admin/SubmissionEditForm'),
+  {
+    ssr: false,
+  }
+);
 
 export default function SubmissionsAdminPage() {
   const { user, isLoading } = useUser();
@@ -27,6 +36,9 @@ export default function SubmissionsAdminPage() {
   );
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
+  const [editingSubmission, setEditingSubmission] =
+    useState<CampingSpotSubmissionWithId | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const filteredSubmissions = useMemo(() => {
     if (activeTab === 'all') return submissions;
@@ -75,6 +87,29 @@ export default function SubmissionsAdminPage() {
 
   const handleRefresh = () => {
     loadSubmissions();
+  };
+
+  const handleEdit = (submission: CampingSpotSubmissionWithId) => {
+    setEditingSubmission(submission);
+    setShowEditForm(true);
+  };
+
+  const handleEditClose = () => {
+    setShowEditForm(false);
+    setEditingSubmission(null);
+  };
+
+  const handleEditSuccess = () => {
+    console.log('handleEditSuccess: Starting success handler...');
+    loadSubmissions();
+    console.log('handleEditSuccess: Submissions reloaded');
+    handleEditClose();
+    console.log('handleEditSuccess: Edit form closed');
+    toast({
+      title: '成功',
+      description: '車中泊スポットを承認し、作成しました',
+    });
+    console.log('handleEditSuccess: Toast displayed');
   };
 
   if (isLoading) {
@@ -230,6 +265,7 @@ export default function SubmissionsAdminPage() {
                       key={submission._id}
                       submission={submission}
                       onUpdate={loadSubmissions}
+                      onEdit={handleEdit}
                     />
                   ))}
                 </div>
@@ -238,6 +274,14 @@ export default function SubmissionsAdminPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {showEditForm && editingSubmission && (
+        <SubmissionEditForm
+          submission={editingSubmission}
+          onClose={handleEditClose}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </div>
   );
 }
