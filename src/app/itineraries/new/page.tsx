@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { ClientItineraryInput, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/components/itinerary/TransportationBadge';
+import { TransportationType } from '@/data/schemas/transportationSchema';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

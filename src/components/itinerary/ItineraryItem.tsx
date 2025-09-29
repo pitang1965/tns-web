@@ -11,10 +11,6 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  TransportationBadge,
-  TransportationType,
-} from '@/components/itinerary/TransportationBadge';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { formatDateWithWeekday } from '@/lib/date';
@@ -40,21 +36,16 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   return (
     <Card className='flex flex-col h-full'>
       <CardHeader>
-        <div className='flex items-center gap-2'>
-          <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
-          {itinerary.isPublic ? (
-            <Badge>公開</Badge>
-          ) : (
-            <Badge variant='outline'>非公開</Badge>
-          )}
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-start justify-between gap-2'>
+            <CardTitle className='line-clamp-2 flex-1'>{itinerary.title}</CardTitle>
+            {itinerary.isPublic ? (
+              <Badge className='flex-shrink-0'>公開</Badge>
+            ) : (
+              <Badge variant='outline' className='flex-shrink-0'>非公開</Badge>
+            )}
+          </div>
         </div>
-        {itinerary.transportation && (
-          <TransportationBadge
-            type={
-              (itinerary.transportation.type as TransportationType) || 'OTHER'
-            }
-          />
-        )}
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>

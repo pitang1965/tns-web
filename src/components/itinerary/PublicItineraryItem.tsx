@@ -12,10 +12,6 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import {
-  TransportationBadge,
-  TransportationType,
-} from '@/components/itinerary/TransportationBadge';
 import { formatDateWithWeekday } from '@/lib/date';
 
 type Props = {
@@ -62,20 +58,11 @@ export const PublicItineraryItem: React.FC<Props> = ({ itinerary }) => {
     <Card className='flex flex-col h-full'>
       <CardHeader>
         <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
-        <div className='flex justify-between items-center mt-1'>
-          {itinerary.transportation && (
-            <TransportationBadge
-              type={
-                (itinerary.transportation.type as TransportationType) || 'OTHER'
-              }
-            />
-          )}
-          {itinerary.owner && (
-            <span className='text-xs text-gray-500 dark:text-gray-400'>
-              作成者: {displayCreator(itinerary.owner)}
-            </span>
-          )}
-        </div>
+        {itinerary.owner && (
+          <span className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+            作成者: {displayCreator(itinerary.owner)}
+          </span>
+        )}
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>

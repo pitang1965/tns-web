@@ -6,3 +6,5 @@ export const transportationSchema = z.object({
     .default('OTHER'),
   details: z.string().nullable(),
 });
+
+export type TransportationType = 'CAR' | 'TRAIN' | 'BUS' | 'PLANE' | 'SHIP' | 'OTHER';

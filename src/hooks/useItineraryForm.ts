@@ -8,7 +8,7 @@ import {
   ClientItineraryInput,
   ClientItineraryDocument,
 } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/components/itinerary/TransportationBadge';
+import { TransportationType } from '@/data/schemas/transportationSchema';
 import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
 import { itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
 

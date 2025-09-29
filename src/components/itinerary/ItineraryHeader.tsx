@@ -1,8 +1,4 @@
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
-import {
-  TransportationBadge,
-  TransportationType,
-} from '@/components/itinerary/TransportationBadge';
 import { H1, LargeText, Text } from '@/components/common/Typography';
 import { Badge } from '@/components/ui/badge';
 
@@ -17,21 +13,9 @@ type ItineraryHeaderProps = {
         numberOfDays?: number;
         totalDays?: number; // API が返す形式
         isPublic?: boolean;
-        transportation?: {
-          type: string;
-          details: string | null;
-        };
       };
 };
 
-const getTransportationType = (
-  transportation: any
-): TransportationType | undefined => {
-  if (transportation && 'type' in transportation) {
-    return transportation.type as TransportationType;
-  }
-  return undefined;
-};
 
 const calculateEndDate = (startDate: string, days: number): Date => {
   const start = new Date(startDate);
@@ -43,7 +27,6 @@ const calculateEndDate = (startDate: string, days: number): Date => {
 export const ItineraryHeader: React.FC<ItineraryHeaderProps> = ({
   itinerary,
 }) => {
-  const transportationType = getTransportationType(itinerary.transportation);
 
   // numberOfDays か totalDays のどちらかを使用
   const days =
@@ -79,7 +62,6 @@ export const ItineraryHeader: React.FC<ItineraryHeaderProps> = ({
           </Badge>
         )}
       </div>
-      {transportationType && <TransportationBadge type={transportationType} />}
       <LargeText>{itinerary.description}</LargeText>
       <Text>期間: {periodDisplay}</Text>
     </div>
