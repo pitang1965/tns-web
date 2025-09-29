@@ -48,7 +48,6 @@ export default function SubmissionReviewCard({
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-
   const handleReject = async () => {
     if (!reviewNotes.trim()) {
       toast({
@@ -124,13 +123,13 @@ export default function SubmissionReviewCard({
   return (
     <Card>
       <CardHeader>
-        <div className='flex justify-between items-start'>
-          <div>
+        <div className='flex flex-col md:flex-row md:justify-between md:items-start gap-4'>
+          <div className='flex-1'>
             <CardTitle className='flex items-center gap-2'>
               <MapPin className='w-5 h-5' />
               {submission.name}
             </CardTitle>
-            <div className='flex items-center gap-2 mt-2'>
+            <div className='flex items-center gap-2 mt-2 flex-wrap'>
               {getStatusBadge()}
               <Badge variant='outline'>
                 {CampingSpotTypeLabels[submission.type]}
@@ -149,7 +148,7 @@ export default function SubmissionReviewCard({
             </div>
           </div>
 
-          <div className='flex gap-2'>
+          <div className='flex gap-2 flex-shrink-0'>
             {submission.status === 'pending' && (
               <>
                 <Button
@@ -351,21 +350,21 @@ export default function SubmissionReviewCard({
             </div>
           )}
 
-          <div className='flex items-center gap-4 text-sm text-gray-500 pt-2 border-t'>
+          <div className='flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-500 pt-2 border-t'>
             <div className='flex items-center gap-1'>
               <Clock className='w-4 h-4' />
-              {new Date(submission.submittedAt).toLocaleDateString('ja-JP')}
+              {new Date(submission.submittedAt).toISOString().split('T')[0]}
             </div>
             {submission.submitterName && (
               <div className='flex items-center gap-1'>
                 <User className='w-4 h-4' />
-                {submission.submitterName}
+                <span className='break-all'>{submission.submitterName}</span>
               </div>
             )}
             {submission.submitterEmail && (
               <div className='flex items-center gap-1'>
                 <Mail className='w-4 h-4' />
-                {submission.submitterEmail}
+                <span className='break-all'>{submission.submitterEmail}</span>
               </div>
             )}
           </div>
@@ -377,7 +376,7 @@ export default function SubmissionReviewCard({
               </h4>
               {submission.reviewedAt && (
                 <p className='text-xs text-gray-500'>
-                  {new Date(submission.reviewedAt).toLocaleDateString('ja-JP')}{' '}
+                  {new Date(submission.reviewedAt).toISOString().split('T')[0]}{' '}
                   by {submission.reviewedBy}
                 </p>
               )}

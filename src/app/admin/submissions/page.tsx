@@ -161,8 +161,8 @@ export default function SubmissionsAdminPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+      {/* Stats Cards - Hidden on mobile */}
+      <div className='hidden md:grid grid-cols-1 md:grid-cols-4 gap-4'>
         <Card>
           <CardContent className='p-4'>
             <div className='flex items-center gap-2'>
