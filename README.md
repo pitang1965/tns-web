@@ -361,7 +361,6 @@ itinerariesコレクションのサンプルデータを3件表示して
 | `sharedWith` | Array | 共有ユーザー |
 | `startDate` | String | 開始日 |
 | `title` | String | 旅行タイトル |
-| `transportation` | Document | 交通手段情報 |
 | `updatedAt` | Date | 更新日時 |
 
 ## 高度な活用例

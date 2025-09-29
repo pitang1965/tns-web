@@ -47,7 +47,6 @@ export async function createItineraryAction(data: ClientItineraryInput) {
         email: session.user.email ?? '',
       },
       isPublic: false,
-      transportation: { type: 'OTHER', details: null },
       sharedWith: [],
     };
 

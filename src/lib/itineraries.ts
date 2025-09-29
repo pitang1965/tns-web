@@ -247,7 +247,6 @@ export async function updateItinerary(
       description: updatedData.description,
       numberOfDays: updatedData.numberOfDays,
       startDate: updatedData.startDate,
-      transportation: updatedData.transportation,
       isPublic: updatedData.isPublic,
       sharedWith: updatedData.sharedWith,
       updatedAt: now,

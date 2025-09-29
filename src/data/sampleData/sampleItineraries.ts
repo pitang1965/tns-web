@@ -9,10 +9,6 @@ export const sampleItineraries: ServerItineraryDocument[] = [
     numberOfDays: 30,
     description: '近畿、中国、四国、九州を巡る旅',
     dayPlans: [],
-    transportation: {
-      type: 'CAR',
-      details: '車中泊',
-    },
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
     owner: {
@@ -205,10 +201,6 @@ export const sampleItineraries: ServerItineraryDocument[] = [
         activities: [],
       },
     ],
-    transportation: {
-      type: 'CAR',
-      details: '車中泊',
-    },
     createdAt: new Date(), // 現在の日時
     updatedAt: new Date(), // 現在の日時
     owner: {

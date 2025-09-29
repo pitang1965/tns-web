@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { ClientItineraryInput, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/data/schemas/transportationSchema';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,10 +65,6 @@ export default withPageAuthRequired(function NewItineraryPage() {
     numberOfDays: 1,
     isPublic: false,
     dayPlans: [],
-    transportation: {
-      type: 'OTHER' as TransportationType,
-      details: null as string | null,
-    },
     sharedWith: [],
     owner: {
       id: user?.sub || 'dummy-id',

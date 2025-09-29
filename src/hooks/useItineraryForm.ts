@@ -8,7 +8,6 @@ import {
   ClientItineraryInput,
   ClientItineraryDocument,
 } from '@/data/schemas/itinerarySchema';
-import { TransportationType } from '@/data/schemas/transportationSchema';
 import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
 import { itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
 
@@ -19,10 +18,6 @@ const DEFAULT_ITINERARY = {
   numberOfDays: 1,
   isPublic: false,
   dayPlans: [],
-  transportation: {
-    type: 'OTHER' as TransportationType,
-    details: null as string | null,
-  },
   sharedWith: [],
 };
 

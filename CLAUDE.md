@@ -69,7 +69,6 @@ The application uses Zod schemas for type-safe data validation:
 - **DayPlan**: Activities for a specific day
 - **Activity**: Individual activity with location, time, and notes
 - **Place**: Location data with coordinates and address
-- **Transportation**: Travel method between activities
 
 Key schemas are defined in `src/data/schemas/` with separate client/server variants to handle MongoDB ObjectId conversion.
 

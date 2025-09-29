@@ -28,7 +28,6 @@ export type ItineraryMetadata = {
       title: string;
     }[];
   }[];
-  transportation?: { type: string; details: string | null };
   createdAt?: string;
   updatedAt?: string;
 };

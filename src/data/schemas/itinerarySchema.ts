@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { objectIdSchema } from './commonSchemas';
 import { userReferenceSchema } from './userSchema';
 import { activitySchema } from './activitySchema';
-import { transportationSchema } from './transportationSchema';
 
 // Day plan schema
 const dayPlanSchema = z.object({
@@ -18,10 +17,6 @@ const baseSchema = z.object({
   numberOfDays: z.number().min(1, '日数を入力してください'),
   startDate: z.string().optional(),
   dayPlans: z.array(dayPlanSchema),
-  transportation: transportationSchema.default({
-    type: 'OTHER',
-    details: null,
-  }),
   owner: userReferenceSchema,
   isPublic: z.boolean().default(false),
   sharedWith: z.array(userReferenceSchema).default([]),
@@ -177,7 +172,6 @@ export class ItineraryManager {
       numberOfDays: params.numberOfDays,
       startDate: params.startDate,
       dayPlans,
-      transportation: { type: 'OTHER', details: null },
       isPublic: false,
       sharedWith: [],
     };
