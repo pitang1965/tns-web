@@ -26,16 +26,23 @@ export const ActivityView: React.FC<ActivityProps> = ({
 
   return (
     <li className='bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50'>
-      <div className='flex'>
+      <div>
         <H3>
           {titlePrefix}
           {activity.title}
         </H3>
-        <TimeRangeDisplay
-          startTime={activity.startTime ?? undefined}
-          endTime={activity.endTime ?? undefined}
-        />
-        {activity.cost && activity.cost > 0 ? `　(${activity.cost}円)` : ''}
+        <div className='flex items-baseline gap-1 mt-1'>
+          <TimeRangeDisplay
+            startTime={activity.startTime ?? undefined}
+            endTime={activity.endTime ?? undefined}
+            className='ml-0'
+          />
+          {activity.cost !== null && activity.cost !== undefined && (
+            <span className='text-gray-600 dark:text-gray-400 text-sm'>
+              ({activity.cost > 0 ? `${activity.cost}円` : '無料'})
+            </span>
+          )}
+        </div>
       </div>
       <PlaceView
         name={activity.place.name}
