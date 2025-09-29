@@ -507,8 +507,69 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 MONGODB_URI_READONLY=mongodb+srv://claude_readonly:your_password@cluster0.xxxxx.mongodb.net/?appName=ClaudeMCP
 ```
 
+## MCPサーバー連携
+
+### Context7
+
+Context7はAIアシスタント向けのコンテキスト管理サービスです。Claude Codeとの統合により、プロジェクトの履歴管理や高度なコンテキスト検索機能を提供します。
+
+このプロジェクトでは、使用している技術スタック（Next.js 14、React 19、Tailwind CSS、Jotai、MongoDB、Auth0など）の最新ドキュメントを参照できるよう、プロジェクト固有のContext7設定を行っています。
+
+#### プロジェクト固有の設定
+
+1. **環境変数の設定**
+   ```bash
+   # .env.mcp.exampleを.env.mcpにコピー
+   cp .env.mcp.example .env.mcp
+
+   # 実際のAPIキーを設定
+   # CONTEXT7_API_KEY=your-actual-api-key
+   ```
+
+2. **MCP設定ファイル**
+   `.mcp.json`にプロジェクト専用のContext7設定が含まれています：
+   ```json
+   {
+     "mcpServers": {
+       "context7-project": {
+         "type": "http",
+         "url": "https://mcp.context7.com/mcp",
+         "headers": {
+           "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}",
+           "X-Project-Context": "travel-itinerary-nextjs"
+         }
+       }
+     }
+   }
+   ```
+
+3. **接続確認**
+   ```bash
+   # MCPサーバー一覧を確認
+   claude mcp list
+   ```
+
+   正常に接続されている場合：
+   ```
+   mongodb-readonly: npx -y @mongodb-js/mongodb-mcp-server - ✓ Connected
+   context7-project: https://mcp.context7.com/mcp (HTTP) - ✓ Connected
+   ```
+
+#### 対応技術スタック
+
+Context7から最新ドキュメントを取得可能な技術：
+- Next.js 14 (App Router、Server Components)
+- React 19 (最新Hooks、パフォーマンス改善)
+- Tailwind CSS 4.x (新機能、ユーティリティ)
+- Jotai (状態管理パターン)
+- MongoDB & Mongoose (ベストプラクティス)
+- Auth0 (認証実装パターン)
+- React Hook Form & Zod (フォーム設計)
+- TypeScript (型定義、エラーハンドリング)
+
 ## 参考リンク
 
 - [MongoDB MCP Server 公式ドキュメント](https://www.mongodb.com/docs/mcp-server/)
 - [Claude Code MCP ガイド](https://docs.anthropic.com/ja/docs/claude-code/mcp)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
+- [Context7](https://context7.com/) - AIコンテキスト管理サービス

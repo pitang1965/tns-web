@@ -11,6 +11,14 @@
         "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI}",
         "MDB_MCP_READ_ONLY": "true"
       }
+    },
+    "context7-project": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}",
+        "X-Project-Context": "travel-itinerary-nextjs"
+      }
     }
   }
 }
