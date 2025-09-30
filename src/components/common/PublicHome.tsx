@@ -42,7 +42,7 @@ export default function ClientHome() {
           <li>
             <Text>
               <span className='font-semibold'>アカウント管理:</span>{' '}
-              アカウントを作成して個人の旅程を管理
+              Google・Facebook・メールアドレスでログインして個人の旅程を管理
             </Text>
           </li>
           <li>
@@ -77,14 +77,14 @@ export default function ClientHome() {
           </li>
           <li>
             <Text>
-              <span className='font-semibold'>SNS共有:</span>{' '}
-              旅程をX（Twitter）で共有するボタンを実装
+              <span className='font-semibold'>簡単共有:</span>{' '}
+              旅程をSNS（X・LINE・Facebook等）やメールで簡単に共有
             </Text>
           </li>
           <li>
             <Text>
               <span className='font-semibold'>車中泊スポットマップ:</span>{' '}
-              みなさんのおすすめの車中泊スポットを
+              トイレ・コンビニ・入浴施設までの距離や、安全性・静けさの情報を提供。みなさんのおすすめスポットも
               <a
                 href='/shachu-haku/submit'
                 className='text-blue-600 dark:text-blue-400 hover:underline mx-1'
