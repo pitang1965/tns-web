@@ -33,6 +33,7 @@ import {
   CampingSpotType,
 } from '@/data/schemas/campingSpot';
 import dynamic from 'next/dynamic';
+import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
 
 // Dynamically import map component to avoid SSR issues
 const SimpleLocationPicker = dynamic(
@@ -330,15 +331,34 @@ export default function CampingSpotSubmissionForm({
                 />
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowMap(!showMap)}
-                className="w-full"
-              >
-                <MapPin className="w-4 h-4 mr-2" />
-                {showMap ? '地図を閉じる' : '地図で位置を選択'}
-              </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowMap(!showMap)}
+                    className="w-full"
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {showMap ? '地図を閉じる' : '地図で位置を選択'}
+                  </Button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    地図上でクリックして位置を選択できます
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <CoordinatesFromClipboardButton
+                    onCoordinatesExtracted={(latitude, longitude) => {
+                      form.setValue('lat', latitude);
+                      form.setValue('lng', longitude);
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Google Maps の URL や「35.123456, 139.123456」形式の座標をコピーしてから押してください
+                  </p>
+                </div>
+              </div>
 
               {showMap && (
                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
