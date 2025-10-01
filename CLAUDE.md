@@ -26,6 +26,7 @@ npm run init-db      # Initialize MongoDB database with sample data
 - Using other ports (3001, 3002, etc.) will cause CORS errors with Auth0 authentication
 - If port 3000 is occupied, stop the conflicting process first before starting the dev server
 - Never allow Next.js to automatically switch to alternative ports
+- Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
 
 ## Architecture
 
