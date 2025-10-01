@@ -370,18 +370,18 @@ export default function SubmissionReviewCard({
           </div>
 
           {(submission.reviewedAt || submission.reviewNotes) && (
-            <div className='bg-gray-50 p-3 rounded-lg'>
-              <h4 className='font-medium text-sm text-gray-700 mb-1'>
+            <div className='bg-gray-50 dark:bg-gray-800 p-3 rounded-lg'>
+              <h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-1'>
                 管理者レビュー
               </h4>
               {submission.reviewedAt && (
-                <p className='text-xs text-gray-500'>
+                <p className='text-xs text-gray-500 dark:text-gray-400'>
                   {new Date(submission.reviewedAt).toISOString().split('T')[0]}{' '}
                   by {submission.reviewedBy}
                 </p>
               )}
               {submission.reviewNotes && (
-                <p className='text-sm mt-1'>{submission.reviewNotes}</p>
+                <p className='text-sm text-gray-900 dark:text-gray-100 mt-1'>{submission.reviewNotes}</p>
               )}
             </div>
           )}
