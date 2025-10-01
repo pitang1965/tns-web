@@ -381,7 +381,7 @@ export default function SubmissionReviewCard({
                 </p>
               )}
               {submission.reviewNotes && (
-                <p className='text-sm text-gray-900 dark:text-gray-100 mt-1'>{submission.reviewNotes}</p>
+                <p className='text-sm text-gray-900 dark:text-gray-100 mt-1 break-words whitespace-pre-wrap'>{submission.reviewNotes}</p>
               )}
             </div>
           )}
