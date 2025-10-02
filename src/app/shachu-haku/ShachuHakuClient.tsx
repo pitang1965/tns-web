@@ -170,12 +170,23 @@ export default function ShachuHakuClient() {
               ログイン不要で車中泊スポットを検索・閲覧できます
             </div>
           </div>
-          <Link href='/shachu-haku/submit'>
-            <Button className='bg-blue-600 hover:bg-blue-700 text-white'>
-              <Plus className='w-4 h-4 mr-2' />
-              スポット投稿
-            </Button>
-          </Link>
+          <div className='flex flex-col sm:flex-row gap-2'>
+            <a
+              href='https://amzn.to/4pI2i6W'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <Button className='bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto'>
+                Jackeryアーリーオータムセール
+              </Button>
+            </a>
+            <Link href='/shachu-haku/submit'>
+              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto'>
+                <Plus className='w-4 h-4 mr-2' />
+                スポット投稿
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
