@@ -92,7 +92,10 @@ export default function ShachuHakuClient() {
     const tabParam = searchParams.get('tab');
     return tabParam === 'list' ? 'list' : 'map';
   });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    // URLパラメータから検索クエリを取得
+    return searchParams.get('q') || '';
+  });
   const [prefectureFilter, setPrefectureFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 

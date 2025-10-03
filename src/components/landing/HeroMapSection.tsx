@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import mapboxgl from 'mapbox-gl';
 import { H1, LargeText } from '@/components/common/Typography';
 import {
@@ -20,9 +21,11 @@ interface HeroMapSectionProps {
 }
 
 export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProps) {
+  const router = useRouter();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const animationRef = useRef<number | null>(null);
   const currentSpotIndex = useRef(0);
 
@@ -169,14 +172,31 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
 
           {/* Search Bar */}
           <div className='pointer-events-auto mt-6'>
-            <input
-              type='text'
-              placeholder='地名・エリアで検索...'
-              className='w-full max-w-md px-6 py-4 text-lg rounded-full border-2 border-blue-500 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:bg-gray-800 dark:border-blue-400 dark:text-white transition-all'
-              onFocus={(e) => {
-                window.location.href = '/shachu-haku';
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const params = new URLSearchParams();
+                if (searchQuery.trim()) {
+                  params.set('q', searchQuery.trim());
+                }
+                router.push(`/shachu-haku${params.toString() ? `?${params.toString()}` : ''}`);
               }}
-            />
+              className='flex flex-col sm:flex-row gap-2 items-center justify-center'
+            >
+              <input
+                type='text'
+                placeholder='地名・エリアで検索...'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='w-full max-w-md px-6 py-4 text-lg rounded-full border-2 border-blue-500 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:bg-gray-800 dark:border-blue-400 dark:text-white transition-all'
+              />
+              <button
+                type='submit'
+                className='px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-colors shadow-lg hover:shadow-xl whitespace-nowrap min-w-[100px]'
+              >
+                検索
+              </button>
+            </form>
           </div>
         </div>
       </div>
