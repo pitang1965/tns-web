@@ -10,13 +10,14 @@ export function AdSense() {
   const { user } = useUser();
   const isAdminPage = pathname.startsWith('/admin');
   const isPremium = isPremiumMember(user);
+  const isTopPage = pathname === '/';
 
   if (isAdminPage || isPremium || !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
     return null;
   }
 
   return (
-    <div className='w-full bg-background border-b border-gray-200 dark:border-gray-700'>
+    <div className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}>
       <div className='container mx-auto px-2 py-0.5'>
         <Script
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
