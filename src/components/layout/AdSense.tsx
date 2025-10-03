@@ -17,21 +17,21 @@ export function AdSense() {
 
   return (
     <div className='w-full bg-background border-b border-gray-200 dark:border-gray-700'>
-      <div className='container mx-auto px-4 py-1'>
+      <div className='container mx-auto px-2 py-0.5'>
         <Script
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
+          strategy='afterInteractive'
+          crossOrigin='anonymous'
         />
         <div className='w-full max-w-screen-lg mx-auto'>
           <ins
-            className="adsbygoogle"
-            style={{ display: 'block', minHeight: '50px', maxHeight: '100px' }}
+            className='adsbygoogle'
+            style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
             data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
+            data-ad-format='auto'
+            data-full-width-responsive='true'
           />
-          <Script id="adsense-push-header" strategy="lazyOnload">
+          <Script id='adsense-push-header' strategy='lazyOnload'>
             {`
               try {
                 if (typeof window !== 'undefined' && window.adsbygoogle) {

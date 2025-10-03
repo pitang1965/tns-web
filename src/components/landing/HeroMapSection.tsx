@@ -20,7 +20,9 @@ interface HeroMapSectionProps {
   initialSpots?: any[];
 }
 
-export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProps) {
+export default function HeroMapSection({
+  initialSpots = [],
+}: HeroMapSectionProps) {
   const router = useRouter();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -101,7 +103,8 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
         essential: true,
       });
 
-      currentSpotIndex.current = (currentSpotIndex.current + 1) % initialSpots.length;
+      currentSpotIndex.current =
+        (currentSpotIndex.current + 1) % initialSpots.length;
 
       setTimeout(() => {
         animationRef.current = requestAnimationFrame(animateToNextSpot);
@@ -144,9 +147,9 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className='h-[70vh] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
+      <div className='h-[50vh] sm:h-[70vh] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
         <div className='text-center px-6'>
-          <H1 className='mb-4'>日本中の車中泊スポットを探そう</H1>
+          <H1 className='mb-4'>車中泊スポットを探そう</H1>
           <LargeText className='text-gray-600 dark:text-gray-400'>
             旅行計画をもっと簡単に、もっと楽しく。
           </LargeText>
@@ -158,20 +161,24 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
   return (
     <div className='relative h-[50vh] sm:h-[70vh] w-full px-2 sm:px-0'>
       {/* Map Container */}
-      <div ref={mapContainer} className='absolute inset-0 w-full h-full rounded-lg sm:rounded-none' style={{ left: '0.5rem', right: '0.5rem', width: 'calc(100% - 1rem)' }} />
+      <div
+        ref={mapContainer}
+        className='absolute inset-0 w-full h-full rounded-lg sm:rounded-none'
+        style={{ left: '0.5rem', right: '0.5rem', width: 'calc(100% - 1rem)' }}
+      />
 
       {/* Overlay Text */}
-      <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
-        <div className='text-center px-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl max-w-3xl'>
-          <H1 className='mb-4 text-gray-900 dark:text-white'>
-            日本中の車中泊スポットを探そう
+      <div className='absolute inset-0 flex items-center justify-center pointer-events-none px-2'>
+        <div className='text-center px-4 sm:px-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-2xl max-w-3xl w-full'>
+          <H1 className='mb-3 sm:mb-4 text-gray-900 dark:text-white text-2xl sm:text-3xl md:text-4xl'>
+            車中泊スポットを探そう
           </H1>
-          <LargeText className='text-gray-700 dark:text-gray-300 mb-6'>
+          <LargeText className='text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base'>
             旅行計画をもっと簡単に、もっと楽しく。
           </LargeText>
 
           {/* Search Bar */}
-          <div className='pointer-events-auto mt-6'>
+          <div className='pointer-events-auto mt-4 sm:mt-6'>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -179,20 +186,24 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
                 if (searchQuery.trim()) {
                   params.set('q', searchQuery.trim());
                 }
-                router.push(`/shachu-haku${params.toString() ? `?${params.toString()}` : ''}`);
+                router.push(
+                  `/shachu-haku${
+                    params.toString() ? `?${params.toString()}` : ''
+                  }`
+                );
               }}
-              className='flex flex-col sm:flex-row gap-2 items-center justify-center'
+              className='flex flex-col gap-2 items-stretch w-full max-w-md mx-auto'
             >
               <input
                 type='text'
                 placeholder='地名・エリアで検索...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className='w-full max-w-md px-6 py-4 text-lg rounded-full border-2 border-blue-500 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:bg-gray-800 dark:border-blue-400 dark:text-white transition-all'
+                className='w-full px-4 sm:px-6 py-3 sm:py-4 text-base sm:text-lg rounded-full border-2 border-blue-500 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:bg-gray-800 dark:border-blue-400 dark:text-white transition-all'
               />
               <button
                 type='submit'
-                className='px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-colors shadow-lg hover:shadow-xl whitespace-nowrap min-w-[100px]'
+                className='w-full px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-colors shadow-lg hover:shadow-xl'
               >
                 検索
               </button>
