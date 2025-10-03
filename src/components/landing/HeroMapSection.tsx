@@ -153,9 +153,9 @@ export default function HeroMapSection({ initialSpots = [] }: HeroMapSectionProp
   }
 
   return (
-    <div className='relative h-[70vh] w-full'>
+    <div className='relative h-[50vh] sm:h-[70vh] w-full px-2 sm:px-0'>
       {/* Map Container */}
-      <div ref={mapContainer} className='absolute inset-0 w-full h-full' />
+      <div ref={mapContainer} className='absolute inset-0 w-full h-full rounded-lg sm:rounded-none' style={{ left: '0.5rem', right: '0.5rem', width: 'calc(100% - 1rem)' }} />
 
       {/* Overlay Text */}
       <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
