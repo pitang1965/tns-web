@@ -74,6 +74,46 @@ export function CoordinateInput({
     <div className='space-y-2'>
       <div>
         <Label className='whitespace-nowrap block mb-2'>座標</Label>
+        <div className='flex gap-2'>
+          <div className='flex-1'>
+            <Input
+              type='number'
+              step='any'
+              placeholder='緯度'
+              {...register(latPath, {
+                onChange: () => trigger(lonPath), // 経度
+              })}
+            />
+            {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+              ?.location?.latitude && (
+              <SmallText>
+                {
+                  errors.dayPlans[dayIndex].activities[activityIndex].place
+                    .location.latitude.message
+                }
+              </SmallText>
+            )}
+          </div>
+          <div className='flex-1'>
+            <Input
+              type='number'
+              step='any'
+              placeholder='経度'
+              {...register(lonPath, {
+                onChange: () => trigger(latPath), // 緯度
+              })}
+            />
+            {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
+              ?.location?.longitude && (
+              <SmallText>
+                {
+                  errors.dayPlans[dayIndex].activities[activityIndex].place
+                    .location.longitude.message
+                }
+              </SmallText>
+            )}
+          </div>
+        </div>
         <div className='space-y-2'>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
             <CoordinatesFromClipboardButton
@@ -92,68 +132,26 @@ export function CoordinateInput({
               {showMap ? '選択完了' : '地図で選択'}
             </button>
           </div>
+          {/* Map picker */}
+          {showMap && (
+            <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
+              {/* 注意バナー */}
+              <div className='bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center'>
+                📍 地図をクリックして座標を選択してください
+              </div>
+              <SimpleLocationPicker
+                onLocationSelect={handleLocationSelect}
+                initialLat={location?.latitude || 35.6762}
+                initialLng={location?.longitude || 139.6503}
+              />
+            </div>
+          )}
           <PlaceNavigationButton
             latitude={location?.latitude}
             longitude={location?.longitude}
           />
         </div>
       </div>
-      <div className='flex gap-2'>
-        <div className='flex-1'>
-          <Input
-            type='number'
-            step='any'
-            placeholder='緯度'
-            {...register(latPath, {
-              onChange: () => trigger(lonPath), // 経度
-            })}
-          />
-          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
-            ?.location?.latitude && (
-            <SmallText>
-              {
-                errors.dayPlans[dayIndex].activities[activityIndex].place
-                  .location.latitude.message
-              }
-            </SmallText>
-          )}
-        </div>
-        <div className='flex-1'>
-          <Input
-            type='number'
-            step='any'
-            placeholder='経度'
-            {...register(lonPath, {
-              onChange: () => trigger(latPath), // 緯度
-            })}
-          />
-          {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
-            ?.location?.longitude && (
-            <SmallText>
-              {
-                errors.dayPlans[dayIndex].activities[activityIndex].place
-                  .location.longitude.message
-              }
-            </SmallText>
-          )}
-        </div>
-      </div>
-
-      {/* Map picker */}
-      {showMap && (
-        <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
-          {/* 注意バナー */}
-          <div className='bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center'>
-            📍 地図をクリックして座標を選択してください
-          </div>
-          <SimpleLocationPicker
-            onLocationSelect={handleLocationSelect}
-            initialLat={location?.latitude || 35.6762}
-            initialLng={location?.longitude || 139.6503}
-          />
-        </div>
-      )}
-
       {location && !showMap && <LocationView location={location} />}
     </div>
   );
