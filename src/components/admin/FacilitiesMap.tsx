@@ -47,7 +47,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
   // マーカーの凡例データ
   const legendItems = [
-    { type: 'camping', label: '車中泊スポット', icon: '🏕️', color: '#e74c3c' },
+    { type: 'camping', label: '車中泊スポット', icon: '🛏️', color: '#e74c3c' },
     { type: 'toilet', label: 'トイレ', icon: '🚻', color: '#3498db' },
     { type: 'convenience', label: 'コンビニ', icon: '🏪', color: '#2ecc71' },
     { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f39c12' },
@@ -81,7 +81,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       case 'camping':
         return {
           color: '#e74c3c',
-          icon: '🏕️',
+          icon: '🛏️',
           size: 24, // 小さめサイズ
         };
       case 'toilet':

@@ -152,7 +152,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       case 'camping':
         return {
           color: '#3b82f6',
-          icon: '🏕️',
+          icon: '🛏️',
           size: 24,
         };
       case 'toilet':
@@ -184,7 +184,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
 
   // マーカーの凡例データ
   const legendItems = [
-    { type: 'camping', label: '車中泊スポット', icon: '🏕️', color: '#3b82f6' },
+    { type: 'camping', label: '車中泊スポット', icon: '🛏️', color: '#3b82f6' },
     { type: 'toilet', label: 'トイレ', icon: '🚻', color: '#8b5cf6' },
     { type: 'convenience', label: 'コンビニ', icon: '🏪', color: '#10b981' },
     { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f59e0b' },
