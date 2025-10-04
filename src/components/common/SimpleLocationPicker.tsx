@@ -54,6 +54,9 @@ export default function SimpleLocationPicker({
       },
     });
 
+    // Set crosshair cursor for the map canvas
+    map.current.getCanvas().style.cursor = 'crosshair';
+
     // Add error handling
     map.current.on('error', handleMapError);
 
@@ -109,7 +112,10 @@ export default function SimpleLocationPicker({
 
   return (
     <div className='h-[400px] w-full'>
-      <div ref={mapContainer} className='w-full h-full rounded-lg' />
+      <div
+        ref={mapContainer}
+        className='w-full h-full rounded-lg cursor-crosshair'
+      />
       <div className='mt-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded'>
         地図をクリック、またはマーカーをドラッグして位置を選択してください。
         <br />

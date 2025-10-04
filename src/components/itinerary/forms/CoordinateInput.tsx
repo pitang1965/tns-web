@@ -76,10 +76,6 @@ export function CoordinateInput({
         <Label className='whitespace-nowrap block mb-2'>座標</Label>
         <div className='space-y-2'>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
-            <PlaceNavigationButton
-              latitude={location?.latitude}
-              longitude={location?.longitude}
-            />
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
                 setValue(latPath, lat);
@@ -87,15 +83,19 @@ export function CoordinateInput({
                 trigger([latPath, lonPath]);
               }}
             />
+            <button
+              type='button'
+              onClick={() => setShowMap(!showMap)}
+              className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
+            >
+              <MapPin className='w-4 h-4' />
+              {showMap ? '選択完了' : '地図で選択'}
+            </button>
           </div>
-          <button
-            type='button'
-            onClick={() => setShowMap(!showMap)}
-            className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
-          >
-            <MapPin className='w-4 h-4' />
-            {showMap ? '地図を閉じる' : '地図で選択'}
-          </button>
+          <PlaceNavigationButton
+            latitude={location?.latitude}
+            longitude={location?.longitude}
+          />
         </div>
       </div>
       <div className='flex gap-2'>
@@ -141,7 +141,11 @@ export function CoordinateInput({
 
       {/* Map picker */}
       {showMap && (
-        <div className='border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
+        <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
+          {/* 注意バナー */}
+          <div className='bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center'>
+            📍 地図をクリックして座標を選択してください
+          </div>
           <SimpleLocationPicker
             onLocationSelect={handleLocationSelect}
             initialLat={location?.latitude || 35.6762}
@@ -150,7 +154,7 @@ export function CoordinateInput({
         </div>
       )}
 
-      {location && <LocationView location={location} />}
+      {location && !showMap && <LocationView location={location} />}
     </div>
   );
 }
