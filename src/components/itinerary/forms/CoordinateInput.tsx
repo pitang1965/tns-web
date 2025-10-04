@@ -76,10 +76,6 @@ export function CoordinateInput({
         <Label className='whitespace-nowrap block mb-2'>座標</Label>
         <div className='space-y-2'>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
-            <PlaceNavigationButton
-              latitude={location?.latitude}
-              longitude={location?.longitude}
-            />
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
                 setValue(latPath, lat);
@@ -87,15 +83,19 @@ export function CoordinateInput({
                 trigger([latPath, lonPath]);
               }}
             />
+            <button
+              type='button'
+              onClick={() => setShowMap(!showMap)}
+              className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
+            >
+              <MapPin className='w-4 h-4' />
+              {showMap ? '選択完了' : '地図で選択'}
+            </button>
           </div>
-          <button
-            type='button'
-            onClick={() => setShowMap(!showMap)}
-            className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
-          >
-            <MapPin className='w-4 h-4' />
-            {showMap ? '地図を閉じる' : '地図で選択'}
-          </button>
+          <PlaceNavigationButton
+            latitude={location?.latitude}
+            longitude={location?.longitude}
+          />
         </div>
       </div>
       <div className='flex gap-2'>
@@ -150,7 +150,7 @@ export function CoordinateInput({
         </div>
       )}
 
-      {location && <LocationView location={location} />}
+      {location && !showMap && <LocationView location={location} />}
     </div>
   );
 }
