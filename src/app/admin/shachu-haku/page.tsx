@@ -465,7 +465,7 @@ export default function ShachuHakuAdminPage() {
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
                   <MapPin className='w-5 h-5' />
-                  地図から編集 ({filteredSpots.length}件)
+                  {loading ? '地図から編集 (読み込み中...)' : `地図から編集 (${filteredSpots.length}件)`}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -559,7 +559,7 @@ export default function ShachuHakuAdminPage() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  車中泊スポット一覧 ({filteredSpots.length}件)
+                  {loading ? '車中泊スポット一覧 (読み込み中...)' : `車中泊スポット一覧 (${filteredSpots.length}件)`}
                 </CardTitle>
               </CardHeader>
               <CardContent>
