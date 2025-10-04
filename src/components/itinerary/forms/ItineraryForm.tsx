@@ -176,7 +176,7 @@ export function ItineraryForm({
               </div>
               {process.env.NODE_ENV === 'development' &&
                 Object.keys(errors).length > 0 && (
-                  <div className='mb-4 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-800'>
+                  <div className='mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-800 dark:text-red-200'>
                     <LargeText>フォームにエラーがあります:</LargeText>
                     <pre>
                       {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
