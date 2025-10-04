@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -26,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Send, Info, MapPin } from 'lucide-react';
+import { Send, Info, MapPin, Map } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -168,6 +167,15 @@ export default function CampingSpotSubmissionForm({
     form.setValue('lat', lat.toString());
     form.setValue('lng', lng.toString());
     setShowMap(false);
+  };
+
+  const handleShowOnMap = () => {
+    const lat = form.watch('lat');
+    const lng = form.watch('lng');
+    if (lat && lng) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+      window.open(url, '_blank');
+    }
   };
 
   return (
@@ -331,37 +339,58 @@ export default function CampingSpotSubmissionForm({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowMap(!showMap)}
-                    className="w-full"
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {showMap ? '地図を閉じる' : '地図で位置を選択'}
-                  </Button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    地図上でクリックして位置を選択できます
-                  </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <CoordinatesFromClipboardButton
+                      onCoordinatesExtracted={(latitude, longitude) => {
+                        form.setValue('lat', latitude);
+                        form.setValue('lng', longitude);
+                      }}
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Google Maps の URL や「35.123456, 139.123456」形式の座標をコピーしてから押してください
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowMap(!showMap)}
+                      className="flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full"
+                    >
+                      <MapPin className="w-4 h-4" />
+                      {showMap ? '選択完了' : '地図で選択'}
+                    </Button>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      地図上でクリックして位置を選択できます
+                    </p>
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <CoordinatesFromClipboardButton
-                    onCoordinatesExtracted={(latitude, longitude) => {
-                      form.setValue('lat', latitude);
-                      form.setValue('lng', longitude);
-                    }}
-                  />
+                  <button
+                    type="button"
+                    onClick={handleShowOnMap}
+                    disabled={!form.watch('lat') || !form.watch('lng')}
+                    className="flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Map className="w-4 h-4" />
+                    地図で表示
+                  </button>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Google Maps の URL や「35.123456, 139.123456」形式の座標をコピーしてから押してください
+                    入力した座標をGoogle Mapsで確認できます
                   </p>
                 </div>
               </div>
 
               {showMap && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+                <div className="border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+                  {/* 注意バナー */}
+                  <div className="bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center">
+                    📍 地図をクリックして座標を選択してください
+                  </div>
                   <SimpleLocationPicker
                     onLocationSelect={handleLocationSelect}
                     initialLat={form.watch('lat') ? Number(form.watch('lat')) : 35.6762}
