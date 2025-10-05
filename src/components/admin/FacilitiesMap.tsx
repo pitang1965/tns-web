@@ -240,7 +240,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: mainLat,
         lng: mainLng,
         name: mainName,
-        color: getMarkerStyle('camping').color,
+        color: getMarkerStyle('camping', currentZoom).color,
       });
     }
 
@@ -255,7 +255,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: toiletLat,
         lng: toiletLng,
         name: 'トイレ',
-        color: getMarkerStyle('toilet').color,
+        color: getMarkerStyle('toilet', currentZoom).color,
         distance: toiletDistance || undefined,
       });
     }
@@ -273,7 +273,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: convenienceLat,
         lng: convenienceLng,
         name: 'コンビニ',
-        color: getMarkerStyle('convenience').color,
+        color: getMarkerStyle('convenience', currentZoom).color,
         distance: convenienceDistance || undefined,
       });
     }
@@ -289,7 +289,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: bathLat,
         lng: bathLng,
         name: '入浴施設',
-        color: getMarkerStyle('bath').color,
+        color: getMarkerStyle('bath', currentZoom).color,
         distance: bathDistance || undefined,
       });
     }
