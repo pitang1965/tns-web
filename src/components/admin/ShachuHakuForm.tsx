@@ -378,6 +378,7 @@ export default function ShachuHakuForm({
             <RatingFields
               register={register}
               errors={errors}
+              watch={watch}
             />
 
             <FeatureFields

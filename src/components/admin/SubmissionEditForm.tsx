@@ -307,7 +307,7 @@ export default function SubmissionEditForm({
               errors={errors}
             />
 
-            <RatingFields register={register} errors={errors} />
+            <RatingFields register={register} errors={errors} watch={watch} />
 
             <FeatureFields
               register={register}
