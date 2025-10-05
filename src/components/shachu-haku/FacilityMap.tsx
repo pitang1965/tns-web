@@ -42,6 +42,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [isMapMoving, setIsMapMoving] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(14);
 
   // 現在開いているポップアップを閉じる
   const closeCurrentPopup = () => {
@@ -53,14 +54,14 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
 
   // Hide/show markers during map movement
   const hideMarkers = () => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '0';
     });
   };
 
   const showMarkers = () => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '1';
     });
@@ -147,44 +148,54 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
   );
 
   // マーカーの色とアイコンを取得
-  const getMarkerStyle = (type: string) => {
+  const getMarkerStyle = (type: string, zoom: number) => {
+    // Determine marker size based on zoom level
+    // Zoom level 9 or higher (市町村レベル): show larger markers
+    const isDetailedView = zoom >= 15;
+    const baseSizeMultiplier = isDetailedView ? 1.2 : 0.7;
+
     switch (type) {
       case 'camping':
         return {
-          color: '#3b82f6',
+          color: '#e74c3c',
           icon: '🛏️',
-          size: 24,
+          size: Math.round(24 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 3 : 2,
         };
       case 'toilet':
         return {
           color: '#8b5cf6',
           icon: '🚻',
-          size: 20,
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 3 : 2,
         };
       case 'convenience':
         return {
           color: '#10b981',
           icon: '🏪',
-          size: 20,
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 3 : 2,
         };
       case 'bath':
         return {
           color: '#f59e0b',
           icon: '♨️',
-          size: 20,
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 3 : 2,
         };
       default:
         return {
           color: '#6b7280',
           icon: '📍',
-          size: 20,
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 3 : 2,
         };
     }
   };
 
   // マーカーの凡例データ
   const legendItems = [
-    { type: 'camping', label: '車中泊スポット', icon: '🛏️', color: '#3b82f6' },
+    { type: 'camping', label: '車中泊スポット', icon: '🛏️', color: '#e74c3c' },
     { type: 'toilet', label: 'トイレ', icon: '🚻', color: '#8b5cf6' },
     { type: 'convenience', label: 'コンビニ', icon: '🏪', color: '#10b981' },
     { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f59e0b' },
@@ -299,6 +310,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
       restoreConsoleWarn();
 
       setMapLoaded(true);
+      setCurrentZoom(map.current.getZoom());
 
       try {
         // 日本語ラベルを設定
@@ -330,6 +342,9 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
     map.current.on('zoomend', () => {
       setIsMapMoving(false);
       showMarkers();
+      if (map.current) {
+        setCurrentZoom(map.current.getZoom());
+      }
     });
 
     // Add controls
@@ -348,7 +363,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
     };
   }, [spot.coordinates]);
 
-  // Update markers when facilities change
+  // Update markers when facilities change or zoom level changes
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
@@ -359,7 +374,7 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
 
     // Add facility markers
     facilityMarkers.forEach((facility) => {
-      const style = getMarkerStyle(facility.type);
+      const style = getMarkerStyle(facility.type, currentZoom);
 
       // Create marker element
       const markerElement = document.createElement('div');
@@ -368,8 +383,9 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
         width: ${style.size}px;
         height: ${style.size}px;
         background-color: ${style.color};
+        border-width: ${style.borderWidth}px;
         opacity: ${isMapMoving ? '0' : '1'};
-        transition: opacity 0.15s ease-in-out;
+        transition: opacity 0.15s ease-in-out, width 0.2s ease, height 0.2s ease;
       `;
       markerElement.textContent = style.icon;
 
@@ -405,23 +421,25 @@ export default function FacilityMap({ spot }: FacilityMapProps) {
 
       markersRef.current.push(marker);
     });
+  }, [facilityMarkers, mapLoaded, currentZoom, isMapMoving]);
 
-    // Fit map to show all facilities
-    if (facilityMarkers.length > 1) {
-      const bounds = new mapboxgl.LngLatBounds();
-      facilityMarkers.forEach((facility) => {
-        bounds.extend(facility.coordinates);
-      });
+  // Fit map to show all facilities only when facilities change (not on zoom)
+  useEffect(() => {
+    if (!map.current || !mapLoaded || facilityMarkers.length <= 1) return;
 
-      map.current.fitBounds(bounds, {
-        padding: 50,
-        maxZoom: 16,
-      });
-    }
+    const bounds = new mapboxgl.LngLatBounds();
+    facilityMarkers.forEach((facility) => {
+      bounds.extend(facility.coordinates);
+    });
+
+    map.current.fitBounds(bounds, {
+      padding: 50,
+      maxZoom: 16,
+    });
   }, [facilityMarkers, mapLoaded]);
 
   const createFacilityPopupHTML = (facility: FacilityMarker): string => {
-    const style = getMarkerStyle(facility.type);
+    const style = getMarkerStyle(facility.type, currentZoom);
 
     return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">

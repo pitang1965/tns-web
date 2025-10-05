@@ -44,6 +44,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(true);
   const [isMapMoving, setIsMapMoving] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(12);
 
   // マーカーの凡例データ
   const legendItems = [
@@ -63,50 +64,60 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
   // Hide/show markers during map movement
   const hideMarkers = () => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '0';
     });
   };
 
   const showMarkers = () => {
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       const element = marker.getElement();
       element.style.opacity = '1';
     });
   };
 
-  const getMarkerStyle = (type: string) => {
+  const getMarkerStyle = (type: string, zoom: number) => {
+    // Determine marker size based on zoom level
+    // Zoom level 9 or higher (市町村レベル): show larger markers
+    const isDetailedView = zoom >= 9;
+    const baseSizeMultiplier = isDetailedView ? 1 : 0.7;
+
     switch (type) {
       case 'camping':
         return {
           color: '#e74c3c',
           icon: '🛏️',
-          size: 24, // 小さめサイズ
+          size: Math.round(24 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 2 : 1.5,
         };
       case 'toilet':
         return {
           color: '#3498db',
           icon: '🚻',
-          size: 20, // 小さめサイズ
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 2 : 1.5,
         };
       case 'convenience':
         return {
           color: '#2ecc71',
           icon: '🏪',
-          size: 20, // 小さめサイズ
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 2 : 1.5,
         };
       case 'bath':
         return {
           color: '#f39c12',
           icon: '♨️',
-          size: 20, // 小さめサイズ
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 2 : 1.5,
         };
       default:
         return {
           color: '#95a5a6',
           icon: '📍',
-          size: 20,
+          size: Math.round(20 * baseSizeMultiplier),
+          borderWidth: isDetailedView ? 2 : 1.5,
         };
     }
   };
@@ -124,10 +135,10 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     markersRef.current = [];
   };
 
-  const addMarker = (facility: FacilityData) => {
+  const addMarker = (facility: FacilityData, zoom: number) => {
     if (!mapInstance.current) return;
 
-    const style = getMarkerStyle(facility.type);
+    const style = getMarkerStyle(facility.type, zoom);
 
     // マーカー要素を作成
     const markerElement = document.createElement('div');
@@ -136,8 +147,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       width: ${style.size}px;
       height: ${style.size}px;
       background-color: ${style.color};
+      border-width: ${style.borderWidth}px;
       opacity: 1;
-      transition: opacity 0.15s ease-in-out;
+      transition: opacity 0.15s ease-in-out, width 0.2s ease, height 0.2s ease;
     `;
     markerElement.textContent = style.icon;
     markerElement.title = getTypeLabel(facility.type);
@@ -147,7 +159,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       closeButton: true,
       closeOnClick: false,
       className: 'admin-custom-popup',
-    }).setHTML(createFacilityPopupHTML(facility));
+    }).setHTML(createFacilityPopupHTML(facility, zoom));
 
     const marker = new mapboxgl.Marker(markerElement)
       .setLngLat([facility.lng, facility.lat])
@@ -166,8 +178,11 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     markersRef.current.push(marker);
   };
 
-  const createFacilityPopupHTML = (facility: FacilityData): string => {
-    const style = getMarkerStyle(facility.type);
+  const createFacilityPopupHTML = (
+    facility: FacilityData,
+    zoom: number
+  ): string => {
+    const style = getMarkerStyle(facility.type, zoom);
 
     return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
@@ -366,6 +381,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
         restoreConsoleWarn();
         setMapLoaded(true);
+        setCurrentZoom(mapInstance.current.getZoom());
 
         try {
           setupJapaneseLabels(mapInstance.current);
@@ -394,6 +410,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       mapInstance.current.on('zoomend', () => {
         setIsMapMoving(false);
         showMarkers();
+        if (mapInstance.current) {
+          setCurrentZoom(mapInstance.current.getZoom());
+        }
       });
     } catch (error) {
       console.error('Failed to initialize map:', error);
@@ -420,7 +439,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     };
   }, []);
 
-  // マーカーの更新
+  // マーカーの更新（ズームレベル変更時も含む）
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
 
@@ -430,10 +449,33 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     if (facilities.length > 0) {
       // 各施設のマーカーを追加
       facilities.forEach((facility) => {
-        addMarker(facility);
+        addMarker(facility, currentZoom);
       });
+    }
+  }, [
+    watch('lat'),
+    watch('lng'),
+    watch('name'),
+    watch('nearbyToiletLat'),
+    watch('nearbyToiletLng'),
+    watch('distanceToToilet'),
+    watch('nearbyConvenienceLat'),
+    watch('nearbyConvenienceLng'),
+    watch('distanceToConvenience'),
+    watch('nearbyBathLat'),
+    watch('nearbyBathLng'),
+    watch('distanceToBath'),
+    mapLoaded,
+    currentZoom,
+  ]);
 
-      // 全ての施設が見えるようにマップを調整
+  // 全ての施設が見えるようにマップを調整（施設変更時のみ、ズーム時は除外）
+  useEffect(() => {
+    if (!mapInstance.current || !mapLoaded) return;
+
+    const facilities = getFacilitiesWithCoordinates();
+
+    if (facilities.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       facilities.forEach((facility) => {
         bounds.extend([facility.lng, facility.lat]);
