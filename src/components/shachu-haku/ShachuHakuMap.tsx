@@ -47,6 +47,7 @@ export default function ShachuHakuMap({
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(5);
 
   // Hide/show markers during map movement
   const hideMarkers = useCallback(() => {
@@ -164,6 +165,7 @@ export default function ShachuHakuMap({
       restoreConsoleWarn();
 
       setMapLoaded(true);
+      setCurrentZoom(map.current.getZoom());
 
       try {
         // 日本語ラベルを設定
@@ -203,6 +205,9 @@ export default function ShachuHakuMap({
     map.current.on('zoomend', () => {
       setIsMapMoving(false);
       showMarkers();
+      if (map.current) {
+        setCurrentZoom(map.current.getZoom());
+      }
     });
 
     // Close all popups when clicking on the map (not on markers)
@@ -236,20 +241,9 @@ export default function ShachuHakuMap({
     };
   }, [onCreateSpot, hideMarkers, showMarkers, readonly]);
 
-  // Update markers when spots change
+  // Update markers when spots change or zoom level changes
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
-
-    // Check if markers are visible on the map
-    const markersVisibleOnMap = markersRef.current.filter((marker) => {
-      const element = marker.getElement();
-      return element && element.parentNode && document.contains(element);
-    });
-
-    // Always recreate markers if they're not visible or count doesn't match
-    if (markersVisibleOnMap.length === spots.length) {
-      return; // No need to recreate markers
-    }
 
     // Clear existing markers
     markersRef.current.forEach((marker) => marker.remove());
@@ -259,15 +253,22 @@ export default function ShachuHakuMap({
     spots.forEach((spot) => {
       const markerColor = getMarkerColor(spot);
 
+      // Determine marker size and content based on zoom level
+      // Zoom level 9 or higher (市町村レベル): show detailed markers with scores
+      const isDetailedView = currentZoom >= 9;
+      const markerSize = isDetailedView ? 25 : 12;
+      const borderWidth = isDetailedView ? 3 : 2;
+      const fontSize = isDetailedView ? 12 : 0;
+
       // Create marker element
       const markerElement = document.createElement('div');
       markerElement.className = 'shachu-haku-spot-marker';
       markerElement.style.cssText = `
-        width: 30px;
-        height: 30px;
+        width: ${markerSize}px;
+        height: ${markerSize}px;
         border-radius: 50%;
         background-color: ${markerColor};
-        border: 3px solid white;
+        border: ${borderWidth}px solid white;
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         cursor: pointer;
         display: flex;
@@ -275,8 +276,8 @@ export default function ShachuHakuMap({
         justify-content: center;
         color: white;
         font-weight: bold;
-        font-size: 12px;
-        transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease;
+        font-size: ${fontSize}px;
+        transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease, width 0.2s ease, height 0.2s ease;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -288,8 +289,10 @@ export default function ShachuHakuMap({
       // Add CSS hover effect with unique class
       markerElement.classList.add('shachu-haku-marker-hover');
 
-      // Add security level number to marker
-      markerElement.textContent = calculateSecurityLevel(spot).toString();
+      // Add security level number to marker only in detailed view
+      if (isDetailedView) {
+        markerElement.textContent = calculateSecurityLevel(spot).toString();
+      }
 
       // Add simple tooltip using title attribute
       markerElement.title = spot.name;
@@ -337,20 +340,22 @@ export default function ShachuHakuMap({
 
       markersRef.current.push(marker);
     });
+  }, [spots, mapLoaded, onSpotSelect, readonly, currentZoom, isMapMoving]);
 
-    // Fit map to show all spots if there are any
-    if (spots.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      spots.forEach((spot) => {
-        bounds.extend(spot.coordinates);
-      });
+  // Fit map to show all spots only when spots change (not on zoom)
+  useEffect(() => {
+    if (!map.current || !mapLoaded || spots.length === 0) return;
 
-      map.current.fitBounds(bounds, {
-        padding: 50,
-        maxZoom: 10,
-      });
-    }
-  }, [spots, mapLoaded, onSpotSelect, readonly]);
+    const bounds = new mapboxgl.LngLatBounds();
+    spots.forEach((spot) => {
+      bounds.extend(spot.coordinates);
+    });
+
+    map.current.fitBounds(bounds, {
+      padding: 50,
+      maxZoom: 10,
+    });
+  }, [spots, mapLoaded]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on overall rating
@@ -434,12 +439,14 @@ export default function ShachuHakuMap({
               </div>
               {!readonly && <div>• 地図をダブルクリック: 新規作成</div>}
               <div>
-                • マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 →
-                赤=1点
+                • マーカー色: 緑=5点 → 青=4点 → 黄=3点 → 橙=2点 → 赤=1点
               </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
+      </div>
+      <div className='absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600 text-sm'>
+        ズームレベル: {currentZoom.toFixed(1)}
       </div>
     </div>
   );
