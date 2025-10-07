@@ -99,8 +99,28 @@ export default function ShachuHakuClient() {
     // URLパラメータから検索クエリを取得
     return searchParams.get('q') || '';
   });
-  const [prefectureFilter, setPrefectureFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [prefectureFilter, setPrefectureFilter] = useState(() => {
+    // URLパラメータから都道府県フィルターを取得
+    return searchParams.get('prefecture') || 'all';
+  });
+  const [typeFilter, setTypeFilter] = useState(() => {
+    // URLパラメータから種別フィルターを取得
+    return searchParams.get('type') || 'all';
+  });
+
+  // Map state for zoom and center
+  const [mapZoom, setMapZoom] = useState(() => {
+    const zoom = searchParams.get('zoom');
+    return zoom ? parseFloat(zoom) : 9;
+  });
+  const [mapCenter, setMapCenter] = useState<[number, number]>(() => {
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
+    if (lat && lng) {
+      return [parseFloat(lng), parseFloat(lat)];
+    }
+    return [139.6917, 35.6895]; // デフォルト: 東京
+  });
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
@@ -117,16 +137,23 @@ export default function ShachuHakuClient() {
   } | null>(null);
   const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const initialLoadDoneRef = useRef(false);
-  const filtersRef = useRef({ searchTerm: '', prefectureFilter: 'all', typeFilter: 'all' });
+  const filtersRef = useRef({
+    searchTerm: '',
+    prefectureFilter: 'all',
+    typeFilter: 'all',
+  });
   const lastLoadedBoundsRef = useRef<{
     north: number;
     south: number;
     east: number;
     west: number;
   } | null>(null);
+  const isInitialMountRef = useRef(true);
 
   // Load spots for map view based on bounds - NO dependencies except toast
-  const loadMapSpotsRef = useRef<typeof getPublicCampingSpotsByBounds | null>(null);
+  const loadMapSpotsRef = useRef<typeof getPublicCampingSpotsByBounds | null>(
+    null
+  );
   loadMapSpotsRef.current = async (
     bounds: {
       north: number;
@@ -157,14 +184,17 @@ export default function ShachuHakuClient() {
   };
 
   // Load spots for list view with pagination - NO dependencies
-  const loadListSpotsRef = useRef<((
-    page: number,
-    filters?: {
-      searchTerm?: string;
-      prefecture?: string;
-      type?: string;
-    }
-  ) => Promise<void>) | null>(null);
+  const loadListSpotsRef = useRef<
+    | ((
+        page: number,
+        filters?: {
+          searchTerm?: string;
+          prefecture?: string;
+          type?: string;
+        }
+      ) => Promise<void>)
+    | null
+  >(null);
   loadListSpotsRef.current = async (
     page: number,
     filters?: {
@@ -175,7 +205,11 @@ export default function ShachuHakuClient() {
   ) => {
     try {
       setLoading(true);
-      const result = await getPublicCampingSpotsWithPagination(page, pageSize, filters);
+      const result = await getPublicCampingSpotsWithPagination(
+        page,
+        pageSize,
+        filters
+      );
       setSpots(result.spots);
       setTotalPages(result.totalPages);
       setTotalCount(result.total);
@@ -199,31 +233,35 @@ export default function ShachuHakuClient() {
 
   // Helper function to check if bounds have significantly changed
   const boundsHaveChanged = (
-    oldBounds: { north: number; south: number; east: number; west: number } | null,
+    oldBounds: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    } | null,
     newBounds: { north: number; south: number; east: number; west: number }
   ): boolean => {
     if (!oldBounds) return true;
 
     // Calculate the difference as a percentage of the current view
-    const latDiff = Math.abs(newBounds.north - oldBounds.north) + Math.abs(newBounds.south - oldBounds.south);
-    const lngDiff = Math.abs(newBounds.east - oldBounds.east) + Math.abs(newBounds.west - oldBounds.west);
+    const latDiff =
+      Math.abs(newBounds.north - oldBounds.north) +
+      Math.abs(newBounds.south - oldBounds.south);
+    const lngDiff =
+      Math.abs(newBounds.east - oldBounds.east) +
+      Math.abs(newBounds.west - oldBounds.west);
 
     const latRange = newBounds.north - newBounds.south;
     const lngRange = newBounds.east - newBounds.west;
 
     // Only reload if bounds changed by more than 5% of current view
     const threshold = 0.05;
-    return (latDiff / latRange > threshold) || (lngDiff / lngRange > threshold);
+    return latDiff / latRange > threshold || lngDiff / lngRange > threshold;
   };
 
   // Handle bounds change with debounce - stable function with NO dependencies
   const handleBoundsChange = useCallback(
-    (bounds: {
-      north: number;
-      south: number;
-      east: number;
-      west: number;
-    }) => {
+    (bounds: { north: number; south: number; east: number; west: number }) => {
       setMapBounds(bounds);
 
       // Clear existing timeout
@@ -240,8 +278,14 @@ export default function ShachuHakuClient() {
 
         const filters = {
           searchTerm: filtersRef.current.searchTerm || undefined,
-          prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
-          type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+          prefecture:
+            filtersRef.current.prefectureFilter !== 'all'
+              ? filtersRef.current.prefectureFilter
+              : undefined,
+          type:
+            filtersRef.current.typeFilter !== 'all'
+              ? filtersRef.current.typeFilter
+              : undefined,
         };
         loadMapSpotsRef.current?.(bounds, filters);
         lastLoadedBoundsRef.current = bounds; // Update last loaded bounds
@@ -250,6 +294,58 @@ export default function ShachuHakuClient() {
     },
     [] // NO dependencies - completely stable
   );
+
+  // Update URL when filters or map state change (skip initial mount)
+  useEffect(() => {
+    // Skip URL update on initial mount to preserve URL parameters
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    // Add active tab if it's 'list'
+    if (activeTab === 'list') {
+      params.set('tab', 'list');
+    }
+
+    // Add search term
+    if (searchTerm) {
+      params.set('q', searchTerm);
+    }
+
+    // Add prefecture filter
+    if (prefectureFilter && prefectureFilter !== 'all') {
+      params.set('prefecture', prefectureFilter);
+    }
+
+    // Add type filter
+    if (typeFilter && typeFilter !== 'all') {
+      params.set('type', typeFilter);
+    }
+
+    // Add map zoom and center (only for map tab)
+    if (activeTab === 'map') {
+      params.set('zoom', mapZoom.toFixed(2));
+      params.set('lat', mapCenter[1].toFixed(6));
+      params.set('lng', mapCenter[0].toFixed(6));
+    }
+
+    // Update URL without reload
+    const newUrl = params.toString()
+      ? `/shachu-haku?${params.toString()}`
+      : '/shachu-haku';
+    router.replace(newUrl, { scroll: false });
+  }, [
+    searchTerm,
+    prefectureFilter,
+    typeFilter,
+    activeTab,
+    mapZoom,
+    mapCenter,
+    router,
+  ]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -261,8 +357,14 @@ export default function ShachuHakuClient() {
     if (activeTab === 'list') {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
-        type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+        prefecture:
+          filtersRef.current.prefectureFilter !== 'all'
+            ? filtersRef.current.prefectureFilter
+            : undefined,
+        type:
+          filtersRef.current.typeFilter !== 'all'
+            ? filtersRef.current.typeFilter
+            : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
@@ -277,8 +379,14 @@ export default function ShachuHakuClient() {
 
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
-        type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+        prefecture:
+          filtersRef.current.prefectureFilter !== 'all'
+            ? filtersRef.current.prefectureFilter
+            : undefined,
+        type:
+          filtersRef.current.typeFilter !== 'all'
+            ? filtersRef.current.typeFilter
+            : undefined,
       };
       loadMapSpotsRef.current?.(mapBounds, filters);
       lastLoadedBoundsRef.current = mapBounds; // Update after loading
@@ -310,9 +418,7 @@ export default function ShachuHakuClient() {
 
   const handleTabChange = (tab: 'map' | 'list') => {
     setActiveTab(tab);
-    // URLパラメータを更新
-    const url = tab === 'list' ? '/shachu-haku?tab=list' : '/shachu-haku';
-    router.replace(url);
+    // URL update is handled by useEffect
   };
 
   return (
@@ -412,7 +518,14 @@ export default function ShachuHakuClient() {
         </div>
 
         {/* Map Tab Content - Always render but hide with visibility */}
-        <div className='space-y-4' style={{ visibility: activeTab === 'map' ? 'visible' : 'hidden', height: activeTab === 'map' ? 'auto' : '0', overflow: 'hidden' }}>
+        <div
+          className='space-y-4'
+          style={{
+            visibility: activeTab === 'map' ? 'visible' : 'hidden',
+            height: activeTab === 'map' ? 'auto' : '0',
+            overflow: 'hidden',
+          }}
+        >
           <Card>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
@@ -428,6 +541,10 @@ export default function ShachuHakuClient() {
                 onSpotSelect={handleSpotSelect}
                 readonly={true}
                 onBoundsChange={handleBoundsChange}
+                initialZoom={mapZoom}
+                initialCenter={mapCenter}
+                onZoomChange={setMapZoom}
+                onCenterChange={setMapCenter}
               />
             </CardContent>
           </Card>
@@ -488,7 +605,10 @@ export default function ShachuHakuClient() {
                     ? '車中泊スポット一覧 (読み込み中...)'
                     : `車中泊スポット一覧 (${totalCount}件中 ${
                         (currentPage - 1) * pageSize + 1
-                      }-${Math.min(currentPage * pageSize, totalCount)}件を表示)`}
+                      }-${Math.min(
+                        currentPage * pageSize,
+                        totalCount
+                      )}件を表示)`}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -581,7 +701,9 @@ export default function ShachuHakuClient() {
                       <div className='flex justify-center items-center gap-2 mt-6'>
                         <Button
                           variant='outline'
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          onClick={() =>
+                            setCurrentPage((p) => Math.max(1, p - 1))
+                          }
                           disabled={currentPage === 1 || loading}
                         >
                           前へ
@@ -677,14 +799,21 @@ export default function ShachuHakuClient() {
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
                   {selectedSpot.distanceToToilet && (
-                    <div>トイレまで: {formatDistance(selectedSpot.distanceToToilet)}</div>
+                    <div>
+                      トイレまで:{' '}
+                      {formatDistance(selectedSpot.distanceToToilet)}
+                    </div>
                   )}
                   {selectedSpot.distanceToBath && (
-                    <div>入浴施設まで: {formatDistance(selectedSpot.distanceToBath)}</div>
+                    <div>
+                      入浴施設まで:{' '}
+                      {formatDistance(selectedSpot.distanceToBath)}
+                    </div>
                   )}
                   {selectedSpot.distanceToConvenience && (
                     <div>
-                      コンビニまで: {formatDistance(selectedSpot.distanceToConvenience)}
+                      コンビニまで:{' '}
+                      {formatDistance(selectedSpot.distanceToConvenience)}
                     </div>
                   )}
                   {selectedSpot.elevation && (

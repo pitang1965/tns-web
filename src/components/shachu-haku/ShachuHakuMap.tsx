@@ -37,6 +37,10 @@ interface ShachuHakuMapProps {
     east: number;
     west: number;
   }) => void;
+  initialZoom?: number;
+  initialCenter?: [number, number];
+  onZoomChange?: (zoom: number) => void;
+  onCenterChange?: (center: [number, number]) => void;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -47,6 +51,10 @@ export default function ShachuHakuMap({
   onCreateSpot,
   readonly = false,
   onBoundsChange,
+  initialZoom = 9,
+  initialCenter = [139.6917, 35.6895],
+  onZoomChange,
+  onCenterChange,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -154,8 +162,8 @@ export default function ShachuHakuMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [139.6917, 35.6895], // 東京
-      zoom: 9, // 関東地域が見えるズームレベル
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 7, // 全国表示を防ぐための最小ズーム
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
@@ -225,7 +233,7 @@ export default function ShachuHakuMap({
       showMarkers();
 
       // Only notify parent if user manually moved the map (after initial load)
-      if (map.current && onBoundsChange && isUserInteractionRef.current) {
+      if (map.current && isUserInteractionRef.current) {
         const bounds = map.current.getBounds();
         if (!bounds) return;
 
@@ -244,12 +252,21 @@ export default function ShachuHakuMap({
           west = 122;
         }
 
-        onBoundsChange({
-          north: Math.min(north, 46),
-          south: Math.max(south, 24),
-          east,
-          west,
-        });
+        if (onBoundsChange) {
+          onBoundsChange({
+            north: Math.min(north, 46),
+            south: Math.max(south, 24),
+            east,
+            west,
+          });
+        }
+
+        // Notify parent of center change
+        if (onCenterChange) {
+          const center = map.current.getCenter();
+          onCenterChange([center.lng, center.lat]);
+        }
+
         isUserInteractionRef.current = false; // Reset after handling
       }
     });
@@ -270,30 +287,36 @@ export default function ShachuHakuMap({
           updateMarkersForZoom();
         }
 
-        // Notify parent of bounds change on zoom (if user initiated)
-        if (onBoundsChange && isUserInteractionRef.current) {
-          const bounds = map.current.getBounds();
-          if (!bounds) return;
-
-          const north = bounds.getNorth();
-          const south = bounds.getSouth();
-          let east = bounds.getEast();
-          let west = bounds.getWest();
-
-          // Normalize longitude
-          if (east > 154) east = 154;
-          if (west < 122) west = 122;
-          if (east < west) {
-            east = 154;
-            west = 122;
+        // Notify parent of zoom change (if user initiated)
+        if (isUserInteractionRef.current) {
+          if (onZoomChange) {
+            onZoomChange(newZoom);
           }
 
-          onBoundsChange({
-            north: Math.min(north, 46),
-            south: Math.max(south, 24),
-            east,
-            west,
-          });
+          if (onBoundsChange) {
+            const bounds = map.current.getBounds();
+            if (!bounds) return;
+
+            const north = bounds.getNorth();
+            const south = bounds.getSouth();
+            let east = bounds.getEast();
+            let west = bounds.getWest();
+
+            // Normalize longitude
+            if (east > 154) east = 154;
+            if (west < 122) west = 122;
+            if (east < west) {
+              east = 154;
+              west = 122;
+            }
+
+            onBoundsChange({
+              north: Math.min(north, 46),
+              south: Math.max(south, 24),
+              east,
+              west,
+            });
+          }
           isUserInteractionRef.current = false;
         }
       }
@@ -328,7 +351,7 @@ export default function ShachuHakuMap({
         styleElement.remove();
       }
     };
-  }, [onCreateSpot, hideMarkers, showMarkers, readonly, updateMarkersForZoom]);
+  }, [onCreateSpot, hideMarkers, showMarkers, readonly, updateMarkersForZoom, initialZoom, initialCenter]);
 
   // Update markers when spots change or zoom level changes
   useEffect(() => {
