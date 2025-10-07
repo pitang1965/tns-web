@@ -8,7 +8,6 @@ import mongoose from 'mongoose';
 import {
   CampingSpotSchema,
   CampingSpotFilter,
-  CampingSpotCSVJapanese,
   csvRowToCampingSpot,
   csvJapaneseRowToCampingSpot,
   CampingSpotCSVSchema,
@@ -73,9 +72,14 @@ async function ensureDbConnection() {
     console.error('Failed to establish MongoDB connection:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       readyState: mongoose.connection.readyState,
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
     });
-    throw new Error(`Database connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Database connection failed: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
   }
 }
 
@@ -172,10 +176,16 @@ function convertFormDataToCampingSpot(formObject: Record<string, any>) {
         ? Number(formObject.capacity)
         : undefined,
     restrictions: formObject.restrictions
-      ? formObject.restrictions.split(',').map((r: string) => r.trim()).filter((r: string) => r)
+      ? formObject.restrictions
+          .split(',')
+          .map((r: string) => r.trim())
+          .filter((r: string) => r)
       : [],
     amenities: formObject.amenities
-      ? formObject.amenities.split(',').map((a: string) => a.trim()).filter((a: string) => a)
+      ? formObject.amenities
+          .split(',')
+          .map((a: string) => a.trim())
+          .filter((a: string) => a)
       : [],
     notes: formObject.notes || undefined,
     submittedBy: formObject.submittedBy,
@@ -214,7 +224,6 @@ export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
       query.securityLevel = { $gte: filter.minSecurityLevel };
     }
 
-
     if (filter.hasRoof !== undefined) {
       query.hasRoof = filter.hasRoof;
     }
@@ -253,6 +262,90 @@ export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
   const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
 
   return JSON.parse(JSON.stringify(spots));
+}
+
+// Public function for map view with bounds-based filtering
+export async function getPublicCampingSpotsByBounds(
+  bounds: { north: number; south: number; east: number; west: number },
+  options?: {
+    searchTerm?: string;
+    prefecture?: string;
+    type?: string;
+  }
+) {
+  await ensureDbConnection();
+
+  const query: any = {
+    coordinates: {
+      $geoWithin: {
+        $box: [
+          [bounds.west, bounds.south],
+          [bounds.east, bounds.north],
+        ],
+      },
+    },
+  };
+
+  if (options?.searchTerm) {
+    query.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+
+  if (options?.prefecture && options.prefecture !== 'all') {
+    query.prefecture = options.prefecture;
+  }
+
+  if (options?.type && options.type !== 'all') {
+    query.type = options.type;
+  }
+
+  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
+
+  return JSON.parse(JSON.stringify(spots));
+}
+
+// Public function for list view with pagination
+export async function getPublicCampingSpotsWithPagination(
+  page: number = 1,
+  limit: number = 20,
+  options?: {
+    searchTerm?: string;
+    prefecture?: string;
+    type?: string;
+  }
+) {
+  await ensureDbConnection();
+
+  const query: any = {};
+
+  if (options?.searchTerm) {
+    query.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+
+  if (options?.prefecture && options.prefecture !== 'all') {
+    query.prefecture = options.prefecture;
+  }
+
+  if (options?.type && options.type !== 'all') {
+    query.type = options.type;
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [spots, total] = await Promise.all([
+    CampingSpot.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    CampingSpot.countDocuments(query),
+  ]);
+
+  return {
+    spots: JSON.parse(JSON.stringify(spots)),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
@@ -286,7 +379,6 @@ export async function getCampingSpots(filter?: CampingSpotFilter) {
       query.securityLevel = { $gte: filter.minSecurityLevel };
     }
 
-
     if (filter.hasRoof !== undefined) {
       query.hasRoof = filter.hasRoof;
     }
@@ -327,6 +419,92 @@ export async function getCampingSpots(filter?: CampingSpotFilter) {
   return JSON.parse(JSON.stringify(spots));
 }
 
+// Admin function for map view with bounds-based filtering
+export async function getCampingSpotsByBounds(
+  bounds: { north: number; south: number; east: number; west: number },
+  options?: {
+    searchTerm?: string;
+    prefecture?: string;
+    type?: string;
+  }
+) {
+  await checkAdminAuth();
+  await ensureDbConnection();
+
+  const query: any = {
+    coordinates: {
+      $geoWithin: {
+        $box: [
+          [bounds.west, bounds.south],
+          [bounds.east, bounds.north],
+        ],
+      },
+    },
+  };
+
+  if (options?.searchTerm) {
+    query.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+
+  if (options?.prefecture && options.prefecture !== 'all') {
+    query.prefecture = options.prefecture;
+  }
+
+  if (options?.type && options.type !== 'all') {
+    query.type = options.type;
+  }
+
+  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
+
+  return JSON.parse(JSON.stringify(spots));
+}
+
+// Admin function for list view with pagination
+export async function getCampingSpotsWithPagination(
+  page: number = 1,
+  limit: number = 20,
+  options?: {
+    searchTerm?: string;
+    prefecture?: string;
+    type?: string;
+  }
+) {
+  await checkAdminAuth();
+  await ensureDbConnection();
+
+  const query: any = {};
+
+  if (options?.searchTerm) {
+    query.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+
+  if (options?.prefecture && options.prefecture !== 'all') {
+    query.prefecture = options.prefecture;
+  }
+
+  if (options?.type && options.type !== 'all') {
+    query.type = options.type;
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [spots, total] = await Promise.all([
+    CampingSpot.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    CampingSpot.countDocuments(query),
+  ]);
+
+  return {
+    spots: JSON.parse(JSON.stringify(spots)),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
+}
+
 export async function getCampingSpotById(id: string) {
   try {
     // Validate input
@@ -352,7 +530,8 @@ export async function getCampingSpotById(id: string) {
       id,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
     });
 
     // Always throw a proper Error object, never undefined
@@ -428,7 +607,6 @@ export async function updateCampingSpot(id: string, data: FormData) {
   // Convert form data to proper types using helper function
   const spotData = convertFormDataToCampingSpot(formObject);
 
-
   // Validate the data
   const validatedData = CampingSpotSchema.parse(spotData);
 
@@ -502,15 +680,20 @@ export async function updateCampingSpot(id: string, data: FormData) {
   // Handle nested security fields
   if (validatedData.security) {
     updateOperations.$set['security.hasGate'] = validatedData.security.hasGate;
-    updateOperations.$set['security.hasLighting'] = validatedData.security.hasLighting;
-    updateOperations.$set['security.hasStaff'] = validatedData.security.hasStaff;
+    updateOperations.$set['security.hasLighting'] =
+      validatedData.security.hasLighting;
+    updateOperations.$set['security.hasStaff'] =
+      validatedData.security.hasStaff;
   }
 
   // Handle nested nightNoise fields
   if (validatedData.nightNoise) {
-    updateOperations.$set['nightNoise.hasNoiseIssues'] = validatedData.nightNoise.hasNoiseIssues;
-    updateOperations.$set['nightNoise.nearBusyRoad'] = validatedData.nightNoise.nearBusyRoad;
-    updateOperations.$set['nightNoise.isQuietArea'] = validatedData.nightNoise.isQuietArea;
+    updateOperations.$set['nightNoise.hasNoiseIssues'] =
+      validatedData.nightNoise.hasNoiseIssues;
+    updateOperations.$set['nightNoise.nearBusyRoad'] =
+      validatedData.nightNoise.nearBusyRoad;
+    updateOperations.$set['nightNoise.isQuietArea'] =
+      validatedData.nightNoise.isQuietArea;
   }
 
   // Add $unset operation if there are fields to unset

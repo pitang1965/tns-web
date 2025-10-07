@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,7 +18,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MapPin, Filter, Search, Info, Plus } from 'lucide-react';
-import { getPublicCampingSpots } from '../actions/campingSpots';
+import {
+  getPublicCampingSpotsByBounds,
+  getPublicCampingSpotsWithPagination,
+} from '../actions/campingSpots';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -99,32 +102,47 @@ export default function ShachuHakuClient() {
   const [prefectureFilter, setPrefectureFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const filteredSpots = useMemo(() => {
-    if (!spots || !Array.isArray(spots)) {
-      return [];
+  // Pagination state for list view
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 20;
+
+  // Bounds state for map view
+  const [mapBounds, setMapBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
+  const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialLoadDoneRef = useRef(false);
+  const filtersRef = useRef({ searchTerm: '', prefectureFilter: 'all', typeFilter: 'all' });
+  const lastLoadedBoundsRef = useRef<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
+
+  // Load spots for map view based on bounds - NO dependencies except toast
+  const loadMapSpotsRef = useRef<typeof getPublicCampingSpotsByBounds | null>(null);
+  loadMapSpotsRef.current = async (
+    bounds: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    },
+    filters?: {
+      searchTerm?: string;
+      prefecture?: string;
+      type?: string;
     }
-
-    return spots.filter((spot) => {
-      if (
-        searchTerm &&
-        !spot.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ) {
-        return false;
-      }
-      if (prefectureFilter !== 'all' && spot.prefecture !== prefectureFilter) {
-        return false;
-      }
-      if (typeFilter !== 'all' && spot.type !== typeFilter) {
-        return false;
-      }
-      return true;
-    });
-  }, [spots, searchTerm, prefectureFilter, typeFilter]);
-
-  const loadSpots = async () => {
+  ) => {
     try {
       setLoading(true);
-      const data = await getPublicCampingSpots();
+      const data = await getPublicCampingSpotsByBounds(bounds, filters);
       setSpots(data);
     } catch (error) {
       toast({
@@ -138,8 +156,142 @@ export default function ShachuHakuClient() {
     }
   };
 
+  // Load spots for list view with pagination - NO dependencies
+  const loadListSpotsRef = useRef<((
+    page: number,
+    filters?: {
+      searchTerm?: string;
+      prefecture?: string;
+      type?: string;
+    }
+  ) => Promise<void>) | null>(null);
+  loadListSpotsRef.current = async (
+    page: number,
+    filters?: {
+      searchTerm?: string;
+      prefecture?: string;
+      type?: string;
+    }
+  ) => {
+    try {
+      setLoading(true);
+      const result = await getPublicCampingSpotsWithPagination(page, pageSize, filters);
+      setSpots(result.spots);
+      setTotalPages(result.totalPages);
+      setTotalCount(result.total);
+      setCurrentPage(result.page);
+    } catch (error) {
+      toast({
+        title: 'エラー',
+        description: '車中泊スポットの読み込みに失敗しました',
+        variant: 'destructive',
+      });
+      console.error('Error loading spots:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update filters ref whenever they change
   useEffect(() => {
-    loadSpots();
+    filtersRef.current = { searchTerm, prefectureFilter, typeFilter };
+  }, [searchTerm, prefectureFilter, typeFilter]);
+
+  // Helper function to check if bounds have significantly changed
+  const boundsHaveChanged = (
+    oldBounds: { north: number; south: number; east: number; west: number } | null,
+    newBounds: { north: number; south: number; east: number; west: number }
+  ): boolean => {
+    if (!oldBounds) return true;
+
+    // Calculate the difference as a percentage of the current view
+    const latDiff = Math.abs(newBounds.north - oldBounds.north) + Math.abs(newBounds.south - oldBounds.south);
+    const lngDiff = Math.abs(newBounds.east - oldBounds.east) + Math.abs(newBounds.west - oldBounds.west);
+
+    const latRange = newBounds.north - newBounds.south;
+    const lngRange = newBounds.east - newBounds.west;
+
+    // Only reload if bounds changed by more than 5% of current view
+    const threshold = 0.05;
+    return (latDiff / latRange > threshold) || (lngDiff / lngRange > threshold);
+  };
+
+  // Handle bounds change with debounce - stable function with NO dependencies
+  const handleBoundsChange = useCallback(
+    (bounds: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    }) => {
+      setMapBounds(bounds);
+
+      // Clear existing timeout
+      if (boundsTimeoutRef.current) {
+        clearTimeout(boundsTimeoutRef.current);
+      }
+
+      // Set new timeout for debounced load
+      boundsTimeoutRef.current = setTimeout(() => {
+        // Check if bounds have significantly changed
+        if (!boundsHaveChanged(lastLoadedBoundsRef.current, bounds)) {
+          return; // Skip loading if bounds haven't changed significantly
+        }
+
+        const filters = {
+          searchTerm: filtersRef.current.searchTerm || undefined,
+          prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
+          type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+        };
+        loadMapSpotsRef.current?.(bounds, filters);
+        lastLoadedBoundsRef.current = bounds; // Update last loaded bounds
+        initialLoadDoneRef.current = true;
+      }, 500); // 500ms debounce
+    },
+    [] // NO dependencies - completely stable
+  );
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, prefectureFilter, typeFilter]);
+
+  // Load spots for list view when tab, filters, or page changes
+  useEffect(() => {
+    if (activeTab === 'list') {
+      const filters = {
+        searchTerm: filtersRef.current.searchTerm || undefined,
+        prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
+        type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+      };
+      loadListSpotsRef.current?.(currentPage, filters);
+    }
+  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter]);
+
+  // Reload map data when filters change (if map is active and bounds are available)
+  // DO NOT include mapBounds in dependencies - it causes infinite loop!
+  useEffect(() => {
+    if (activeTab === 'map' && mapBounds && initialLoadDoneRef.current) {
+      // Reset last loaded bounds to force reload when filters change
+      lastLoadedBoundsRef.current = null;
+
+      const filters = {
+        searchTerm: filtersRef.current.searchTerm || undefined,
+        prefecture: filtersRef.current.prefectureFilter !== 'all' ? filtersRef.current.prefectureFilter : undefined,
+        type: filtersRef.current.typeFilter !== 'all' ? filtersRef.current.typeFilter : undefined,
+      };
+      loadMapSpotsRef.current?.(mapBounds, filters);
+      lastLoadedBoundsRef.current = mapBounds; // Update after loading
+    }
+  }, [searchTerm, prefectureFilter, typeFilter, activeTab]); // mapBounds removed!
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (boundsTimeoutRef.current) {
+        clearTimeout(boundsTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleSpotSelect = (spot: CampingSpotWithId) => {
@@ -259,34 +411,27 @@ export default function ShachuHakuClient() {
           </Button>
         </div>
 
-        {/* Map Tab Content */}
-        {activeTab === 'map' && (
-          <div className='space-y-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <MapPin className='w-5 h-5' />
-                  {loading ? '車中泊スポット地図 (読み込み中...)' : `車中泊スポット地図 (${filteredSpots.length}件)`}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-                    <div className='text-gray-500'>
-                      地図データを読み込み中...
-                    </div>
-                  </div>
-                ) : (
-                  <ShachuHakuMap
-                    spots={filteredSpots}
-                    onSpotSelect={handleSpotSelect}
-                    readonly={true}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {/* Map Tab Content - Always render but hide with visibility */}
+        <div className='space-y-4' style={{ visibility: activeTab === 'map' ? 'visible' : 'hidden', height: activeTab === 'map' ? 'auto' : '0', overflow: 'hidden' }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <MapPin className='w-5 h-5' />
+                {loading
+                  ? '車中泊スポット地図 (読み込み中...)'
+                  : `車中泊スポット地図 (${spots.length}件)`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ShachuHakuMap
+                spots={spots}
+                onSpotSelect={handleSpotSelect}
+                readonly={true}
+                onBoundsChange={handleBoundsChange}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
         {/* List Tab Content */}
         {activeTab === 'list' && (
@@ -339,19 +484,23 @@ export default function ShachuHakuClient() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                  {loading ? '車中泊スポット一覧 (読み込み中...)' : `車中泊スポット一覧 (${filteredSpots.length}件)`}
+                  {loading
+                    ? '車中泊スポット一覧 (読み込み中...)'
+                    : `車中泊スポット一覧 (${totalCount}件中 ${
+                        (currentPage - 1) * pageSize + 1
+                      }-${Math.min(currentPage * pageSize, totalCount)}件を表示)`}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {loading ? (
                   <div className='text-center py-8'>読み込み中...</div>
-                ) : filteredSpots.length === 0 ? (
+                ) : spots.length === 0 ? (
                   <div className='text-center py-8 text-gray-500'>
                     条件に一致する車中泊スポットがありません
                   </div>
                 ) : (
                   <div className='space-y-4'>
-                    {filteredSpots.map((spot) => (
+                    {spots.map((spot) => (
                       <div
                         key={spot._id}
                         className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
@@ -426,6 +575,31 @@ export default function ShachuHakuClient() {
                         </div>
                       </div>
                     ))}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className='flex justify-center items-center gap-2 mt-6'>
+                        <Button
+                          variant='outline'
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          disabled={currentPage === 1 || loading}
+                        >
+                          前へ
+                        </Button>
+                        <span className='text-sm text-gray-600 dark:text-gray-300'>
+                          {currentPage} / {totalPages} ページ
+                        </span>
+                        <Button
+                          variant='outline'
+                          onClick={() =>
+                            setCurrentPage((p) => Math.min(totalPages, p + 1))
+                          }
+                          disabled={currentPage === totalPages || loading}
+                        >
+                          次へ
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>

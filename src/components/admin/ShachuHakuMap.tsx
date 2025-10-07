@@ -32,6 +32,12 @@ interface ShachuHakuMapProps {
   spots: CampingSpotWithId[];
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onCreateSpot: (coordinates: [number, number]) => void;
+  onBoundsChange?: (bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  }) => void;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -40,6 +46,7 @@ export default function ShachuHakuMap({
   spots,
   onSpotSelect,
   onCreateSpot,
+  onBoundsChange,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -47,7 +54,10 @@ export default function ShachuHakuMap({
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
-  const [currentZoom, setCurrentZoom] = useState(5);
+  const currentZoomRef = useRef<number>(9);
+  const [displayZoom, setDisplayZoom] = useState(9);
+  const [markerUpdateTrigger, setMarkerUpdateTrigger] = useState(0);
+  const isUserInteractionRef = useRef(false);
 
   // Hide/show markers during map movement
   const hideMarkers = useCallback(() => {
@@ -62,6 +72,10 @@ export default function ShachuHakuMap({
       const element = marker.getElement();
       element.style.opacity = '1';
     });
+  }, []);
+
+  const updateMarkersForZoom = useCallback(() => {
+    setMarkerUpdateTrigger((prev) => prev + 1);
   }, []);
 
   // Initialize map
@@ -120,8 +134,13 @@ export default function ShachuHakuMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [139.5631214, 35.332528935], // 相模湾
-      zoom: 5,
+      center: [139.6917, 35.6895], // 東京
+      zoom: 9, // 関東地域が見えるズームレベル
+      minZoom: 7, // 全国表示を防ぐための最小ズーム
+      maxBounds: [
+        [122.0, 24.0], // 南西端（西端、南端）沖縄より南
+        [154.0, 46.0]  // 北東端（東端、北端）北海道より北
+      ],
     });
 
     // エラーハンドラの設定
@@ -146,7 +165,8 @@ export default function ShachuHakuMap({
       restoreConsoleWarn();
 
       setMapLoaded(true);
-      setCurrentZoom(map.current.getZoom());
+      currentZoomRef.current = map.current.getZoom();
+      setDisplayZoom(Math.round(map.current.getZoom() * 10) / 10);
 
       try {
         // 日本語ラベルを設定
@@ -167,11 +187,13 @@ export default function ShachuHakuMap({
 
     // Add map movement event listeners to hide/show markers
     map.current.on('movestart', () => {
+      isUserInteractionRef.current = true;
       setIsMapMoving(true);
       hideMarkers();
     });
 
     map.current.on('zoomstart', () => {
+      isUserInteractionRef.current = true;
       setIsMapMoving(true);
       hideMarkers();
     });
@@ -179,13 +201,78 @@ export default function ShachuHakuMap({
     map.current.on('moveend', () => {
       setIsMapMoving(false);
       showMarkers();
+
+      // Only notify parent if user manually moved the map (after initial load)
+      if (map.current && onBoundsChange && isUserInteractionRef.current) {
+        const bounds = map.current.getBounds();
+        if (!bounds) return;
+
+        const north = bounds.getNorth();
+        const south = bounds.getSouth();
+        let east = bounds.getEast();
+        let west = bounds.getWest();
+
+        // Normalize longitude to prevent wraparound issues
+        // Ensure bounds are within Japan's approximate range
+        if (east > 154) east = 154;
+        if (west < 122) west = 122;
+        if (east < west) {
+          // If bounds wrapped around, reset to max bounds
+          east = 154;
+          west = 122;
+        }
+
+        onBoundsChange({
+          north: Math.min(north, 46),
+          south: Math.max(south, 24),
+          east,
+          west,
+        });
+        isUserInteractionRef.current = false; // Reset after handling
+      }
     });
 
     map.current.on('zoomend', () => {
       setIsMapMoving(false);
       showMarkers();
       if (map.current) {
-        setCurrentZoom(map.current.getZoom());
+        const newZoom = map.current.getZoom();
+        const oldZoom = currentZoomRef.current;
+        currentZoomRef.current = newZoom;
+        setDisplayZoom(Math.round(newZoom * 10) / 10);
+
+        const crossedThreshold =
+          (oldZoom < 9 && newZoom >= 9) || (oldZoom >= 9 && newZoom < 9);
+        if (crossedThreshold) {
+          updateMarkersForZoom();
+        }
+
+        // Notify parent of bounds change on zoom (if user initiated)
+        if (onBoundsChange && isUserInteractionRef.current) {
+          const bounds = map.current.getBounds();
+          if (!bounds) return;
+
+          const north = bounds.getNorth();
+          const south = bounds.getSouth();
+          let east = bounds.getEast();
+          let west = bounds.getWest();
+
+          // Normalize longitude
+          if (east > 154) east = 154;
+          if (west < 122) west = 122;
+          if (east < west) {
+            east = 154;
+            west = 122;
+          }
+
+          onBoundsChange({
+            north: Math.min(north, 46),
+            south: Math.max(south, 24),
+            east,
+            west,
+          });
+          isUserInteractionRef.current = false;
+        }
       }
     });
 
@@ -204,7 +291,7 @@ export default function ShachuHakuMap({
         styleElement.remove();
       }
     };
-  }, [onCreateSpot, hideMarkers, showMarkers]);
+  }, [onCreateSpot, hideMarkers, showMarkers, updateMarkersForZoom]);
 
   // Update markers when spots change or zoom level changes
   useEffect(() => {
@@ -220,7 +307,7 @@ export default function ShachuHakuMap({
 
       // Determine marker size and content based on zoom level
       // Zoom level 9 or higher (市町村レベル): show detailed markers with scores
-      const isDetailedView = currentZoom >= 9;
+      const isDetailedView = currentZoomRef.current >= 9;
       const markerSize = isDetailedView ? 25 : 12;
       const borderWidth = isDetailedView ? 3 : 2;
       const fontSize = isDetailedView ? 12 : 0;
@@ -242,7 +329,7 @@ export default function ShachuHakuMap({
         color: white;
         font-weight: bold;
         font-size: ${fontSize}px;
-        transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease, width 0.2s ease, height 0.2s ease;
+        transition: opacity 0.15s ease-in-out, box-shadow 0.2s ease;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
@@ -286,22 +373,38 @@ export default function ShachuHakuMap({
 
       markersRef.current.push(marker);
     });
-  }, [spots, mapLoaded, onSpotSelect, currentZoom, isMapMoving]);
+  }, [spots, mapLoaded, onSpotSelect, isMapMoving, markerUpdateTrigger]);
 
-  // Fit map to show all spots only when spots change (not on zoom)
+  // Initial load only: Trigger bounds change to load spots
   useEffect(() => {
-    if (!map.current || !mapLoaded || spots.length === 0) return;
+    if (!map.current || !mapLoaded || !onBoundsChange) return;
 
-    const bounds = new mapboxgl.LngLatBounds();
-    spots.forEach((spot) => {
-      bounds.extend(spot.coordinates);
+    const bounds = map.current.getBounds();
+    if (!bounds) return;
+
+    const north = bounds.getNorth();
+    const south = bounds.getSouth();
+    let east = bounds.getEast();
+    let west = bounds.getWest();
+
+    // Normalize longitude to prevent wraparound issues
+    if (east > 154) east = 154;
+    if (west < 122) west = 122;
+    if (east < west) {
+      east = 154;
+      west = 122;
+    }
+
+    onBoundsChange({
+      north: Math.min(north, 46),
+      south: Math.max(south, 24),
+      east,
+      west,
     });
 
-    map.current.fitBounds(bounds, {
-      padding: 50,
-      maxZoom: 10,
-    });
-  }, [spots, mapLoaded]);
+    // After initial load, only respond to user interactions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLoaded]); // Only run on initial map load
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on calculated security level
@@ -468,7 +571,7 @@ export default function ShachuHakuMap({
         </div>
       </div>
       {/* <div className='absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600 text-sm'>
-        ズームレベル: {currentZoom.toFixed(1)}
+        ズームレベル: {displayZoom.toFixed(1)}
       </div> */}
     </div>
   );
