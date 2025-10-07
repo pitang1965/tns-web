@@ -436,6 +436,8 @@ export default function ShachuHakuMap({
     if (!map.current || !mapLoaded || !onBoundsChange) return;
 
     const bounds = map.current.getBounds();
+    if (!bounds) return;
+
     const north = bounds.getNorth();
     const south = bounds.getSouth();
     let east = bounds.getEast();
