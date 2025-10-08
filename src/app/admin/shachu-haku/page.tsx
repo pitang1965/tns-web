@@ -130,15 +130,8 @@ export default function ShachuHakuAdminPage() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
 
-  // Bounds state for map view
-  const [mapBounds, setMapBounds] = useState<{
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  } | null>(null);
-  // Saved bounds from map (used for list view filtering)
-  const [savedBounds, setSavedBounds] = useState<{
+  // Bounds state for map view - use ref instead of state to prevent re-renders
+  const mapBoundsRef = useRef<{
     north: number;
     south: number;
     east: number;
@@ -179,7 +172,6 @@ export default function ShachuHakuAdminPage() {
       setSpots(data);
 
       // Also get total count for map view (without bounds)
-      const { getCampingSpotsWithPagination } = await import('../../actions/campingSpots');
       const totalResult = await getCampingSpotsWithPagination(1, 1, filters);
       setTotalCount(totalResult.total);
     } catch (error) {
@@ -201,7 +193,6 @@ export default function ShachuHakuAdminPage() {
       searchTerm?: string;
       prefecture?: string;
       type?: string;
-      bounds?: { north: number; south: number; east: number; west: number };
     }
   ) => Promise<void>) | null>(null);
   loadListSpotsRef.current = async (
@@ -210,7 +201,6 @@ export default function ShachuHakuAdminPage() {
       searchTerm?: string;
       prefecture?: string;
       type?: string;
-      bounds?: { north: number; south: number; east: number; west: number };
     }
   ) => {
     try {
@@ -263,8 +253,7 @@ export default function ShachuHakuAdminPage() {
   // Handle bounds change with debounce - stable function with NO dependencies
   const handleBoundsChange = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
-      setMapBounds(bounds);
-      setSavedBounds(bounds); // Save bounds for list view
+      mapBoundsRef.current = bounds;
 
       // Clear existing timeout
       if (boundsTimeoutRef.current) {
@@ -315,16 +304,15 @@ export default function ShachuHakuAdminPage() {
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
             : undefined,
-        bounds: savedBounds || undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
-  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter, savedBounds]);
+  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!
   useEffect(() => {
-    if (activeTab === 'map' && mapBounds && initialLoadDoneRef.current) {
+    if (activeTab === 'map' && mapBoundsRef.current && initialLoadDoneRef.current) {
       // Reset last loaded bounds to force reload when filters change
       lastLoadedBoundsRef.current = null;
 
@@ -339,8 +327,8 @@ export default function ShachuHakuAdminPage() {
             ? filtersRef.current.typeFilter
             : undefined,
       };
-      loadMapSpotsRef.current?.(mapBounds, filters);
-      lastLoadedBoundsRef.current = mapBounds; // Update after loading
+      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
+      lastLoadedBoundsRef.current = mapBoundsRef.current; // Update after loading
     }
   }, [searchTerm, prefectureFilter, typeFilter, activeTab]); // mapBounds removed!
 
@@ -378,7 +366,7 @@ export default function ShachuHakuAdminPage() {
             : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
-    } else if (activeTab === 'map' && mapBounds) {
+    } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
         prefecture:
@@ -390,8 +378,8 @@ export default function ShachuHakuAdminPage() {
             ? filtersRef.current.typeFilter
             : undefined,
       };
-      loadMapSpotsRef.current?.(mapBounds, filters);
-      lastLoadedBoundsRef.current = mapBounds;
+      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
+      lastLoadedBoundsRef.current = mapBoundsRef.current;
     }
     handleFormClose();
     toast({
@@ -417,7 +405,7 @@ export default function ShachuHakuAdminPage() {
             : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
-    } else if (activeTab === 'map' && mapBounds) {
+    } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
         prefecture:
@@ -429,8 +417,8 @@ export default function ShachuHakuAdminPage() {
             ? filtersRef.current.typeFilter
             : undefined,
       };
-      loadMapSpotsRef.current?.(mapBounds, filters);
-      lastLoadedBoundsRef.current = mapBounds;
+      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
+      lastLoadedBoundsRef.current = mapBoundsRef.current;
     }
     toast({
       title: 'インポート完了',
@@ -726,6 +714,7 @@ export default function ShachuHakuAdminPage() {
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
+                key="shachu-haku-admin-map"
                 spots={spots}
                 onSpotSelect={handleSpotSelect}
                 onBoundsChange={handleBoundsChange}
