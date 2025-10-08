@@ -39,6 +39,16 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     ? `${descriptionParts.join('・')}の車中泊スポットを検索・閲覧できます。詳細情報、料金、設備、周辺施設などをご確認いただけます。`
     : '全国の車中泊スポットを検索・閲覧できます。道の駅、SA・PA、RVパークなど様々な種類のスポットの詳細情報、料金、設備、周辺施設などをご確認いただけます。';
 
+  // Build URL with current search params for OGP
+  const urlParams = new URLSearchParams();
+  if (prefecture) urlParams.set('prefecture', prefecture);
+  if (type) urlParams.set('type', type);
+  if (q) urlParams.set('q', q);
+
+  const ogUrl = urlParams.toString()
+    ? `https://tabi.over40web.club/shachu-haku?${urlParams.toString()}`
+    : 'https://tabi.over40web.club/shachu-haku';
+
   return {
     title,
     description,
@@ -46,7 +56,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     openGraph: {
       title,
       description,
-      url: 'https://tabi.over40web.club/shachu-haku',
+      url: ogUrl,
+      siteName: '旅のしおり',
       images: [
         {
           url: 'https://tabi.over40web.club/shachu-haku.webp',
@@ -59,7 +70,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       type: 'website',
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
