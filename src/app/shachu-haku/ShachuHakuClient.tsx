@@ -152,8 +152,8 @@ export default function ShachuHakuClient() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
 
-  // Bounds state for map view
-  const [mapBounds, setMapBounds] = useState<{
+  // Bounds state for map view - use ref instead of state to prevent re-renders
+  const mapBoundsRef = useRef<{
     north: number;
     south: number;
     east: number;
@@ -288,7 +288,7 @@ export default function ShachuHakuClient() {
   // Handle bounds change with debounce - stable function with NO dependencies
   const handleBoundsChange = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
-      setMapBounds(bounds);
+      mapBoundsRef.current = bounds;
       setSavedBounds(bounds); // Save bounds for list view
 
       // Clear existing timeout
@@ -416,7 +416,7 @@ export default function ShachuHakuClient() {
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!
   useEffect(() => {
-    if (activeTab === 'map' && mapBounds && initialLoadDoneRef.current) {
+    if (activeTab === 'map' && mapBoundsRef.current && initialLoadDoneRef.current) {
       // Reset last loaded bounds to force reload when filters change
       lastLoadedBoundsRef.current = null;
 
@@ -431,8 +431,8 @@ export default function ShachuHakuClient() {
             ? filtersRef.current.typeFilter
             : undefined,
       };
-      loadMapSpotsRef.current?.(mapBounds, filters);
-      lastLoadedBoundsRef.current = mapBounds; // Update after loading
+      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
+      lastLoadedBoundsRef.current = mapBoundsRef.current; // Update after loading
     }
   }, [searchTerm, prefectureFilter, typeFilter, activeTab]); // mapBounds removed!
 

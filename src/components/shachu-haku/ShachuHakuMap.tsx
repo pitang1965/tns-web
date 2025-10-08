@@ -351,7 +351,8 @@ export default function ShachuHakuMap({
         styleElement.remove();
       }
     };
-  }, [onCreateSpot, hideMarkers, showMarkers, readonly, updateMarkersForZoom, initialZoom, initialCenter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only run on mount/unmount
 
   // Update markers when spots change or zoom level changes
   useEffect(() => {
