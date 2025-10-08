@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistance } from '@/lib/formatDistance';
+import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -122,6 +123,29 @@ export default function ShachuHakuClient() {
     return [139.6917, 35.6895]; // デフォルト: 東京
   });
 
+  // Saved bounds from map (used for list view filtering)
+  const [savedBounds, setSavedBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(() => {
+    // URLパラメータから境界を取得
+    const north = searchParams.get('bounds_north');
+    const south = searchParams.get('bounds_south');
+    const east = searchParams.get('bounds_east');
+    const west = searchParams.get('bounds_west');
+    if (north && south && east && west) {
+      return {
+        north: parseFloat(north),
+        south: parseFloat(south),
+        east: parseFloat(east),
+        west: parseFloat(west),
+      };
+    }
+    return null;
+  });
+
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -191,6 +215,7 @@ export default function ShachuHakuClient() {
           searchTerm?: string;
           prefecture?: string;
           type?: string;
+          bounds?: { north: number; south: number; east: number; west: number };
         }
       ) => Promise<void>)
     | null
@@ -201,6 +226,7 @@ export default function ShachuHakuClient() {
       searchTerm?: string;
       prefecture?: string;
       type?: string;
+      bounds?: { north: number; south: number; east: number; west: number };
     }
   ) => {
     try {
@@ -263,6 +289,7 @@ export default function ShachuHakuClient() {
   const handleBoundsChange = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       setMapBounds(bounds);
+      setSavedBounds(bounds); // Save bounds for list view
 
       // Clear existing timeout
       if (boundsTimeoutRef.current) {
@@ -325,11 +352,17 @@ export default function ShachuHakuClient() {
       params.set('type', typeFilter);
     }
 
-    // Add map zoom and center (only for map tab)
-    if (activeTab === 'map') {
-      params.set('zoom', mapZoom.toFixed(2));
-      params.set('lat', mapCenter[1].toFixed(6));
-      params.set('lng', mapCenter[0].toFixed(6));
+    // Add map zoom and center (for both map and list tabs to maintain filter state)
+    params.set('zoom', mapZoom.toFixed(2));
+    params.set('lat', mapCenter[1].toFixed(6));
+    params.set('lng', mapCenter[0].toFixed(6));
+
+    // Add bounds if available (for consistent filtering between map and list)
+    if (savedBounds) {
+      params.set('bounds_north', savedBounds.north.toFixed(6));
+      params.set('bounds_south', savedBounds.south.toFixed(6));
+      params.set('bounds_east', savedBounds.east.toFixed(6));
+      params.set('bounds_west', savedBounds.west.toFixed(6));
     }
 
     // Update URL without reload
@@ -344,6 +377,7 @@ export default function ShachuHakuClient() {
     activeTab,
     mapZoom,
     mapCenter,
+    savedBounds,
     router,
   ]);
 
@@ -355,6 +389,14 @@ export default function ShachuHakuClient() {
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {
     if (activeTab === 'list') {
+      // Use savedBounds if available (from map), otherwise calculate from zoom and center
+      let bounds: { north: number; south: number; east: number; west: number } | undefined;
+      if (savedBounds) {
+        bounds = savedBounds;
+      } else if (mapZoom && mapCenter) {
+        bounds = calculateBoundsFromZoomAndCenter(mapCenter, mapZoom);
+      }
+
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
         prefecture:
@@ -365,10 +407,11 @@ export default function ShachuHakuClient() {
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
             : undefined,
+        bounds,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
-  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter]);
+  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter, savedBounds, mapZoom, mapCenter]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!
@@ -553,6 +596,20 @@ export default function ShachuHakuClient() {
         {/* List Tab Content */}
         {activeTab === 'list' && (
           <div className='space-y-4'>
+            {/* Filter Notice */}
+            {savedBounds && (
+              <Card className='bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800'>
+                <CardContent className='pt-4 pb-4'>
+                  <div className='flex items-start gap-2'>
+                    <Info className='w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5' />
+                    <div className='text-sm text-blue-800 dark:text-blue-200'>
+                      <strong>地図表示の範囲内</strong>のスポットを表示しています。より広い範囲のスポットを表示するには、地図表示でズームアウトしてから一覧表示に切り替えてください。
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Stats */}
             <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               <Card>

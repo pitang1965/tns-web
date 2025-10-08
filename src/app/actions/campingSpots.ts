@@ -311,6 +311,7 @@ export async function getPublicCampingSpotsWithPagination(
     searchTerm?: string;
     prefecture?: string;
     type?: string;
+    bounds?: { north: number; south: number; east: number; west: number };
   }
 ) {
   await ensureDbConnection();
@@ -327,6 +328,18 @@ export async function getPublicCampingSpotsWithPagination(
 
   if (options?.type && options.type !== 'all') {
     query.type = options.type;
+  }
+
+  // Add bounds filter if provided
+  if (options?.bounds) {
+    query.coordinates = {
+      $geoWithin: {
+        $box: [
+          [options.bounds.west, options.bounds.south],
+          [options.bounds.east, options.bounds.north],
+        ],
+      },
+    };
   }
 
   const skip = (page - 1) * limit;
@@ -467,6 +480,7 @@ export async function getCampingSpotsWithPagination(
     searchTerm?: string;
     prefecture?: string;
     type?: string;
+    bounds?: { north: number; south: number; east: number; west: number };
   }
 ) {
   await checkAdminAuth();
@@ -484,6 +498,18 @@ export async function getCampingSpotsWithPagination(
 
   if (options?.type && options.type !== 'all') {
     query.type = options.type;
+  }
+
+  // Add bounds filter if provided
+  if (options?.bounds) {
+    query.coordinates = {
+      $geoWithin: {
+        $box: [
+          [options.bounds.west, options.bounds.south],
+          [options.bounds.east, options.bounds.north],
+        ],
+      },
+    };
   }
 
   const skip = (page - 1) * limit;

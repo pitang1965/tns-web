@@ -137,6 +137,13 @@ export default function ShachuHakuAdminPage() {
     east: number;
     west: number;
   } | null>(null);
+  // Saved bounds from map (used for list view filtering)
+  const [savedBounds, setSavedBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
   const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const initialLoadDoneRef = useRef(false);
   const filtersRef = useRef({
@@ -194,6 +201,7 @@ export default function ShachuHakuAdminPage() {
       searchTerm?: string;
       prefecture?: string;
       type?: string;
+      bounds?: { north: number; south: number; east: number; west: number };
     }
   ) => Promise<void>) | null>(null);
   loadListSpotsRef.current = async (
@@ -202,6 +210,7 @@ export default function ShachuHakuAdminPage() {
       searchTerm?: string;
       prefecture?: string;
       type?: string;
+      bounds?: { north: number; south: number; east: number; west: number };
     }
   ) => {
     try {
@@ -255,6 +264,7 @@ export default function ShachuHakuAdminPage() {
   const handleBoundsChange = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       setMapBounds(bounds);
+      setSavedBounds(bounds); // Save bounds for list view
 
       // Clear existing timeout
       if (boundsTimeoutRef.current) {
@@ -305,10 +315,11 @@ export default function ShachuHakuAdminPage() {
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
             : undefined,
+        bounds: savedBounds || undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
-  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter]);
+  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter, savedBounds]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!

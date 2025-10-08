@@ -39,3 +39,44 @@ export function extractCoordinatesFromGoogleMapsUrl(input: string) {
 
   return null;
 }
+
+/**
+ * ズームレベルと中心座標から地図の境界を計算する
+ * Mapboxのズームレベルに基づいて、おおよその境界を計算
+ * @param center 中心座標 [longitude, latitude]
+ * @param zoom ズームレベル
+ * @returns 境界 { north, south, east, west }
+ */
+export function calculateBoundsFromZoomAndCenter(
+  center: [number, number],
+  zoom: number
+): { north: number; south: number; east: number; west: number } {
+  const [lng, lat] = center;
+
+  // ズームレベルに基づいて、画面に表示される範囲を計算
+  // Mapboxの場合、zoom 0 では全世界が表示され、zoom が 1 増えるごとに表示範囲が半分になる
+  // 標準的な16:9のアスペクト比を想定
+  const metersPerPixel = (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
+
+  // 一般的な地図の表示サイズ（600px height として計算）
+  const mapHeightPixels = 600;
+  const mapWidthPixels = 1000; // おおよその幅
+
+  // メートル単位での表示範囲
+  const latRangeMeters = metersPerPixel * mapHeightPixels;
+  const lngRangeMeters = metersPerPixel * mapWidthPixels;
+
+  // 緯度1度 ≈ 111,320メートル
+  const latDegrees = latRangeMeters / 111320;
+
+  // 経度1度の距離は緯度によって変わる
+  const lngDegreesPerMeter = 1 / (111320 * Math.cos((lat * Math.PI) / 180));
+  const lngDegrees = lngRangeMeters * lngDegreesPerMeter;
+
+  return {
+    north: Math.min(lat + latDegrees / 2, 46), // 日本の北限
+    south: Math.max(lat - latDegrees / 2, 24), // 日本の南限
+    east: Math.min(lng + lngDegrees / 2, 154), // 日本の東限
+    west: Math.max(lng - lngDegrees / 2, 122), // 日本の西限
+  };
+}
