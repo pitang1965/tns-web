@@ -164,7 +164,7 @@ export default function ShachuHakuMap({
       style: 'mapbox://styles/mapbox/streets-v11',
       center: initialCenter,
       zoom: initialZoom,
-      minZoom: 7, // 全国表示を防ぐための最小ズーム
+      minZoom: 6, // 全国表示を防ぐための最小ズーム（北海道は表示できる）
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
         [154.0, 46.0]  // 北東端（東端、北端）北海道より北
