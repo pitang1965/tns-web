@@ -82,9 +82,7 @@ export const ShachuHakuFormCreateSchema = z.object({
   ),
   hasRoof: z.boolean(),
   hasPowerOutlet: z.boolean(),
-  isFree: z.enum(['free', 'paid'] as const, {
-    errorMap: () => ({ message: '無料か有料かを選択してください' })
-  }),
+  isFree: z.boolean().optional(),
   pricePerNight: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }

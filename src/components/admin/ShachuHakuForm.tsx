@@ -83,7 +83,7 @@ export default function ShachuHakuForm({
       overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      isFree: undefined as any,
+      isFree: undefined,
       pricePerNight: '',
       priceNote: '',
       capacity: '',
@@ -128,7 +128,7 @@ export default function ShachuHakuForm({
         overallRating: (spot as any).overallRating?.toString() || '',
         hasRoof: spot.hasRoof,
         hasPowerOutlet: spot.hasPowerOutlet,
-        isFree: (spot.pricing.isFree ? 'free' : 'paid') as 'free' | 'paid',
+        isFree: spot.pricing.isFree,
         pricePerNight: spot.pricing.pricePerNight?.toString() || '',
         priceNote: spot.pricing.priceNote || '',
         capacity: spot.capacity?.toString() || '',
@@ -179,7 +179,7 @@ export default function ShachuHakuForm({
         overallRating: '',
         hasRoof: false,
         hasPowerOutlet: false,
-        isFree: undefined as any,
+        isFree: undefined,
         pricePerNight: '',
         priceNote: '',
         capacity: '',
@@ -290,7 +290,9 @@ export default function ShachuHakuForm({
       // Handle boolean fields
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      formData.append('isFree', (data.isFree === 'free').toString());
+      if (data.isFree !== undefined) {
+        formData.append('isFree', data.isFree.toString());
+      }
 
       // Handle array fields
       formData.append('restrictions', data.restrictions);

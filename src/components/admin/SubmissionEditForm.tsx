@@ -13,7 +13,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import { createCampingSpot } from '../../app/actions/campingSpots';
 import { approveSubmissionWithoutCreating } from '../../app/actions/campingSpotSubmissions';
-import { ShachuHakuFormSchema, ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
 import { RatingFields } from './RatingFields';
@@ -43,7 +43,7 @@ export default function SubmissionEditForm({
     reset,
     formState: { errors },
   } = useForm<ShachuHakuFormData>({
-    resolver: zodResolver(ShachuHakuFormSchema),
+    resolver: zodResolver(ShachuHakuFormEditSchema),
     defaultValues: {
       name: '',
       lat: '35.3325289',
@@ -73,10 +73,11 @@ export default function SubmissionEditForm({
       overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      isFree: true,
+      isFree: undefined,
       pricePerNight: '',
       priceNote: '',
       capacity: '',
+      capacityLarge: '',
       restrictions: '',
       amenities: '',
       notes: '',
@@ -118,7 +119,8 @@ export default function SubmissionEditForm({
         isFree: submission.isFree,
         pricePerNight: submission.pricePerNight?.toString() || '',
         priceNote: submission.priceNote || '',
-        capacity: '1', // デフォルト値
+        capacity: '',
+        capacityLarge: '',
         restrictions: '',
         amenities: '',
         notes: submission.notes || '',
@@ -234,6 +236,9 @@ export default function SubmissionEditForm({
       if (data.capacity && data.capacity.trim() !== '') {
         formData.append('capacity', data.capacity);
       }
+      if (data.capacityLarge && data.capacityLarge.trim() !== '') {
+        formData.append('capacityLarge', data.capacityLarge);
+      }
       if (data.pricePerNight && data.pricePerNight.trim() !== '') {
         formData.append('pricePerNight', data.pricePerNight);
       }
@@ -241,7 +246,9 @@ export default function SubmissionEditForm({
       // Handle boolean fields
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      formData.append('isFree', data.isFree.toString());
+      if (data.isFree !== undefined) {
+        formData.append('isFree', data.isFree.toString());
+      }
 
       // Handle array fields
       formData.append('restrictions', data.restrictions);

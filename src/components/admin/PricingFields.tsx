@@ -22,8 +22,8 @@ export function PricingFields({ register, watch, setValue, errors }: PricingFiel
       <div>
         <Label className="after:content-['*'] after:ml-0.5 after:text-red-500">費用</Label>
         <RadioGroup
-          value={isFree || ''}
-          onValueChange={(value) => setValue('isFree', value as 'free' | 'paid', { shouldValidate: true })}
+          value={isFree === undefined ? '' : isFree ? 'free' : 'paid'}
+          onValueChange={(value) => setValue('isFree', value === 'free', { shouldValidate: true })}
           className='flex flex-row space-x-4 mt-2'
         >
           <div className='flex items-center space-x-2'>
@@ -39,7 +39,7 @@ export function PricingFields({ register, watch, setValue, errors }: PricingFiel
           <p className='text-sm text-red-500 mt-1'>{errors.isFree.message}</p>
         )}
       </div>
-      {isFree === 'paid' && (
+      {isFree === false && (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
             <Label htmlFor='pricePerNight'>一泊料金 (円)</Label>
