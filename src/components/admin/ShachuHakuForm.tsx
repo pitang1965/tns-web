@@ -17,7 +17,7 @@ import {
   updateCampingSpot,
   deleteCampingSpot,
 } from '../../app/actions/campingSpots';
-import { ShachuHakuFormSchema, ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormCreateSchema, ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
 import { RatingFields } from './RatingFields';
@@ -51,11 +51,11 @@ export default function ShachuHakuForm({
     reset,
     formState: { errors },
   } = useForm<ShachuHakuFormData>({
-    resolver: zodResolver(ShachuHakuFormSchema),
+    resolver: zodResolver(isEdit ? ShachuHakuFormEditSchema : ShachuHakuFormCreateSchema),
     defaultValues: {
       name: '',
-      lat: '35.3325289',　// 相模湾
-      lng: '139.5631214',　// 相模湾
+      lat: '',
+      lng: '',
       prefecture: '',
       address: '',
       url: '',
@@ -83,7 +83,7 @@ export default function ShachuHakuForm({
       overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      isFree: true,
+      isFree: undefined as any,
       pricePerNight: '',
       priceNote: '',
       capacity: '',
@@ -127,7 +127,7 @@ export default function ShachuHakuForm({
         overallRating: (spot as any).overallRating?.toString() || '',
         hasRoof: spot.hasRoof,
         hasPowerOutlet: spot.hasPowerOutlet,
-        isFree: spot.pricing.isFree,
+        isFree: spot.pricing.isFree ? 'free' : 'paid',
         pricePerNight: spot.pricing.pricePerNight?.toString() || '',
         priceNote: spot.pricing.priceNote || '',
         capacity: spot.capacity?.toString() || '',
@@ -148,8 +148,8 @@ export default function ShachuHakuForm({
       // 新規作成の場合はデフォルト値にリセット
       reset({
         name: '',
-        lat: '35.3325289',
-        lng: '139.5631214',
+        lat: '',
+        lng: '',
         prefecture: '',
         address: '',
         url: '',
@@ -177,7 +177,7 @@ export default function ShachuHakuForm({
         overallRating: '',
         hasRoof: false,
         hasPowerOutlet: false,
-        isFree: true,
+        isFree: undefined as any,
         pricePerNight: '',
         priceNote: '',
         capacity: '',
@@ -284,7 +284,7 @@ export default function ShachuHakuForm({
       // Handle boolean fields
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      formData.append('isFree', data.isFree.toString());
+      formData.append('isFree', (data.isFree === 'free').toString());
 
       // Handle array fields
       formData.append('restrictions', data.restrictions);
@@ -379,6 +379,7 @@ export default function ShachuHakuForm({
               register={register}
               errors={errors}
               watch={watch}
+              spot={spot}
             />
 
             <FeatureFields

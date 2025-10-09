@@ -2,7 +2,8 @@
 
 import { z } from 'zod';
 
-export const ShachuHakuFormSchema = z.object({
+// 新規作成用（標高必須）
+export const ShachuHakuFormCreateSchema = z.object({
   name: z.string().min(1, '名称を入力してください'),
   lat: z.string().min(1, '緯度を入力してください').refine(
     (val) => !isNaN(Number(val)) && Number(val) >= -90 && Number(val) <= 90,
@@ -55,8 +56,8 @@ export const ShachuHakuFormSchema = z.object({
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -180 && Number(val) <= 180),
     { message: '有効な経度を入力してください（-180〜180）' }
   ),
-  elevation: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+  elevation: z.string().min(1, '標高を入力してください').refine(
+    (val) => !isNaN(Number(val)) && Number(val) >= 0,
     { message: '有効な数値を入力してください（0以上）' }
   ),
   // 新評価システム（客観的データ） - フラット構造
@@ -81,7 +82,9 @@ export const ShachuHakuFormSchema = z.object({
   ),
   hasRoof: z.boolean(),
   hasPowerOutlet: z.boolean(),
-  isFree: z.boolean(),
+  isFree: z.enum(['free', 'paid'] as const, {
+    errorMap: () => ({ message: '無料か有料かを選択してください' })
+  }),
   pricePerNight: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
@@ -96,4 +99,17 @@ export const ShachuHakuFormSchema = z.object({
   notes: z.string().optional(),
 });
 
-export type ShachuHakuFormData = z.infer<typeof ShachuHakuFormSchema>;
+// 編集用（標高任意）
+export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema.extend({
+  elevation: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+    { message: '有効な数値を入力してください（0以上）' }
+  ),
+});
+
+export const ShachuHakuFormSchema = ShachuHakuFormCreateSchema;
+
+// 両方のスキーマに対応する共通の型（elevationをオプショナルにする）
+export type ShachuHakuFormData = Omit<z.infer<typeof ShachuHakuFormCreateSchema>, 'elevation'> & {
+  elevation?: string;
+};

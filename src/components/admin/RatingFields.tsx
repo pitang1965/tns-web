@@ -11,9 +11,10 @@ interface RatingFieldsProps {
   register: UseFormRegister<ShachuHakuFormData>;
   errors: FieldErrors<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;
+  spot?: any;
 }
 
-export function RatingFields({ register, errors, watch }: RatingFieldsProps) {
+export function RatingFields({ register, errors, watch, spot }: RatingFieldsProps) {
   const handleCheckElevation = () => {
     const lat = watch('lat');
     const lng = watch('lng');
@@ -23,6 +24,7 @@ export function RatingFields({ register, errors, watch }: RatingFieldsProps) {
       window.open(url, '_blank');
     }
   };
+
   return (
     <div className='space-y-6'>
       {/* セキュリティ関連 */}
@@ -123,7 +125,12 @@ export function RatingFields({ register, errors, watch }: RatingFieldsProps) {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           <div>
             <div className='flex items-center justify-between mb-1'>
-              <Label htmlFor='elevation'>標高 (m)</Label>
+              <Label
+                htmlFor='elevation'
+                className={!spot ? "after:content-['*'] after:ml-0.5 after:text-red-500" : ""}
+              >
+                標高 (m)
+              </Label>
               <Button
                 type='button'
                 variant='outline'
@@ -140,7 +147,7 @@ export function RatingFields({ register, errors, watch }: RatingFieldsProps) {
               type='number'
               min='0'
               {...register('elevation')}
-              placeholder='標高(m)または空欄'
+              placeholder='標高（メートル）'
             />
             {errors.elevation && (
               <p className='text-sm text-red-500'>{errors.elevation.message}</p>

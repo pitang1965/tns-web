@@ -88,14 +88,14 @@ export function BasicInfoFields({
       {/* Basic Info */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
-          <Label htmlFor='name'>名称 *</Label>
+          <Label htmlFor='name' className="after:content-['*'] after:ml-0.5 after:text-red-500">名称</Label>
           <Input id='name' {...register('name')} placeholder='名称を入力' />
           {errors.name && (
             <p className='text-sm text-red-500'>{errors.name.message}</p>
           )}
         </div>
         <div>
-          <Label htmlFor='prefecture'>都道府県 *</Label>
+          <Label htmlFor='prefecture' className="after:content-['*'] after:ml-0.5 after:text-red-500">都道府県</Label>
           <Select
             onValueChange={(value) => setValue('prefecture', value)}
             defaultValue={spot?.prefecture}
@@ -121,14 +121,14 @@ export function BasicInfoFields({
       <div className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
-            <Label htmlFor='lat'>緯度 *</Label>
+            <Label htmlFor='lat' className="after:content-['*'] after:ml-0.5 after:text-red-500">緯度</Label>
             <Input id='lat' type='number' step='any' {...register('lat')} />
             {errors.lat && (
               <p className='text-sm text-red-500'>{errors.lat.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor='lng'>経度 *</Label>
+            <Label htmlFor='lng' className="after:content-['*'] after:ml-0.5 after:text-red-500">経度</Label>
             <Input id='lng' type='number' step='any' {...register('lng')} />
             {errors.lng && (
               <p className='text-sm text-red-500'>{errors.lng.message}</p>
@@ -224,9 +224,9 @@ export function BasicInfoFields({
       </div>
 
       {/* Type and Basic Properties */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
-          <Label htmlFor='type'>種別 *</Label>
+          <Label htmlFor='type' className="after:content-['*'] after:ml-0.5 after:text-red-500">種別</Label>
           <Select
             onValueChange={(value) =>
               setValue('type', value as CampingSpotType)
