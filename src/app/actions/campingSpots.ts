@@ -175,6 +175,10 @@ function convertFormDataToCampingSpot(formObject: Record<string, any>) {
       formObject.capacity && formObject.capacity.trim() !== ''
         ? Number(formObject.capacity)
         : undefined,
+    capacityLarge:
+      formObject.capacityLarge && formObject.capacityLarge.trim() !== ''
+        ? Number(formObject.capacityLarge)
+        : undefined,
     restrictions: formObject.restrictions
       ? formObject.restrictions
           .split(',')

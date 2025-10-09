@@ -248,18 +248,38 @@ export function BasicInfoFields({
             <p className='text-sm text-red-500'>{errors.type.message}</p>
           )}
         </div>
-        <div>
-          <Label htmlFor='capacity'>収容台数</Label>
-          <Input
-            id='capacity'
-            type='number'
-            min='1'
-            placeholder='台数または空欄'
-            {...register('capacity')}
-          />
-          {errors.capacity && (
-            <p className='text-sm text-red-500'>{errors.capacity.message}</p>
-          )}
+      </div>
+
+      {/* Capacity */}
+      <div className='space-y-3'>
+        <Label className='text-base font-semibold'>収容台数</Label>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div>
+            <Label htmlFor='capacity'>普通車</Label>
+            <Input
+              id='capacity'
+              type='number'
+              min='1'
+              placeholder='台数または空欄'
+              {...register('capacity')}
+            />
+            {errors.capacity && (
+              <p className='text-sm text-red-500'>{errors.capacity.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor='capacityLarge'>大型車</Label>
+            <Input
+              id='capacityLarge'
+              type='number'
+              min='1'
+              placeholder='台数または空欄'
+              {...register('capacityLarge')}
+            />
+            {errors.capacityLarge && (
+              <p className='text-sm text-red-500'>{errors.capacityLarge.message}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

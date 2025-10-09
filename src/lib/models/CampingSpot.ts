@@ -36,7 +36,8 @@ export interface ICampingSpot extends Document {
     pricePerNight?: number;
     priceNote?: string;
   };
-  capacity?: number; // number of vehicles
+  capacity?: number; // number of regular vehicles
+  capacityLarge?: number; // number of large vehicles
   restrictions: string[];
   amenities: string[];
   notes?: string;
@@ -186,6 +187,10 @@ const campingSpotSchema = new Schema<ICampingSpot>({
     },
   },
   capacity: {
+    type: Number,
+    min: 1,
+  },
+  capacityLarge: {
     type: Number,
     min: 1,
   },

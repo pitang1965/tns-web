@@ -87,6 +87,7 @@ export default function ShachuHakuForm({
       pricePerNight: '',
       priceNote: '',
       capacity: '',
+      capacityLarge: '',
       restrictions: '',
       amenities: '',
       notes: '',
@@ -127,10 +128,11 @@ export default function ShachuHakuForm({
         overallRating: (spot as any).overallRating?.toString() || '',
         hasRoof: spot.hasRoof,
         hasPowerOutlet: spot.hasPowerOutlet,
-        isFree: spot.pricing.isFree ? 'free' : 'paid',
+        isFree: (spot.pricing.isFree ? 'free' : 'paid') as 'free' | 'paid',
         pricePerNight: spot.pricing.pricePerNight?.toString() || '',
         priceNote: spot.pricing.priceNote || '',
         capacity: spot.capacity?.toString() || '',
+        capacityLarge: spot.capacityLarge?.toString() || '',
         restrictions: spot.restrictions.join(', '),
         amenities: spot.amenities.join(', '),
         notes: spot.notes || ''
@@ -181,6 +183,7 @@ export default function ShachuHakuForm({
         pricePerNight: '',
         priceNote: '',
         capacity: '',
+        capacityLarge: '',
         restrictions: '',
         amenities: '',
         notes: ''
@@ -276,6 +279,9 @@ export default function ShachuHakuForm({
       }
       if (data.capacity && data.capacity.trim() !== '') {
         formData.append('capacity', data.capacity);
+      }
+      if (data.capacityLarge && data.capacityLarge.trim() !== '') {
+        formData.append('capacityLarge', data.capacityLarge);
       }
       if (data.pricePerNight && data.pricePerNight.trim() !== '') {
         formData.append('pricePerNight', data.pricePerNight);

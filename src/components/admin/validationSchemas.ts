@@ -94,6 +94,10 @@ export const ShachuHakuFormCreateSchema = z.object({
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1),
     { message: '有効な数値を入力してください（1以上）' }
   ),
+  capacityLarge: z.string().optional().refine(
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1),
+    { message: '有効な数値を入力してください（1以上）' }
+  ),
   restrictions: z.string(),
   amenities: z.string(),
   notes: z.string().optional(),

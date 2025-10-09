@@ -63,6 +63,7 @@ export const CampingSpotSchema = z.object({
   hasPowerOutlet: z.boolean().default(false),
   pricing: CampingSpotPricingSchema,
   capacity: z.number().int().min(1, '収容台数は1以上で入力してください').optional(),
+  capacityLarge: z.number().int().min(1, '大型車収容台数は1以上で入力してください').optional(),
   restrictions: z.array(z.string().trim()).default([]),
   amenities: z.array(z.string().trim()).default([]),
   notes: z.string().trim().optional(),
@@ -176,6 +177,12 @@ export const CampingSpotCSVSchema = z.object({
   }, {
     message: "収容台数は空欄または1以上の整数で入力してください",
   }).optional().default(''),
+  capacityLarge: z.string().refine((val) => {
+    const num = Number(val);
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1);
+  }, {
+    message: "大型車収容台数は空欄または1以上の整数で入力してください",
+  }).optional().default(''),
   restrictions: z.string().trim().optional().default(''),
   amenities: z.string().trim().optional().default(''),
   notes: z.string().trim().optional().default(''),
@@ -275,6 +282,12 @@ export const CampingSpotCSVJapaneseSchema = z.object({
     return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1);
   }, {
     message: "収容台数は空欄または1以上の整数で入力してください",
+  }).optional().default(''),
+  '大型車収容台数': z.string().refine((val) => {
+    const num = Number(val);
+    return val === '' || (!isNaN(num) && Number.isInteger(num) && num >= 1);
+  }, {
+    message: "大型車収容台数は空欄または1以上の整数で入力してください",
   }).optional().default(''),
   '制限事項': z.string().trim().optional().default(''),
   '設備': z.string().trim().optional().default(''),
@@ -386,6 +399,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
       priceNote: csvRow.priceNote || undefined,
     },
     capacity: csvRow.capacity ? Number(csvRow.capacity) : undefined,
+    capacityLarge: csvRow.capacityLarge ? Number(csvRow.capacityLarge) : undefined,
     restrictions: csvRow.restrictions ? csvRow.restrictions.split(',').map(r => r.trim()).filter(r => r) : [],
     amenities: csvRow.amenities ? csvRow.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
     notes: csvRow.notes || undefined,
@@ -430,6 +444,7 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
       priceNote: csvRow['料金備考'] || undefined,
     },
     capacity: csvRow['収容台数'] ? Number(csvRow['収容台数']) : undefined,
+    capacityLarge: csvRow['大型車収容台数'] ? Number(csvRow['大型車収容台数']) : undefined,
     restrictions: csvRow['制限事項'] ? csvRow['制限事項'].split(',').map(r => r.trim()).filter(r => r) : [],
     amenities: csvRow['設備'] ? csvRow['設備'].split(',').map(a => a.trim()).filter(a => a) : [],
     notes: csvRow['備考'] || undefined,
