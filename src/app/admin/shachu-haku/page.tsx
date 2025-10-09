@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -105,6 +106,7 @@ const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
 export default function ShachuHakuAdminPage() {
   const { user, isLoading } = useUser();
   const { toast } = useToast();
+  const router = useRouter();
 
   // Check if user is admin
   const isAdmin =
@@ -342,8 +344,8 @@ export default function ShachuHakuAdminPage() {
   }, []);
 
   const handleSpotSelect = (spot: CampingSpotWithId) => {
-    setSelectedSpot(spot);
-    setShowForm(true);
+    // Navigate to the edit page with the spot ID
+    router.push(`/admin/shachu-haku/${spot._id}`);
   };
 
   const handleFormClose = () => {
@@ -878,16 +880,17 @@ export default function ShachuHakuAdminPage() {
                             )}
                           </div>
                           <div className='flex gap-2'>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSpotSelect(spot);
-                              }}
-                            >
-                              <Edit className='w-4 h-4' />
-                            </Button>
+                            <Link href={`/admin/shachu-haku/${spot._id}`}>
+                              <Button
+                                size='sm'
+                                variant='outline'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <Edit className='w-4 h-4' />
+                              </Button>
+                            </Link>
                           </div>
                         </div>
                       </div>
