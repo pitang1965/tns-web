@@ -24,6 +24,8 @@ import {
   Search,
   Edit,
   Users,
+  Navigation,
+  Filter,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -39,6 +41,11 @@ import {
   calculateSecurityLevel,
   calculateQuietnessLevel,
 } from '@/lib/campingSpotUtils';
+import {
+  PREFECTURE_COORDINATES,
+  REGION_COORDINATES,
+} from '@/lib/prefectureCoordinates';
+import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -123,8 +130,13 @@ export default function ShachuHakuAdminPage() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'map' | 'list'>('map');
   const [searchTerm, setSearchTerm] = useState('');
-  const [prefectureFilter, setPrefectureFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+
+  // Map state for jump functionality
+  const [mapCenter, setMapCenter] = useState<[number, number]>([
+    138.2529, 36.2048,
+  ]); // Japan center
+  const [mapZoom, setMapZoom] = useState(5);
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
@@ -143,7 +155,6 @@ export default function ShachuHakuAdminPage() {
   const initialLoadDoneRef = useRef(false);
   const filtersRef = useRef({
     searchTerm: '',
-    prefectureFilter: 'all',
     typeFilter: 'all',
   });
   const lastLoadedBoundsRef = useRef<{
@@ -189,14 +200,17 @@ export default function ShachuHakuAdminPage() {
   };
 
   // Load spots for list view with pagination - NO dependencies
-  const loadListSpotsRef = useRef<((
-    page: number,
-    filters?: {
-      searchTerm?: string;
-      prefecture?: string;
-      type?: string;
-    }
-  ) => Promise<void>) | null>(null);
+  const loadListSpotsRef = useRef<
+    | ((
+        page: number,
+        filters?: {
+          searchTerm?: string;
+          prefecture?: string;
+          type?: string;
+        }
+      ) => Promise<void>)
+    | null
+  >(null);
   loadListSpotsRef.current = async (
     page: number,
     filters?: {
@@ -230,26 +244,35 @@ export default function ShachuHakuAdminPage() {
 
   // Update filters ref whenever they change
   useEffect(() => {
-    filtersRef.current = { searchTerm, prefectureFilter, typeFilter };
-  }, [searchTerm, prefectureFilter, typeFilter]);
+    filtersRef.current = { searchTerm, typeFilter };
+  }, [searchTerm, typeFilter]);
 
   // Helper function to check if bounds have significantly changed
   const boundsHaveChanged = (
-    oldBounds: { north: number; south: number; east: number; west: number } | null,
+    oldBounds: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    } | null,
     newBounds: { north: number; south: number; east: number; west: number }
   ): boolean => {
     if (!oldBounds) return true;
 
     // Calculate the difference as a percentage of the current view
-    const latDiff = Math.abs(newBounds.north - oldBounds.north) + Math.abs(newBounds.south - oldBounds.south);
-    const lngDiff = Math.abs(newBounds.east - oldBounds.east) + Math.abs(newBounds.west - oldBounds.west);
+    const latDiff =
+      Math.abs(newBounds.north - oldBounds.north) +
+      Math.abs(newBounds.south - oldBounds.south);
+    const lngDiff =
+      Math.abs(newBounds.east - oldBounds.east) +
+      Math.abs(newBounds.west - oldBounds.west);
 
     const latRange = newBounds.north - newBounds.south;
     const lngRange = newBounds.east - newBounds.west;
 
     // Only reload if bounds changed by more than 5% of current view
     const threshold = 0.05;
-    return (latDiff / latRange > threshold) || (lngDiff / lngRange > threshold);
+    return latDiff / latRange > threshold || lngDiff / lngRange > threshold;
   };
 
   // Handle bounds change with debounce - stable function with NO dependencies
@@ -271,10 +294,7 @@ export default function ShachuHakuAdminPage() {
 
         const filters = {
           searchTerm: filtersRef.current.searchTerm || undefined,
-          prefecture:
-            filtersRef.current.prefectureFilter !== 'all'
-              ? filtersRef.current.prefectureFilter
-              : undefined,
+          prefecture: undefined,
           type:
             filtersRef.current.typeFilter !== 'all'
               ? filtersRef.current.typeFilter
@@ -291,17 +311,14 @@ export default function ShachuHakuAdminPage() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, prefectureFilter, typeFilter]);
+  }, [searchTerm, typeFilter]);
 
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {
     if (activeTab === 'list') {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -309,21 +326,22 @@ export default function ShachuHakuAdminPage() {
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
-  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter]);
+  }, [activeTab, currentPage, searchTerm, typeFilter]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!
   useEffect(() => {
-    if (activeTab === 'map' && mapBoundsRef.current && initialLoadDoneRef.current) {
+    if (
+      activeTab === 'map' &&
+      mapBoundsRef.current &&
+      initialLoadDoneRef.current
+    ) {
       // Reset last loaded bounds to force reload when filters change
       lastLoadedBoundsRef.current = null;
 
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -332,7 +350,7 @@ export default function ShachuHakuAdminPage() {
       loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
       lastLoadedBoundsRef.current = mapBoundsRef.current; // Update after loading
     }
-  }, [searchTerm, prefectureFilter, typeFilter, activeTab]); // mapBounds removed!
+  }, [searchTerm, typeFilter, activeTab]); // mapBounds removed!
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -353,15 +371,62 @@ export default function ShachuHakuAdminPage() {
     setSelectedSpot(null);
   };
 
+  // Handle prefecture jump
+  const handlePrefectureJump = (prefecture: string) => {
+    const coords = PREFECTURE_COORDINATES[prefecture];
+    if (coords) {
+      setMapCenter([coords.lng, coords.lat]);
+      setMapZoom(coords.zoom);
+    }
+  };
+
+  // Handle region jump
+  const handleRegionJump = (region: string) => {
+    const coords = REGION_COORDINATES[region];
+    if (coords) {
+      setMapCenter([coords.lng, coords.lat]);
+      setMapZoom(coords.zoom);
+    }
+  };
+
+  // Handle current location jump
+  const handleCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: 'エラー',
+        description: 'お使いのブラウザは位置情報取得に対応していません',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setMapCenter([position.coords.longitude, position.coords.latitude]);
+        setMapZoom(12);
+        toast({
+          title: '成功',
+          description: '現在地に移動しました',
+        });
+      },
+      (error) => {
+        toast({
+          title: 'エラー',
+          description:
+            '位置情報の取得に失敗しました。ブラウザの設定を確認してください。',
+          variant: 'destructive',
+        });
+        console.error('Geolocation error:', error);
+      }
+    );
+  };
+
   const handleFormSuccess = () => {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -371,10 +436,7 @@ export default function ShachuHakuAdminPage() {
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -397,10 +459,7 @@ export default function ShachuHakuAdminPage() {
     if (activeTab === 'list') {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -410,10 +469,7 @@ export default function ShachuHakuAdminPage() {
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
         searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture:
-          filtersRef.current.prefectureFilter !== 'all'
-            ? filtersRef.current.prefectureFilter
-            : undefined,
+        prefecture: undefined,
         type:
           filtersRef.current.typeFilter !== 'all'
             ? filtersRef.current.typeFilter
@@ -631,51 +687,15 @@ export default function ShachuHakuAdminPage() {
       </div>
 
       <div className='w-full'>
-        {/* Common Filters */}
-        <Card className='mb-6'>
-          <CardContent className='pt-6'>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='relative'>
-                <Search className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
-                <Input
-                  placeholder='名前で検索...'
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className='pl-10'
-                />
-              </div>
-              <Select
-                value={prefectureFilter}
-                onValueChange={setPrefectureFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder='全都道府県' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>全都道府県</SelectItem>
-                  {PrefectureOptions.map((prefecture) => (
-                    <SelectItem key={prefecture} value={prefecture}>
-                      {prefecture}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder='全種別' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <ShachuHakuFilters
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          onPrefectureJump={handlePrefectureJump}
+          onRegionJump={handleRegionJump}
+          onCurrentLocation={handleCurrentLocation}
+        />
 
         {/* Tab Navigation */}
         <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
@@ -718,10 +738,12 @@ export default function ShachuHakuAdminPage() {
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
-                key="shachu-haku-admin-map"
+                key='shachu-haku-admin-map'
                 spots={spots}
                 onSpotSelect={handleSpotSelect}
                 onBoundsChange={handleBoundsChange}
+                initialCenter={mapCenter}
+                initialZoom={mapZoom}
                 onCreateSpot={(coordinates) => {
                   setSelectedSpot({
                     coordinates,

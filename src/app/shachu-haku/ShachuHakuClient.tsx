@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MapPin, Filter, Search, Info, Plus } from 'lucide-react';
+import { MapPin, Search, Info, Plus, Navigation, Filter } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
@@ -32,6 +32,11 @@ import {
   calculateSecurityLevel,
   calculateQuietnessLevel,
 } from '@/lib/campingSpotUtils';
+import {
+  PREFECTURE_COORDINATES,
+  REGION_COORDINATES,
+} from '@/lib/prefectureCoordinates';
+import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -99,10 +104,6 @@ export default function ShachuHakuClient() {
   const [searchTerm, setSearchTerm] = useState(() => {
     // URLパラメータから検索クエリを取得
     return searchParams.get('q') || '';
-  });
-  const [prefectureFilter, setPrefectureFilter] = useState(() => {
-    // URLパラメータから都道府県フィルターを取得
-    return searchParams.get('prefecture') || 'all';
   });
   const [typeFilter, setTypeFilter] = useState(() => {
     // URLパラメータから種別フィルターを取得
@@ -254,8 +255,8 @@ export default function ShachuHakuClient() {
 
   // Update filters ref whenever they change
   useEffect(() => {
-    filtersRef.current = { searchTerm, prefectureFilter, typeFilter };
-  }, [searchTerm, prefectureFilter, typeFilter]);
+    filtersRef.current = { searchTerm, prefectureFilter: 'all', typeFilter };
+  }, [searchTerm, typeFilter]);
 
   // Helper function to check if bounds have significantly changed
   const boundsHaveChanged = (
@@ -342,11 +343,6 @@ export default function ShachuHakuClient() {
       params.set('q', searchTerm);
     }
 
-    // Add prefecture filter
-    if (prefectureFilter && prefectureFilter !== 'all') {
-      params.set('prefecture', prefectureFilter);
-    }
-
     // Add type filter
     if (typeFilter && typeFilter !== 'all') {
       params.set('type', typeFilter);
@@ -372,7 +368,6 @@ export default function ShachuHakuClient() {
     router.replace(newUrl, { scroll: false });
   }, [
     searchTerm,
-    prefectureFilter,
     typeFilter,
     activeTab,
     mapZoom,
@@ -384,13 +379,15 @@ export default function ShachuHakuClient() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, prefectureFilter, typeFilter]);
+  }, [searchTerm, typeFilter]);
 
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {
     if (activeTab === 'list') {
       // Use savedBounds if available (from map), otherwise calculate from zoom and center
-      let bounds: { north: number; south: number; east: number; west: number } | undefined;
+      let bounds:
+        | { north: number; south: number; east: number; west: number }
+        | undefined;
       if (savedBounds) {
         bounds = savedBounds;
       } else if (mapZoom && mapCenter) {
@@ -411,12 +408,24 @@ export default function ShachuHakuClient() {
       };
       loadListSpotsRef.current?.(currentPage, filters);
     }
-  }, [activeTab, currentPage, searchTerm, prefectureFilter, typeFilter, savedBounds, mapZoom, mapCenter]);
+  }, [
+    activeTab,
+    currentPage,
+    searchTerm,
+    typeFilter,
+    savedBounds,
+    mapZoom,
+    mapCenter,
+  ]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   // DO NOT include mapBounds in dependencies - it causes infinite loop!
   useEffect(() => {
-    if (activeTab === 'map' && mapBoundsRef.current && initialLoadDoneRef.current) {
+    if (
+      activeTab === 'map' &&
+      mapBoundsRef.current &&
+      initialLoadDoneRef.current
+    ) {
       // Reset last loaded bounds to force reload when filters change
       lastLoadedBoundsRef.current = null;
 
@@ -434,7 +443,7 @@ export default function ShachuHakuClient() {
       loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
       lastLoadedBoundsRef.current = mapBoundsRef.current; // Update after loading
     }
-  }, [searchTerm, prefectureFilter, typeFilter, activeTab]); // mapBounds removed!
+  }, [searchTerm, typeFilter, activeTab]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -462,6 +471,56 @@ export default function ShachuHakuClient() {
   const handleTabChange = (tab: 'map' | 'list') => {
     setActiveTab(tab);
     // URL update is handled by useEffect
+  };
+
+  // Handle prefecture jump
+  const handlePrefectureJump = (prefecture: string) => {
+    const coords = PREFECTURE_COORDINATES[prefecture];
+    if (coords) {
+      setMapCenter([coords.lng, coords.lat]);
+      setMapZoom(coords.zoom);
+    }
+  };
+
+  // Handle region jump
+  const handleRegionJump = (region: string) => {
+    const coords = REGION_COORDINATES[region];
+    if (coords) {
+      setMapCenter([coords.lng, coords.lat]);
+      setMapZoom(coords.zoom);
+    }
+  };
+
+  // Handle current location jump
+  const handleCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: 'エラー',
+        description: 'お使いのブラウザは位置情報取得に対応していません',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setMapCenter([position.coords.longitude, position.coords.latitude]);
+        setMapZoom(12);
+        toast({
+          title: '成功',
+          description: '現在地に移動しました',
+        });
+      },
+      (error) => {
+        toast({
+          title: 'エラー',
+          description:
+            '位置情報の取得に失敗しました。ブラウザの設定を確認してください。',
+          variant: 'destructive',
+        });
+        console.error('Geolocation error:', error);
+      }
+    );
   };
 
   return (
@@ -495,51 +554,15 @@ export default function ShachuHakuClient() {
       </div>
 
       <div className='w-full'>
-        {/* Common Filters */}
-        <Card className='mb-6'>
-          <CardContent className='pt-6'>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='relative'>
-                <Search className='absolute left-3 top-3 h-4 w-4 text-gray-400' />
-                <Input
-                  placeholder='名前で検索...'
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className='pl-10'
-                />
-              </div>
-              <Select
-                value={prefectureFilter}
-                onValueChange={setPrefectureFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder='全都道府県' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>全都道府県</SelectItem>
-                  {PrefectureOptions.map((prefecture) => (
-                    <SelectItem key={prefecture} value={prefecture}>
-                      {prefecture}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder='全種別' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <ShachuHakuFilters
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          onPrefectureJump={handlePrefectureJump}
+          onRegionJump={handleRegionJump}
+          onCurrentLocation={handleCurrentLocation}
+        />
 
         {/* Tab Navigation */}
         <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
@@ -603,7 +626,8 @@ export default function ShachuHakuClient() {
                   <div className='flex items-start gap-2'>
                     <Info className='w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5' />
                     <div className='text-sm text-blue-800 dark:text-blue-200'>
-                      <strong>地図表示の範囲内</strong>のスポットを表示しています。より広い範囲のスポットを表示するには、地図表示でズームアウトしてから一覧表示に切り替えてください。
+                      <strong>地図表示の範囲内</strong>
+                      のスポットを表示しています。より広い範囲のスポットを表示するには、地図表示でズームアウトしてから一覧表示に切り替えてください。
                     </div>
                   </div>
                 </CardContent>

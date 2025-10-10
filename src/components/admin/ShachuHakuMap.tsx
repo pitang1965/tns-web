@@ -38,6 +38,8 @@ interface ShachuHakuMapProps {
     east: number;
     west: number;
   }) => void;
+  initialCenter?: [number, number];
+  initialZoom?: number;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -47,6 +49,8 @@ export default function ShachuHakuMap({
   onSpotSelect,
   onCreateSpot,
   onBoundsChange,
+  initialCenter = [139.6917, 35.6895],
+  initialZoom = 9,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -134,8 +138,8 @@ export default function ShachuHakuMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [139.6917, 35.6895], // 東京
-      zoom: 9, // 関東地域が見えるズームレベル
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 6, //  全国表示を防ぐための最小ズーム（北海道は表示できる）
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
@@ -406,6 +410,31 @@ export default function ShachuHakuMap({
     // After initial load, only respond to user interactions
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only run on initial map load
+
+  // Update map center and zoom when props change (for jump functionality)
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    // Get current center and zoom
+    const currentCenter = map.current.getCenter();
+    const currentZoom = map.current.getZoom();
+
+    // Check if center or zoom has changed significantly
+    const centerChanged =
+      Math.abs(currentCenter.lng - initialCenter[0]) > 0.001 ||
+      Math.abs(currentCenter.lat - initialCenter[1]) > 0.001;
+    const zoomChanged = Math.abs(currentZoom - initialZoom) > 0.1;
+
+    // If changed, update the map (this is programmatic, not user interaction)
+    if (centerChanged || zoomChanged) {
+      isUserInteractionRef.current = false; // Mark as programmatic change
+      map.current.flyTo({
+        center: initialCenter,
+        zoom: initialZoom,
+        duration: 1000, // Smooth animation
+      });
+    }
+  }, [initialCenter, initialZoom, mapLoaded]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on calculated security level

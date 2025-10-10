@@ -484,6 +484,31 @@ export default function ShachuHakuMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only run on initial map load
 
+  // Update map center and zoom when props change (for jump functionality)
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    // Get current center and zoom
+    const currentCenter = map.current.getCenter();
+    const currentZoom = map.current.getZoom();
+
+    // Check if center or zoom has changed significantly
+    const centerChanged =
+      Math.abs(currentCenter.lng - initialCenter[0]) > 0.001 ||
+      Math.abs(currentCenter.lat - initialCenter[1]) > 0.001;
+    const zoomChanged = Math.abs(currentZoom - initialZoom) > 0.1;
+
+    // If changed, update the map (this is programmatic, not user interaction)
+    if (centerChanged || zoomChanged) {
+      isUserInteractionRef.current = false; // Mark as programmatic change
+      map.current.flyTo({
+        center: initialCenter,
+        zoom: initialZoom,
+        duration: 1000, // Smooth animation
+      });
+    }
+  }, [initialCenter, initialZoom, mapLoaded]);
+
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on overall rating
     const rating = calculateSecurityLevel(spot);
