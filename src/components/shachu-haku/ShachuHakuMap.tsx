@@ -567,8 +567,11 @@ export default function ShachuHakuMap({
   }
 
   return (
-    <div className='relative'>
-      <div ref={mapContainer} className='h-[600px] w-full rounded-lg' />
+    <div className='relative w-full'>
+      {/* Consistent 16:10 aspect ratio across all devices, with max height limits */}
+      <div className='w-full aspect-[16/10] max-h-[300px] sm:max-h-[600px]'>
+        <div ref={mapContainer} className='w-full h-full rounded-lg' />
+      </div>
       <div className='absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
         <Collapsible
           open={isInstructionsOpen}

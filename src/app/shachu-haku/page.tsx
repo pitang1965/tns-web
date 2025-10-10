@@ -8,17 +8,11 @@ type Props = {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const q = typeof searchParams.q === 'string' && searchParams.q.trim() !== '' ? searchParams.q : undefined;
-  const prefecture = typeof searchParams.prefecture === 'string' && searchParams.prefecture !== 'all' ? searchParams.prefecture : undefined;
   const type = typeof searchParams.type === 'string' && searchParams.type !== 'all' ? searchParams.type : undefined;
 
   // Build dynamic title and description
-  let titleParts: string[] = [];
-  let descriptionParts: string[] = [];
-
-  if (prefecture) {
-    titleParts.push(prefecture);
-    descriptionParts.push(prefecture);
-  }
+  const titleParts: string[] = [];
+  const descriptionParts: string[] = [];
 
   if (type && type in CampingSpotTypeLabels) {
     const typeLabel = CampingSpotTypeLabels[type as keyof typeof CampingSpotTypeLabels];
@@ -41,7 +35,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   // Build URL with current search params for OGP
   const urlParams = new URLSearchParams();
-  if (prefecture) urlParams.set('prefecture', prefecture);
   if (type) urlParams.set('type', type);
   if (q) urlParams.set('q', q);
 
