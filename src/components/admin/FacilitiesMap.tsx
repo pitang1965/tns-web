@@ -226,13 +226,27 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   };
 
   // 座標情報を持つ施設を取得
+  // フォームの値を監視
+  const lat = watch('lat');
+  const lng = watch('lng');
+  const name = watch('name');
+  const nearbyToiletLat = watch('nearbyToiletLat');
+  const nearbyToiletLng = watch('nearbyToiletLng');
+  const distanceToToilet = watch('distanceToToilet');
+  const nearbyConvenienceLat = watch('nearbyConvenienceLat');
+  const nearbyConvenienceLng = watch('nearbyConvenienceLng');
+  const distanceToConvenience = watch('distanceToConvenience');
+  const nearbyBathLat = watch('nearbyBathLat');
+  const nearbyBathLng = watch('nearbyBathLng');
+  const distanceToBath = watch('distanceToBath');
+
   const facilities = useMemo((): FacilityData[] => {
     const result: FacilityData[] = [];
 
     // 車中泊スポット（メイン）
-    const mainLat = parseFloat(watch('lat') || '0');
-    const mainLng = parseFloat(watch('lng') || '0');
-    const mainName = watch('name') || '車中泊スポット';
+    const mainLat = parseFloat(lat || '0');
+    const mainLng = parseFloat(lng || '0');
+    const mainName = name || '車中泊スポット';
 
     if (mainLat && mainLng) {
       result.push({
@@ -240,14 +254,14 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: mainLat,
         lng: mainLng,
         name: mainName,
-        color: getMarkerStyle('camping', currentZoom).color,
+        color: '#e74c3c', // 固定色を使用
       });
     }
 
     // トイレ
-    const toiletLat = parseFloat(watch('nearbyToiletLat') || '0');
-    const toiletLng = parseFloat(watch('nearbyToiletLng') || '0');
-    const toiletDistance = parseFloat(watch('distanceToToilet') || '0');
+    const toiletLat = parseFloat(nearbyToiletLat || '0');
+    const toiletLng = parseFloat(nearbyToiletLng || '0');
+    const toiletDistance = parseFloat(distanceToToilet || '0');
 
     if (toiletLat && toiletLng) {
       result.push({
@@ -255,17 +269,15 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: toiletLat,
         lng: toiletLng,
         name: 'トイレ',
-        color: getMarkerStyle('toilet', currentZoom).color,
+        color: '#3498db', // 固定色を使用
         distance: toiletDistance || undefined,
       });
     }
 
     // コンビニ
-    const convenienceLat = parseFloat(watch('nearbyConvenienceLat') || '0');
-    const convenienceLng = parseFloat(watch('nearbyConvenienceLng') || '0');
-    const convenienceDistance = parseFloat(
-      watch('distanceToConvenience') || '0'
-    );
+    const convenienceLat = parseFloat(nearbyConvenienceLat || '0');
+    const convenienceLng = parseFloat(nearbyConvenienceLng || '0');
+    const convenienceDistance = parseFloat(distanceToConvenience || '0');
 
     if (convenienceLat && convenienceLng) {
       result.push({
@@ -273,15 +285,15 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: convenienceLat,
         lng: convenienceLng,
         name: 'コンビニ',
-        color: getMarkerStyle('convenience', currentZoom).color,
+        color: '#2ecc71', // 固定色を使用
         distance: convenienceDistance || undefined,
       });
     }
 
     // 入浴施設
-    const bathLat = parseFloat(watch('nearbyBathLat') || '0');
-    const bathLng = parseFloat(watch('nearbyBathLng') || '0');
-    const bathDistance = parseFloat(watch('distanceToBath') || '0');
+    const bathLat = parseFloat(nearbyBathLat || '0');
+    const bathLng = parseFloat(nearbyBathLng || '0');
+    const bathDistance = parseFloat(distanceToBath || '0');
 
     if (bathLat && bathLng) {
       result.push({
@@ -289,31 +301,41 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         lat: bathLat,
         lng: bathLng,
         name: '入浴施設',
-        color: getMarkerStyle('bath', currentZoom).color,
+        color: '#f39c12', // 固定色を使用
         distance: bathDistance || undefined,
       });
     }
 
     return result;
   }, [
-    watch('lat'),
-    watch('lng'),
-    watch('name'),
-    watch('nearbyToiletLat'),
-    watch('nearbyToiletLng'),
-    watch('distanceToToilet'),
-    watch('nearbyConvenienceLat'),
-    watch('nearbyConvenienceLng'),
-    watch('distanceToConvenience'),
-    watch('nearbyBathLat'),
-    watch('nearbyBathLng'),
-    watch('distanceToBath'),
-    currentZoom,
+    lat,
+    lng,
+    name,
+    nearbyToiletLat,
+    nearbyToiletLng,
+    distanceToToilet,
+    nearbyConvenienceLat,
+    nearbyConvenienceLng,
+    distanceToConvenience,
+    nearbyBathLat,
+    nearbyBathLng,
+    distanceToBath,
   ]);
 
   // マップの初期化
   useEffect(() => {
-    if (!mapContainer.current || mapInstance.current || !MAPBOX_TOKEN) return;
+    if (!mapContainer.current) {
+      console.warn('[FacilitiesMap] mapContainer is not ready');
+      return;
+    }
+    if (mapInstance.current) {
+      console.log('[FacilitiesMap] Map already initialized');
+      return;
+    }
+    if (!MAPBOX_TOKEN) {
+      console.error('[FacilitiesMap] MAPBOX_TOKEN is not set:', MAPBOX_TOKEN);
+      return;
+    }
 
     // Add CSS for marker styles
     if (!document.getElementById('admin-facility-marker-styles')) {
@@ -510,17 +532,6 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     );
   }
 
-  if (facilities.length === 0) {
-    return (
-      <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-        <h3 className='text-lg font-medium mb-2'>施設マップ</h3>
-        <p className='text-gray-500 text-sm'>
-          座標情報が設定されている施設がありません
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 relative'>
       <div className='flex items-center gap-2 mb-3'>
@@ -535,72 +546,77 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         className='w-full h-[300px] rounded-md overflow-hidden border border-gray-300 dark:border-gray-600'
       />
 
-      {/* 凡例 */}
-      <div className='absolute top-16 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
-        <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
-          <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
-            <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
-              凡例
-            </h4>
-            {isLegendOpen ? (
-              <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-            ) : (
-              <ChevronDown className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent className='px-3 pb-3'>
-            <div className='space-y-2'>
-              {legendItems.map((item) => {
-                const exists = facilityExists(item.type);
+      {facilities.length > 0 && (
+        <>
 
-                // 距離データを取得（座標の有無に関わらず）
-                let distance: number | undefined;
-                if (item.type === 'toilet') {
-                  distance =
-                    parseFloat(watch('distanceToToilet') || '0') || undefined;
-                } else if (item.type === 'convenience') {
-                  distance =
-                    parseFloat(watch('distanceToConvenience') || '0') ||
-                    undefined;
-                } else if (item.type === 'bath') {
-                  distance =
-                    parseFloat(watch('distanceToBath') || '0') || undefined;
-                }
+          {/* 凡例 */}
+          <div className='absolute top-16 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
+            <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
+              <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
+                <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
+                  凡例
+                </h4>
+                {isLegendOpen ? (
+                  <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                ) : (
+                  <ChevronDown className='w-4 h-4 text-gray-600 dark:text-gray-400' />
+                )}
+              </CollapsibleTrigger>
+              <CollapsibleContent className='px-3 pb-3'>
+                <div className='space-y-2'>
+                  {legendItems.map((item) => {
+                    const exists = facilityExists(item.type);
 
-                return (
-                  <div
-                    key={item.type}
-                    className={`flex items-center gap-2 text-sm ${
-                      exists
-                        ? 'text-gray-700 dark:text-gray-300'
-                        : 'text-gray-400 dark:text-gray-500'
-                    }`}
-                  >
-                    <div
-                      className='w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs'
-                      style={{
-                        backgroundColor: exists ? item.color : '#e5e7eb',
-                      }}
-                    >
-                      <span style={{ fontSize: '10px' }}>{item.icon}</span>
-                    </div>
-                    <span>{item.label}</span>
-                    {item.type !== 'camping' && distance && (
-                      <span className='text-xs text-gray-500 dark:text-gray-400'>
-                        ({formatDistance(distance)})
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
+                    // 距離データを取得（座標の有無に関わらず）
+                    let distance: number | undefined;
+                    if (item.type === 'toilet') {
+                      distance =
+                        parseFloat(watch('distanceToToilet') || '0') || undefined;
+                    } else if (item.type === 'convenience') {
+                      distance =
+                        parseFloat(watch('distanceToConvenience') || '0') ||
+                        undefined;
+                    } else if (item.type === 'bath') {
+                      distance =
+                        parseFloat(watch('distanceToBath') || '0') || undefined;
+                    }
 
-      <p className='text-xs text-gray-500 mt-2'>
-        マーカーをクリックすると詳細が表示されます
-      </p>
+                    return (
+                      <div
+                        key={item.type}
+                        className={`flex items-center gap-2 text-sm ${
+                          exists
+                            ? 'text-gray-700 dark:text-gray-300'
+                            : 'text-gray-400 dark:text-gray-500'
+                        }`}
+                      >
+                        <div
+                          className='w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs'
+                          style={{
+                            backgroundColor: exists ? item.color : '#e5e7eb',
+                          }}
+                        >
+                          <span style={{ fontSize: '10px' }}>{item.icon}</span>
+                        </div>
+                        <span>{item.label}</span>
+                        {item.type !== 'camping' && distance && (
+                          <span className='text-xs text-gray-500 dark:text-gray-400'>
+                            ({formatDistance(distance)})
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+
+        <p className='text-xs text-gray-500 mt-2'>
+          マーカーをクリックすると詳細が表示されます
+        </p>
+      </>
+      )}
     </div>
   );
 }
