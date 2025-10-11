@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { formatDistance } from '@/lib/formatDistance';
 import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
@@ -21,11 +21,11 @@ import { UseFormWatch } from 'react-hook-form';
 import { ShachuHakuFormData } from './validationSchemas';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
-
 interface FacilitiesMapProps {
   watch: UseFormWatch<ShachuHakuFormData>;
 }
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 interface FacilityData {
   type: 'camping' | 'toilet' | 'convenience' | 'bath';
@@ -226,8 +226,8 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   };
 
   // 座標情報を持つ施設を取得
-  const getFacilitiesWithCoordinates = (): FacilityData[] => {
-    const facilities: FacilityData[] = [];
+  const facilities = useMemo((): FacilityData[] => {
+    const result: FacilityData[] = [];
 
     // 車中泊スポット（メイン）
     const mainLat = parseFloat(watch('lat') || '0');
@@ -235,7 +235,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     const mainName = watch('name') || '車中泊スポット';
 
     if (mainLat && mainLng) {
-      facilities.push({
+      result.push({
         type: 'camping',
         lat: mainLat,
         lng: mainLng,
@@ -250,7 +250,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     const toiletDistance = parseFloat(watch('distanceToToilet') || '0');
 
     if (toiletLat && toiletLng) {
-      facilities.push({
+      result.push({
         type: 'toilet',
         lat: toiletLat,
         lng: toiletLng,
@@ -268,7 +268,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     );
 
     if (convenienceLat && convenienceLng) {
-      facilities.push({
+      result.push({
         type: 'convenience',
         lat: convenienceLat,
         lng: convenienceLng,
@@ -284,7 +284,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     const bathDistance = parseFloat(watch('distanceToBath') || '0');
 
     if (bathLat && bathLng) {
-      facilities.push({
+      result.push({
         type: 'bath',
         lat: bathLat,
         lng: bathLng,
@@ -294,12 +294,26 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       });
     }
 
-    return facilities;
-  };
+    return result;
+  }, [
+    watch('lat'),
+    watch('lng'),
+    watch('name'),
+    watch('nearbyToiletLat'),
+    watch('nearbyToiletLng'),
+    watch('distanceToToilet'),
+    watch('nearbyConvenienceLat'),
+    watch('nearbyConvenienceLng'),
+    watch('distanceToConvenience'),
+    watch('nearbyBathLat'),
+    watch('nearbyBathLng'),
+    watch('distanceToBath'),
+    currentZoom,
+  ]);
 
   // マップの初期化
   useEffect(() => {
-    if (!mapContainer.current || mapInstance.current) return;
+    if (!mapContainer.current || mapInstance.current || !MAPBOX_TOKEN) return;
 
     // Add CSS for marker styles
     if (!document.getElementById('admin-facility-marker-styles')) {
@@ -356,6 +370,8 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
     try {
       const restoreConsoleWarn = suppressImageWarnings();
+
+      mapboxgl.accessToken = MAPBOX_TOKEN;
 
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -444,7 +460,6 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     if (!mapInstance.current || !mapLoaded) return;
 
     clearMarkers();
-    const facilities = getFacilitiesWithCoordinates();
 
     if (facilities.length > 0) {
       // 各施設のマーカーを追加
@@ -452,28 +467,11 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         addMarker(facility, currentZoom);
       });
     }
-  }, [
-    watch('lat'),
-    watch('lng'),
-    watch('name'),
-    watch('nearbyToiletLat'),
-    watch('nearbyToiletLng'),
-    watch('distanceToToilet'),
-    watch('nearbyConvenienceLat'),
-    watch('nearbyConvenienceLng'),
-    watch('distanceToConvenience'),
-    watch('nearbyBathLat'),
-    watch('nearbyBathLng'),
-    watch('distanceToBath'),
-    mapLoaded,
-    currentZoom,
-  ]);
+  }, [facilities, mapLoaded, currentZoom]);
 
   // 全ての施設が見えるようにマップを調整（施設変更時のみ、ズーム時は除外）
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
-
-    const facilities = getFacilitiesWithCoordinates();
 
     if (facilities.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
@@ -493,28 +491,24 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         });
       }
     }
-  }, [
-    watch('lat'),
-    watch('lng'),
-    watch('name'),
-    watch('nearbyToiletLat'),
-    watch('nearbyToiletLng'),
-    watch('distanceToToilet'),
-    watch('nearbyConvenienceLat'),
-    watch('nearbyConvenienceLng'),
-    watch('distanceToConvenience'),
-    watch('nearbyBathLat'),
-    watch('nearbyBathLng'),
-    watch('distanceToBath'),
-    mapLoaded,
-  ]);
-
-  const facilities = getFacilitiesWithCoordinates();
+  }, [facilities, mapLoaded]);
 
   // 施設の存在チェック用のヘルパー関数
   const facilityExists = (type: string) => {
     return facilities.some((f) => f.type === type);
   };
+
+  // Mapboxトークンが設定されていない場合
+  if (!MAPBOX_TOKEN) {
+    return (
+      <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
+        <h3 className='text-lg font-medium mb-2'>施設マップ</h3>
+        <p className='text-red-500 text-sm'>
+          Mapboxトークンが設定されていません
+        </p>
+      </div>
+    );
+  }
 
   if (facilities.length === 0) {
     return (
