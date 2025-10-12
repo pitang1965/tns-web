@@ -26,6 +26,7 @@ export function useMapboxCore({
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false); // 画面内に表示されているか
 
   // マップリソースをクリアする関数
   const clearMapResources = useCallback(() => {
@@ -67,10 +68,35 @@ export function useMapboxCore({
     }
   }, [zoom]);
 
-  // マップの初期化
+  // Intersection Observerで画面内表示を検知
   useEffect(() => {
-    // すでにマップが存在する場合は初期化をスキップ
-    if (!mapContainer.current || mapInstance.current) return;
+    if (!mapContainer.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      {
+        rootMargin: '50px', // 50px手前で読み込み開始
+        threshold: 0.1, // 10%見えたら発火
+      }
+    );
+
+    observer.observe(mapContainer.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // マップの初期化（画面内に表示された時のみ）
+  useEffect(() => {
+    // 画面内に表示されていない、またはすでにマップが存在する場合は初期化をスキップ
+    if (!isVisible || !mapContainer.current || mapInstance.current) return;
 
     try {
       // マップの初期化前に、コンソール警告を一時的に抑制
@@ -131,7 +157,7 @@ export function useMapboxCore({
     return () => {
       clearMapResources();
     };
-  }, []); // 空の依存配列で初期化処理を1回だけ実行
+  }, [isVisible, latitude, longitude, zoom, clearMapResources]); // isVisibleが変わったら初期化
 
   // マップの位置とズームを更新
   useEffect(() => {
@@ -156,6 +182,7 @@ export function useMapboxCore({
     mapInstance: mapInstance.current,
     markerRef: markerRef.current,
     mapLoaded,
+    isVisible, // 画面内に表示されているかを返す
     centerOnMarker,
     clearMapResources,
   };
