@@ -28,6 +28,14 @@ npm run init-db      # Initialize MongoDB database with sample data
 - Never allow Next.js to automatically switch to alternative ports
 - Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
 
+**CRITICAL SERVER MANAGEMENT RULE**:
+- **NEVER start the development server (`npm run dev` or `pnpm dev`) unless explicitly requested by the user**
+- The user will start and manage the development server themselves
+- If you need to check if the server is running, you may use `netstat -ano | findstr :3000` to check port status
+- If the user asks you to stop the server, you may kill the process using `taskkill //F //PID [PID]`
+- Do NOT automatically start the server for testing, debugging, or any other purpose
+- If you need the server running for a task, ask the user to start it first
+
 ## Architecture
 
 ### Tech Stack
