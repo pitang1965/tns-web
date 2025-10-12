@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -8,7 +8,6 @@ import { formatDistance } from '@/lib/formatDistance';
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -37,6 +36,8 @@ import {
   REGION_COORDINATES,
 } from '@/lib/prefectureCoordinates';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
+import { SpotsList } from '@/components/shachu-haku/SpotsList';
+import { SpotsStats } from '@/components/shachu-haku/SpotsStats';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -152,6 +153,13 @@ export default function ShachuHakuClient() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
+
+  // Promise key for triggering Suspense re-render
+  const [listPromiseKey, setListPromiseKey] = useState(0);
+
+  // Cache the promise to avoid creating new ones on every render
+  const [cachedListPromise, setCachedListPromise] =
+    useState<Promise<any> | null>(null);
 
   // Bounds state for map view - use ref instead of state to prevent re-renders
   const mapBoundsRef = useRef<{
@@ -382,6 +390,7 @@ export default function ShachuHakuClient() {
   }, [searchTerm, typeFilter]);
 
   // Load spots for list view when tab, filters, or page changes
+  // Create and cache the promise
   useEffect(() => {
     if (activeTab === 'list') {
       // Use savedBounds if available (from map), otherwise calculate from zoom and center
@@ -406,7 +415,15 @@ export default function ShachuHakuClient() {
             : undefined,
         bounds,
       };
-      loadListSpotsRef.current?.(currentPage, filters);
+
+      // Create new promise and cache it
+      const promise = getPublicCampingSpotsWithPagination(
+        currentPage,
+        pageSize,
+        filters
+      );
+      setCachedListPromise(promise);
+      setListPromiseKey((prev) => prev + 1);
     }
   }, [
     activeTab,
@@ -634,179 +651,64 @@ export default function ShachuHakuClient() {
               </Card>
             )}
 
-            {/* Stats */}
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-              <Card>
-                <CardContent className='p-4'>
-                  <div className='text-2xl font-bold text-blue-600'>
-                    {spots?.length || 0}
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-300'>
-                    総スポット数
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className='p-4'>
-                  <div className='text-2xl font-bold text-green-600'>
-                    {spots?.filter((s) => s.pricing.isFree).length || 0}
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-300'>
-                    無料スポット
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className='p-4'>
-                  <div className='text-2xl font-bold text-yellow-600'>
-                    {spots?.filter((s) => s.isVerified).length || 0}
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-300'>
-                    確認済み
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className='p-4'>
-                  <div className='text-2xl font-bold text-purple-600'>
-                    {spots ? new Set(spots.map((s) => s.prefecture)).size : 0}
-                  </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-300'>
-                    都道府県数
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Stats and List - use + Suspense */}
+            {cachedListPromise && (
+              <>
+                <Suspense
+                  fallback={
+                    <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+                      {[...Array(4)].map((_, i) => (
+                        <Card key={i}>
+                          <CardContent className='p-4'>
+                            <div className='h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-10 mb-2'></div>
+                            <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-24'></div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  }
+                  key={`stats-${listPromiseKey}`}
+                >
+                  <SpotsStats spotsPromise={cachedListPromise} />
+                </Suspense>
 
-            {/* Spots List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {loading
-                    ? '車中泊スポット一覧 (読み込み中...)'
-                    : `車中泊スポット一覧 (${totalCount}件中 ${
-                        (currentPage - 1) * pageSize + 1
-                      }-${Math.min(
-                        currentPage * pageSize,
-                        totalCount
-                      )}件を表示)`}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loading ? (
-                  <div className='text-center py-8'>読み込み中...</div>
-                ) : spots.length === 0 ? (
-                  <div className='text-center py-8 text-gray-500'>
-                    条件に一致する車中泊スポットがありません
-                  </div>
-                ) : (
-                  <div className='space-y-4'>
-                    {spots.map((spot) => (
-                      <div
-                        key={spot._id}
-                        className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
-                        onClick={() => handleListSpotSelect(spot)}
-                      >
-                        <div className='flex justify-between items-start'>
-                          <div className='flex-1'>
-                            <h3 className='font-semibold text-lg'>
-                              {spot.name}
-                            </h3>
-                            <p className='text-gray-600 dark:text-gray-300'>
-                              {spot.address}
-                            </p>
-                            <div className='flex gap-2 mt-2 flex-wrap'>
-                              <Badge
-                                className={`${getTypeColor(
-                                  spot.type
-                                )} text-white`}
-                              >
-                                {CampingSpotTypeLabels[spot.type]}
-                              </Badge>
-                              <Badge
-                                className={`${getPricingColor(
-                                  spot.pricing.isFree,
-                                  spot.pricing.pricePerNight
-                                )} text-white`}
-                              >
-                                {spot.pricing.isFree
-                                  ? '無料'
-                                  : `¥${
-                                      spot.pricing.pricePerNight || '未設定'
-                                    }`}
-                              </Badge>
-                              <Badge
-                                className={`${getRatingColor(
-                                  calculateSecurityLevel(spot)
-                                )} text-white`}
-                              >
-                                治安 {calculateSecurityLevel(spot)}/5 🔒
-                              </Badge>
-                              <Badge
-                                className={`${getRatingColor(
-                                  calculateQuietnessLevel(spot)
-                                )} text-white`}
-                              >
-                                静けさ {calculateQuietnessLevel(spot)}/5 🔇
-                              </Badge>
-                              {spot.isVerified && (
-                                <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
-                                  ✓ 確認済み
-                                </Badge>
-                              )}
+                <Suspense
+                  fallback={
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>
+                          車中泊スポット一覧 (読み込み中...)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className='space-y-4'>
+                          {[...Array(5)].map((_, i) => (
+                            <div key={i} className='border rounded-lg p-4'>
+                              <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
+                              <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
+                              <div className='flex gap-2'>
+                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
+                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                              </div>
                             </div>
-                            {spot.notes && (
-                              <p className='text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2'>
-                                {spot.notes}
-                              </p>
-                            )}
-                          </div>
-                          <div className='flex gap-2'>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNavigateToSpotDetail(spot._id);
-                              }}
-                            >
-                              <Info className='w-4 h-4' />
-                            </Button>
-                          </div>
+                          ))}
                         </div>
-                      </div>
-                    ))}
-
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                      <div className='flex justify-center items-center gap-2 mt-6'>
-                        <Button
-                          variant='outline'
-                          onClick={() =>
-                            setCurrentPage((p) => Math.max(1, p - 1))
-                          }
-                          disabled={currentPage === 1 || loading}
-                        >
-                          前へ
-                        </Button>
-                        <span className='text-sm text-gray-600 dark:text-gray-300'>
-                          {currentPage} / {totalPages} ページ
-                        </span>
-                        <Button
-                          variant='outline'
-                          onClick={() =>
-                            setCurrentPage((p) => Math.min(totalPages, p + 1))
-                          }
-                          disabled={currentPage === totalPages || loading}
-                        >
-                          次へ
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      </CardContent>
+                    </Card>
+                  }
+                  key={`list-${listPromiseKey}`}
+                >
+                  <SpotsList
+                    spotsPromise={cachedListPromise}
+                    onSpotSelect={handleListSpotSelect}
+                    onNavigateToDetail={handleNavigateToSpotDetail}
+                    onPageChange={setCurrentPage}
+                  />
+                </Suspense>
+              </>
+            )}
           </div>
         )}
       </div>
