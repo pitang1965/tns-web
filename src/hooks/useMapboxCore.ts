@@ -68,7 +68,7 @@ export function useMapboxCore({
     }
   }, [zoom]);
 
-  // Intersection Observerで画面内表示を検知
+  // Intersection Observerで画面内表示を検知（画面外に出たら破棄）
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -76,13 +76,18 @@ export function useMapboxCore({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            // 画面内に入った
             setIsVisible(true);
+          } else {
+            // 画面外に出た - Mapboxインスタンスを破棄
+            setIsVisible(false);
+            clearMapResources();
           }
         });
       },
       {
-        rootMargin: '50px', // 50px手前で読み込み開始
-        threshold: 0.1, // 10%見えたら発火
+        rootMargin: '100px', // 100px手前で読み込み開始
+        threshold: 0, // 少しでも見えたら/見えなくなったら発火
       }
     );
 
@@ -91,7 +96,7 @@ export function useMapboxCore({
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [clearMapResources]);
 
   // マップの初期化（画面内に表示された時のみ）
   useEffect(() => {
