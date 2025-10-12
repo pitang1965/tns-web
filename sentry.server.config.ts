@@ -12,7 +12,8 @@ Sentry.init({
   ],
   // Enable logs to be sent to Sentry
   enableLogs: true,
-  enabled: process.env.NODE_ENV === 'production', // 本番環境のみSentryを有効化
+  // 本番環境のみSentryを有効化（プレビュー環境は除外）
+  enabled: process.env.VERCEL_ENV === 'production',
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
