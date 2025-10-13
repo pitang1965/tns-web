@@ -141,8 +141,8 @@ export function BasicInfoFields({
             <div className='space-y-1'>
               <CoordinatesFromClipboardButton
                 onCoordinatesExtracted={(latitude, longitude) => {
-                  setValue('lat', latitude);
-                  setValue('lng', longitude);
+                  setValue('lat', latitude.toString());
+                  setValue('lng', longitude.toString());
                 }}
               />
               <p className='text-xs text-gray-500 dark:text-gray-400'>

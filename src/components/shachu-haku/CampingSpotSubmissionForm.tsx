@@ -366,8 +366,8 @@ export default function CampingSpotSubmissionForm({
                   <div className='space-y-1'>
                     <CoordinatesFromClipboardButton
                       onCoordinatesExtracted={(latitude, longitude) => {
-                        form.setValue('lat', latitude);
-                        form.setValue('lng', longitude);
+                        form.setValue('lat', latitude.toString());
+                        form.setValue('lng', longitude.toString());
                       }}
                     />
                     <p className='text-xs text-gray-500 dark:text-gray-400'>

@@ -132,8 +132,8 @@ export function NearbyFacilityFields({
               <div className='flex flex-col sm:flex-row gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
-                    setValue('nearbyToiletLat', lat);
-                    setValue('nearbyToiletLng', lng);
+                    setValue('nearbyToiletLat', lat.toString());
+                    setValue('nearbyToiletLng', lng.toString());
                   }}
                 />
                 <Button
@@ -234,8 +234,8 @@ export function NearbyFacilityFields({
               <div className='flex flex-col sm:flex-row gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
-                    setValue('nearbyConvenienceLat', lat);
-                    setValue('nearbyConvenienceLng', lng);
+                    setValue('nearbyConvenienceLat', lat.toString());
+                    setValue('nearbyConvenienceLng', lng.toString());
                   }}
                 />
                 <Button
@@ -336,8 +336,8 @@ export function NearbyFacilityFields({
               <div className='flex flex-col sm:flex-row gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
-                    setValue('nearbyBathLat', lat);
-                    setValue('nearbyBathLng', lng);
+                    setValue('nearbyBathLat', lat.toString());
+                    setValue('nearbyBathLng', lng.toString());
                   }}
                 />
                 <Button
