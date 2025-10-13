@@ -14,13 +14,7 @@ import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Upload,
-  Download,
-  MapPin,
-  Plus,
-  Users,
-} from 'lucide-react';
+import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import Link from 'next/link';
 import {
   getCampingSpotsByBounds,
@@ -42,6 +36,11 @@ import {
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
 import { AdminSpotsStats } from '@/components/admin/AdminSpotsStats';
+import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
+import {
+  filterSpotsClientSide,
+  hasActiveClientFilters,
+} from '@/lib/clientSideFilterSpots';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -156,6 +155,14 @@ export default function AdminClient() {
   const [typeFilter, setTypeFilter] = useState(() => {
     // URLパラメータから種別フィルターを取得
     return searchParams.get('type') || 'all';
+  });
+  const [clientFilters, setClientFilters] = useState<ClientSideFilterValues>({
+    pricingFilter: 'all',
+    minSecurityLevel: 0,
+    minQuietnessLevel: 0,
+    maxToiletDistance: null,
+    minElevation: null,
+    maxElevation: null,
   });
 
   // Map state for jump functionality
@@ -577,6 +584,9 @@ export default function AdminClient() {
     }
   };
 
+  // Apply client-side filters to spots
+  const filteredSpots = filterSpotsClientSide(spots, clientFilters);
+
   const exportToCSV = async () => {
     try {
       const { getCampingSpotsForExport } = await import(
@@ -781,6 +791,8 @@ export default function AdminClient() {
           onPrefectureJump={handlePrefectureJump}
           onRegionJump={handleRegionJump}
           onCurrentLocation={handleCurrentLocation}
+          clientFilters={clientFilters}
+          onClientFiltersChange={setClientFilters}
         />
 
         {/* Tab Navigation */}
@@ -818,14 +830,18 @@ export default function AdminClient() {
                 {loading
                   ? '地図から編集 (読み込み中...)'
                   : totalCount > 0
-                  ? `地図から編集 (${totalCount}件中${spots.length}件)`
-                  : `地図から編集 (${spots.length}件)`}
+                  ? `地図から編集 (${filteredSpots.length}件${
+                      hasActiveClientFilters(clientFilters)
+                        ? ` / ${spots.length}件中`
+                        : `中${spots.length}件`
+                    })`
+                  : `地図から編集 (${filteredSpots.length}件)`}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
                 key='shachu-haku-admin-map'
-                spots={spots}
+                spots={filteredSpots}
                 onSpotSelect={handleSpotSelect}
                 onBoundsChange={handleBoundsChange}
                 initialCenter={mapCenter}
@@ -878,7 +894,10 @@ export default function AdminClient() {
                   }
                   key={`stats-${listPromiseState.key}`}
                 >
-                  <AdminSpotsStats spotsPromise={listPromiseState.promise} />
+                  <AdminSpotsStats
+                    spotsPromise={listPromiseState.promise}
+                    clientFilters={clientFilters}
+                  />
                 </Suspense>
 
                 {/* Spots List - use + Suspense */}
@@ -914,6 +933,7 @@ export default function AdminClient() {
                     spotsPromise={listPromiseState.promise}
                     onSpotSelect={handleSpotSelect}
                     onPageChange={setCurrentPage}
+                    clientFilters={clientFilters}
                   />
                 </Suspense>
               </>

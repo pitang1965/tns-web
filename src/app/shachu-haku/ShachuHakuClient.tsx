@@ -10,14 +10,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { MapPin, Search, Info, Plus, Navigation, Filter } from 'lucide-react';
+
+import { MapPin, Info, Plus } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
@@ -25,7 +19,6 @@ import {
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
-  PrefectureOptions,
 } from '@/data/schemas/campingSpot';
 import {
   calculateSecurityLevel,
@@ -38,6 +31,11 @@ import {
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotsList } from '@/components/shachu-haku/SpotsList';
 import { SpotsStats } from '@/components/shachu-haku/SpotsStats';
+import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
+import {
+  filterSpotsClientSide,
+  hasActiveClientFilters,
+} from '@/lib/clientSideFilterSpots';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -110,6 +108,28 @@ export default function ShachuHakuClient() {
     // URLパラメータから種別フィルターを取得
     return searchParams.get('type') || 'all';
   });
+  const [clientFilters, setClientFilters] = useState<ClientSideFilterValues>(
+    () => {
+      // URLパラメータからクライアント側フィルターを取得
+      return {
+        pricingFilter:
+          (searchParams.get(
+            'pricing'
+          ) as ClientSideFilterValues['pricingFilter']) || 'all',
+        minSecurityLevel: parseInt(searchParams.get('min_security') || '0'),
+        minQuietnessLevel: parseInt(searchParams.get('min_quietness') || '0'),
+        maxToiletDistance: searchParams.get('max_toilet_dist')
+          ? parseInt(searchParams.get('max_toilet_dist')!)
+          : null,
+        minElevation: searchParams.get('min_elevation')
+          ? parseInt(searchParams.get('min_elevation')!)
+          : null,
+        maxElevation: searchParams.get('max_elevation')
+          ? parseInt(searchParams.get('max_elevation')!)
+          : null,
+      };
+    }
+  );
 
   // Map state for zoom and center
   const [mapZoom, setMapZoom] = useState(() => {
@@ -356,6 +376,26 @@ export default function ShachuHakuClient() {
       params.set('type', typeFilter);
     }
 
+    // Add client-side filters
+    if (clientFilters.pricingFilter !== 'all') {
+      params.set('pricing', clientFilters.pricingFilter);
+    }
+    if (clientFilters.minSecurityLevel > 0) {
+      params.set('min_security', clientFilters.minSecurityLevel.toString());
+    }
+    if (clientFilters.minQuietnessLevel > 0) {
+      params.set('min_quietness', clientFilters.minQuietnessLevel.toString());
+    }
+    if (clientFilters.maxToiletDistance !== null) {
+      params.set('max_toilet_dist', clientFilters.maxToiletDistance.toString());
+    }
+    if (clientFilters.minElevation !== null) {
+      params.set('min_elevation', clientFilters.minElevation.toString());
+    }
+    if (clientFilters.maxElevation !== null) {
+      params.set('max_elevation', clientFilters.maxElevation.toString());
+    }
+
     // Add map zoom and center (for both map and list tabs to maintain filter state)
     params.set('zoom', mapZoom.toFixed(2));
     params.set('lat', mapCenter[1].toFixed(6));
@@ -377,6 +417,7 @@ export default function ShachuHakuClient() {
   }, [
     searchTerm,
     typeFilter,
+    clientFilters,
     activeTab,
     mapZoom,
     mapCenter,
@@ -387,7 +428,7 @@ export default function ShachuHakuClient() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, typeFilter]);
+  }, [searchTerm, typeFilter, clientFilters]);
 
   // Load spots for list view when tab, filters, or page changes
   // Create and cache the promise
@@ -540,6 +581,9 @@ export default function ShachuHakuClient() {
     );
   };
 
+  // Apply client-side filters to spots
+  const filteredSpots = filterSpotsClientSide(spots, clientFilters);
+
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
@@ -579,6 +623,8 @@ export default function ShachuHakuClient() {
           onPrefectureJump={handlePrefectureJump}
           onRegionJump={handleRegionJump}
           onCurrentLocation={handleCurrentLocation}
+          clientFilters={clientFilters}
+          onClientFiltersChange={setClientFilters}
         />
 
         {/* Tab Navigation */}
@@ -615,12 +661,16 @@ export default function ShachuHakuClient() {
                 <MapPin className='w-5 h-5' />
                 {loading
                   ? '車中泊スポット地図 (読み込み中...)'
-                  : `車中泊スポット地図 (${spots.length}件)`}
+                  : `車中泊スポット地図 (${filteredSpots.length}件${
+                      hasActiveClientFilters(clientFilters)
+                        ? ` / ${spots.length}件中`
+                        : ''
+                    })`}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
-                spots={spots}
+                spots={filteredSpots}
                 onSpotSelect={handleSpotSelect}
                 readonly={true}
                 onBoundsChange={handleBoundsChange}
@@ -669,7 +719,10 @@ export default function ShachuHakuClient() {
                   }
                   key={`stats-${listPromiseKey}`}
                 >
-                  <SpotsStats spotsPromise={cachedListPromise} />
+                  <SpotsStats
+                    spotsPromise={cachedListPromise}
+                    clientFilters={clientFilters}
+                  />
                 </Suspense>
 
                 <Suspense
@@ -705,6 +758,7 @@ export default function ShachuHakuClient() {
                     onSpotSelect={handleListSpotSelect}
                     onNavigateToDetail={handleNavigateToSpotDetail}
                     onPageChange={setCurrentPage}
+                    clientFilters={clientFilters}
                   />
                 </Suspense>
               </>

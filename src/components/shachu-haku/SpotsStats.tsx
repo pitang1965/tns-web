@@ -3,6 +3,8 @@
 import { use } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
+import { ClientSideFilterValues } from './ClientSideFilters';
+import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 
 interface SpotsStatsProps {
   spotsPromise: Promise<{
@@ -11,21 +13,29 @@ interface SpotsStatsProps {
     page: number;
     totalPages: number;
   }>;
+  clientFilters: ClientSideFilterValues;
 }
 
-export function SpotsStats({ spotsPromise }: SpotsStatsProps) {
+export function SpotsStats({ spotsPromise, clientFilters }: SpotsStatsProps) {
   // use フックでPromiseを直接扱う
   const { spots } = use(spotsPromise);
 
-  const freeSpots = spots.filter((s) => s.pricing.isFree).length;
-  const verifiedSpots = spots.filter((s) => s.isVerified).length;
-  const uniquePrefectures = new Set(spots.map((s) => s.prefecture)).size;
+  // Apply client-side filters
+  const filteredSpots = filterSpotsClientSide(spots, clientFilters);
+
+  const freeSpots = filteredSpots.filter((s) => s.pricing.isFree).length;
+  const verifiedSpots = filteredSpots.filter((s) => s.isVerified).length;
+  const uniquePrefectures = new Set(
+    filteredSpots.map((s) => s.prefecture)
+  ).size;
 
   return (
     <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
       <Card>
         <CardContent className='p-4'>
-          <div className='text-2xl font-bold text-blue-600'>{spots.length}</div>
+          <div className='text-2xl font-bold text-blue-600'>
+            {filteredSpots.length}
+          </div>
           <div className='text-sm text-gray-600 dark:text-gray-300'>
             総スポット数
           </div>

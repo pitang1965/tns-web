@@ -14,6 +14,11 @@ import {
   calculateSecurityLevel,
   calculateQuietnessLevel,
 } from '@/lib/campingSpotUtils';
+import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
+import {
+  filterSpotsClientSide,
+  hasActiveClientFilters,
+} from '@/lib/clientSideFilterSpots';
 
 // スポットタイプごとの色分け関数
 const getTypeColor = (type: string) => {
@@ -62,19 +67,25 @@ interface AdminSpotsListProps {
   }>;
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onPageChange: (page: number) => void;
+  clientFilters: ClientSideFilterValues;
 }
 
 export function AdminSpotsList({
   spotsPromise,
   onSpotSelect,
   onPageChange,
+  clientFilters,
 }: AdminSpotsListProps) {
   // use フックでPromiseを直接扱う（React 19の新機能）
   const { spots, total, page, totalPages } = use(spotsPromise);
 
+  // Apply client-side filters
+  const filteredSpots = filterSpotsClientSide(spots, clientFilters);
+  const hasFilters = hasActiveClientFilters(clientFilters);
+
   const pageSize = 20;
 
-  if (spots.length === 0) {
+  if (filteredSpots.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -82,7 +93,9 @@ export function AdminSpotsList({
         </CardHeader>
         <CardContent>
           <div className='text-center py-8 text-gray-500'>
-            条件に一致する車中泊スポットがありません
+            {hasFilters
+              ? '詳細フィルターの条件に一致する車中泊スポットがありません'
+              : '条件に一致する車中泊スポットがありません'}
           </div>
         </CardContent>
       </Card>
@@ -93,13 +106,19 @@ export function AdminSpotsList({
     <Card>
       <CardHeader>
         <CardTitle>
-          車中泊スポット一覧 ({total}件中 {(page - 1) * pageSize + 1}-
-          {Math.min(page * pageSize, total)}件を表示)
+          車中泊スポット一覧 (
+          {hasFilters
+            ? `${filteredSpots.length}件 / ${total}件中`
+            : `${total}件中 ${(page - 1) * pageSize + 1}-${Math.min(
+                page * pageSize,
+                total
+              )}件を表示`}
+          )
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className='space-y-4'>
-          {spots.map((spot) => (
+          {filteredSpots.map((spot) => (
             <div
               key={spot._id}
               className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'

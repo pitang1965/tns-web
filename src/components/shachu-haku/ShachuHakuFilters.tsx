@@ -15,11 +15,8 @@ import {
   CampingSpotTypeLabels,
   PrefectureOptions,
 } from '@/data/schemas/campingSpot';
-import {
-  PREFECTURE_COORDINATES,
-  REGION_COORDINATES,
-} from '@/lib/prefectureCoordinates';
-import { useToast } from '@/components/ui/use-toast';
+import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
+import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
 
 interface ShachuHakuFiltersProps {
   searchTerm: string;
@@ -29,6 +26,8 @@ interface ShachuHakuFiltersProps {
   onPrefectureJump: (prefecture: string) => void;
   onRegionJump: (region: string) => void;
   onCurrentLocation: () => void;
+  clientFilters: ClientSideFilterValues;
+  onClientFiltersChange: (filters: ClientSideFilterValues) => void;
 }
 
 export default function ShachuHakuFilters({
@@ -39,6 +38,8 @@ export default function ShachuHakuFilters({
   onPrefectureJump,
   onRegionJump,
   onCurrentLocation,
+  clientFilters,
+  onClientFiltersChange,
 }: ShachuHakuFiltersProps) {
   return (
     <Card className='mb-4'>
@@ -116,15 +117,17 @@ export default function ShachuHakuFilters({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(
-                    ([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    )
-                  )}
+                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <ClientSideFilters
+                filters={clientFilters}
+                onFiltersChange={onClientFiltersChange}
+              />
             </div>
           </div>
         </div>
@@ -201,15 +204,19 @@ export default function ShachuHakuFilters({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value='all'>全種別</SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(
-                    ([key, label]) => (
-                      <SelectItem key={key} value={key}>
-                        {label}
-                      </SelectItem>
-                    )
-                  )}
+                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <div className='ml-2'>
+                <ClientSideFilters
+                  filters={clientFilters}
+                  onFiltersChange={onClientFiltersChange}
+                />
+              </div>
             </div>
           </div>
         </div>
