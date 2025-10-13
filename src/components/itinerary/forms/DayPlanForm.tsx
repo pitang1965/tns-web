@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useState, useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Map, Clock } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
@@ -45,7 +45,15 @@ export function DayPlanForm({
     watch,
     setValue,
     register,
+    control,
   } = useFormContext<ClientItineraryInput>();
+
+  // useWatchを使用してリアルタイムで監視
+  const watchedActivities = useWatch({
+    control,
+    name: `dayPlans.${dayIndex}.activities`,
+    defaultValue: [],
+  });
 
   const moveActivity = (
     dayIndex: number,
@@ -83,24 +91,34 @@ export function DayPlanForm({
   // その日の活動の総数を取得
   const totalActivities = day.activities?.length || 0;
 
-  // 現在のフォームの値を監視して地図データを生成
-  const activitiesData = watch(`dayPlans.${dayIndex}.activities`) || [];
-
   // 位置情報を持つアクティビティのみマップに表示
-  const activitiesWithLocation: ActivityLocation[] = activitiesData
-    .filter(
-      (activity) =>
-        activity.place?.location &&
-        typeof activity.place.location.latitude === 'number' &&
-        typeof activity.place.location.longitude === 'number'
-    )
-    .map((activity, index) => ({
-      id: activity.id || `activity-${index}`,
-      order: index + 1,
-      title: activity.title || `アクティビティ ${index + 1}`,
-      latitude: activity.place.location!.latitude as number,
-      longitude: activity.place.location!.longitude as number,
-    }));
+  // useMemoで計算結果をメモ化し、必要な時だけ再計算
+  const activitiesWithLocation: ActivityLocation[] = useMemo(() => {
+    const activities = watchedActivities || [];
+
+    const result = activities
+      .map((activity: any, originalIndex: number) => {
+        // 位置情報がない場合はnullを返す
+        if (
+          !activity?.place?.location ||
+          typeof activity.place.location.latitude !== 'number' ||
+          typeof activity.place.location.longitude !== 'number'
+        ) {
+          return null;
+        }
+
+        return {
+          id: activity.id || `activity-${originalIndex}`,
+          order: originalIndex + 1, // 元のインデックスを使用
+          title: activity.title || `アクティビティ ${originalIndex + 1}`,
+          latitude: activity.place.location.latitude as number,
+          longitude: activity.place.location.longitude as number,
+        };
+      })
+      .filter((activity): activity is ActivityLocation => activity !== null);
+
+    return result;
+  }, [JSON.stringify(watchedActivities)]);
 
   // 位置情報が設定されているアクティビティが2つ以上ある場合にのみ地図を表示
   const shouldShowMap = activitiesWithLocation.length >= 2;

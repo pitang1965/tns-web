@@ -81,6 +81,7 @@ export function CoordinateInput({
               step='any'
               placeholder='緯度'
               {...register(latPath, {
+                valueAsNumber: true, // 数値として扱う
                 onChange: () => trigger(lonPath), // 経度
               })}
             />
@@ -100,6 +101,7 @@ export function CoordinateInput({
               step='any'
               placeholder='経度'
               {...register(lonPath, {
+                valueAsNumber: true, // 数値として扱う
                 onChange: () => trigger(latPath), // 緯度
               })}
             />
@@ -118,8 +120,9 @@ export function CoordinateInput({
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
-                setValue(latPath, lat);
-                setValue(lonPath, lng);
+                // 明示的に数値に変換
+                setValue(latPath, Number(lat), { shouldValidate: true });
+                setValue(lonPath, Number(lng), { shouldValidate: true });
                 trigger([latPath, lonPath]);
               }}
             />

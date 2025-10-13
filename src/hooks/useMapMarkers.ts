@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { ActivityLocation } from '@/components/common/Maps/DailyRouteMap';
 
@@ -16,6 +16,11 @@ export function useMapMarkers({
   updateMapBounds,
 }: UseMapMarkersProps) {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+
+  // activitiesの内容をメモ化して、参照ではなく内容の変更を検知
+  const activitiesKey = useMemo(() => {
+    return activities.map((a) => `${a.id}-${a.latitude}-${a.longitude}`).join(',');
+  }, [JSON.stringify(activities)]);
 
   // マーカーをクリアする関数
   const clearMarkers = useCallback(() => {
@@ -123,6 +128,7 @@ export function useMapMarkers({
     mapInstance,
     mapLoaded,
     activities,
+    activitiesKey,
     clearMarkers,
     createMarkerElement,
     createPopup,

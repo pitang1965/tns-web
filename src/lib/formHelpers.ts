@@ -7,18 +7,41 @@ import { H3 } from '@/components/common/Typography';
 export const getErrorsForDisplay = (errors: any): Record<string, string> => {
   const result: Record<string, string> = {};
 
-  Object.keys(errors).forEach((key) => {
-    if (errors[key]) {
-      if (typeof errors[key] === 'object' && errors[key].message) {
-        result[key] = errors[key].message;
-      } else if (typeof errors[key] === 'string') {
-        result[key] = errors[key];
-      } else {
-        result[key] = 'エラーがあります';
-      }
-    }
-  });
+  const extractErrors = (obj: any, prefix = ''): void => {
+    Object.keys(obj).forEach((key) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      const value = obj[key];
 
+      if (!value) return;
+
+      // メッセージプロパティがある場合
+      if (typeof value === 'object' && value.message) {
+        result[fullKey] = value.message;
+      }
+      // 文字列の場合
+      else if (typeof value === 'string') {
+        result[fullKey] = value;
+      }
+      // 配列の場合（dayPlansのような配列エラー）
+      else if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          if (item && typeof item === 'object') {
+            extractErrors(item, `${fullKey}[${index}]`);
+          }
+        });
+      }
+      // ネストしたオブジェクトの場合
+      else if (typeof value === 'object') {
+        extractErrors(value, fullKey);
+      }
+      // その他
+      else {
+        result[fullKey] = 'エラーがあります';
+      }
+    });
+  };
+
+  extractErrors(errors);
   return result;
 };
 

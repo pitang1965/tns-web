@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 
 interface CoordinatesFromClipboardButtonProps {
-  onCoordinatesExtracted: (latitude: string, longitude: string) => void;
+  onCoordinatesExtracted: (latitude: number | string, longitude: number | string) => void;
   className?: string;
 }
 
@@ -21,10 +21,10 @@ export const CoordinatesFromClipboardButton: React.FC<
       const coords = extractCoordinatesFromGoogleMapsUrl(clipboardText);
 
       if (coords) {
-        console.log(coords);
+        // 数値として渡す
         onCoordinatesExtracted(
-          coords.latitude.toString(),
-          coords.longitude.toString()
+          coords.latitude,
+          coords.longitude
         );
       } else {
         console.error('クリップボードのテキストに有効な座標が見つかりません。');

@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { ActivityLocation } from '@/components/common/Maps/DailyRouteMap';
 
 type UseRouteLayerProps = {
@@ -12,6 +12,11 @@ export function useRouteLayer({
   mapLoaded,
   activities,
 }: UseRouteLayerProps) {
+  // activitiesの内容をメモ化して、参照ではなく内容の変更を検知
+  const activitiesKey = useMemo(() => {
+    return activities.map((a) => `${a.id}-${a.latitude}-${a.longitude}`).join(',');
+  }, [JSON.stringify(activities)]);
+
   // ルートライン（アクティビティ間の線）を追加する関数
   const addRouteLines = useCallback(() => {
     if (!mapInstance || activities.length < 2) return;
@@ -71,6 +76,10 @@ export function useRouteLayer({
     if (!mapInstance) return;
 
     try {
+      // マップが既に破棄されているか確認
+      const map = mapInstance.getStyle();
+      if (!map) return;
+
       if (mapInstance.getLayer('route-line')) {
         mapInstance.removeLayer('route-line');
       }
@@ -94,7 +103,7 @@ export function useRouteLayer({
       // アクティビティが1つ以下の場合はルートラインを削除
       removeRouteLines();
     }
-  }, [mapInstance, mapLoaded, activities, addRouteLines, removeRouteLines]);
+  }, [mapInstance, mapLoaded, activities, activitiesKey, addRouteLines, removeRouteLines]);
 
   // クリーンアップ時にルートラインを削除
   useEffect(() => {
