@@ -1,17 +1,21 @@
-import React from 'react';
+'use client';
+
+import { use } from 'react';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PublicItineraryItem } from '@/components/itinerary/PublicItineraryItem';
 import { LargeText } from '@/components/common/Typography';
 
 type Props = {
-  itineraries: ClientItineraryDocument[];
+  itinerariesPromise: Promise<ClientItineraryDocument[]>;
   limit?: number; // 表示する最大数を指定するためのオプションプロパティ
 };
 
 export const PublicItineraryList: React.FC<Props> = ({
-  itineraries,
+  itinerariesPromise,
   limit = 5,
 }) => {
+  const itineraries = use(itinerariesPromise);
+
   if (itineraries.length > 0 && itineraries[0].owner) {
     console.log('Owner data:', itineraries[0].owner);
   }

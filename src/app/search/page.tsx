@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { PublicItineraryList } from '@/components/itinerary/PublicItineraryList';
 import { H1, H2, LargeText } from '@/components/common/Typography';
 import { getPublicItineraries } from '@/lib/itineraries';
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
   openGraph: {
     title: '旅のしおり',
-    description: '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+    description:
+      '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
     images: [
       {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
@@ -28,8 +30,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Search() {
-  // 公開旅程を取得
-  const publicItineraries = await getPublicItineraries();
+  const publicItinerariesPromise = getPublicItineraries();
 
   return (
     <div className='container mx-auto p-4 md:p-6'>
@@ -38,7 +39,24 @@ export default async function Search() {
 
       <div className='mb-8'>
         <H2>公開されている旅程</H2>
-        <PublicItineraryList itineraries={publicItineraries} />
+        <Suspense
+          fallback={
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse'
+                >
+                  <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3'></div>
+                  <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2'></div>
+                  <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6'></div>
+                </div>
+              ))}
+            </div>
+          }
+        >
+          <PublicItineraryList itinerariesPromise={publicItinerariesPromise} />
+        </Suspense>
       </div>
     </div>
   );

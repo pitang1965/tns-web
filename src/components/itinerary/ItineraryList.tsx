@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ItineraryItem } from './ItineraryItem';
@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { LargeText } from '@/components/common/Typography';
 
 type Props = {
-  itineraries: ClientItineraryDocument[];
+  itinerariesPromise: Promise<ClientItineraryDocument[]>;
 };
 
-export const ItineraryList: React.FC<Props> = ({ itineraries }) => {
+export const ItineraryList: React.FC<Props> = ({ itinerariesPromise }) => {
+  const itineraries = use(itinerariesPromise);
   const router = useRouter();
 
   const handleCreateNew = () => {
