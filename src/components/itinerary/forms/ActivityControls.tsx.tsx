@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { TimeShiftDialog } from '@/components/itinerary/forms/TimeShiftDialog';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { MoveUp, MoveDown, Trash2, MoreVertical } from 'lucide-react';
 import {
   DropdownMenu,
@@ -80,11 +81,11 @@ export function ActivityControls({
 
   return (
     <>
-      <div className='flex gap-1'>
+      <ButtonGroup>
         {moveActivity && !isFirst && (
           <Button
             type='button'
-            variant='ghost'
+            variant='outline'
             size='sm'
             onClick={() =>
               moveActivity(dayIndex, activityIndex, activityIndex - 1)
@@ -97,7 +98,7 @@ export function ActivityControls({
         {moveActivity && !isLast && (
           <Button
             type='button'
-            variant='ghost'
+            variant='outline'
             size='sm'
             onClick={() =>
               moveActivity(dayIndex, activityIndex, activityIndex + 1)
@@ -109,7 +110,7 @@ export function ActivityControls({
         )}
         <Button
           type='button'
-          variant='ghost'
+          variant='outline'
           size='sm'
           onClick={() => setIsDeleteConfirmOpen(true)}
           title='削除'
@@ -120,7 +121,7 @@ export function ActivityControls({
           <DropdownMenuTrigger>
             <Button
               type='button'
-              variant='ghost'
+              variant='outline'
               size='sm'
               title='その他のオプション'
             >
@@ -143,7 +144,7 @@ export function ActivityControls({
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </ButtonGroup>
       <TimeShiftDialog
         open={isTimeShiftDialogOpen}
         onOpenChange={setIsTimeShiftDialogOpen}

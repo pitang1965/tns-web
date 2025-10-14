@@ -2,11 +2,15 @@
 
 import React from 'react';
 import { ClipboardPaste } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 
 interface CoordinatesFromClipboardButtonProps {
-  onCoordinatesExtracted: (latitude: number | string, longitude: number | string) => void;
+  onCoordinatesExtracted: (
+    latitude: number | string,
+    longitude: number | string
+  ) => void;
   className?: string;
 }
 
@@ -22,10 +26,7 @@ export const CoordinatesFromClipboardButton: React.FC<
 
       if (coords) {
         // 数値として渡す
-        onCoordinatesExtracted(
-          coords.latitude,
-          coords.longitude
-        );
+        onCoordinatesExtracted(coords.latitude, coords.longitude);
       } else {
         console.error('クリップボードのテキストに有効な座標が見つかりません。');
         toast({
@@ -47,13 +48,15 @@ export const CoordinatesFromClipboardButton: React.FC<
   };
 
   return (
-    <button
+    <Button
       type='button'
-      className={`flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full ${className}`}
+      variant='outline'
+      size='sm'
+      className={className}
       onClick={handleGoogleMapsUrl}
     >
       <ClipboardPaste className='w-4 h-4' />
       クリップボードから取得
-    </button>
+    </Button>
   );
 };

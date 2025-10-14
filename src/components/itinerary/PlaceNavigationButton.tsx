@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Navigation, Map, Route } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,22 +43,30 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
 
   if (!isValidCoordinate()) {
     return (
-      <button
+      <Button
         disabled
-        className={`flex items-center gap-2 text-sm px-3 h-8 border border-input bg-background rounded-md text-muted-foreground cursor-not-allowed ${className}`}
+        variant='outline'
+        size='sm'
+        className={`w-full ${className}`}
         aria-label='ナビゲーション (無効)'
       >
         <MapPin className='w-4 h-4' />
-        <span className='text-sm'>地図を開く</span>
-      </button>
+        地図を開く
+      </Button>
     );
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'>
-        <MapPin className='w-4 h-4' />
-        地図を開く
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant='outline'
+          size='sm'
+          className='w-full'
+        >
+          <MapPin className='w-4 h-4' />
+          地図を開く
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuItem onClick={openCurrentLocationRoute}>

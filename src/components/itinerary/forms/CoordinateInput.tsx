@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Path, useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { LocationView } from '@/components/itinerary/LocationView';
 import { PlaceNavigationButton } from '@/components/itinerary/PlaceNavigationButton';
 import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
@@ -116,8 +118,8 @@ export function CoordinateInput({
             )}
           </div>
         </div>
-        <div className='space-y-2'>
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
+        <div className='space-y-2 mt-2'>
+          <ButtonGroup className='w-full flex-col sm:flex-row'>
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
                 // 明示的に数値に変換
@@ -125,16 +127,19 @@ export function CoordinateInput({
                 setValue(lonPath, Number(lng), { shouldValidate: true });
                 trigger([latPath, lonPath]);
               }}
+              className='flex-1'
             />
-            <button
+            <Button
               type='button'
+              variant='outline'
+              size='sm'
               onClick={() => setShowMap(!showMap)}
-              className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
+              className='flex-1'
             >
               <MapPin className='w-4 h-4' />
               {showMap ? '選択完了' : '地図で選択'}
-            </button>
-          </div>
+            </Button>
+          </ButtonGroup>
           {/* Map picker */}
           {showMap && (
             <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>

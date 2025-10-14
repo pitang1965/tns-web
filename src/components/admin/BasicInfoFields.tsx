@@ -9,6 +9,7 @@ import {
   FieldErrors,
 } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
@@ -88,14 +89,24 @@ export function BasicInfoFields({
       {/* Basic Info */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
-          <Label htmlFor='name' className="after:content-['*'] after:ml-0.5 after:text-red-500">名称</Label>
+          <Label
+            htmlFor='name'
+            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+          >
+            名称
+          </Label>
           <Input id='name' {...register('name')} placeholder='名称を入力' />
           {errors.name && (
             <p className='text-sm text-red-500'>{errors.name.message}</p>
           )}
         </div>
         <div>
-          <Label htmlFor='prefecture' className="after:content-['*'] after:ml-0.5 after:text-red-500">都道府県</Label>
+          <Label
+            htmlFor='prefecture'
+            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+          >
+            都道府県
+          </Label>
           <Select
             onValueChange={(value) => setValue('prefecture', value)}
             defaultValue={spot?.prefecture}
@@ -121,14 +132,24 @@ export function BasicInfoFields({
       <div className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
-            <Label htmlFor='lat' className="after:content-['*'] after:ml-0.5 after:text-red-500">緯度</Label>
+            <Label
+              htmlFor='lat'
+              className="after:content-['*'] after:ml-0.5 after:text-red-500"
+            >
+              緯度
+            </Label>
             <Input id='lat' type='number' step='any' {...register('lat')} />
             {errors.lat && (
               <p className='text-sm text-red-500'>{errors.lat.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor='lng' className="after:content-['*'] after:ml-0.5 after:text-red-500">経度</Label>
+            <Label
+              htmlFor='lng'
+              className="after:content-['*'] after:ml-0.5 after:text-red-500"
+            >
+              経度
+            </Label>
             <Input id='lng' type='number' step='any' {...register('lng')} />
             {errors.lng && (
               <p className='text-sm text-red-500'>{errors.lng.message}</p>
@@ -137,33 +158,30 @@ export function BasicInfoFields({
         </div>
 
         <div className='space-y-4'>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='space-y-1'>
+          <div className='space-y-1'>
+            <ButtonGroup className='w-full flex-col sm:flex-row'>
               <CoordinatesFromClipboardButton
                 onCoordinatesExtracted={(latitude, longitude) => {
                   setValue('lat', latitude.toString());
                   setValue('lng', longitude.toString());
                 }}
+                className='flex-1'
               />
-              <p className='text-xs text-gray-500 dark:text-gray-400'>
-                Google Maps の URL や「35.123456,
-                139.123456」形式の座標をコピーしてから押してください
-              </p>
-            </div>
-
-            <div className='space-y-1'>
-              <button
+              <Button
                 type='button'
+                variant='outline'
+                size='sm'
                 onClick={() => setShowMap(!showMap)}
-                className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
+                className='flex-1'
               >
                 <MapPin className='w-4 h-4' />
                 {showMap ? '選択完了' : '地図で選択'}
-              </button>
-              <p className='text-xs text-gray-500 dark:text-gray-400'>
-                地図上でクリックして位置を選択できます
-              </p>
-            </div>
+              </Button>
+            </ButtonGroup>
+            <p className='text-xs text-gray-500 dark:text-gray-400'>
+              Google Maps の URL
+              や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
+            </p>
           </div>
 
           {showMap && (
@@ -181,15 +199,17 @@ export function BasicInfoFields({
           )}
 
           <div className='space-y-1'>
-            <button
+            <Button
               type='button'
+              variant='outline'
+              size='sm'
               onClick={showOnMap}
               disabled={!watch('lat') || !watch('lng')}
-              className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full disabled:opacity-50 disabled:cursor-not-allowed'
+              className='w-full'
             >
               <Map className='w-4 h-4' />
               地図で表示
-            </button>
+            </Button>
             <p className='text-xs text-gray-500 dark:text-gray-400'>
               入力した座標をGoogle Mapsで確認できます
             </p>
@@ -226,7 +246,12 @@ export function BasicInfoFields({
       {/* Type and Basic Properties */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
-          <Label htmlFor='type' className="after:content-['*'] after:ml-0.5 after:text-red-500">種別</Label>
+          <Label
+            htmlFor='type'
+            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+          >
+            種別
+          </Label>
           <Select
             onValueChange={(value) =>
               setValue('type', value as CampingSpotType)
@@ -277,7 +302,9 @@ export function BasicInfoFields({
               {...register('capacityLarge')}
             />
             {errors.capacityLarge && (
-              <p className='text-sm text-red-500'>{errors.capacityLarge.message}</p>
+              <p className='text-sm text-red-500'>
+                {errors.capacityLarge.message}
+              </p>
             )}
           </div>
         </div>

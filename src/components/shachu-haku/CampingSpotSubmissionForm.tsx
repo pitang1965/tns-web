@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -362,34 +363,29 @@ export default function CampingSpotSubmissionForm({
               </div>
 
               <div className='space-y-4'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div className='space-y-1'>
+                <div className='space-y-1'>
+                  <ButtonGroup className='w-full flex-col sm:flex-row'>
                     <CoordinatesFromClipboardButton
                       onCoordinatesExtracted={(latitude, longitude) => {
                         form.setValue('lat', latitude.toString());
                         form.setValue('lng', longitude.toString());
                       }}
+                      className='flex-1'
                     />
-                    <p className='text-xs text-gray-500 dark:text-gray-400'>
-                      Google Maps の URL や「35.123456,
-                      139.123456」形式の座標をコピーしてから押してください
-                    </p>
-                  </div>
-
-                  <div className='space-y-1'>
                     <Button
                       type='button'
                       variant='outline'
+                      size='sm'
                       onClick={() => setShowMap(!showMap)}
-                      className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full'
+                      className='flex-1'
                     >
                       <MapPin className='w-4 h-4' />
                       {showMap ? '選択完了' : '地図で選択'}
                     </Button>
-                    <p className='text-xs text-gray-500 dark:text-gray-400'>
-                      地図上でクリックして位置を選択できます
-                    </p>
-                  </div>
+                  </ButtonGroup>
+                  <p className='text-xs text-gray-500 dark:text-gray-400'>
+                    Google Maps の URL や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
+                  </p>
                 </div>
 
                 {showMap && (
@@ -411,15 +407,17 @@ export default function CampingSpotSubmissionForm({
                 )}
 
                 <div className='space-y-1'>
-                  <button
+                  <Button
                     type='button'
+                    variant='outline'
+                    size='sm'
                     onClick={handleShowOnMap}
                     disabled={!form.watch('lat') || !form.watch('lng')}
-                    className='flex items-center justify-center gap-2 text-sm px-3 border bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 text-foreground w-full disabled:opacity-50 disabled:cursor-not-allowed'
+                    className='w-full'
                   >
                     <Map className='w-4 h-4' />
                     地図で表示
-                  </button>
+                  </Button>
                   <p className='text-xs text-gray-500 dark:text-gray-400'>
                     入力した座標をGoogle Mapsで確認できます
                   </p>
