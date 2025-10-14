@@ -129,3 +129,14 @@ Required environment variables (see README.md for full details):
 - When adding new shadcn/ui components, use: `npx shadcn@latest add [component-name]`
 - If components are mistakenly placed in other directories (like `@/components/ui/`), move them to the correct location
 - Clean up any incorrectly created directories after moving components
+
+**IMPORTANT - Import Path Convention:**
+- This project uses `@/lib/utils` for the cn() utility function
+- shadcn/ui CLI may generate files with `@/utils` imports, which is INCORRECT for this project
+- After installing any shadcn/ui component, always verify and fix import paths:
+  - ❌ Wrong: `import { cn } from "@/utils"`
+  - ✅ Correct: `import { cn } from "@/lib/utils"`
+- Check these files after running `npx shadcn@latest add`:
+  - Any newly created files in `src/components/ui/`
+  - Any updated files (button.tsx, separator.tsx, etc.)
+- Run `npx tsc --noEmit` after adding components to catch import errors early
