@@ -150,16 +150,16 @@ export function useItineraryForm({
   };
 
   // ボタンハンドラー
-  const handleSave = (e: React.MouseEvent) => {
+  const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     setIsSaving(true);
     try {
-      handleSubmit(async (data) => {
+      await handleSubmit(async (data) => {
         console.log('更新ボタンがクリックされました。データ:', data);
         setFormModified(false);
-        return await handleFormSubmit(data);
+        await handleFormSubmit(data);
       })();
     } finally {
       setIsSaving(false);
@@ -175,7 +175,7 @@ export function useItineraryForm({
       await handleSubmit(async (data) => {
         setFormModified(false);
         console.log('作成ボタンがクリックされました。データ:', data);
-        return await handleFormSubmit(data);
+        await handleFormSubmit(data);
       })();
     } finally {
       setIsSaving(false);

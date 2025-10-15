@@ -43,6 +43,7 @@ export function useActivityOperations({
           startTime: '',
           endTime: '',
           cost: 0,
+          url: null,
         },
       ],
       { shouldValidate: true, shouldDirty: true }

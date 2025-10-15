@@ -42,6 +42,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '2',
@@ -56,6 +57,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '3',
@@ -70,6 +72,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '4',
@@ -84,6 +87,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '5',
@@ -98,6 +102,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '6',
@@ -112,6 +117,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '7',
@@ -126,6 +132,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '8',
@@ -140,6 +147,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '9',
@@ -154,6 +162,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: null,
             description: null,
             cost: null,
+            url: null,
           },
           {
             id: '10',
@@ -179,6 +188,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             startTime: '19:37',
             endTime: null,
             cost: null,
+            url: null,
           },
           {
             id: '11',
@@ -193,6 +203,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             endTime: '22:08',
             description: null,
             cost: null,
+            url: null,
           },
         ],
       },

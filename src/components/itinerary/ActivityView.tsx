@@ -51,6 +51,7 @@ export const ActivityView: React.FC<ActivityProps> = ({
         location={activity.place.location}
         allActivities={allActivities}
         currentActivityIndex={index}
+        url={activity.url}
       />
       {activity.description && <Text>{activity.description}</Text>}
     </li>

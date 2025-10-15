@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Share2,
   BookPlus,
+  Loader2,
 } from 'lucide-react';
 import { handleShare, type ShareData } from '@/lib/shareUtils';
 
@@ -156,12 +157,16 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onSave(e)}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground'
+                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110'}`}
               >
-                <Save className='h-5 w-5' />
+                {disabled ? (
+                  <Loader2 className='h-5 w-5 animate-spin' />
+                ) : (
+                  <Save className='h-5 w-5' />
+                )}
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>保存</p>
+                <p>{disabled ? '保存中...' : '保存'}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -176,12 +181,16 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onCreate(e)}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground'
+                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110'}`}
               >
-                <BookPlus className='h-5 w-5' />
+                {disabled ? (
+                  <Loader2 className='h-5 w-5 animate-spin' />
+                ) : (
+                  <BookPlus className='h-5 w-5' />
+                )}
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>作成</p>
+                <p>{disabled ? '作成中...' : '作成'}</p>
               </TooltipContent>
             </Tooltip>
           )}

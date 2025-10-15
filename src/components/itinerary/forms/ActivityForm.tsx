@@ -49,8 +49,8 @@ export function ActivityForm({
   );
 
   // アクティビティのタイトル表示を生成
-  const activityHeader = total 
-    ? `アクティビティ ${activityIndex + 1}/${total}` 
+  const activityHeader = total
+    ? `アクティビティ ${activityIndex + 1}/${total}`
     : `アクティビティ ${activityIndex + 1}`;
 
   return (
@@ -138,6 +138,18 @@ export function ActivityForm({
           />
           {getFieldError('cost') && (
             <SmallText>{getFieldError('cost')}</SmallText>
+          )}
+        </div>
+
+        <div className='space-y-2'>
+          <Label>URL</Label>
+          <Input
+            type='url'
+            {...getFieldRegister('url')}
+            placeholder='https://example.com'
+          />
+          {getFieldError('url') && (
+            <SmallText>{getFieldError('url')}</SmallText>
           )}
         </div>
       </div>
