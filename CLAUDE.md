@@ -28,6 +28,15 @@ npm run init-db      # Initialize MongoDB database with sample data
 - Never allow Next.js to automatically switch to alternative ports
 - Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
 
+**CRITICAL DATABASE OPERATION RULE**:
+- **ALWAYS use MCP server tools (mcp__mongodb-readonly__*) for all MongoDB operations**
+- DO NOT write custom scripts or use Mongoose directly for data inspection, queries, or updates
+- Use MCP tools for: listing databases/collections, finding documents, aggregations, inserts, updates, deletes
+- Only write application code (models, schemas, API routes) when implementing new features
+- When asked to check, inspect, or modify database data, immediately use MCP tools
+- MongoDB connection string is available in `.env.local` as `MONGODB_URI` - read from this file when needed for MCP operations
+- NEVER write the actual MONGODB_URI value to any git-tracked files
+
 **CRITICAL SERVER MANAGEMENT RULE**:
 - **NEVER start the development server (`npm run dev` or `pnpm dev`) unless explicitly requested by the user**
 - The user will start and manage the development server themselves
