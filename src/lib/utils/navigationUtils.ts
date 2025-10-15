@@ -27,17 +27,8 @@ export const isMobileDevice = (): boolean => {
 export const formatAddress = (
   address: Activity['place']['address']
 ): string | null => {
-  if (!address) return null;
-
-  const parts = [
-    address.prefecture,
-    address.city,
-    address.town,
-    address.block,
-    address.building,
-  ].filter((part) => part && part.trim() !== '');
-
-  return parts.join('');
+  // addressは既に文字列なのでそのまま返す
+  return address || null;
 };
 
 export const filterValidActivities = (activities: Activity[]): Activity[] => {

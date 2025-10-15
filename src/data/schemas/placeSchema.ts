@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { addressSchema } from './addressSchema';
 import { locationSchema } from './locationSchema';
 
 export const placeSchema = z.object({
@@ -20,6 +19,6 @@ export const placeSchema = z.object({
     'COIN_LAUNDRY', // コインランドリ
     'OTHER', // その他
   ]),
-  address: addressSchema.nullable(),
+  address: z.string().nullable(), // 住所（任意のテキスト）
   location: locationSchema.nullable(),
 });

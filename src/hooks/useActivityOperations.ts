@@ -25,15 +25,7 @@ export function useActivityOperations({
           place: {
             type: 'ATTRACTION' as const,
             name: '',
-            address: {
-              postalCode: null,
-              prefecture: null,
-              city: null,
-              town: null,
-              block: null,
-              building: null,
-              country: 'Japan',
-            },
+            address: null,
             location: {
               latitude: undefined,
               longitude: undefined,

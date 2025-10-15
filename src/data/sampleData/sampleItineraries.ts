@@ -170,15 +170,7 @@ export const sampleItineraries: ServerItineraryDocument[] = [
             place: {
               name: '市営愛宕山 無料駐車場',
               type: 'PARKING_FREE_OTHER',
-              address: {
-                postalCode: '288-0024',
-                prefecture: '千葉県',
-                city: '銚子市',
-                town: '天王台',
-                block: '１４２３−１',
-                building: null,
-                country: 'Japan',
-              },
+              address: '千葉県銚子市天王台１４２３−１',
               location: {
                 latitude: 35.7053506,
                 longitude: 140.849767,

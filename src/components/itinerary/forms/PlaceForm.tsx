@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/select';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { PLACE_TYPES } from '@/constants/placeTypes';
-import { AddressFields } from '@/components/itinerary/forms/AddressFields';
 import { CoordinateInput } from '@/components/itinerary/forms/CoordinateInput';
 
 type PlaceFormProps = {
@@ -67,7 +66,13 @@ export function PlaceForm({
         </Select>
       </div>
 
-      <AddressFields basePath={basePath} />
+      <div className="space-y-2">
+        <Label>住所</Label>
+        <Input
+          {...register(`${basePath}.place.address` as Path<ClientItineraryInput>)}
+          placeholder="例: 東京都渋谷区恵比寿南1-2-3"
+        />
+      </div>
 
       <CoordinateInput
         basePath={basePath}

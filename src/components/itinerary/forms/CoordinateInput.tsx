@@ -83,7 +83,7 @@ export function CoordinateInput({
               step='any'
               placeholder='緯度'
               {...register(latPath, {
-                valueAsNumber: true, // 数値として扱う
+                setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
                 onChange: () => trigger(lonPath), // 経度
               })}
             />
@@ -103,7 +103,7 @@ export function CoordinateInput({
               step='any'
               placeholder='経度'
               {...register(lonPath, {
-                valueAsNumber: true, // 数値として扱う
+                setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
                 onChange: () => trigger(latPath), // 緯度
               })}
             />

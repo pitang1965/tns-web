@@ -1,4 +1,3 @@
-export * from './addressSchema';
 export * from './locationSchema';
 export * from './placeSchema';
 export * from './activitySchema';

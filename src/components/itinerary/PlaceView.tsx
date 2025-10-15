@@ -1,12 +1,14 @@
 import React from 'react';
 import { PlaceTypeBadge } from '@/components/itinerary/PlaceTypeBadge';
-import { AddressView } from './AddressView';
 import { LocationView } from './LocationView';
 import { PlaceNavigationButton } from './PlaceNavigationButton';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { Text } from '@/components/common/Typography';
 
-type ActivityType = ClientItineraryDocument['dayPlans'][number]['activities'][number];
-type PlacePropsBase = ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
+type ActivityType =
+  ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type PlacePropsBase =
+  ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
 
 type PlaceProps = PlacePropsBase & {
   allActivities?: ActivityType[];
@@ -63,7 +65,7 @@ export const PlaceView: React.FC<PlaceProps> = ({
         />
       </div>
     </div>
-    {address && <AddressView address={address} />}
+    {address && <Text>{address}</Text>}
     {location && <LocationView location={location} />}
   </div>
 );

@@ -11,23 +11,12 @@ type DayRouteNavigationButtonProps = {
   className?: string;
 };
 
-export const DayRouteNavigationButton: React.FC<DayRouteNavigationButtonProps> = ({
-  activities,
-  className = '',
-}) => {
-  // 住所オブジェクトを文字列に変換する関数
+export const DayRouteNavigationButton: React.FC<
+  DayRouteNavigationButtonProps
+> = ({ activities, className = '' }) => {
+  // 住所を返す関数（addressは既に文字列）
   const formatAddress = (address: Activity['place']['address']) => {
-    if (!address) return null;
-    
-    const parts = [
-      address.prefecture,
-      address.city,
-      address.town,
-      address.block,
-      address.building
-    ].filter(part => part && part.trim() !== '');
-    
-    return parts.join('');
+    return address || null;
   };
 
   // 位置情報があるアクティビティを取得
@@ -58,7 +47,7 @@ export const DayRouteNavigationButton: React.FC<DayRouteNavigationButtonProps> =
   const openFullRoute = () => {
     const waypoints = activitiesWithLocation.map((activity) => {
       const { latitude, longitude } = activity.place.location!;
-      
+
       // 住所がある場合はエンコードして使用
       const addressString = formatAddress(activity.place.address);
       if (addressString) {
@@ -70,10 +59,10 @@ export const DayRouteNavigationButton: React.FC<DayRouteNavigationButtonProps> =
 
     // Google Maps の directions URL を構築
     let url = `https://www.google.com/maps/dir/${waypoints.join('/')}`;
-    
+
     // パラメータを追加
     url += '?travelmode=driving';
-    
+
     if (isMobileDevice()) {
       // モバイルの場合は同じタブで開く
       window.location.href = url;
