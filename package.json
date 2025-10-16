@@ -33,7 +33,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "jotai": "^2.12.2",
-    "lucide-react": "^0.539.0",
+    "lucide-react": "^0.546.0",
     "mapbox-gl": "^3.7.0",
     "mongodb": "6.9.0",
     "mongoose": "8.6.4",
