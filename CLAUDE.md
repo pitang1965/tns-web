@@ -37,6 +37,18 @@ npm run init-db      # Initialize MongoDB database with sample data
 - MongoDB connection string is available in `.env.local` as `MONGODB_URI` - read from this file when needed for MCP operations
 - NEVER write the actual MONGODB_URI value to any git-tracked files
 
+**CRITICAL ENVIRONMENT SAFETY RULES**:
+- **BEFORE any database operation, ALWAYS verify you are connected to the DEVELOPMENT database**
+- Development database: `itinerary_db_dev` (safe for all operations)
+- Production database: `itinerary_db` (NEVER modify without explicit user confirmation)
+- Check `.env.local` to confirm `MONGODB_URI` contains `/itinerary_db_dev?`
+- The `npm run init-db` script has built-in protection:
+  - Automatically blocks execution if targeting `itinerary_db`
+  - Requires explicit confirmation (y/N) even for development database
+  - Shows database name and masked connection URI before execution
+- If user asks to "initialize database" or "reset data", FIRST confirm the target database
+- See `ENVIRONMENT_SETUP.md` for detailed environment management guidelines
+
 **CRITICAL SERVER MANAGEMENT RULE**:
 - **NEVER start the development server (`npm run dev` or `pnpm dev`) unless explicitly requested by the user**
 - The user will start and manage the development server themselves

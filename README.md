@@ -104,7 +104,15 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 ### データベース
 - `MONGODB_URI`:
   - MongoDB データベースに接続するための接続文字列。
+  - **重要**: データベース名を必ず含めてください（`/データベース名?`の形式）
+  - 開発環境の例: `mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/itinerary_db_dev?retryWrites=true&w=majority`
+  - 本番環境の例: `mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/itinerary_db?retryWrites=true&w=majority`
   - データベースのホスト、ポート、認証情報、データベース名などを含む。
+
+**環境別のデータベース設定:**
+- **開発環境** (`.env.local`): `itinerary_db_dev` を使用
+- **本番環境** (Vercel等の環境変数): `itinerary_db` を使用
+- 詳細は `ENVIRONMENT_SETUP.md` を参照してください。
 
 ### モニタリング・分析
 - `SENTRY_AUTH_TOKEN`:

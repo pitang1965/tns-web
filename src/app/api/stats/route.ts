@@ -9,9 +9,8 @@ export const dynamic = 'force-dynamic';
 async function ensureDbConnection() {
   if (mongoose.connection.readyState === 0) {
     const uri = process.env.MONGODB_URI!;
-    const dbName = 'itinerary_db';
+    // データベース名は接続URIから自動取得
     await mongoose.connect(uri, {
-      dbName,
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,
@@ -25,7 +24,7 @@ export async function GET() {
 
     // Get MongoDB client for itineraries collection
     const client = await clientPromise;
-    const db = client.db('itinerary_db');
+    const db = client.db(); // 接続URIから自動取得
 
     const [campingSpotCount, itineraryCount, submissionCount] = await Promise.all([
       CampingSpot.countDocuments({}), // Count all spots, not just verified

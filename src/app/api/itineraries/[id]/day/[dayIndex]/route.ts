@@ -28,7 +28,7 @@ export async function GET(
     }
 
     const client = await clientPromise;
-    const db = client.db('itinerary_db');
+    const db = client.db(); // 接続URIから自動取得
 
     // まず基本的な情報を取得して日数をチェック
     const itinerary = await db

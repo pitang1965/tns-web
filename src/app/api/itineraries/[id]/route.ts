@@ -27,7 +27,7 @@ export async function GET(
     }
 
     const client = await clientPromise;
-    const db = client.db('itinerary_db');
+    const db = client.db(); // 接続URIから自動取得
     const itinerary = await db
       .collection('itineraries')
       .findOne({ _id: new ObjectId(id as string) });

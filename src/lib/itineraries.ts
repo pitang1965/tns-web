@@ -19,9 +19,10 @@ async function getAuthenticatedUser() {
 }
 
 // データベース接続を取得する関数
+// データベース名は MONGODB_URI の接続文字列から自動的に取得されます
 async function getDatabase() {
   const client = await clientPromise;
-  return client.db('itinerary_db');
+  return client.db(); // データベース名を指定しない場合、接続URIから自動取得
 }
 
 export async function createItinerary(
@@ -103,7 +104,7 @@ export async function getItineraryById(
   id: string
 ): Promise<ClientItineraryDocument | null> {
   const client = await clientPromise;
-  const db = client.db('itinerary_db');
+  const db = client.db(); // 接続URIから自動取得
 
   try {
     // 有効なObjectIdかチェック
@@ -140,7 +141,7 @@ export async function getItineraryWithDay(
   dayIndex: number
 ): Promise<{ metadata: any; dayPlan: any } | null> {
   const client = await clientPromise;
-  const db = client.db('itinerary_db');
+  const db = client.db(); // 接続URIから自動取得
 
   try {
     // 有効なObjectIdかチェック

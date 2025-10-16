@@ -12,7 +12,7 @@ export async function deleteItinerary(id: string) {
 
   try {
     const client = await clientPromise;
-    const db = client.db('itinerary_db');
+    const db = client.db(); // 接続URIから自動取得
 
     const result = await db.collection('itineraries').deleteOne({
       _id: new ObjectId(id),
