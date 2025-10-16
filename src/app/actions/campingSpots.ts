@@ -35,13 +35,11 @@ async function checkAdminAuth() {
 async function ensureDbConnection() {
   try {
     if (mongoose.connection.readyState === 0) {
-      // Connect to the same database as itineraries (itinerary_db)
+      // データベース名は MONGODB_URI から自動取得
       const uri = process.env.MONGODB_URI!;
-      const dbName = 'itinerary_db';
 
       // Enhanced connection options for stability in various environments
       await mongoose.connect(uri, {
-        dbName,
         connectTimeoutMS: 10000, // 10 seconds
         socketTimeoutMS: 45000, // 45 seconds
         serverSelectionTimeoutMS: 10000, // 10 seconds
