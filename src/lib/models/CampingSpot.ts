@@ -114,7 +114,8 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   nearbyBathCoordinates: [Number],
   elevation: {
     type: Number,
-    min: 0,
+    min: -10,
+    max: 3776,
   },
   // 旧評価システム（段階的廃止予定）
   quietnessLevel: {

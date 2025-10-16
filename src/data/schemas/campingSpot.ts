@@ -56,7 +56,7 @@ export const CampingSpotSchema = z.object({
     z.number().min(-180).max(180), // longitude
     z.number().min(-90).max(90)    // latitude
   ]).optional(),
-  elevation: z.number().min(0).optional(),
+  elevation: z.number().min(-10).max(3776).optional(),
   security: CampingSpotSecuritySchema.default({}),
   nightNoise: CampingSpotNightNoiseSchema.default({}),
   hasRoof: z.boolean().default(false),
@@ -134,8 +134,8 @@ export const CampingSpotCSVSchema = z.object({
   nearbyBathLng: z.string().refine((val) => val === '' || !isNaN(Number(val)), {
     message: "入浴施設の経度は空欄または数値で入力してください",
   }).optional().default(''),
-  elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
-    message: "標高は空欄または0以上の数値で入力してください",
+  elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776), {
+    message: "標高は空欄または-10〜3776の数値で入力してください",
   }).optional().default(''),
   hasGateField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
     message: "ゲート有無はtrue/false/空欄で入力してください",
@@ -240,8 +240,8 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   'お風呂経度': z.string().refine((val) => val === '' || !isNaN(Number(val)), {
     message: "入浴施設の経度は空欄または数値で入力してください",
   }).optional().default(''),
-  '標高(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
-    message: "標高は空欄または0以上の数値で入力してください",
+  '標高(m)': z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776), {
+    message: "標高は空欄または-10〜3776の数値で入力してください",
   }).optional().default(''),
   'セキュリティ-ゲート有無(true/false)': z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
     message: "ゲート有無はtrue/false/空欄で入力してください",

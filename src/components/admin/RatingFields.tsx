@@ -145,7 +145,8 @@ export function RatingFields({ register, errors, watch, spot }: RatingFieldsProp
             <Input
               id='elevation'
               type='number'
-              min='0'
+              min='-10'
+              max='3776'
               {...register('elevation')}
               placeholder='標高（メートル）'
             />

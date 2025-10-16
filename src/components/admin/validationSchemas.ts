@@ -57,8 +57,8 @@ export const ShachuHakuFormCreateSchema = z.object({
     { message: '有効な経度を入力してください（-180〜180）' }
   ),
   elevation: z.string().min(1, '標高を入力してください').refine(
-    (val) => !isNaN(Number(val)) && Number(val) >= 0,
-    { message: '有効な数値を入力してください（0以上）' }
+    (val) => !isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776,
+    { message: '有効な数値を入力してください（-10〜3776）' }
   ),
   // 新評価システム（客観的データ） - フラット構造
   securityHasGate: z.boolean().default(false),
@@ -104,8 +104,8 @@ export const ShachuHakuFormCreateSchema = z.object({
 // 編集用（標高任意）
 export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema.extend({
   elevation: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
-    { message: '有効な数値を入力してください（0以上）' }
+    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776),
+    { message: '有効な数値を入力してください（-10〜3776）' }
   ),
 });
 
