@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { LoginButton } from '@/components/auth/LoginButton';
@@ -9,6 +9,23 @@ import { UserAvatar } from '@/components/common/UserAvatar';
 import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { useEnvironment } from '@/hooks/useEnvironment';
+
+function EnvironmentBadge() {
+  const environment = useEnvironment();
+
+  // 開発環境のみバッジを表示
+  if (environment === 'development') {
+    return (
+      <span className='px-2 py-1 text-xs font-bold bg-orange-500 text-white rounded-md'>
+        DEV
+      </span>
+    );
+  }
+
+  // 本番環境では何も表示しない
+  return null;
+}
 
 export function Header() {
   const { user, error, isLoading } = useUser();
@@ -30,6 +47,9 @@ export function Header() {
         <Link href='/' className='text-xl ml-auto cursor-pointer'>
           旅のしおり
         </Link>
+        <Suspense fallback={null}>
+          <EnvironmentBadge />
+        </Suspense>
         <div className='flex items-center space-x-4 ml-auto'>
           <div className='hidden md:block'>
             <Navigation />
