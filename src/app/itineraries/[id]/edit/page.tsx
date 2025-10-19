@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { ItineraryToc } from '@/components/layout/ItineraryToc';
@@ -10,17 +10,18 @@ import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 
 type EditItineraryPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default withPageAuthRequired(function EditItineraryPage({
   params,
 }: EditItineraryPageProps) {
+  const { id } = use(params);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
-  const { itinerary, loading, error } = useGetItinerary(params.id);
+  const { itinerary, loading, error } = useGetItinerary(id);
 
   // ページタイトルを動的に設定
   useEffect(() => {
@@ -36,7 +37,7 @@ export default withPageAuthRequired(function EditItineraryPage({
     setIsSubmitting(true);
 
     try {
-      const result = await updateItineraryAction(params.id, data);
+      const result = await updateItineraryAction(id, data);
       console.log('Update action result:', result);
       setIsSubmitting(false);
       if (!result) {

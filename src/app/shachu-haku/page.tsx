@@ -3,12 +3,13 @@ import ShachuHakuClient from './ShachuHakuClient';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 
 type Props = {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const q = typeof searchParams.q === 'string' && searchParams.q.trim() !== '' ? searchParams.q : undefined;
-  const type = typeof searchParams.type === 'string' && searchParams.type !== 'all' ? searchParams.type : undefined;
+  const resolvedSearchParams = await searchParams;
+  const q = typeof resolvedSearchParams.q === 'string' && resolvedSearchParams.q.trim() !== '' ? resolvedSearchParams.q : undefined;
+  const type = typeof resolvedSearchParams.type === 'string' && resolvedSearchParams.type !== 'all' ? resolvedSearchParams.type : undefined;
 
   // Build dynamic title and description
   const titleParts: string[] = [];

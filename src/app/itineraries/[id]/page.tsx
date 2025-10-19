@@ -4,15 +4,17 @@ import { getItineraryById } from '@/lib/itineraries';
 import { formatDateWithWeekday } from '@/lib/date';
 
 type PageProps = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export const generateMetadata = async ({
   params,
   searchParams,
 }: PageProps): Promise<Metadata> => {
-  const itinerary = await getItineraryById(params.id);
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
+  const itinerary = await getItineraryById(id);
 
   if (!itinerary) {
     return {
@@ -39,8 +41,8 @@ export const generateMetadata = async ({
   }
 
   // dayパラメータがある場合は日数を表示（ただし旅程が1日の場合は表示しない）
-  const dayParam = searchParams.day
-    ? parseInt(searchParams.day as string)
+  const dayParam = resolvedSearchParams.day
+    ? parseInt(resolvedSearchParams.day as string)
     : null;
   const totalDays = itinerary.dayPlans?.length || 1;
   const dayDisplay = dayParam && totalDays > 1 ? ` ${dayParam}日目` : '';
@@ -51,8 +53,8 @@ export const generateMetadata = async ({
     itinerary.description || '旅のしおりで作成された旅行計画です。';
 
   // URLを構築（searchParamsがある場合はそれも含める）
-  const baseUrl = `https://tabi.over40web.club/itineraries/${params.id}`;
-  const url = searchParams.day ? `${baseUrl}?day=${searchParams.day}` : baseUrl;
+  const baseUrl = `https://tabi.over40web.club/itineraries/${id}`;
+  const url = resolvedSearchParams.day ? `${baseUrl}?day=${resolvedSearchParams.day}` : baseUrl;
 
   return {
     title: title,
@@ -82,10 +84,12 @@ export const generateMetadata = async ({
   };
 };
 
-export default function ItinerariesPage({ params }: PageProps) {
-  if (!params?.id) {
+export default async function ItinerariesPage({ params }: PageProps) {
+  const { id } = await params;
+
+  if (!id) {
     return <div>旅程が見つかりませんね。</div>;
   }
 
-  return <ItineraryDetail id={params.id} />;
+  return <ItineraryDetail id={id} />;
 }

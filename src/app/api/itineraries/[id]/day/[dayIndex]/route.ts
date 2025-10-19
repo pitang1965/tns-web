@@ -9,10 +9,10 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string; dayIndex: string } }
+  { params }: { params: Promise<{ id: string; dayIndex: string }> }
 ) {
   try {
-    const { id, dayIndex } = params;
+    const { id, dayIndex } = await params;
     const dayIndexNum = parseInt(dayIndex, 10);
 
     // パラメータの検証

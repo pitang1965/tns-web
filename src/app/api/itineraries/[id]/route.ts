@@ -13,10 +13,10 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // ObjectId の検証
     if (!isValidObjectId(id)) {

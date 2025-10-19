@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { redirect } from 'next/navigation';
+import { getSession } from '@auth0/nextjs-auth0';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
 import { H1, LargeText } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
@@ -31,44 +32,47 @@ export const metadata: Metadata = {
   },
 };
 
-export default withPageAuthRequired(
-  async function Itineraries() {
-    // Promiseを作成（awaitせずに渡す）
-    const itinerariesPromise = getItineraries();
+export default async function Itineraries() {
+  const session = await getSession();
 
-    return (
-      <main className='flex flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24 bg-background text-foreground'>
-        <section>
-          <H1>保存された旅程一覧</H1>
-          <LargeText>
-            これまでに作成した旅程を確認できます。新しい旅程を作成する場合は、「新規作成」ボタンをクリックしてください。
-          </LargeText>
-          <Suspense
-            fallback={
-              <div className='flex flex-col gap-2'>
-                <Button size='sm' className='w-20' disabled>
-                  新規作成
-                </Button>
-                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
-                  {[...Array(3)].map((_, i) => (
-                    <div
-                      key={i}
-                      className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse'
-                    >
-                      <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3'></div>
-                      <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2'></div>
-                      <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6'></div>
-                    </div>
-                  ))}
-                </div>
+  if (!session) {
+    redirect('/api/auth/login?returnTo=/itineraries');
+  }
+
+  // Promiseを作成（awaitせずに渡す）
+  const itinerariesPromise = getItineraries();
+
+  return (
+    <main className='flex flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24 bg-background text-foreground'>
+      <section>
+        <H1>保存された旅程一覧</H1>
+        <LargeText>
+          これまでに作成した旅程を確認できます。新しい旅程を作成する場合は、「新規作成」ボタンをクリックしてください。
+        </LargeText>
+        <Suspense
+          fallback={
+            <div className='flex flex-col gap-2'>
+              <Button size='sm' className='w-20' disabled>
+                新規作成
+              </Button>
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse'
+                  >
+                    <div className='h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3'></div>
+                    <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2'></div>
+                    <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6'></div>
+                  </div>
+                ))}
               </div>
-            }
-          >
-            <ItineraryList itinerariesPromise={itinerariesPromise} />
-          </Suspense>
-        </section>
-      </main>
-    );
-  },
-  { returnTo: '/itineraries' }
-);
+            </div>
+          }
+        >
+          <ItineraryList itinerariesPromise={itinerariesPromise} />
+        </Suspense>
+      </section>
+    </main>
+  );
+}

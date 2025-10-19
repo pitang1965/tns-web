@@ -5,14 +5,15 @@ import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
 
 type PageProps = {
-  params: { spotId: string };
+  params: Promise<{ spotId: string }>;
 };
 
 export const generateMetadata = async ({
   params,
 }: PageProps): Promise<Metadata> => {
   try {
-    const spot = await getCampingSpotById(params.spotId);
+    const { spotId } = await params;
+    const spot = await getCampingSpotById(spotId);
 
     if (!spot) {
       return {
@@ -46,7 +47,7 @@ export const generateMetadata = async ({
       ? `¥${spot.pricing.pricePerNight}`
       : '料金未設定';
     const description = `${spot.prefecture}の${typeLabel}「${spot.name}」の車中泊スポット情報。${priceInfo}。${spot.address}`;
-    const url = `https://tabi.over40web.club/shachu-haku/${params.spotId}`;
+    const url = `https://tabi.over40web.club/shachu-haku/${spotId}`;
 
     return {
       title: title,
@@ -98,20 +99,22 @@ export const generateMetadata = async ({
 };
 
 interface SpotDetailPageProps {
-  params: { spotId: string };
+  params: Promise<{ spotId: string }>;
 }
 
 export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
-  if (!params?.spotId) {
+  const { spotId } = await params;
+
+  if (!spotId) {
     console.error('SpotDetailPage: No spotId provided in params');
     notFound();
   }
 
   try {
-    const spot = await getCampingSpotById(params.spotId);
+    const spot = await getCampingSpotById(spotId);
 
     if (!spot) {
-      console.error('SpotDetailPage: Spot not found for ID:', params.spotId);
+      console.error('SpotDetailPage: Spot not found for ID:', spotId);
       notFound();
     }
 
@@ -119,7 +122,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
   } catch (error) {
     // Enhanced error logging for debugging Facebook WebView issues
     console.error('SpotDetailPage: Error loading spot:', {
-      spotId: params.spotId,
+      spotId: spotId,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
