@@ -28,10 +28,20 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo); // TODO： 最終的に削除？
+    console.error('Uncaught error:', error, errorInfo);
 
+    // エラー情報をstateに保存
+    this.setState({
+      error,
+      errorInfo,
+    });
+
+    // 本番環境ではSentryにログ送信
     if (process.env.NODE_ENV !== 'development') {
-      logger.error(error);
+      logger.error(error, {
+        componentStack: errorInfo.componentStack,
+        digest: (error as any).digest, // Server Components error digest
+      });
     }
   }
 
