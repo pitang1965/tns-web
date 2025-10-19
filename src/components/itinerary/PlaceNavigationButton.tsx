@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { MapPin, Navigation, Map, Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,11 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { ServerItineraryDocument, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { useNavigation } from '@/hooks/useNavigation';
 
-type Activity =
+type ServerActivity =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
+type ClientActivity =
+  ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type Activity = ServerActivity | ClientActivity;
 
 type PlaceNavigationButtonProps = {
   latitude?: number;
@@ -28,6 +33,12 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
   activities = [],
   currentActivityIndex = -1,
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const {
     openCurrentLocationRoute,
     openCurrentToFinalRoute,
@@ -41,7 +52,10 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
     currentActivityIndex,
   });
 
-  if (!isValidCoordinate()) {
+  const isValid = isValidCoordinate();
+
+  // マウント前または無効な座標の場合は無効ボタンを表示
+  if (!isMounted || !isValid) {
     return (
       <Button
         disabled
@@ -59,14 +73,12 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant='outline'
-          size='sm'
-          className='w-full'
+        <button
+          className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-3 w-full'
         >
           <MapPin className='w-4 h-4' />
           地図を開く
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuItem onClick={openCurrentLocationRoute}>

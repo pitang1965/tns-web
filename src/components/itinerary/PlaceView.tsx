@@ -2,11 +2,15 @@ import React from 'react';
 import { PlaceTypeBadge } from '@/components/itinerary/PlaceTypeBadge';
 import { LocationView } from './LocationView';
 import { PlaceNavigationButton } from './PlaceNavigationButton';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { ClientItineraryDocument, ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { Text } from '@/components/common/Typography';
 
-type ActivityType =
+type ClientActivityType =
   ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type ServerActivityType =
+  ServerItineraryDocument['dayPlans'][number]['activities'][number];
+type ActivityType = ClientActivityType | ServerActivityType;
+
 type PlacePropsBase =
   ClientItineraryDocument['dayPlans'][number]['activities'][number]['place'];
 
@@ -24,7 +28,11 @@ export const PlaceView: React.FC<PlaceProps> = ({
   allActivities,
   currentActivityIndex,
   url,
-}) => (
+}) => {
+  const lat = location?.latitude;
+  const lng = location?.longitude;
+
+  return (
   <div className='mt-1'>
     <div className='flex items-center gap-2'>
       <PlaceTypeBadge type={type} />
@@ -58,8 +66,8 @@ export const PlaceView: React.FC<PlaceProps> = ({
       )}
       <div className='flex-shrink-0'>
         <PlaceNavigationButton
-          latitude={location?.latitude}
-          longitude={location?.longitude}
+          latitude={lat}
+          longitude={lng}
           activities={allActivities}
           currentActivityIndex={currentActivityIndex}
         />
@@ -68,4 +76,5 @@ export const PlaceView: React.FC<PlaceProps> = ({
     {address && <Text>{address}</Text>}
     {location && <LocationView location={location} />}
   </div>
-);
+  );
+};

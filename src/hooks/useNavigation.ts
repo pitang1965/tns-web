@@ -1,4 +1,4 @@
-import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { ServerItineraryDocument, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import {
   isValidCoordinate,
   isMobileDevice,
@@ -6,8 +6,11 @@ import {
   filterValidActivities,
 } from '@/lib/utils/navigationUtils';
 
-type Activity =
+type ServerActivity =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
+type ClientActivity =
+  ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type Activity = ServerActivity | ClientActivity;
 
 interface UseNavigationProps {
   latitude?: number;

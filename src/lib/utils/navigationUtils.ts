@@ -1,7 +1,10 @@
-import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { ServerItineraryDocument, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
-type Activity =
+type ServerActivity =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
+type ClientActivity =
+  ClientItineraryDocument['dayPlans'][number]['activities'][number];
+type Activity = ServerActivity | ClientActivity;
 
 export const isValidCoordinate = (
   latitude?: number,
