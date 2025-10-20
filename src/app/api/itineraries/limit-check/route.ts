@@ -3,6 +3,8 @@ import { auth0 } from '@/lib/auth0';
 import { getItineraries } from '@/lib/itineraries';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth0.getSession();
