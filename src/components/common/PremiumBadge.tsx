@@ -2,11 +2,11 @@
 
 import { Crown, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { UserProfile } from '@auth0/nextjs-auth0/client';
+import type { User } from '@auth0/nextjs-auth0/types';
 import { getPremiumMemberType, getPremiumMemberLabel } from '@/lib/userUtils';
 
 type PremiumBadgeProps = {
-  user: UserProfile | undefined;
+  user: User | null | undefined;
   variant?: 'default' | 'large';
   showIcon?: boolean;
 };

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { H2 } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import UserStats from '@/components/common/UserStats';
 import RecentItineraries from '@/components/common/RecentItineraries';
 import QuickActions from '@/components/common/QuickActions';
@@ -16,7 +16,7 @@ type LoggedInHomeProps = {
 
 async function DashboardContent() {
   const itineraries = await getItineraries();
-  const session = await getSession();
+  const session = await auth0.getSession();
 
   return (
     <>

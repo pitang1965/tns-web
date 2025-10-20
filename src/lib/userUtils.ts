@@ -1,10 +1,10 @@
-import { UserProfile } from '@auth0/nextjs-auth0/client';
+import type { User } from '@auth0/nextjs-auth0/types';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 /**
  * ユーザーが管理者かどうかを判定する
  */
-export function isAdmin(user: UserProfile | undefined): boolean {
+export function isAdmin(user: User | null | undefined): boolean {
   return !!(
     user?.email &&
     process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
@@ -18,7 +18,7 @@ export function isAdmin(user: UserProfile | undefined): boolean {
  * 管理者もプレミアム会員特典を持つ
  * 将来的にはデータベースから取得する予定
  */
-export function isPremiumMember(user: UserProfile | undefined): boolean {
+export function isPremiumMember(user: User | null | undefined): boolean {
   // 管理者はプレミアム会員特典を持つ
   if (isAdmin(user)) return true;
 
@@ -34,7 +34,7 @@ export function isPremiumMember(user: UserProfile | undefined): boolean {
  * プレミアム会員のタイプを取得する
  * 管理者とプレミアム会員を区別する
  */
-export function getPremiumMemberType(user: UserProfile | undefined): 'admin' | 'premium' | null {
+export function getPremiumMemberType(user: User | null | undefined): 'admin' | 'premium' | null {
   if (isAdmin(user)) return 'admin';
 
   // 将来的には以下のロジックが有効になる：
@@ -46,7 +46,7 @@ export function getPremiumMemberType(user: UserProfile | undefined): 'admin' | '
 /**
  * プレミアム会員のラベルを取得する
  */
-export function getPremiumMemberLabel(user: UserProfile | undefined): string | null {
+export function getPremiumMemberLabel(user: User | null | undefined): string | null {
   const type = getPremiumMemberType(user);
   switch (type) {
     case 'admin':
@@ -67,7 +67,7 @@ export const ITINERARY_LIMITS = {
 /**
  * ユーザーの旅程作成制限数を取得する
  */
-export function getItineraryLimit(user: UserProfile | undefined): number {
+export function getItineraryLimit(user: User | null | undefined): number {
   if (isPremiumMember(user)) {
     return ITINERARY_LIMITS.PREMIUM_UNLIMITED; // 無制限
   }
@@ -78,7 +78,7 @@ export function getItineraryLimit(user: UserProfile | undefined): number {
  * ユーザーが新しい旅程を作成できるかチェックする
  */
 export function canCreateItinerary(
-  user: UserProfile | undefined,
+  user: User | null | undefined,
   currentItineraryCount: number
 ): boolean {
   const limit = getItineraryLimit(user);
@@ -96,7 +96,7 @@ export function canCreateItinerary(
  * 旅程作成制限の状況を取得する
  */
 export function getItineraryLimitStatus(
-  user: UserProfile | undefined,
+  user: User | null | undefined,
   itineraries: ClientItineraryDocument[]
 ) {
   const currentCount = itineraries.length;

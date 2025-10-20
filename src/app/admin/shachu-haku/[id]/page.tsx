@@ -98,7 +98,7 @@ export default function ShachuHakuEditPage() {
           この機能を利用するにはログインしてください。
         </p>
         <div className='flex gap-4'>
-          <Link href='/api/auth/login'>
+          <Link href='/auth/login'>
             <Button>ログイン</Button>
           </Link>
           <Link href='/'>

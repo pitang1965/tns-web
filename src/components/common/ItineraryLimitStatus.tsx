@@ -4,12 +4,12 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, CheckCircle, Crown, Infinity } from 'lucide-react';
-import { UserProfile } from '@auth0/nextjs-auth0/client';
+import type { User } from '@auth0/nextjs-auth0/types';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
 
 type ItineraryLimitStatusProps = {
-  user: UserProfile | undefined;
+  user: User | null | undefined;
   itineraries: ClientItineraryDocument[];
 };
 

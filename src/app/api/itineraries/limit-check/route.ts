@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { getItineraries } from '@/lib/itineraries';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
 
     if (!session?.user) {
       return NextResponse.json(

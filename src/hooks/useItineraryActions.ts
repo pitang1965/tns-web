@@ -35,7 +35,7 @@ export const useItineraryActions = ({ id }: UseItineraryActionsProps) => {
   };
 
   const handleLogin = () => {
-    router.push(`/api/auth/login?returnTo=/itineraries/${id}`);
+    router.push(`/auth/login?returnTo=/itineraries/${id}`);
   };
 
   return {

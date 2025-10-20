@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { AdSense } from '@/components/layout/AdSense';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -94,7 +94,7 @@ export default function RootLayout({
           />
         )}
         <ErrorBoundary>
-          <UserProvider>
+          <Auth0Provider>
             <ThemeProvider
               attribute='class'
               defaultTheme='system'
@@ -116,7 +116,7 @@ export default function RootLayout({
                 </EnvironmentWrapper>
               </TooltipProvider>
             </ThemeProvider>
-          </UserProvider>
+          </Auth0Provider>
         </ErrorBoundary>
       </body>
     </html>

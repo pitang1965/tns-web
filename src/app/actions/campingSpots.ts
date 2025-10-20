@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
 import CampingSpot from '@/lib/models/CampingSpot';
 import mongoose from 'mongoose';
@@ -16,10 +16,10 @@ import {
 
 // Helper function to check admin authorization
 async function checkAdminAuth() {
-  const session = await getSession();
+  const session = await auth0.getSession();
 
   if (!session?.user?.email) {
-    redirect('/api/auth/login');
+    redirect('/auth/login');
   }
 
   const adminEmails =

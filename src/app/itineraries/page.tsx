@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { getSession } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
 import { H1, LargeText } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
@@ -33,10 +33,10 @@ export const metadata: Metadata = {
 };
 
 export default async function Itineraries() {
-  const session = await getSession();
+  const session = await auth0.getSession();
 
   if (!session) {
-    redirect('/api/auth/login?returnTo=/itineraries');
+    redirect('/auth/login?returnTo=/itineraries');
   }
 
   // Promiseを作成（awaitせずに渡す）

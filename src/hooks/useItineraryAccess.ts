@@ -1,4 +1,4 @@
-import { UserProfile } from '@auth0/nextjs-auth0/client';
+import type { User } from '@auth0/nextjs-auth0/types';
 
 type ItineraryMetadata = {
   id: string;
@@ -14,7 +14,7 @@ type ItineraryMetadata = {
 };
 
 interface UseItineraryAccessProps {
-  user: UserProfile | undefined;
+  user: User | null | undefined;
   metadata: ItineraryMetadata | null | undefined;
 }
 

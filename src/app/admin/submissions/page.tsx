@@ -74,7 +74,7 @@ export default function SubmissionsAdminPage() {
       if (!user) {
         // Not logged in - redirect to login
         window.location.href =
-          '/api/auth/login?returnTo=' +
+          '/auth/login?returnTo=' +
           encodeURIComponent(window.location.pathname);
         return;
       }

@@ -25,7 +25,7 @@ export default function CTASection() {
             公開旅程を見る
           </a>
           <a
-            href='/api/auth/login'
+            href='/auth/login'
             className='group inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105'
           >
             ログイン / 新規登録
