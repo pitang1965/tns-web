@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { auth0 } from '@/lib/auth0';
 import { ItineraryList } from '@/components/itinerary/ItineraryList';
 import { H1, LargeText } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default withPageAuthRequired(
+export default auth0.withPageAuthRequired(
   async function Itineraries() {
     // Promiseを作成（awaitせずに渡す）
     const itinerariesPromise = getItineraries();
