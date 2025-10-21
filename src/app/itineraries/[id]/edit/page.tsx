@@ -28,7 +28,7 @@ export default withPageAuthRequired(function EditItineraryPage({
     if (itinerary?.title) {
       const dayParam = searchParams.get('day');
       const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
-      document.title = `${itinerary.title}${dayDisplay} | 旅のしおり`;
+      document.title = `${itinerary.title}${dayDisplay} | 車旅のしおり`;
     }
   }, [itinerary?.title, searchParams]);
 

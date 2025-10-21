@@ -63,7 +63,26 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   }
 
   if (error) {
-    return <LargeText className='p-4'>エラーが発生しました: {error}</LargeText>;
+    return (
+      <div className='container mx-auto p-4'>
+        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6'>
+          <h2 className='text-xl font-semibold text-red-800 dark:text-red-200 mb-3'>
+            エラーが発生しました
+          </h2>
+          <div className='text-red-700 dark:text-red-300 whitespace-pre-line mb-4'>
+            {error}
+          </div>
+          <div className='flex gap-3'>
+            <Button variant='outline' onClick={actions.handleBack}>
+              旅程一覧に戻る
+            </Button>
+            {access.isOwner && (
+              <Button onClick={actions.handleEdit}>旅程を編集</Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!metadata || !currentDayPlan) {

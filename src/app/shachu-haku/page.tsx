@@ -6,17 +6,28 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
-  const q = typeof resolvedSearchParams.q === 'string' && resolvedSearchParams.q.trim() !== '' ? resolvedSearchParams.q : undefined;
-  const type = typeof resolvedSearchParams.type === 'string' && resolvedSearchParams.type !== 'all' ? resolvedSearchParams.type : undefined;
+  const q =
+    typeof resolvedSearchParams.q === 'string' &&
+    resolvedSearchParams.q.trim() !== ''
+      ? resolvedSearchParams.q
+      : undefined;
+  const type =
+    typeof resolvedSearchParams.type === 'string' &&
+    resolvedSearchParams.type !== 'all'
+      ? resolvedSearchParams.type
+      : undefined;
 
   // Build dynamic title and description
   const titleParts: string[] = [];
   const descriptionParts: string[] = [];
 
   if (type && type in CampingSpotTypeLabels) {
-    const typeLabel = CampingSpotTypeLabels[type as keyof typeof CampingSpotTypeLabels];
+    const typeLabel =
+      CampingSpotTypeLabels[type as keyof typeof CampingSpotTypeLabels];
     titleParts.push(typeLabel);
     descriptionParts.push(typeLabel);
   }
@@ -26,13 +37,17 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     descriptionParts.push(`「${q}」で検索`);
   }
 
-  const title = titleParts.length > 0
-    ? `${titleParts.join('・')}の車中泊スポット | 旅のしおり`
-    : '車中泊スポット検索 | 旅のしおり';
+  const title =
+    titleParts.length > 0
+      ? `${titleParts.join('・')}の車中泊スポット | 車旅のしおり`
+      : '車中泊スポット検索 | 車旅のしおり';
 
-  const description = descriptionParts.length > 0
-    ? `${descriptionParts.join('・')}の車中泊スポットを検索・閲覧できます。詳細情報、料金、設備、周辺施設などをご確認いただけます。`
-    : '全国の車中泊スポットを検索・閲覧できます。道の駅、SA・PA、RVパークなど様々な種類のスポットの詳細情報、料金、設備、周辺施設などをご確認いただけます。';
+  const description =
+    descriptionParts.length > 0
+      ? `${descriptionParts.join(
+          '・'
+        )}の車中泊スポットを検索・閲覧できます。詳細情報、料金、設備、周辺施設などをご確認いただけます。`
+      : '全国の車中泊スポットを検索・閲覧できます。道の駅、SA・PA、RVパークなど様々な種類のスポットの詳細情報、料金、設備、周辺施設などをご確認いただけます。';
 
   // Build URL with current search params for OGP
   const urlParams = new URLSearchParams();
@@ -46,18 +61,19 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return {
     title,
     description,
-    keywords: '車中泊,スポット検索,道の駅,SA,PA,RVパーク,キャンプ,旅行,旅のしおり',
+    keywords:
+      '車中泊,車中泊スポット,スポット検索,道の駅,SA,PA,RVパーク,オートキャンプ場,車旅',
     openGraph: {
       title,
       description,
       url: ogUrl,
-      siteName: '旅のしおり',
+      siteName: '車旅のしおり',
       images: [
         {
           url: 'https://tabi.over40web.club/shachu-haku.webp',
           width: 1200,
           height: 629,
-          alt: '車中泊スポット - 旅のしおり',
+          alt: '車中泊スポット - 車旅のしおり',
         },
       ],
       locale: 'ja_JP',

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'プライバシーポリシー | 旅のしおり',
-  description: '旅のしおりのプライバシーポリシー',
+  title: 'プライバシーポリシー | 車旅のしおり',
+  description: '車旅のしおりのプライバシーポリシー',
 };
 
 export default function PrivacyPage() {
@@ -12,7 +12,7 @@ export default function PrivacyPage() {
 
       <div className='prose max-w-none'>
         <p className='mb-6'>
-          旅のしおり（以下「当サービス」）は、ユーザーの個人情報の取り扱いについて、以下のとおりプライバシーポリシーを定めます。
+          車旅のしおり（以下「当サービス」）は、ユーザーの個人情報の取り扱いについて、以下のとおりプライバシーポリシーを定めます。
         </p>
 
         <h2 className='text-2xl font-semibold mt-8 mb-4'>1. 収集する情報</h2>

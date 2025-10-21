@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '利用規約 | 旅のしおり',
-  description: '旅のしおりの利用規約',
+  title: '利用規約 | 車旅のしおり',
+  description: '車旅のしおりの利用規約',
 };
 
 export default function TermsPage() {
@@ -12,7 +12,7 @@ export default function TermsPage() {
 
       <div className='prose max-w-none'>
         <p className='mb-6'>
-          この利用規約（以下「本規約」）は、旅のしおり（以下「当サービス」）の利用条件を定めるものです。登録ユーザーの皆さま（以下「ユーザー」）には、本規約に従って、当サービスをご利用いただきます。
+          この利用規約（以下「本規約」）は、車旅のしおり（以下「当サービス」）の利用条件を定めるものです。登録ユーザーの皆さま（以下「ユーザー」）には、本規約に従って、当サービスをご利用いただきます。
         </p>
 
         <h2 className='text-2xl font-semibold mt-8 mb-4'>第1条（適用）</h2>

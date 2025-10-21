@@ -18,9 +18,10 @@ import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '旅のしおり',
+  title: '車旅のしおり',
   description:
     '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
+  keywords: '車旅,車中泊,車中泊スポット,旅程作成,旅行計画,道の駅,RVパーク',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: '旅のしおり',
+    title: '車旅のしおり',
     description:
       '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
     images: [
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
         width: 1200,
         height: 628,
-        alt: '旅のしおりアプリ - 旅行計画作成ツール',
+        alt: '車旅のしおりアプリ - 旅行計画作成ツール',
       },
     ],
     locale: 'ja_JP',

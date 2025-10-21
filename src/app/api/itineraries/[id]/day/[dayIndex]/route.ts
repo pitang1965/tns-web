@@ -50,11 +50,28 @@ export async function GET(
       `Total days in itinerary: ${totalDays}, requested day: ${dayIndexNum}`
     );
 
+    // dayPlansが空の場合の特別処理
+    if (totalDays === 0) {
+      return NextResponse.json(
+        {
+          error: 'NO_DAY_PLANS',
+          message: 'この旅程にはまだ日程が登録されていません。',
+          suggestion: '旅程を編集して日程を追加してください。',
+          totalDays: 0,
+        },
+        { status: 400 }
+      );
+    }
+
     // 0ベースインデックスなので、totalDaysと比較する必要がある
     if (dayIndexNum >= totalDays) {
       return NextResponse.json(
         {
-          error: `Day index out of range. Requested: ${dayIndexNum}, Total days: ${totalDays}`,
+          error: 'DAY_INDEX_OUT_OF_RANGE',
+          message: `指定された日付が範囲外です。`,
+          details: `${
+            dayIndexNum + 1
+          }日目が指定されましたが、この旅程は${totalDays}日間です。`,
           totalDays: totalDays,
         },
         { status: 400 }
@@ -131,7 +148,11 @@ export async function GET(
     if (itineraryData.selectedDay === null) {
       return NextResponse.json(
         {
-          error: `Day index out of range (pipeline check). Requested: ${dayIndexNum}, Total days: ${itineraryData.totalDays}`,
+          error: 'DAY_INDEX_OUT_OF_RANGE',
+          message: `指定された日付が範囲外です。`,
+          details: `${dayIndexNum + 1}日目が指定されましたが、この旅程は${
+            itineraryData.totalDays
+          }日間です。`,
           totalDays: itineraryData.totalDays,
         },
         { status: 400 }

@@ -8,20 +8,20 @@ import { getItineraries } from '@/lib/itineraries';
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: '保存された旅程一覧 | 旅のしおり',
+  title: '保存された旅程一覧 | 車旅のしおり',
   description:
     'あなたが作成した旅程の一覧です。過去の旅行計画を確認したり、新しい旅程を作成したりできます。',
-  keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
+  keywords: '旅程,旅行計画,車旅,車中泊,車中泊スポット,道の駅,RVパーク',
   openGraph: {
-    title: '旅のしおり',
+    title: '車旅のしおり',
     description:
-      '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+      '旅程を簡単に作成。車中泊場所の情報も提供し、旅行の計画から実行まで、あなたの旅をサポートします。',
     images: [
       {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
         width: 1200,
         height: 628,
-        alt: '旅のしおりアプリ - 旅行計画作成ツール',
+        alt: '車旅のしおりアプリ - 旅行計画作成ツール',
       },
     ],
     locale: 'ja_JP',
