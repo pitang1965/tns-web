@@ -46,6 +46,19 @@ export const useGetItineraryDay = (
 
         if (!response.ok) {
           const errorData = await response.json();
+
+          // 構造化されたエラーメッセージを処理
+          if (errorData.error === 'NO_DAY_PLANS') {
+            throw new Error(
+              `${errorData.message}\n${errorData.suggestion || ''}`
+            );
+          } else if (errorData.error === 'DAY_INDEX_OUT_OF_RANGE') {
+            throw new Error(
+              `${errorData.message}\n${errorData.details || ''}`
+            );
+          }
+
+          // 従来のエラーフォーマット
           throw new Error(
             errorData.error ||
               `旅程データを取得できませんでした。: ${response.status}`
