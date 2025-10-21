@@ -19,11 +19,6 @@ export function AdSense() {
   return (
     <div className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}>
       <div className='container mx-auto px-2 py-0.5'>
-        <Script
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-          strategy='afterInteractive'
-          crossOrigin='anonymous'
-        />
         <div className='w-full max-w-screen-lg mx-auto'>
           <ins
             className='adsbygoogle'
@@ -36,10 +31,19 @@ export function AdSense() {
             {`
               try {
                 if (typeof window !== 'undefined' && window.adsbygoogle) {
-                  (adsbygoogle = window.adsbygoogle || []).push({});
+                  const ads = document.querySelectorAll('.adsbygoogle');
+                  ads.forEach((ad) => {
+                    // Only push if not already initialized
+                    if (!ad.getAttribute('data-adsbygoogle-status')) {
+                      (adsbygoogle = window.adsbygoogle || []).push({});
+                    }
+                  });
                 }
               } catch (err) {
-                console.error('AdSense initialization error:', err);
+                // Silently ignore AdSense errors in development
+                if (process.env.NODE_ENV !== 'production') {
+                  console.debug('AdSense:', err.message);
+                }
               }
             `}
           </Script>

@@ -1,27 +1,28 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth0 } from './src/lib/auth0';
+import { auth0 } from './lib/auth0';
 
 export async function middleware(request: NextRequest) {
-  // Auth0 middleware handles /auth/* routes automatically
-  const auth0Response = await auth0.middleware(request);
+  const authRes = await auth0.middleware(request);
 
-  if (auth0Response) {
-    return auth0Response;
+  // Ensure your own middleware does not handle the `/auth` routes, auto-mounted and handled by the SDK
+  if (request.nextUrl.pathname.startsWith('/auth')) {
+    return authRes;
   }
 
   // Custom logic for admin routes
   if (request.nextUrl.pathname.startsWith('/admin/camping-spots')) {
-    const sessionCookie = request.cookies.get('appSession');
+    const session = await auth0.getSession(request);
 
-    if (!sessionCookie) {
+    if (!session) {
       const loginUrl = new URL('/auth/login', request.url);
       loginUrl.searchParams.set('returnTo', request.url);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  return NextResponse.next();
+  // If a valid session exists, continue with the response from Auth0 middleware
+  return authRes;
 }
 
 export const config = {

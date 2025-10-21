@@ -28,8 +28,8 @@ async function checkAdminAuth() {
 async function ensureDbConnection() {
   if (mongoose.connection.readyState === 0) {
     const uri = process.env.MONGODB_URI!;
-    const dbName = 'itinerary_db';
-    await mongoose.connect(uri, { dbName });
+    // Database name is determined by MONGODB_URI
+    await mongoose.connect(uri);
   }
 }
 

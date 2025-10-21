@@ -10,7 +10,8 @@
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\.claude/**)",
       "Bash(npx shadcn@latest add:*)",
       "mcp__mongodb-readonly__list-collections",
-      "mcp__mongodb-readonly__aggregate"
+      "mcp__mongodb-readonly__aggregate",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

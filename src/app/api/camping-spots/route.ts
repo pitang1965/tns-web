@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 async function ensureDbConnection() {
   if (mongoose.connection.readyState === 0) {
     const uri = process.env.MONGODB_URI!;
-    const dbName = 'itinerary_db';
+    // Database name is determined by MONGODB_URI
+    // No need to override dbName - it will use the database specified in the connection string
     await mongoose.connect(uri, {
-      dbName,
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       serverSelectionTimeoutMS: 10000,

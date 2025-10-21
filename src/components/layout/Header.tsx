@@ -35,8 +35,18 @@ export function Header() {
     setIsClient(true);
   }, []);
 
+  // Show loading spinner while checking authentication status
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <div>{error.message}</div>;
+
+  // Handle errors - "Unauthorized" is expected when logged out, so we ignore it
+  if (error && error.message !== 'Unauthorized') {
+    console.error('[Header] Auth0 useUser error:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      fullError: error
+    });
+  }
 
   return (
     <header className='fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-50'>

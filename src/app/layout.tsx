@@ -24,10 +24,6 @@ export const metadata: Metadata = {
   keywords: '車旅,車中泊,車中泊スポット,旅程作成,旅行計画,道の駅,RVパーク',
   manifest: '/manifest.json',
   icons: {
-    icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
@@ -68,8 +64,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='ja'>
-      <body className={inter.className}>
+    <html lang='ja' suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script
