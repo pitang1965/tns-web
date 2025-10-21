@@ -2,12 +2,12 @@
 
 import { createItinerary, getItineraries } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { auth0 } from '@/lib/auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { canCreateItinerary } from '@/lib/userUtils';
 
 export async function createItineraryAction(data: ClientItineraryInput) {
   try {
-    const session = await auth0.getSession();
+    const session = await getSession();
     if (!session?.user) {
       throw new Error('認証されていません');
     }

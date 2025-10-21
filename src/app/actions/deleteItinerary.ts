@@ -1,11 +1,11 @@
 'use server';
 
-import { auth0 } from '@/lib/auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { ObjectId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
 
 export async function deleteItinerary(id: string) {
-  const session = await auth0.getSession();
+  const session = await getSession();
   if (!session?.user) {
     throw new Error('Unauthorized');
   }

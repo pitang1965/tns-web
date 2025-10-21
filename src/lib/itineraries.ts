@@ -7,11 +7,11 @@ import {
   ClientItineraryInput,
   toClientItinerary,
 } from '@/data/schemas/itinerarySchema';
-import { auth0 } from '@/lib/auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 
 // 認証済みユーザーのセッション情報を取得する関数
 async function getAuthenticatedUser() {
-  const session = await auth0.getSession();
+  const session = await getSession();
   if (!session?.user) {
     throw new Error('認証されていません');
   }

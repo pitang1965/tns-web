@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { auth0 } from '@/lib/auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import PublicHome from '@/components/common/PublicHome';
 import LoggedInHome from '@/components/common/LoggedInHome';
 
@@ -25,7 +25,7 @@ async function getFeaturedSpots() {
 }
 
 export default async function Home() {
-  const session = await auth0.getSession();
+  const session = await getSession();
 
   if (session?.user) {
     return <LoggedInHome userName={session.user.name || 'ゲスト'} />;
