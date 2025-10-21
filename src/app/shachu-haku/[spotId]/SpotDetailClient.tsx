@@ -360,7 +360,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                     あなたの車中泊スポットを教えてください
                   </h3>
                   <p className='text-sm text-blue-700 dark:text-blue-300 mb-4'>
-                    旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
+                    車旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
                     <br />
                     みんなで情報を共有して、より快適な車中泊を楽しみましょう。
                   </p>

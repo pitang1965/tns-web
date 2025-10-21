@@ -16,17 +16,17 @@ export const generateMetadata = async ({
 
     if (!spot) {
       return {
-        title: '車中泊スポットが見つかりません | 旅のしおり',
+        title: '車中泊スポットが見つかりません | 車旅のしおり',
         description: '指定された車中泊スポットの情報が見つかりませんでした。',
         openGraph: {
-          title: '車中泊スポットが見つかりません | 旅のしおり',
+          title: '車中泊スポットが見つかりません | 車旅のしおり',
           description: '指定された車中泊スポットの情報が見つかりませんでした。',
           images: [
             {
               url: 'https://tabi.over40web.club/shachu-haku.webp',
               width: 1200,
               height: 629,
-              alt: '車中泊スポット - 旅のしおり',
+              alt: '車中泊スポット - 車旅のしおり',
             },
           ],
           locale: 'ja_JP',
@@ -38,8 +38,9 @@ export const generateMetadata = async ({
       };
     }
 
-    const title = `${spot.name} | 車中泊スポット - 旅のしおり`;
-    const typeLabel = CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels];
+    const title = `${spot.name} | 車中泊スポット - 車旅のしおり`;
+    const typeLabel =
+      CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels];
     const priceInfo = spot.pricing.isFree
       ? '無料'
       : spot.pricing.pricePerNight
@@ -51,7 +52,7 @@ export const generateMetadata = async ({
     return {
       title: title,
       description: description,
-      keywords: `車中泊,${spot.prefecture},${typeLabel},${spot.name},旅のしおり`,
+      keywords: `車中泊スポット,${spot.prefecture},${typeLabel},${spot.name},車中泊,車旅`,
       openGraph: {
         title: title,
         description: description,
@@ -74,17 +75,17 @@ export const generateMetadata = async ({
   } catch (error) {
     console.error('Error generating metadata:', error);
     return {
-      title: '車中泊スポット | 旅のしおり',
+      title: '車中泊スポット | 車旅のしおり',
       description: '車中泊スポットの詳細情報をご覧いただけます。',
       openGraph: {
-        title: '車中泊スポット | 旅のしおり',
+        title: '車中泊スポット | 車旅のしおり',
         description: '車中泊スポットの詳細情報をご覧いただけます。',
         images: [
           {
             url: 'https://tabi.over40web.club/shachu-haku.webp',
             width: 1200,
             height: 629,
-            alt: '夜の車中泊スポット - 旅のしおり',
+            alt: '夜の車中泊スポット - 車旅のしおり',
           },
         ],
         locale: 'ja_JP',
@@ -122,13 +123,19 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
       spotId: params.spotId,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
       timestamp: new Date().toISOString(),
     });
 
     // For Facebook WebView and other In-App browsers, provide more specific error handling
-    if (typeof navigator !== 'undefined' && /FBAN|FBAV|Instagram|Line|Twitter/.test(navigator.userAgent)) {
-      console.warn('SpotDetailPage: Error occurred in In-App Browser environment');
+    if (
+      typeof navigator !== 'undefined' &&
+      /FBAN|FBAV|Instagram|Line|Twitter/.test(navigator.userAgent)
+    ) {
+      console.warn(
+        'SpotDetailPage: Error occurred in In-App Browser environment'
+      );
     }
 
     notFound();

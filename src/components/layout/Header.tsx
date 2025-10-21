@@ -45,7 +45,7 @@ export function Header() {
           <BurgerMenu />
         </div>
         <Link href='/' className='text-xl ml-auto cursor-pointer'>
-          旅のしおり
+          車旅のしおり
         </Link>
         <Suspense fallback={null}>
           <EnvironmentBadge />

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "旅のしおり" (Travel Itinerary), a Next.js-based web application for creating and managing travel itineraries with maps integration. The app supports multi-day trip planning with Google Maps/Mapbox integration and social sharing features.
+This is "車旅のしおり" (Travel Itinerary), a Next.js-based web application for creating and managing travel itineraries with maps integration. The app supports multi-day trip planning with Google Maps/Mapbox integration and social sharing features.
 
 ## Development Commands
 
@@ -22,6 +22,7 @@ npm run init-db      # Initialize MongoDB database with sample data
 ## Development Server Requirements
 
 **IMPORTANT**: Always use http://localhost:3000 for development server
+
 - The application is configured for port 3000 only
 - Using other ports (3001, 3002, etc.) will cause CORS errors with Auth0 authentication
 - If port 3000 is occupied, stop the conflicting process first before starting the dev server
@@ -29,7 +30,8 @@ npm run init-db      # Initialize MongoDB database with sample data
 - Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
 
 **CRITICAL DATABASE OPERATION RULE**:
-- **ALWAYS use MCP server tools (mcp__mongodb-readonly__*) for all MongoDB operations**
+
+- **ALWAYS use MCP server tools (mcp**mongodb-readonly**\*) for all MongoDB operations**
 - DO NOT write custom scripts or use Mongoose directly for data inspection, queries, or updates
 - Use MCP tools for: listing databases/collections, finding documents, aggregations, inserts, updates, deletes
 - Only write application code (models, schemas, API routes) when implementing new features
@@ -38,6 +40,7 @@ npm run init-db      # Initialize MongoDB database with sample data
 - NEVER write the actual MONGODB_URI value to any git-tracked files
 
 **CRITICAL ENVIRONMENT SAFETY RULES**:
+
 - **BEFORE any database operation, ALWAYS verify you are connected to the DEVELOPMENT database**
 - Development database: `itinerary_db_dev` (safe for all operations)
 - Production database: `itinerary_db` (NEVER modify without explicit user confirmation)
@@ -50,6 +53,7 @@ npm run init-db      # Initialize MongoDB database with sample data
 - See `ENVIRONMENT_SETUP.md` for detailed environment management guidelines
 
 **CRITICAL SERVER MANAGEMENT RULE**:
+
 - **NEVER start the development server (`npm run dev` or `pnpm dev`) unless explicitly requested by the user**
 - The user will start and manage the development server themselves
 - If you need to check if the server is running, you may use `netstat -ano | findstr :3000` to check port status
@@ -60,6 +64,7 @@ npm run init-db      # Initialize MongoDB database with sample data
 ## Architecture
 
 ### Tech Stack
+
 - **Framework**: Next.js 14 with App Router
 - **UI**: React 19, Radix UI components, Tailwind CSS
 - **State Management**: Jotai for global state
@@ -124,9 +129,10 @@ Key schemas are defined in `src/data/schemas/` with separate client/server varia
 ### Environment Variables
 
 Required environment variables (see README.md for full details):
+
 - `MONGODB_URI`: Database connection string
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`: Mapbox API token
-- Auth0 configuration variables (AUTH0_*)
+- Auth0 configuration variables (AUTH0\_\*)
 - Optional: Sentry DSN, AdSense client ID
 
 ### Build Configuration
@@ -146,12 +152,14 @@ Required environment variables (see README.md for full details):
 ### UI Component Guidelines
 
 **shadcn/ui Components:**
+
 - All shadcn/ui components must be placed in `src/components/ui/` directory
 - When adding new shadcn/ui components, use: `npx shadcn@latest add [component-name]`
 - If components are mistakenly placed in other directories (like `@/components/ui/`), move them to the correct location
 - Clean up any incorrectly created directories after moving components
 
 **IMPORTANT - Import Path Convention:**
+
 - This project uses `@/lib/utils` for the cn() utility function
 - shadcn/ui CLI may generate files with `@/utils` imports, which is INCORRECT for this project
 - After installing any shadcn/ui component, always verify and fix import paths:

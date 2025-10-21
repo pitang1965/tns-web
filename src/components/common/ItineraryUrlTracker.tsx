@@ -39,9 +39,9 @@ export default function ItineraryUrlTracker() {
           const isEditPage = pathname.endsWith('/edit');
           const dayParam = searchParams.get('day');
 
-          if (pageTitle && pageTitle !== '旅のしおり') {
-            // ページタイトルから「| 旅のしおり」を除去
-            let itineraryTitle = pageTitle.replace(' | 旅のしおり', '');
+          if (pageTitle && pageTitle !== '車旅のしおり') {
+            // ページタイトルから「| 車旅のしおり」を除去
+            let itineraryTitle = pageTitle.replace(' | 車旅のしおり', '');
 
             if (isEditPage) {
               // 編集ページの場合

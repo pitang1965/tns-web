@@ -5,20 +5,20 @@ import { H1, H2, LargeText } from '@/components/common/Typography';
 import { getPublicItineraries } from '@/lib/itineraries';
 
 export const metadata: Metadata = {
-  title: '旅行先を検索 | 旅のしおり',
+  title: '旅行先を検索 | 車旅のしおり',
   description:
     '理想の旅行先を見つけよう。多様な目的地の中から、あなたにぴったりの行き先を探索できます。',
-  keywords: '旅程一覧,旅行計画,旅のしおり,保存済み旅程',
+  keywords: '旅行先検索,旅程一覧,旅行計画,車旅,車中泊,ドライブ旅行',
   openGraph: {
-    title: '旅のしおり',
+    title: '車旅のしおり',
     description:
-      '旅のしおりを簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
+      '旅程を簡単に作成。旅行の計画から実行まで、あなたの旅をサポートします。文',
     images: [
       {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
         width: 1200,
         height: 628,
-        alt: '旅のしおりアプリ - 旅行計画作成ツール',
+        alt: '車旅のしおりアプリ - 旅行計画作成ツール',
       },
     ],
     locale: 'ja_JP',
