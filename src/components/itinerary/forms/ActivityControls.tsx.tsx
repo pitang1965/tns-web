@@ -118,7 +118,7 @@ export function ActivityControls({
           <Trash2 className='h-4 w-4' />
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button
               type='button'
               variant='outline'

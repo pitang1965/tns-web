@@ -99,6 +99,17 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
       centerLat = sumLat / activities.length;
     }
 
+    // 座標が有効な数値かチェック
+    if (
+      isNaN(centerLng) ||
+      isNaN(centerLat) ||
+      !isFinite(centerLng) ||
+      !isFinite(centerLat)
+    ) {
+      console.warn('Invalid coordinates detected, skipping map initialization');
+      return;
+    }
+
     try {
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,

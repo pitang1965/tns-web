@@ -5,6 +5,29 @@ export const locationSchema = z
     latitude: z.union([z.string(), z.number()]).optional(),
     longitude: z.union([z.string(), z.number()]).optional(),
   })
+  .transform((data) => {
+    // NaNや無効な値を空値に変換
+    const cleanLat =
+      data.latitude !== undefined &&
+      data.latitude !== null &&
+      data.latitude !== '' &&
+      !isNaN(Number(data.latitude))
+        ? data.latitude
+        : undefined;
+
+    const cleanLon =
+      data.longitude !== undefined &&
+      data.longitude !== null &&
+      data.longitude !== '' &&
+      !isNaN(Number(data.longitude))
+        ? data.longitude
+        : undefined;
+
+    return {
+      latitude: cleanLat,
+      longitude: cleanLon,
+    };
+  })
   .superRefine((data, ctx) => {
     if (!data.latitude && !data.longitude) return;
 

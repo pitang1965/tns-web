@@ -118,7 +118,7 @@ export function DayPlanForm({
       .filter((activity): activity is ActivityLocation => activity !== null);
 
     return result;
-  }, [JSON.stringify(watchedActivities)]);
+  }, [watchedActivities]);
 
   // 位置情報が設定されているアクティビティが2つ以上ある場合にのみ地図を表示
   const shouldShowMap = activitiesWithLocation.length >= 2;
