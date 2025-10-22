@@ -37,19 +37,29 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
   // 位置情報を持つアクティビティのみマップに表示
   const activitiesWithLocation: ActivityLocation[] = hasActivities
     ? day.activities
-        .filter(
-          (activity) =>
-            activity.place.location &&
-            typeof activity.place.location.latitude === 'number' &&
-            typeof activity.place.location.longitude === 'number'
-        )
-        .map((activity, index) => ({
-          id: activity.id || `activity-${index}`,
-          order: index + 1,
-          title: activity.title || `アクティビティ ${index + 1}`,
-          latitude: activity.place.location!.latitude!,
-          longitude: activity.place.location!.longitude!,
-        }))
+        .map((activity, originalIndex) => {
+          const lat = activity?.place?.location?.latitude;
+          const lon = activity?.place?.location?.longitude;
+
+          if (
+            !activity?.place?.location ||
+            typeof lat !== 'number' ||
+            typeof lon !== 'number' ||
+            isNaN(lat) ||
+            isNaN(lon)
+          ) {
+            return null;
+          }
+
+          return {
+            id: activity.id || `activity-${originalIndex}`,
+            order: originalIndex + 1, // 元のインデックスを使用
+            title: activity.title || `アクティビティ ${originalIndex + 1}`,
+            latitude: lat,
+            longitude: lon,
+          };
+        })
+        .filter((activity): activity is ActivityLocation => activity !== null)
     : [];
 
   // 位置情報が設定されているアクティビティが2つ以上ある場合にのみ地図を表示

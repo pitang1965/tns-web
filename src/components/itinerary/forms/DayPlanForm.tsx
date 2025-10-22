@@ -99,10 +99,15 @@ export function DayPlanForm({
     const result = activities
       .map((activity: any, originalIndex: number) => {
         // 位置情報がない場合はnullを返す
+        const lat = activity?.place?.location?.latitude;
+        const lon = activity?.place?.location?.longitude;
+
         if (
           !activity?.place?.location ||
-          typeof activity.place.location.latitude !== 'number' ||
-          typeof activity.place.location.longitude !== 'number'
+          typeof lat !== 'number' ||
+          typeof lon !== 'number' ||
+          isNaN(lat) ||
+          isNaN(lon)
         ) {
           return null;
         }
@@ -111,8 +116,8 @@ export function DayPlanForm({
           id: activity.id || `activity-${originalIndex}`,
           order: originalIndex + 1, // 元のインデックスを使用
           title: activity.title || `アクティビティ ${originalIndex + 1}`,
-          latitude: activity.place.location.latitude as number,
-          longitude: activity.place.location.longitude as number,
+          latitude: lat,
+          longitude: lon,
         };
       })
       .filter((activity): activity is ActivityLocation => activity !== null);
