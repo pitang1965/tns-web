@@ -169,3 +169,61 @@ Required environment variables (see README.md for full details):
   - Any newly created files in `src/components/ui/`
   - Any updated files (button.tsx, separator.tsx, etc.)
 - Run `npx tsc --noEmit` after adding components to catch import errors early
+
+## Git Commit Guidelines
+
+**Commit Message Format:**
+
+Use Japanese for commit messages with appropriate emoji prefixes:
+
+```
+🐛 簡潔なタイトル(50文字以内)
+
+- 変更点1の説明
+- 変更点2の説明
+- 変更点3の説明
+
+修正内容:
+- 修正した具体的な問題1
+- 修正した具体的な問題2
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**Common Emoji Prefixes:**
+- 🐛 バグ修正 (Bug fix)
+- ✨ 新機能 (New feature)
+- 🔒 セキュリティ (Security)
+- ⬆️ 依存関係の更新 (Dependency updates)
+- 🔀 マージ (Merge)
+- 🥅 エラー処理の改善 (Error handling)
+- 🎨 スタイル・UI改善 (Style/UI improvements)
+- ♻️ リファクタリング (Refactoring)
+- 📝 ドキュメント (Documentation)
+- 🚀 パフォーマンス改善 (Performance)
+
+**Example Commit Message:**
+
+```
+🐛 Hydrationエラー、NaNバリデーション、マップマーカー番号を修正
+
+- ActivityControlsのネストしたボタン要素によるhydrationエラーを修正
+- locationSchemaにNaN値のバリデーションを追加し、無効な座標の送信を防止
+- useMapboxフックに座標の有効性チェックを追加してMapbox初期化エラーを防止
+- マップマーカーの番号をフィルタ後のインデックスではなく元のインデックスを使用するように修正
+  - DayPlanForm: filter→mapをmap→filterに変更して元のインデックスを保持
+  - DayPlanView: 一貫性のため同じ修正を適用
+- DayPlanFormのuseMemo依存配列を最適化して不要な再レンダリングを回避
+
+修正内容:
+- Mapbox初期化時の "Invalid LngLat object: (NaN, NaN)" エラー
+- フォーム送信時の "Expected string, received nan" バリデーションエラー
+- ネストしたbutton要素によるReact hydration警告
+- 序盤のアクティビティに座標がない場合にマーカーが誤った番号(2-3ではなく1-2)を表示する問題
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
