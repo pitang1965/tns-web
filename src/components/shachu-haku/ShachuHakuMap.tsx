@@ -288,37 +288,11 @@ export default function ShachuHakuMap({
         }
 
         // Notify parent of zoom change (if user initiated)
-        if (isUserInteractionRef.current) {
-          if (onZoomChange) {
-            onZoomChange(newZoom);
-          }
-
-          if (onBoundsChange) {
-            const bounds = map.current.getBounds();
-            if (!bounds) return;
-
-            const north = bounds.getNorth();
-            const south = bounds.getSouth();
-            let east = bounds.getEast();
-            let west = bounds.getWest();
-
-            // Normalize longitude
-            if (east > 154) east = 154;
-            if (west < 122) west = 122;
-            if (east < west) {
-              east = 154;
-              west = 122;
-            }
-
-            onBoundsChange({
-              north: Math.min(north, 46),
-              south: Math.max(south, 24),
-              east,
-              west,
-            });
-          }
-          isUserInteractionRef.current = false;
+        if (isUserInteractionRef.current && onZoomChange) {
+          onZoomChange(newZoom);
         }
+        // Note: onBoundsChange and onCenterChange are handled in moveend event only
+        // to prevent center drift during wheel zoom
       }
     });
 
