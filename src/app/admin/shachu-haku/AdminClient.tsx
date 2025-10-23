@@ -631,10 +631,28 @@ export default function AdminClient() {
         'notes',
       ];
 
-      const csvContent = [
+      // Helper function to escape CSV field
+      const escapeCSVField = (field: any): string => {
+        // Use empty string for null/undefined values
+        const stringField = field == null ? '' : String(field);
+
+        // Always quote fields that contain special characters
+        if (
+          stringField.includes(',') ||
+          stringField.includes('"') ||
+          stringField.includes('\n') ||
+          stringField.includes('\r')
+        ) {
+          // Escape quotes by doubling them
+          return `"${stringField.replace(/"/g, '""')}"`;
+        }
+        return stringField;
+      };
+
+      const csvRows = [
         headers.join(','),
-        ...exportSpots.map((spot: CampingSpotWithId) =>
-          [
+        ...exportSpots.map((spot: CampingSpotWithId) => {
+          const fields = [
             spot.name,
             spot.coordinates[1], // lat
             spot.coordinates[0], // lng
@@ -670,25 +688,13 @@ export default function AdminClient() {
             spot.restrictions.join(','),
             spot.amenities.join(','),
             spot.notes || '',
-          ]
-            .map((field) => {
-              // Handle fields that might contain commas by quoting them
-              // Use empty string for null/undefined values
-              const stringField = field == null ? '' : String(field);
-              if (
-                stringField.includes(',') ||
-                stringField.includes('"') ||
-                stringField.includes('\n')
-              ) {
-                return `"${stringField.replace(/"/g, '""')}"`;
-              }
-              return stringField;
-            })
-            .join(',')
-        ),
-      ].join('\n');
+          ];
+          return fields.map(escapeCSVField).join(',');
+        }),
+      ];
 
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = `shachu-haku-spots-${
