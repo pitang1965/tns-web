@@ -763,31 +763,78 @@ export async function importCampingSpotsFromCSV(csvData: string) {
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
-  // Simple CSV parser that handles basic cases
-  function parseCSVRow(row: string): string[] {
-    const result: string[] = [];
-    let current = '';
+  // CSV parser that handles quoted fields with newlines
+  function parseCSV(csvText: string): string[][] {
+    const rows: string[][] = [];
+    const lines = csvText.split('\n');
+    let currentRow: string[] = [];
+    let currentField = '';
     let inQuotes = false;
+    let i = 0;
 
-    for (let i = 0; i < row.length; i++) {
-      const char = row[i];
+    while (i < csvText.length) {
+      const char = csvText[i];
+      const nextChar = csvText[i + 1];
 
       if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        result.push(current.trim());
-        current = '';
-      } else {
-        current += char;
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote
+          currentField += '"';
+          i += 2;
+          continue;
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+          i++;
+          continue;
+        }
+      }
+
+      if (!inQuotes && char === ',') {
+        // Field separator
+        currentRow.push(currentField.trim());
+        currentField = '';
+        i++;
+        continue;
+      }
+
+      if (!inQuotes && (char === '\n' || char === '\r')) {
+        // End of row
+        if (char === '\r' && nextChar === '\n') {
+          i++; // Skip \r in \r\n
+        }
+        currentRow.push(currentField.trim());
+        if (currentRow.some((field) => field.length > 0) || rows.length === 0) {
+          rows.push(currentRow);
+        }
+        currentRow = [];
+        currentField = '';
+        i++;
+        continue;
+      }
+
+      // Regular character
+      currentField += char;
+      i++;
+    }
+
+    // Handle last field/row
+    if (currentField.length > 0 || currentRow.length > 0) {
+      currentRow.push(currentField.trim());
+      if (currentRow.some((field) => field.length > 0)) {
+        rows.push(currentRow);
       }
     }
 
-    result.push(current.trim());
-    return result;
+    return rows;
   }
 
-  const lines = csvData.trim().split('\n');
-  const headers = parseCSVRow(lines[0]);
+  const rows = parseCSV(csvData.trim());
+  if (rows.length === 0) {
+    return { success: 0, errors: [] };
+  }
+
+  const headers = rows[0];
 
   const results = {
     success: 0,
@@ -797,17 +844,13 @@ export async function importCampingSpotsFromCSV(csvData: string) {
   // Check if headers are in Japanese or English
   const isJapaneseHeaders = headers.includes('名称');
 
-  for (let i = 1; i < lines.length; i++) {
+  for (let i = 1; i < rows.length; i++) {
     try {
-      const values = parseCSVRow(lines[i]);
+      const values = rows[i];
       const rowData: any = {};
 
       headers.forEach((header, index) => {
-        // Remove quotes if present and clean up the value
-        let value = values[index] || '';
-        if (value.startsWith('"') && value.endsWith('"')) {
-          value = value.slice(1, -1);
-        }
+        const value = values[index] || '';
         rowData[header] = value;
       });
 
@@ -857,7 +900,7 @@ export async function importCampingSpotsFromCSV(csvData: string) {
       results.errors.push({
         row: i + 1,
         error: error instanceof Error ? error.message : 'Unknown error',
-        data: lines[i],
+        data: rows[i].join(','),
       });
     }
   }
