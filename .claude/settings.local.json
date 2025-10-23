@@ -11,7 +11,8 @@
       "Bash(npx shadcn@latest add:*)",
       "mcp__mongodb-readonly__list-collections",
       "mcp__mongodb-readonly__aggregate",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "mcp__context7__get-library-docs"
     ]
   },
   "enableAllProjectMcpServers": true,
