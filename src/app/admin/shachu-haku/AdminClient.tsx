@@ -600,6 +600,7 @@ export default function AdminClient() {
         'lng',
         'prefecture',
         'address',
+        'url',
         'type',
         'distanceToToilet',
         'distanceToBath',
@@ -617,10 +618,9 @@ export default function AdminClient() {
         'nightNoiseHasNoiseIssues',
         'nightNoiseNearBusyRoad',
         'nightNoiseIsQuietArea',
-        'calculatedQuietnessLevel',
-        'calculatedSecurityLevel',
         'hasRoof',
         'hasPowerOutlet',
+        'hasGate',
         'isFree',
         'pricePerNight',
         'priceNote',
@@ -640,34 +640,29 @@ export default function AdminClient() {
             spot.coordinates[0], // lng
             spot.prefecture,
             spot.address || '',
+            spot.url || '',
             spot.type,
             spot.distanceToToilet || '',
             spot.distanceToBath || '',
             spot.distanceToConvenience || '',
-            spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[1] : '', // nearbyToiletLat
-            spot.nearbyToiletCoordinates ? spot.nearbyToiletCoordinates[0] : '', // nearbyToiletLng
-            spot.nearbyConvenienceCoordinates
-              ? spot.nearbyConvenienceCoordinates[1]
-              : '', // nearbyConvenienceLat
-            spot.nearbyConvenienceCoordinates
-              ? spot.nearbyConvenienceCoordinates[0]
-              : '', // nearbyConvenienceLng
-            spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[1] : '', // nearbyBathLat
-            spot.nearbyBathCoordinates ? spot.nearbyBathCoordinates[0] : '', // nearbyBathLng
+            spot.nearbyToiletCoordinates?.[1] ?? '', // nearbyToiletLat
+            spot.nearbyToiletCoordinates?.[0] ?? '', // nearbyToiletLng
+            spot.nearbyConvenienceCoordinates?.[1] ?? '', // nearbyConvenienceLat
+            spot.nearbyConvenienceCoordinates?.[0] ?? '', // nearbyConvenienceLng
+            spot.nearbyBathCoordinates?.[1] ?? '', // nearbyBathLat
+            spot.nearbyBathCoordinates?.[0] ?? '', // nearbyBathLng
             spot.elevation || '',
-            // New objective data fields
-            spot.security?.hasGate || false,
-            spot.security?.hasLighting || false,
-            spot.security?.hasStaff || false,
-            spot.nightNoise?.hasNoiseIssues || false,
-            spot.nightNoise?.nearBusyRoad || false,
-            spot.nightNoise?.isQuietArea || false,
-            // Calculated levels (backward compatibility)
-            calculateQuietnessLevel(spot),
-            calculateSecurityLevel(spot),
-            spot.hasRoof,
-            spot.hasPowerOutlet,
-            spot.pricing.isFree,
+            // Security and night noise objective data fields
+            spot.security?.hasGate ? 'true' : 'false',
+            spot.security?.hasLighting ? 'true' : 'false',
+            spot.security?.hasStaff ? 'true' : 'false',
+            spot.nightNoise?.hasNoiseIssues ? 'true' : 'false',
+            spot.nightNoise?.nearBusyRoad ? 'true' : 'false',
+            spot.nightNoise?.isQuietArea ? 'true' : 'false',
+            spot.hasRoof ? 'true' : 'false',
+            spot.hasPowerOutlet ? 'true' : 'false',
+            spot.security?.hasGate ? 'true' : 'false', // hasGate (duplicate for backward compatibility)
+            spot.pricing.isFree ? 'true' : 'false',
             spot.pricing.pricePerNight || '',
             spot.pricing.priceNote || '',
             spot.capacity || '',
@@ -678,7 +673,8 @@ export default function AdminClient() {
           ]
             .map((field) => {
               // Handle fields that might contain commas by quoting them
-              const stringField = String(field);
+              // Use empty string for null/undefined values
+              const stringField = field == null ? '' : String(field);
               if (
                 stringField.includes(',') ||
                 stringField.includes('"') ||

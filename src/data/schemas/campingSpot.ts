@@ -137,24 +137,24 @@ export const CampingSpotCSVSchema = z.object({
   elevation: z.string().refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776), {
     message: "標高は空欄または-10〜3776の数値で入力してください",
   }).optional().default(''),
-  hasGateField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "ゲート有無はtrue/false/空欄で入力してください",
-  }).optional().default(''),
-  hasLightingField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "照明有無はtrue/false/空欄で入力してください",
-  }).optional().default(''),
-  hasStaffField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "管理人・職員有無はtrue/false/空欄で入力してください",
-  }).optional().default(''),
-  hasNoiseIssuesField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "夜間騒音問題はtrue/false/空欄で入力してください",
-  }).optional().default(''),
-  nearBusyRoadField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "交通量多い道路近くはtrue/false/空欄で入力してください",
-  }).optional().default(''),
-  isQuietAreaField: z.string().refine((val) => val === 'true' || val === 'false' || val === '', {
-    message: "静かなエリアはtrue/false/空欄で入力してください",
-  }).optional().default(''),
+  securityHasGate: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "セキュリティ-ゲート有無はtrue/falseで入力してください",
+  }),
+  securityHasLighting: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "セキュリティ-照明有無はtrue/falseで入力してください",
+  }),
+  securityHasStaff: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "セキュリティ-管理人・職員有無はtrue/falseで入力してください",
+  }),
+  nightNoiseHasNoiseIssues: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "夜間騒音-騒音問題はtrue/falseで入力してください",
+  }),
+  nightNoiseNearBusyRoad: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "夜間騒音-交通量多い道路近くはtrue/falseで入力してください",
+  }),
+  nightNoiseIsQuietArea: z.string().refine((val) => val === 'true' || val === 'false', {
+    message: "夜間騒音-静かなエリアはtrue/falseで入力してください",
+  }),
   hasRoof: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "屋根付きはtrue/falseで入力してください",
   }),
@@ -162,7 +162,7 @@ export const CampingSpotCSVSchema = z.object({
     message: "電源はtrue/falseで入力してください",
   }),
   hasGate: z.string().refine((val) => val === 'true' || val === 'false', {
-    message: "ゲーツ付きはtrue/falseで入力してください",
+    message: "ゲート付きはtrue/falseで入力してください",
   }),
   isFree: z.string().refine((val) => val === 'true' || val === 'false', {
     message: "無料はtrue/falseで入力してください",
@@ -374,22 +374,22 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     distanceToToilet: csvRow.distanceToToilet ? Number(csvRow.distanceToToilet) : undefined,
     distanceToBath: csvRow.distanceToBath ? Number(csvRow.distanceToBath) : undefined,
     distanceToConvenience: csvRow.distanceToConvenience ? Number(csvRow.distanceToConvenience) : undefined,
-    nearbyToiletCoordinates: (csvRow.nearbyToiletLat && csvRow.nearbyToiletLng) 
+    nearbyToiletCoordinates: (csvRow.nearbyToiletLat && csvRow.nearbyToiletLng)
       ? [Number(csvRow.nearbyToiletLng), Number(csvRow.nearbyToiletLat)] : undefined,
-    nearbyConvenienceCoordinates: (csvRow.nearbyConvenienceLat && csvRow.nearbyConvenienceLng) 
+    nearbyConvenienceCoordinates: (csvRow.nearbyConvenienceLat && csvRow.nearbyConvenienceLng)
       ? [Number(csvRow.nearbyConvenienceLng), Number(csvRow.nearbyConvenienceLat)] : undefined,
-    nearbyBathCoordinates: (csvRow.nearbyBathLat && csvRow.nearbyBathLng) 
+    nearbyBathCoordinates: (csvRow.nearbyBathLat && csvRow.nearbyBathLng)
       ? [Number(csvRow.nearbyBathLng), Number(csvRow.nearbyBathLat)] : undefined,
     elevation: csvRow.elevation ? Number(csvRow.elevation) : undefined,
     security: {
-      hasGate: csvRow.hasGateField === 'true',
-      hasLighting: csvRow.hasLightingField === 'true',
-      hasStaff: csvRow.hasStaffField === 'true',
+      hasGate: csvRow.securityHasGate === 'true',
+      hasLighting: csvRow.securityHasLighting === 'true',
+      hasStaff: csvRow.securityHasStaff === 'true',
     },
     nightNoise: {
-      hasNoiseIssues: csvRow.hasNoiseIssuesField === 'true',
-      nearBusyRoad: csvRow.nearBusyRoadField === 'true',
-      isQuietArea: csvRow.isQuietAreaField === 'true',
+      hasNoiseIssues: csvRow.nightNoiseHasNoiseIssues === 'true',
+      nearBusyRoad: csvRow.nightNoiseNearBusyRoad === 'true',
+      isQuietArea: csvRow.nightNoiseIsQuietArea === 'true',
     },
     hasRoof: csvRow.hasRoof === 'true',
     hasPowerOutlet: csvRow.hasPowerOutlet === 'true',
