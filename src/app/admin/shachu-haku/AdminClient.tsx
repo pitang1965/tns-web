@@ -693,7 +693,8 @@ export default function AdminClient() {
         }),
       ];
 
-      const csvContent = csvRows.join('\n');
+      // Use \r\n for Windows compatibility and to avoid issues with quoted newlines
+      const csvContent = csvRows.join('\r\n');
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
