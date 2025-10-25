@@ -4,7 +4,7 @@ import { use } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { ClientSideFilterValues } from './ClientSideFilters';
-import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
+import { filterSpotsClientSide, hasActiveClientFilters } from '@/lib/clientSideFilterSpots';
 
 interface SpotsStatsProps {
   spotsPromise: Promise<{
@@ -18,10 +18,11 @@ interface SpotsStatsProps {
 
 export function SpotsStats({ spotsPromise, clientFilters }: SpotsStatsProps) {
   // use フックでPromiseを直接扱う
-  const { spots } = use(spotsPromise);
+  const { spots, total } = use(spotsPromise);
 
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
+  const hasFilters = hasActiveClientFilters(clientFilters);
 
   const freeSpots = filteredSpots.filter((s) => s.pricing.isFree).length;
   const verifiedSpots = filteredSpots.filter((s) => s.isVerified).length;
@@ -34,7 +35,7 @@ export function SpotsStats({ spotsPromise, clientFilters }: SpotsStatsProps) {
       <Card>
         <CardContent className='p-4'>
           <div className='text-2xl font-bold text-blue-600'>
-            {filteredSpots.length}
+            {hasFilters ? filteredSpots.length : total}
           </div>
           <div className='text-sm text-gray-600 dark:text-gray-300'>
             総スポット数
