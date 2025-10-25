@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
 import mailerSend from '@/lib/mailersend';
+import { calculateDistance } from '@/lib/utils/distance';
 
 // Helper function to ensure database connection
 async function ensureDbConnection() {
@@ -26,28 +27,85 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     });
 
-    // Check for duplicates within 100m
-    const existingSubmission = await CampingSpotSubmission.findOne({
-      coordinates: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: validatedData.coordinates,
-          },
-          $maxDistance: 100,
-        },
-      },
+    // Check for duplicates with improved logic:
+    // 1. If name matches exactly:
+    //    - Both have coordinates: reject if within 100m
+    //    - Either lacks coordinates: reject only if same prefecture
+    // 2. If name differs and coordinates exist: reject only if within 10m
+
+    // First, check for exact name match in same prefecture
+    const exactNameMatch = await CampingSpotSubmission.findOne({
+      name: validatedData.name,
+      prefecture: validatedData.prefecture,
       status: { $in: ['pending', 'approved'] },
     });
 
-    if (existingSubmission) {
-      return NextResponse.json(
-        {
-          error: '100m以内に既に投稿済みまたは承認済みのスポットがあります',
-          details: `既存スポット: ${existingSubmission.name}`,
+    if (exactNameMatch) {
+      // If exact name match found in same prefecture
+      if (validatedData.coordinates && exactNameMatch.coordinates) {
+        // Both have coordinates: check distance
+        const distance = calculateDistance(
+          validatedData.coordinates[1],
+          validatedData.coordinates[0],
+          exactNameMatch.coordinates[1],
+          exactNameMatch.coordinates[0]
+        );
+
+        // Reject if within 100m
+        if (distance <= 100) {
+          return NextResponse.json(
+            {
+              error: '同名のスポットが近くに既に投稿済みまたは承認済みです',
+              details: `既存スポット: ${exactNameMatch.name} (${Math.round(distance)}m先)`,
+            },
+            { status: 400 }
+          );
+        }
+      } else {
+        // Either submission lacks coordinates: reject based on name and prefecture match
+        return NextResponse.json(
+          {
+            error: '同名のスポットが同じ都道府県に既に投稿済みまたは承認済みです',
+            details: `既存スポット: ${exactNameMatch.name} (${exactNameMatch.prefecture})`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Second, check for nearby spots with different names (only if coordinates provided)
+    if (validatedData.coordinates) {
+      const nearbySubmissions = await CampingSpotSubmission.find({
+        coordinates: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: validatedData.coordinates,
+            },
+            $maxDistance: 10, // Only check very close spots (10m)
+          },
         },
-        { status: 400 }
-      );
+        name: { $ne: validatedData.name }, // Exclude same name (already checked above)
+        status: { $in: ['pending', 'approved'] },
+      }).limit(5);
+
+      if (nearbySubmissions.length > 0) {
+        const closestSubmission = nearbySubmissions[0];
+        const distance = calculateDistance(
+          validatedData.coordinates[1],
+          validatedData.coordinates[0],
+          closestSubmission.coordinates![1],
+          closestSubmission.coordinates![0]
+        );
+
+        return NextResponse.json(
+          {
+            error: '非常に近い場所に別のスポットが既に投稿済みです',
+            details: `既存スポット: ${closestSubmission.name} (${Math.round(distance)}m先)`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Create new submission

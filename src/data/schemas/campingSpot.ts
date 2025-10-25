@@ -318,12 +318,12 @@ export const CampingSpotFilterSchema = z.object({
 // Public submission schema (simplified for non-admin users)
 export const CampingSpotSubmissionSchema = z.object({
   name: z.string().min(1, '名称を入力してください').trim(),
-  coordinates: z.tuple([
-    z.number().min(-180).max(180), // longitude
-    z.number().min(-90).max(90)    // latitude
-  ], {
-    required_error: '座標を指定してください',
-  }),
+  coordinates: z
+    .tuple([
+      z.number().min(-180).max(180), // longitude
+      z.number().min(-90).max(90),   // latitude
+    ])
+    .optional(),
   prefecture: z.string().min(1, '都道府県を選択してください').trim(),
   address: z.string().trim().optional(),
   url: z.string().url('有効なURLを入力してください').trim().optional(),

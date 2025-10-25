@@ -16,9 +16,10 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
     },
     coordinates: {
       type: [Number],
-      required: true,
+      required: false,
       validate: {
         validator: function(v: number[]) {
+          if (!v || v.length === 0) return true; // Optional field
           return v.length === 2 &&
                  v[0] >= -180 && v[0] <= 180 && // longitude
                  v[1] >= -90 && v[1] <= 90;     // latitude

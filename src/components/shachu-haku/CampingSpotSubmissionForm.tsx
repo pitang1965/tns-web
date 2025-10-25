@@ -48,14 +48,27 @@ const SimpleLocationPicker = dynamic(
 // Form validation schema
 const SubmissionFormSchema = z.object({
   name: z.string().min(1, '名称を入力してください').trim(),
-  lat: z.string().refine((val) => !isNaN(Number(val)), {
-    message: '有効な緯度を入力してください',
-  }),
-  lng: z.string().refine((val) => !isNaN(Number(val)), {
-    message: '有効な経度を入力してください',
-  }),
+  lat: z
+    .string()
+    .refine(
+      (val) => val === '' || !isNaN(Number(val)),
+      {
+        message: '有効な緯度を入力してください',
+      }
+    )
+    .optional()
+    .or(z.literal('')),
+  lng: z
+    .string()
+    .refine(
+      (val) => val === '' || !isNaN(Number(val)),
+      {
+        message: '有効な経度を入力してください',
+      }
+    )
+    .optional()
+    .or(z.literal('')),
   prefecture: z.string().min(1, '都道府県を選択してください'),
-  address: z.string().optional(),
   url: z
     .string()
     .url('有効なURLを入力してください')
@@ -64,7 +77,6 @@ const SubmissionFormSchema = z.object({
   type: z.string().min(1, 'スポットタイプを選択してください'),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
-  isFree: z.boolean().default(true),
   pricePerNight: z.string().optional(),
   priceNote: z.string().optional(),
   notes: z.string().optional(),
@@ -99,12 +111,10 @@ export default function CampingSpotSubmissionForm({
       lat: '',
       lng: '',
       prefecture: '',
-      address: '',
       url: '',
       type: '',
       hasRoof: false,
       hasPowerOutlet: false,
-      isFree: true,
       pricePerNight: '',
       priceNote: '',
       notes: '',
@@ -114,26 +124,27 @@ export default function CampingSpotSubmissionForm({
     },
   });
 
-  const isFree = form.watch('isFree');
-
   const onSubmit = async (data: SubmissionFormData) => {
     try {
       setLoading(true);
 
       // Convert form data to submission format
+      const pricePerNight = data.pricePerNight
+        ? Number(data.pricePerNight)
+        : undefined;
       const submissionData = {
         name: data.name,
-        coordinates: [Number(data.lng), Number(data.lat)],
+        coordinates:
+          data.lng && data.lat
+            ? [Number(data.lng), Number(data.lat)]
+            : undefined,
         prefecture: data.prefecture,
-        address: data.address || undefined,
         url: data.url || undefined,
         type: data.type as CampingSpotType,
         hasRoof: data.hasRoof,
         hasPowerOutlet: data.hasPowerOutlet,
-        isFree: data.isFree,
-        pricePerNight: data.pricePerNight
-          ? Number(data.pricePerNight)
-          : undefined,
+        isFree: !pricePerNight || pricePerNight === 0,
+        pricePerNight,
         priceNote: data.priceNote || undefined,
         notes: data.notes || undefined,
         submitterName: data.submitterName || undefined,
@@ -149,7 +160,18 @@ export default function CampingSpotSubmissionForm({
       });
 
       if (!response.ok) {
-        throw new Error('投稿に失敗しました');
+        const errorData = await response.json();
+        const errorMessage = errorData.error || '投稿に失敗しました';
+        const errorDetails = errorData.details;
+
+        toast({
+          title: 'エラー',
+          description: errorDetails
+            ? `${errorMessage}\n${errorDetails}`
+            : errorMessage,
+          variant: 'destructive',
+        });
+        return;
       }
 
       toast({
@@ -164,7 +186,9 @@ export default function CampingSpotSubmissionForm({
       console.error('Submission error:', error);
       toast({
         title: 'エラー',
-        description: '投稿に失敗しました。もう一度お試しください。',
+        description: error instanceof Error
+          ? error.message
+          : '投稿に失敗しました。もう一度お試しください。',
         variant: 'destructive',
       });
     } finally {
@@ -217,7 +241,9 @@ export default function CampingSpotSubmissionForm({
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>名称 *</FormLabel>
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                      名称
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder='例: 道の駅○○' {...field} />
                     </FormControl>
@@ -232,7 +258,9 @@ export default function CampingSpotSubmissionForm({
                   name='prefecture'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>都道府県 *</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        都道府県
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -260,7 +288,9 @@ export default function CampingSpotSubmissionForm({
                   name='type'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>種別 *</FormLabel>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        種別
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -288,27 +318,10 @@ export default function CampingSpotSubmissionForm({
 
               <FormField
                 control={form.control}
-                name='address'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>住所</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='例: 〇〇県〇〇市〇〇町1-1'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name='url'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>参考URL（任意）</FormLabel>
+                    <FormLabel>参考URL</FormLabel>
                     <FormControl>
                       <Input
                         type='url'
@@ -335,7 +348,7 @@ export default function CampingSpotSubmissionForm({
                   name='lat'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>緯度 *</FormLabel>
+                      <FormLabel>緯度</FormLabel>
                       <FormControl>
                         <Input placeholder='35.123456' {...field} />
                       </FormControl>
@@ -349,7 +362,7 @@ export default function CampingSpotSubmissionForm({
                   name='lng'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>経度 *</FormLabel>
+                      <FormLabel>経度</FormLabel>
                       <FormControl>
                         <Input placeholder='139.123456' {...field} />
                       </FormControl>
@@ -468,56 +481,39 @@ export default function CampingSpotSubmissionForm({
             {/* 料金情報 */}
             <div className='space-y-4'>
               <h3 className='text-lg font-semibold'>料金情報</h3>
+              <p className='text-sm text-gray-600 dark:text-gray-400'>
+                無料の場合は空欄のままにしてください
+              </p>
 
-              <FormField
-                control={form.control}
-                name='isFree'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className='space-y-1 leading-none'>
-                      <FormLabel>無料</FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='pricePerNight'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>1泊料金（円）</FormLabel>
+                      <FormControl>
+                        <Input type='number' placeholder='1000' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {!isFree && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <FormField
-                    control={form.control}
-                    name='pricePerNight'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>1泊料金（円）</FormLabel>
-                        <FormControl>
-                          <Input type='number' placeholder='1000' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name='priceNote'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>料金備考</FormLabel>
-                        <FormControl>
-                          <Input placeholder='例: 軽自動車のみ' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
+                <FormField
+                  control={form.control}
+                  name='priceNote'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>料金備考</FormLabel>
+                      <FormControl>
+                        <Input placeholder='例: 軽自動車のみ' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* 備考 */}
@@ -591,8 +587,8 @@ export default function CampingSpotSubmissionForm({
                     />
                   </FormControl>
                   <div className='space-y-1 leading-none'>
-                    <FormLabel>
-                      投稿内容が正確であることを確認し、利用規約に同意します *
+                    <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                      投稿内容が正確であることを確認し、利用規約に同意します
                     </FormLabel>
                   </div>
                   <FormMessage />

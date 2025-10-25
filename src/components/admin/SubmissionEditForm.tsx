@@ -89,8 +89,8 @@ export default function SubmissionEditForm({
     if (submission) {
       const formValues = {
         name: submission.name,
-        lat: submission.coordinates[1].toString(),
-        lng: submission.coordinates[0].toString(),
+        lat: submission.coordinates ? submission.coordinates[1].toString() : '',
+        lng: submission.coordinates ? submission.coordinates[0].toString() : '',
         prefecture: submission.prefecture,
         address: submission.address || '',
         url: submission.url || '',

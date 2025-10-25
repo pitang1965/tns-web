@@ -313,10 +313,12 @@ export default function SubmissionReviewCard({
                   参考URL ↗
                 </a>
               )}
-              <p className='text-xs text-gray-500 dark:text-gray-400'>
-                座標: {submission.coordinates[1].toFixed(6)},{' '}
-                {submission.coordinates[0].toFixed(6)}
-              </p>
+              {submission.coordinates && (
+                <p className='text-xs text-gray-500 dark:text-gray-400'>
+                  座標: {submission.coordinates[1].toFixed(6)},{' '}
+                  {submission.coordinates[0].toFixed(6)}
+                </p>
+              )}
             </div>
 
             <div>
