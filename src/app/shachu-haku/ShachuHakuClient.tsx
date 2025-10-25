@@ -190,6 +190,7 @@ export default function ShachuHakuClient() {
     west: number;
   } | null>(null);
   const isInitialMountRef = useRef(true);
+  const lastListFiltersRef = useRef<string | null>(null);
 
   // Use custom hook for map bounds loading with optimized data fetching
   const {
@@ -363,6 +364,26 @@ export default function ShachuHakuClient() {
         bounds,
       };
 
+      // Create a stable string representation of filters for comparison
+      const filtersKey = JSON.stringify({
+        searchTerm: filters.searchTerm,
+        type: filters.type,
+        bounds: bounds ? {
+          north: bounds.north.toFixed(4),
+          south: bounds.south.toFixed(4),
+          east: bounds.east.toFixed(4),
+          west: bounds.west.toFixed(4),
+        } : null,
+        page: currentPage,
+      });
+
+      // Skip if filters haven't changed
+      if (lastListFiltersRef.current === filtersKey) {
+        return;
+      }
+
+      lastListFiltersRef.current = filtersKey;
+
       // Create new promise and cache it
       const promise = getPublicCampingSpotsWithPagination(
         currentPage,
@@ -371,6 +392,9 @@ export default function ShachuHakuClient() {
       );
       setCachedListPromise(promise);
       setListPromiseKey((prev) => prev + 1);
+    } else {
+      // Reset when leaving list tab
+      lastListFiltersRef.current = null;
     }
   }, [
     activeTab,
@@ -590,7 +614,7 @@ export default function ShachuHakuClient() {
             )}
 
             {/* List - use + Suspense */}
-            {cachedListPromise && (
+            {cachedListPromise ? (
               <>
                 <Suspense
                   fallback={
@@ -629,6 +653,30 @@ export default function ShachuHakuClient() {
                   />
                 </Suspense>
               </>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center gap-2'>
+                    車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='space-y-4'>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className='border rounded-lg p-4'>
+                        <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
+                        <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
+                        <div className='flex gap-2'>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}
