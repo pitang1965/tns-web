@@ -279,11 +279,11 @@ export default function AdminClient() {
     console.log('[Admin] List useEffect triggered, activeTab:', activeTab);
     if (activeTab === 'list') {
       const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
+        searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
+          typeFilter !== 'all'
+            ? typeFilter
             : undefined,
       };
 
@@ -415,21 +415,21 @@ export default function AdminClient() {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
+        searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
+          typeFilter !== 'all'
+            ? typeFilter
             : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
+        searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
+          typeFilter !== 'all'
+            ? typeFilter
             : undefined,
       };
       loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
@@ -448,21 +448,21 @@ export default function AdminClient() {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
+        searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
+          typeFilter !== 'all'
+            ? typeFilter
             : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
+        searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
+          typeFilter !== 'all'
+            ? typeFilter
             : undefined,
       };
       loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
