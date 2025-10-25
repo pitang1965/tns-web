@@ -203,6 +203,7 @@ export default function ShachuHakuClient() {
     west: number;
   } | null>(null);
   const isInitialMountRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Load spots for map view based on bounds - NO dependencies except toast
   const loadMapSpotsRef = useRef<typeof getPublicCampingSpotsByBounds | null>(
@@ -221,19 +222,41 @@ export default function ShachuHakuClient() {
       type?: string;
     }
   ) => {
+    // Cancel previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new AbortController for this request
+    abortControllerRef.current = new AbortController();
+    const currentController = abortControllerRef.current;
+
     try {
       setLoading(true);
       const data = await getPublicCampingSpotsByBounds(bounds, filters);
-      setSpots(data);
+
+      // Only update state if this request wasn't aborted
+      if (!currentController.signal.aborted) {
+        setSpots(data);
+      }
     } catch (error) {
-      toast({
-        title: 'エラー',
-        description: '車中泊スポットの読み込みに失敗しました',
-        variant: 'destructive',
-      });
-      console.error('Error loading spots:', error);
+      // Ignore abort errors
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+
+      if (!currentController.signal.aborted) {
+        toast({
+          title: 'エラー',
+          description: '車中泊スポットの読み込みに失敗しました',
+          variant: 'destructive',
+        });
+        console.error('Error loading spots:', error);
+      }
     } finally {
-      setLoading(false);
+      if (!currentController.signal.aborted) {
+        setLoading(false);
+      }
     }
   };
 
@@ -327,6 +350,10 @@ export default function ShachuHakuClient() {
       }
 
       // Set new timeout for debounced load
+      // Use longer debounce on mobile devices (800ms) to reduce request frequency during gesture-heavy interactions
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const debounceTime = isMobile ? 800 : 500;
+
       boundsTimeoutRef.current = setTimeout(() => {
         // Check if bounds have significantly changed
         if (!boundsHaveChanged(lastLoadedBoundsRef.current, bounds)) {
@@ -347,7 +374,7 @@ export default function ShachuHakuClient() {
         loadMapSpotsRef.current?.(bounds, filters);
         lastLoadedBoundsRef.current = bounds; // Update last loaded bounds
         initialLoadDoneRef.current = true;
-      }, 500); // 500ms debounce
+      }, debounceTime);
     },
     [] // NO dependencies - completely stable
   );
@@ -504,11 +531,14 @@ export default function ShachuHakuClient() {
     }
   }, [searchTerm, typeFilter, activeTab]);
 
-  // Cleanup timeout on unmount
+  // Cleanup timeout and abort controller on unmount
   useEffect(() => {
     return () => {
       if (boundsTimeoutRef.current) {
         clearTimeout(boundsTimeoutRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     };
   }, []);
