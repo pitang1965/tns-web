@@ -503,15 +503,6 @@ export default function ShachuHakuClient() {
             </div>
           </div>
           <div className='flex flex-col sm:flex-row gap-2'>
-            <a
-              href='https://amzn.to/4pI2i6W'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <Button className='bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto'>
-                Jackeryアーリーオータムセール
-              </Button>
-            </a>
             <Link href='/shachu-haku/submit'>
               <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto'>
                 <Plus className='w-4 h-4 mr-2' />
