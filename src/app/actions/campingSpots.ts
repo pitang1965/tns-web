@@ -13,6 +13,7 @@ import {
   CampingSpotCSVSchema,
   CampingSpotCSVJapaneseSchema,
 } from '@/data/schemas/campingSpot';
+import { calculateDistance } from '@/lib/utils/distance';
 
 // Helper function to check admin authorization
 async function checkAdminAuth() {
@@ -869,23 +870,51 @@ export async function importCampingSpotsFromCSV(csvData: string) {
 
       campingSpotData.submittedBy = user.email;
 
-      // Check for duplicates (within 100m)
-      const existingSpot = await CampingSpot.findOne({
+      // Check for duplicates with improved logic:
+      // - If name matches exactly: reject if within 100m (likely duplicate submission)
+      // - If name differs: reject only if within 10m (likely same location but different facility)
+      const nearbySpots = await CampingSpot.find({
         coordinates: {
           $near: {
             $geometry: {
               type: 'Point',
               coordinates: campingSpotData.coordinates,
             },
-            $maxDistance: 100,
+            $maxDistance: 100, // Check within 100m radius
           },
         },
+      }).limit(5); // Get up to 5 nearest spots
+
+      // Check if any nearby spot is a duplicate
+      const duplicateSpot = nearbySpots.find((spot) => {
+        const distance = spot.coordinates
+          ? calculateDistance(
+              campingSpotData.coordinates[1],
+              campingSpotData.coordinates[0],
+              spot.coordinates[1],
+              spot.coordinates[0]
+            )
+          : Infinity;
+
+        // If names match exactly, consider it duplicate within 100m
+        if (spot.name === campingSpotData.name) {
+          return distance <= 100;
+        }
+
+        // If names differ, only consider duplicate if within 10m (same physical location)
+        return distance <= 10;
       });
 
-      if (existingSpot) {
+      if (duplicateSpot) {
+        const distance = calculateDistance(
+          campingSpotData.coordinates[1],
+          campingSpotData.coordinates[0],
+          duplicateSpot.coordinates[1],
+          duplicateSpot.coordinates[0]
+        );
         results.errors.push({
           row: i + 1,
-          error: `Duplicate spot found within 100m: ${existingSpot.name}`,
+          error: `Duplicate spot found: ${duplicateSpot.name} (${Math.round(distance)}m away)`,
           data: rowData,
         });
         continue;
