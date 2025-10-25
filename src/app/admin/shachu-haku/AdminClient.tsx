@@ -650,9 +650,10 @@ export default function AdminClient() {
         return stringField;
       };
 
-      const csvRows = [
-        headers.join(','),
-        ...exportSpots.map((spot: CampingSpotWithId) => {
+      const csvRows = [headers.join(',')];
+
+      exportSpots.forEach((spot: CampingSpotWithId, index: number) => {
+        try {
           const fields = [
             spot.name,
             spot.coordinates[1], // lat
@@ -690,9 +691,11 @@ export default function AdminClient() {
             spot.amenities.join(','),
             spot.notes || '',
           ];
-          return fields.map(escapeCSVField).join(',');
-        }),
-      ];
+          csvRows.push(fields.map(escapeCSVField).join(','));
+        } catch (error) {
+          console.error(`[Export] Error processing spot ${index}:`, spot.name, error);
+        }
+      });
 
       // Use \r\n for Windows compatibility and to avoid issues with quoted newlines
       const csvContent = csvRows.join('\r\n');
