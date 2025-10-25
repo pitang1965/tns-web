@@ -593,6 +593,7 @@ export default function AdminClient() {
         '../../actions/campingSpots'
       );
       const exportSpots = await getCampingSpotsForExport();
+      console.log('[Export] Total spots fetched:', exportSpots.length);
 
       const headers = [
         'name',
