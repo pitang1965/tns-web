@@ -651,6 +651,8 @@ export default function AdminClient() {
       };
 
       const csvRows = [headers.join(',')];
+      let processedCount = 0;
+      let errorCount = 0;
 
       exportSpots.forEach((spot: CampingSpotWithId, index: number) => {
         try {
@@ -692,9 +694,18 @@ export default function AdminClient() {
             spot.notes || '',
           ];
           csvRows.push(fields.map(escapeCSVField).join(','));
+          processedCount++;
         } catch (error) {
           console.error(`[Export] Error processing spot ${index}:`, spot.name, error);
+          errorCount++;
         }
+      });
+
+      console.log('[Export] Processing complete:', {
+        totalFetched: exportSpots.length,
+        processedCount,
+        errorCount,
+        csvRowsCount: csvRows.length - 1 // -1 for header
       });
 
       // Use \r\n for Windows compatibility and to avoid issues with quoted newlines
