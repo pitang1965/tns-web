@@ -37,7 +37,6 @@ import {
 } from '@/lib/prefectureCoordinates';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
-import { AdminSpotsStats } from '@/components/admin/AdminSpotsStats';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import {
   filterSpotsClientSide,
@@ -786,28 +785,6 @@ export default function AdminClient() {
           <div className='space-y-4'>
             {listPromiseState.promise ? (
               <>
-                {/* Stats and List - use + Suspense */}
-                <Suspense
-                  fallback={
-                    <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-                      {[...Array(4)].map((_, i) => (
-                        <Card key={i}>
-                          <CardContent className='p-4'>
-                            <div className='h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-10 mb-2'></div>
-                            <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-24'></div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  }
-                  key={`stats-${listPromiseState.key}`}
-                >
-                  <AdminSpotsStats
-                    spotsPromise={listPromiseState.promise}
-                    clientFilters={clientFilters}
-                  />
-                </Suspense>
-
                 {/* Spots List - use + Suspense */}
                 <Suspense
                   fallback={
