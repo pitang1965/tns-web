@@ -423,16 +423,8 @@ export default function AdminClient() {
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
-      const filters = {
-        searchTerm: searchTerm || undefined,
-        prefecture: undefined,
-        type:
-          typeFilter !== 'all'
-            ? typeFilter
-            : undefined,
-      };
-      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
-      lastLoadedBoundsRef.current = mapBoundsRef.current;
+      // Use the hook's reloadIfNeeded function to reload map data
+      reloadIfNeeded(mapBoundsRef.current);
     }
     handleFormClose();
     toast({
@@ -456,16 +448,8 @@ export default function AdminClient() {
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
-      const filters = {
-        searchTerm: searchTerm || undefined,
-        prefecture: undefined,
-        type:
-          typeFilter !== 'all'
-            ? typeFilter
-            : undefined,
-      };
-      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
-      lastLoadedBoundsRef.current = mapBoundsRef.current;
+      // Use the hook's reloadIfNeeded function to reload map data
+      reloadIfNeeded(mapBoundsRef.current);
     }
     toast({
       title: 'インポート完了',
