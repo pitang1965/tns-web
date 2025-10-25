@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { setupJapaneseLabels, handleMapError } from '@/lib/mapboxIcons';
+import { LoadingState } from '@/components/common/LoadingState';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface SimpleLocationPickerProps {
@@ -103,11 +104,7 @@ export default function SimpleLocationPicker({
   }, [mounted, initialLat, initialLng, onLocationSelect]);
 
   if (!mounted) {
-    return (
-      <div className='h-[400px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-        <div className='text-gray-500'>地図を読み込み中...</div>
-      </div>
-    );
+    return <LoadingState variant='card' message='地図を読み込み中...' />;
   }
 
   return (

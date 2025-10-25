@@ -13,6 +13,7 @@ import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { LoadingState } from '@/components/common/LoadingState';
 import { Map, MapPin } from 'lucide-react';
 import {
   Select,
@@ -36,11 +37,7 @@ const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => (
-      <div className='h-[400px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-        <div className='text-gray-500'>地図を読み込み中...</div>
-      </div>
-    ),
+    loading: () => <LoadingState variant='card' message='地図を読み込み中...' />,
   }
 );
 

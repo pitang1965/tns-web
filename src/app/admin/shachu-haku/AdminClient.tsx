@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
 import {
   getCampingSpotsByBounds,
@@ -727,20 +728,9 @@ export default function AdminClient() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className='flex justify-center items-center h-screen'>
-        Loading...
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className='flex justify-center items-center h-screen'>
-        Loading...
-      </div>
-    );
+  if (isLoading || !user) {
+    // For loading states, return null and let Suspense handle it
+    return null;
   }
 
   if (!isAdmin) {
@@ -845,15 +835,19 @@ export default function AdminClient() {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <MapPin className='w-5 h-5' />
-                {loading
-                  ? '地図から編集 (読み込み中...)'
-                  : totalCount > 0
-                  ? `地図から編集 (${filteredSpots.length}件${
-                      hasActiveClientFilters(clientFilters)
-                        ? ` / ${spots.length}件中`
-                        : `中${spots.length}件`
-                    })`
-                  : `地図から編集 (${filteredSpots.length}件)`}
+                {loading ? (
+                  <span className='flex items-center gap-2'>
+                    地図から編集 (読み込み中... <Spinner className='size-4' />)
+                  </span>
+                ) : totalCount > 0 ? (
+                  `地図から編集 (${filteredSpots.length}件${
+                    hasActiveClientFilters(clientFilters)
+                      ? ` / ${spots.length}件中`
+                      : `中${spots.length}件`
+                  })`
+                ) : (
+                  `地図から編集 (${filteredSpots.length}件)`
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -923,8 +917,8 @@ export default function AdminClient() {
                   fallback={
                     <Card>
                       <CardHeader>
-                        <CardTitle>
-                          車中泊スポット一覧 (読み込み中...)
+                        <CardTitle className='flex items-center gap-2'>
+                          車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
                         </CardTitle>
                       </CardHeader>
                       <CardContent>

@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Spinner } from '@/components/ui/spinner';
 
 import { MapPin, Info, Plus } from 'lucide-react';
 import {
@@ -659,13 +660,17 @@ export default function ShachuHakuClient() {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <MapPin className='w-5 h-5' />
-                {loading
-                  ? '車中泊スポット地図 (読み込み中...)'
-                  : `車中泊スポット地図 (${filteredSpots.length}件${
-                      hasActiveClientFilters(clientFilters)
-                        ? ` / ${spots.length}件中`
-                        : ''
-                    })`}
+                {loading ? (
+                  <span className='flex items-center gap-2'>
+                    車中泊スポット地図 (読み込み中... <Spinner className='size-4' />)
+                  </span>
+                ) : (
+                  `車中泊スポット地図 (${filteredSpots.length}件${
+                    hasActiveClientFilters(clientFilters)
+                      ? ` / ${spots.length}件中`
+                      : ''
+                  })`
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -729,8 +734,8 @@ export default function ShachuHakuClient() {
                   fallback={
                     <Card>
                       <CardHeader>
-                        <CardTitle>
-                          車中泊スポット一覧 (読み込み中...)
+                        <CardTitle className='flex items-center gap-2'>
+                          車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
                         </CardTitle>
                       </CardHeader>
                       <CardContent>

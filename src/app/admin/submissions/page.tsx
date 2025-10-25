@@ -11,6 +11,7 @@ import { RefreshCw, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
 import { CampingSpotSubmissionWithId } from '@/data/schemas/campingSpot';
 import { getCampingSpotSubmissions } from '../../../app/actions/campingSpotSubmissions';
 import SubmissionReviewCard from '@/components/admin/SubmissionReviewCard';
+import { LoadingState } from '@/components/common/LoadingState';
 
 // Dynamically import the form component to avoid SSR issues
 const SubmissionEditForm = dynamic(
@@ -250,7 +251,9 @@ export default function SubmissionsAdminPage() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className='text-center py-8'>読み込み中...</div>
+                <div className='text-center py-8'>
+                  <LoadingState variant='inline' />
+                </div>
               ) : filteredSubmissions.length === 0 ? (
                 <div className='text-center py-8 text-gray-500'>
                   {activeTab === 'pending' && '承認待ちの投稿はありません'}

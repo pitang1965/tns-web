@@ -8,6 +8,7 @@ import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { updateItineraryAction } from '@/actions/updateItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
+import { LoadingState } from '@/components/common/LoadingState';
 
 type EditItineraryPageProps = {
   params: Promise<{
@@ -61,7 +62,11 @@ export default withPageAuthRequired(function EditItineraryPage({
   };
 
   if (loading) {
-    return <div className='container mx-auto p-4'>読み込み中...</div>;
+    return (
+      <div className='container mx-auto p-4'>
+        <LoadingState variant='inline' />
+      </div>
+    );
   }
 
   if (error) {

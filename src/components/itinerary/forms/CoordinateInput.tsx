@@ -13,17 +13,14 @@ import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { SmallText } from '@/components/common/Typography';
 import { MapPin } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { LoadingState } from '@/components/common/LoadingState';
 
 // Dynamically import map component to avoid SSR issues
 const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => (
-      <div className='h-[400px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center'>
-        <div className='text-gray-500'>地図を読み込み中...</div>
-      </div>
-    ),
+    loading: () => <LoadingState variant='card' message='地図を読み込み中...' />,
   }
 );
 

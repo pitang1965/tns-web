@@ -6,6 +6,7 @@ import { SmallText } from '@/components/common/Typography';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import StatsSection from '@/components/landing/StatsSection';
 import CTASection from '@/components/landing/CTASection';
+import { LoadingState } from '@/components/common/LoadingState';
 
 const HeroMapSection = dynamic(
   () => import('@/components/landing/HeroMapSection'),
@@ -13,9 +14,7 @@ const HeroMapSection = dynamic(
     ssr: false,
     loading: () => (
       <div className='h-[70vh] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
-        <div className='text-center px-6'>
-          <h1 className='text-4xl font-bold mb-4'>読み込み中...</h1>
-        </div>
+        <LoadingState variant='inline' />
       </div>
     ),
   }
