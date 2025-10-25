@@ -32,7 +32,6 @@ import {
 } from '@/lib/prefectureCoordinates';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotsList } from '@/components/shachu-haku/SpotsList';
-import { SpotsStats } from '@/components/shachu-haku/SpotsStats';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import {
   filterSpotsClientSide,
@@ -590,30 +589,9 @@ export default function ShachuHakuClient() {
               </Card>
             )}
 
-            {/* Stats and List - use + Suspense */}
+            {/* List - use + Suspense */}
             {cachedListPromise && (
               <>
-                <Suspense
-                  fallback={
-                    <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-                      {[...Array(4)].map((_, i) => (
-                        <Card key={i}>
-                          <CardContent className='p-4'>
-                            <div className='h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-10 mb-2'></div>
-                            <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-24'></div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  }
-                  key={`stats-${listPromiseKey}`}
-                >
-                  <SpotsStats
-                    spotsPromise={cachedListPromise}
-                    clientFilters={clientFilters}
-                  />
-                </Suspense>
-
                 <Suspense
                   fallback={
                     <Card>
