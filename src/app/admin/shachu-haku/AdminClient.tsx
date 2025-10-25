@@ -12,6 +12,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
+import { useMapBoundsLoader } from '@/hooks/useMapBoundsLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
@@ -191,76 +192,29 @@ export default function AdminClient() {
     east: number;
     west: number;
   } | null>(null);
-  const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const initialLoadDoneRef = useRef(false);
-  const filtersRef = useRef({
-    searchTerm: '',
-    typeFilter: 'all',
-  });
-  const lastLoadedBoundsRef = useRef<{
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  } | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Load spots for map view based on bounds - NO dependencies
-  const loadMapSpotsRef = useRef<typeof getCampingSpotsByBounds | null>(null);
-  loadMapSpotsRef.current = async (
-    bounds: {
-      north: number;
-      south: number;
-      east: number;
-      west: number;
+  // Use custom hook for map bounds loading with optimized data fetching
+  const {
+    handleBoundsChange,
+    cleanup: cleanupMapBoundsLoader,
+    reloadIfNeeded,
+    initialLoadDoneRef,
+  } = useMapBoundsLoader({
+    loadSpots: getCampingSpotsByBounds,
+    setLoading,
+    setSpots,
+    toast,
+    filters: {
+      searchTerm,
+      prefectureFilter: 'all',
+      typeFilter,
     },
-    filters?: {
-      searchTerm?: string;
-      prefecture?: string;
-      type?: string;
-    }
-  ) => {
-    // Cancel previous request if it exists
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new AbortController for this request
-    abortControllerRef.current = new AbortController();
-    const currentController = abortControllerRef.current;
-
-    try {
-      setLoading(true);
-      const data = await getCampingSpotsByBounds(bounds, filters);
-
-      // Only update state if this request wasn't aborted
-      if (!currentController.signal.aborted) {
-        setSpots(data);
-
-        // Also get total count for map view (without bounds)
-        const totalResult = await getCampingSpotsWithPagination(1, 1, filters);
-        setTotalCount(totalResult.total);
-      }
-    } catch (error) {
-      // Ignore abort errors
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
-
-      if (!currentController.signal.aborted) {
-        toast({
-          title: 'エラー',
-          description: '車中泊スポットの読み込みに失敗しました',
-          variant: 'destructive',
-        });
-        console.error('Error loading spots:', error);
-      }
-    } finally {
-      if (!currentController.signal.aborted) {
-        setLoading(false);
-      }
-    }
-  };
+    // Admin-specific: also get total count for display
+    onLoadSuccess: async (data, bounds, filters) => {
+      const totalResult = await getCampingSpotsWithPagination(1, 1, filters);
+      setTotalCount(totalResult.total);
+    },
+  });
 
   // Load spots for list view with pagination - NO dependencies
   const loadListSpotsRef = useRef<
@@ -305,79 +259,13 @@ export default function AdminClient() {
     }
   };
 
-  // Initialize filtersRef on mount with URL parameters
-  useEffect(() => {
-    filtersRef.current = { searchTerm, typeFilter };
-  }, []);
-
-  // Update filters ref whenever they change
-  useEffect(() => {
-    filtersRef.current = { searchTerm, typeFilter };
-  }, [searchTerm, typeFilter]);
-
-  // Helper function to check if bounds have significantly changed
-  const boundsHaveChanged = (
-    oldBounds: {
-      north: number;
-      south: number;
-      east: number;
-      west: number;
-    } | null,
-    newBounds: { north: number; south: number; east: number; west: number }
-  ): boolean => {
-    if (!oldBounds) return true;
-
-    // Calculate the difference as a percentage of the current view
-    const latDiff =
-      Math.abs(newBounds.north - oldBounds.north) +
-      Math.abs(newBounds.south - oldBounds.south);
-    const lngDiff =
-      Math.abs(newBounds.east - oldBounds.east) +
-      Math.abs(newBounds.west - oldBounds.west);
-
-    const latRange = newBounds.north - newBounds.south;
-    const lngRange = newBounds.east - newBounds.west;
-
-    // Only reload if bounds changed by more than 5% of current view
-    const threshold = 0.05;
-    return latDiff / latRange > threshold || lngDiff / lngRange > threshold;
-  };
-
-  // Handle bounds change with debounce - stable function with NO dependencies
-  const handleBoundsChange = useCallback(
+  // Wrapper for handleBoundsChange that saves mapBoundsRef
+  const handleBoundsChangeWrapper = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       mapBoundsRef.current = bounds;
-
-      // Clear existing timeout
-      if (boundsTimeoutRef.current) {
-        clearTimeout(boundsTimeoutRef.current);
-      }
-
-      // Set new timeout for debounced load
-      // Use longer debounce on mobile devices (800ms) to reduce request frequency during gesture-heavy interactions
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const debounceTime = isMobile ? 800 : 500;
-
-      boundsTimeoutRef.current = setTimeout(() => {
-        // Check if bounds have significantly changed
-        if (!boundsHaveChanged(lastLoadedBoundsRef.current, bounds)) {
-          return; // Skip loading if bounds haven't changed significantly
-        }
-
-        const filters = {
-          searchTerm: filtersRef.current.searchTerm || undefined,
-          prefecture: undefined,
-          type:
-            filtersRef.current.typeFilter !== 'all'
-              ? filtersRef.current.typeFilter
-              : undefined,
-        };
-        loadMapSpotsRef.current?.(bounds, filters);
-        lastLoadedBoundsRef.current = bounds; // Update last loaded bounds
-        initialLoadDoneRef.current = true;
-      }, debounceTime);
+      handleBoundsChange(bounds); // Call hook's handler
     },
-    [] // NO dependencies - completely stable
+    [handleBoundsChange]
   );
 
   // Reset page when filters change
@@ -417,40 +305,18 @@ export default function AdminClient() {
   }, [activeTab, currentPage, searchTerm, typeFilter]);
 
   // Reload map data when filters change (if map is active and bounds are available)
-  // DO NOT include mapBounds in dependencies - it causes infinite loop!
   useEffect(() => {
-    if (
-      activeTab === 'map' &&
-      mapBoundsRef.current &&
-      initialLoadDoneRef.current
-    ) {
-      // Reset last loaded bounds to force reload when filters change
-      lastLoadedBoundsRef.current = null;
-
-      const filters = {
-        searchTerm: filtersRef.current.searchTerm || undefined,
-        prefecture: undefined,
-        type:
-          filtersRef.current.typeFilter !== 'all'
-            ? filtersRef.current.typeFilter
-            : undefined,
-      };
-      loadMapSpotsRef.current?.(mapBoundsRef.current, filters);
-      lastLoadedBoundsRef.current = mapBoundsRef.current; // Update after loading
+    if (activeTab === 'map') {
+      reloadIfNeeded(mapBoundsRef.current);
     }
-  }, [searchTerm, typeFilter, activeTab]); // mapBounds removed!
+  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded]);
 
-  // Cleanup timeout and abort controller on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (boundsTimeoutRef.current) {
-        clearTimeout(boundsTimeoutRef.current);
-      }
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      cleanupMapBoundsLoader();
     };
-  }, []);
+  }, [cleanupMapBoundsLoader]);
 
   // Update URL when filters or tab change (on user interaction)
   const isInitialMountRef = useRef(true);
@@ -885,7 +751,7 @@ export default function AdminClient() {
                 key='shachu-haku-admin-map'
                 spots={filteredSpots}
                 onSpotSelect={handleSpotSelect}
-                onBoundsChange={handleBoundsChange}
+                onBoundsChange={handleBoundsChangeWrapper}
                 initialCenter={mapCenter}
                 initialZoom={mapZoom}
                 onCreateSpot={(coordinates) => {

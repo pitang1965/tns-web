@@ -53,9 +53,9 @@ class ErrorBoundary extends React.Component<
           {/* エラーの詳細は開発環境でのみ表示する */}
           {process.env.NODE_ENV === 'development' && (
             <details style={{ whiteSpace: 'pre-wrap' }}>
-              <LargeText>
-                <summary>エラー詳細 (開発環境のみ)</summary>
-              </LargeText>
+              <summary className="text-lg mb-6 text-gray-700 dark:text-gray-300 cursor-pointer">
+                エラー詳細 (開発環境のみ)
+              </summary>
               <Text>{this.state.error && this.state.error.toString()}</Text>
               <br />
               <Text>{this.state.errorInfo?.componentStack}</Text>
