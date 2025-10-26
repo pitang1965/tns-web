@@ -719,10 +719,10 @@ export default function AdminClient() {
                     地図から編集 (読み込み中... <Spinner className='size-4' />)
                   </span>
                 ) : totalCount > 0 ? (
-                  `地図から編集 (${filteredSpots.length}件${
+                  `地図から編集 (全${totalCount}件中${
                     hasActiveClientFilters(clientFilters)
-                      ? ` / ${spots.length}件中`
-                      : `中${spots.length}件`
+                      ? `${filteredSpots.length}件 / 範囲内${spots.length}件`
+                      : `${spots.length}件`
                   })`
                 ) : (
                   `地図から編集 (${filteredSpots.length}件)`
