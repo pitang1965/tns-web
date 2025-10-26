@@ -9,6 +9,10 @@ const getDefaultSecurityLevel = (type: CampingSpotType): number => {
       return 4; // 道の駅・◯◯の駅
     case 'sa_pa':
       return 4; // SA/PA
+    case 'auto_campground':
+      return 4; // オートキャンプ場
+    case 'onsen_facility':
+      return 3; // 日帰り温泉施設
     case 'convenience_store':
       return 2; // コンビニ
     case 'parking_lot':

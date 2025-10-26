@@ -18,6 +18,8 @@ export const CampingSpotTypeSchema = z.enum([
   'roadside_station',
   'sa_pa',
   'rv_park',
+  'auto_campground',
+  'onsen_facility',
   'convenience_store',
   'parking_lot',
   'other'
@@ -457,6 +459,8 @@ export const CampingSpotTypeLabels: Record<CampingSpotType, string> = {
   roadside_station: '道の駅・◯◯の駅',
   sa_pa: 'SA/PA',
   rv_park: 'RVパーク',
+  auto_campground: 'オートキャンプ場',
+  onsen_facility: '日帰り温泉施設',
   convenience_store: 'コンビニ',
   parking_lot: '駐車場',
   other: 'その他',
