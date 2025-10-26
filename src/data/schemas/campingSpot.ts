@@ -454,7 +454,7 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
 
 // Type labels for UI
 export const CampingSpotTypeLabels: Record<CampingSpotType, string> = {
-  roadside_station: '道の駅',
+  roadside_station: '道の駅・◯◯の駅',
   sa_pa: 'SA/PA',
   rv_park: 'RVパーク',
   convenience_store: 'コンビニ',

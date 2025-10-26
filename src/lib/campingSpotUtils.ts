@@ -6,7 +6,7 @@ const getDefaultSecurityLevel = (type: CampingSpotType): number => {
     case 'rv_park':
       return 4; // RVパーク
     case 'roadside_station':
-      return 4; // 道の駅
+      return 4; // 道の駅・◯◯の駅
     case 'sa_pa':
       return 4; // SA/PA
     case 'convenience_store':

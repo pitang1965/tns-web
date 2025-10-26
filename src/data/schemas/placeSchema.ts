@@ -11,7 +11,7 @@ export const placeSchema = z.object({
     'PARKING_PAID_RV_PARK', // 駐車場 -- 有料 -- RVパーク
     'PARKING_PAID_OTHER', // 駐車場 -- 有料 -- その他
     'PARKING_FREE_SERVICE_AREA', // 駐車場 -- 無料 -- サービスエリア・パーキングエリア
-    'PARKING_FREE_MICHINOEKI', // 駐車場 -- 無料 -- 道の駅
+    'PARKING_FREE_MICHINOEKI', // 駐車場 -- 無料 -- 道の駅・◯◯の駅
     'PARKING_FREE_OTHER', // 駐車場 -- 無料 -- その他
     'GAS_STATION', // ガソリンスタンド
     'CONVENIENCE_SUPERMARKET', // コンビニ・スーパーマーケット
