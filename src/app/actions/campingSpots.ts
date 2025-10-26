@@ -735,6 +735,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
     updateOperations,
     {
       new: true,
+      runValidators: true,
     }
   );
 

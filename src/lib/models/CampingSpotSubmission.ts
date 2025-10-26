@@ -54,7 +54,7 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
     },
     type: {
       type: String,
-      enum: ['roadside_station', 'sa_pa', 'rv_park', 'convenience_store', 'parking_lot', 'other'],
+      enum: ['roadside_station', 'sa_pa', 'rv_park', 'auto_campground', 'onsen_facility', 'convenience_store', 'parking_lot', 'other'],
       default: 'other',
     },
     hasRoof: {

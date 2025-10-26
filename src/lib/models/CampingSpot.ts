@@ -6,7 +6,7 @@ export interface ICampingSpot extends Document {
   prefecture: string;
   address?: string;
   url?: string;
-  type: 'roadside_station' | 'sa_pa' | 'rv_park' | 'convenience_store' | 'parking_lot' | 'other';
+  type: 'roadside_station' | 'sa_pa' | 'rv_park' | 'auto_campground' | 'onsen_facility' | 'convenience_store' | 'parking_lot' | 'other';
   distanceToToilet?: number; // meters
   distanceToBath?: number; // meters
   distanceToConvenience?: number; // meters
@@ -95,7 +95,7 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   type: {
     type: String,
     required: true,
-    enum: ['roadside_station', 'sa_pa', 'rv_park', 'convenience_store', 'parking_lot', 'other'],
+    enum: ['roadside_station', 'sa_pa', 'rv_park', 'auto_campground', 'onsen_facility', 'convenience_store', 'parking_lot', 'other'],
   },
   distanceToToilet: {
     type: Number,
