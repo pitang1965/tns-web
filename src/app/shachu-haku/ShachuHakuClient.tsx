@@ -191,6 +191,15 @@ export default function ShachuHakuClient() {
   } | null>(null);
   const isInitialMountRef = useRef(true);
   const lastListFiltersRef = useRef<string | null>(null);
+  const prevActiveTabRef = useRef<'map' | 'list'>(activeTab);
+
+  // Refs for accessing current values without triggering re-renders
+  const savedBoundsRef = useRef(savedBounds);
+  savedBoundsRef.current = savedBounds;
+  const mapZoomRef = useRef(mapZoom);
+  mapZoomRef.current = mapZoom;
+  const mapCenterRef = useRef(mapCenter);
+  mapCenterRef.current = mapCenter;
 
   // Use custom hook for map bounds loading with optimized data fetching
   const {
@@ -406,12 +415,35 @@ export default function ShachuHakuClient() {
     mapCenter,
   ]);
 
-  // Reload map data when filters change (if map is active and bounds are available)
+  // Reload map data when switching to map tab or when filters change
   useEffect(() => {
-    if (activeTab === 'map') {
+    const isTabChangedToMap = prevActiveTabRef.current !== 'map' && activeTab === 'map';
+    prevActiveTabRef.current = activeTab;
+
+    if (isTabChangedToMap) {
+      // Tab just changed to map - initialize bounds if needed
+      let bounds = mapBoundsRef.current;
+
+      // If map hasn't initialized bounds yet, use savedBounds or calculate from zoom/center
+      if (!bounds) {
+        if (savedBoundsRef.current) {
+          bounds = savedBoundsRef.current;
+          mapBoundsRef.current = savedBoundsRef.current;
+        } else if (mapZoomRef.current && mapCenterRef.current) {
+          bounds = calculateBoundsFromZoomAndCenter(mapCenterRef.current, mapZoomRef.current);
+          mapBoundsRef.current = bounds;
+        }
+      }
+
+      // Trigger reload if we have bounds
+      if (bounds) {
+        handleBoundsChangeWrapper(bounds);
+      }
+    } else if (activeTab === 'map') {
+      // Already on map tab, reload if filters changed
       reloadIfNeeded(mapBoundsRef.current);
     }
-  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded]);
+  }, [searchTerm, typeFilter, activeTab, handleBoundsChangeWrapper, reloadIfNeeded]);
 
   // Cleanup on unmount
   useEffect(() => {
