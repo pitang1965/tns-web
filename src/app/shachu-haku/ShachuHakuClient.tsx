@@ -744,7 +744,9 @@ export default function ShachuHakuClient() {
                     >
                       {selectedSpot.pricing.isFree
                         ? '無料'
-                        : `¥${selectedSpot.pricing.pricePerNight || '未設定'}`}
+                        : selectedSpot.pricing.pricePerNight
+                        ? `¥${selectedSpot.pricing.pricePerNight}`
+                        : '有料：？円'}
                     </Badge>
                     <Badge
                       className={`${getRatingColor(

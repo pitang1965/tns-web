@@ -517,7 +517,9 @@ export default function ShachuHakuMap({
           <div><strong class="text-gray-900">料金:</strong> ${
             spot.pricing.isFree
               ? '無料'
-              : `¥${spot.pricing.pricePerNight || '未設定'}/泊`
+              : spot.pricing.pricePerNight
+              ? `¥${spot.pricing.pricePerNight}/泊`
+              : '有料：？円/泊'
           }</div>
           <div class="mt-3 pt-2 border-t border-gray-200">
             <button

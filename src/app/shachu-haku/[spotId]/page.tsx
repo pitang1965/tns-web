@@ -46,7 +46,7 @@ export const generateMetadata = async ({
       ? '無料'
       : spot.pricing.pricePerNight
       ? `¥${spot.pricing.pricePerNight}`
-      : '料金未設定';
+      : '料金要確認';
     const description = `${spot.prefecture}の${typeLabel}「${spot.name}」の車中泊スポット情報。${priceInfo}。${spot.address}`;
     const url = `https://tabi.over40web.club/shachu-haku/${spotId}`;
 

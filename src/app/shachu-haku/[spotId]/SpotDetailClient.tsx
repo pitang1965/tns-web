@@ -301,7 +301,9 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
         >
           {spot.pricing.isFree
             ? '無料'
-            : `¥${spot.pricing.pricePerNight || '未設定'}`}
+            : spot.pricing.pricePerNight
+            ? `¥${spot.pricing.pricePerNight}`
+            : '有料：？円'}
         </Badge>
         <Badge className={`${getRatingColor(securityLevel)} text-white`}>
           <Shield className='w-3 h-3 mr-1' />
@@ -408,7 +410,9 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                   <div className='text-gray-700 dark:text-gray-300'>
                     {spot.pricing.isFree
                       ? '無料'
-                      : `¥${spot.pricing.pricePerNight || '未設定'}/泊`}
+                      : spot.pricing.pricePerNight
+                      ? `¥${spot.pricing.pricePerNight}/泊`
+                      : '有料：？円/泊'}
                   </div>
                 </div>
                 {spot.capacity && (

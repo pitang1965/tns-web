@@ -143,7 +143,9 @@ export default function SubmissionReviewCard({
               >
                 {submission.isFree
                   ? '無料'
-                  : `¥${submission.pricePerNight || '未設定'}`}
+                  : submission.pricePerNight
+                  ? `¥${submission.pricePerNight}`
+                  : '有料：？円'}
               </Badge>
             </div>
           </div>
