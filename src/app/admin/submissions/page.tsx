@@ -12,6 +12,7 @@ import { CampingSpotSubmissionWithId } from '@/data/schemas/campingSpot';
 import { getCampingSpotSubmissions } from '../../../app/actions/campingSpotSubmissions';
 import SubmissionReviewCard from '@/components/admin/SubmissionReviewCard';
 import { LoadingState } from '@/components/common/LoadingState';
+import { celebrateSubmission } from '@/lib/confetti';
 
 // Dynamically import the form component to avoid SSR issues
 const SubmissionEditForm = dynamic(
@@ -102,12 +103,16 @@ export default function SubmissionsAdminPage() {
 
   const handleEditSuccess = () => {
     console.log('handleEditSuccess: Starting success handler...');
+
+    // 承認して作成成功！紙吹雪でお祝い
+    celebrateSubmission();
+
     loadSubmissions();
     console.log('handleEditSuccess: Submissions reloaded');
     handleEditClose();
     console.log('handleEditSuccess: Edit form closed');
     toast({
-      title: '成功',
+      title: '🎉 承認完了',
       description: '車中泊スポットを承認し、作成しました',
     });
     console.log('handleEditSuccess: Toast displayed');

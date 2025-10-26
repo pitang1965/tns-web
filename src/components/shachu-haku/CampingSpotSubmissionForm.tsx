@@ -35,6 +35,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import dynamic from 'next/dynamic';
 import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
+import { celebrateSubmission } from '@/lib/confetti';
 
 // Dynamically import map component to avoid SSR issues
 const SimpleLocationPicker = dynamic(
@@ -174,10 +175,13 @@ export default function CampingSpotSubmissionForm({
         return;
       }
 
+      // 投稿成功！くす玉のような紙吹雪でお祝い
+      celebrateSubmission();
+
       toast({
-        title: '投稿完了',
+        title: '🎉 投稿ありがとうございます！',
         description:
-          '車中泊スポット情報を投稿しました。管理者の確認後に公開されます。',
+          '車中泊スポット情報を投稿いただきました。管理者の確認後に公開されます。コミュニティへのご貢献に感謝します！',
       });
 
       form.reset();

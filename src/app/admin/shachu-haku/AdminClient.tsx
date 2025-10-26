@@ -42,6 +42,7 @@ import {
   filterSpotsClientSide,
   hasActiveClientFilters,
 } from '@/lib/clientSideFilterSpots';
+import { celebrateSubmission } from '@/lib/confetti';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -411,6 +412,12 @@ export default function AdminClient() {
   };
 
   const handleFormSuccess = () => {
+    // 新規作成時は紙吹雪でお祝い
+    const isNewSpot = !selectedSpot?._id;
+    if (isNewSpot) {
+      celebrateSubmission();
+    }
+
     // Reload spots based on current tab
     if (activeTab === 'list') {
       const filters = {
@@ -428,10 +435,10 @@ export default function AdminClient() {
     }
     handleFormClose();
     toast({
-      title: '成功',
-      description: selectedSpot
-        ? '車中泊スポットを更新しました'
-        : '車中泊スポットを作成しました',
+      title: isNewSpot ? '🎉 作成完了' : '成功',
+      description: isNewSpot
+        ? '車中泊スポットを作成しました'
+        : '車中泊スポットを更新しました',
     });
   };
 
