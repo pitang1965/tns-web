@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { useMapBoundsLoader } from '@/hooks/useMapBoundsLoader';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
@@ -22,6 +23,7 @@ import {
   getCampingSpotsByBounds,
   getCampingSpotsWithPagination,
 } from '../../actions/campingSpots';
+import { getCampingSpotSubmissions } from '../../actions/campingSpotSubmissions';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -145,6 +147,7 @@ export default function AdminClient() {
   );
   const [showForm, setShowForm] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
+  const [pendingSubmissionsCount, setPendingSubmissionsCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'map' | 'list'>(() => {
     // URLパラメータからタブを決定
     const tabParam = searchParams.get('tab');
@@ -317,6 +320,25 @@ export default function AdminClient() {
       cleanupMapBoundsLoader();
     };
   }, [cleanupMapBoundsLoader]);
+
+  // Load pending submissions count
+  useEffect(() => {
+    const loadPendingCount = async () => {
+      try {
+        const submissions = await getCampingSpotSubmissions();
+        const pendingCount = submissions.filter(
+          (s: { status: string }) => s.status === 'pending'
+        ).length;
+        setPendingSubmissionsCount(pendingCount);
+      } catch (error) {
+        console.error('Error loading pending submissions count:', error);
+      }
+    };
+
+    if (isAdmin) {
+      loadPendingCount();
+    }
+  }, [isAdmin]);
 
   // Update URL when filters or tab change (on user interaction)
   const isInitialMountRef = useRef(true);
@@ -640,9 +662,17 @@ export default function AdminClient() {
           <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
           <div className='flex gap-2'>
             <Link href='/admin/submissions'>
-              <Button variant='outline' className='hidden md:flex'>
+              <Button variant='outline' className='hidden md:flex relative'>
                 <Users className='w-4 h-4 mr-2' />
                 投稿管理
+                {pendingSubmissionsCount > 0 && (
+                  <Badge
+                    variant='destructive'
+                    className='ml-2 px-1.5 py-0.5 text-xs'
+                  >
+                    {pendingSubmissionsCount}
+                  </Badge>
+                )}
               </Button>
             </Link>
             <Button
