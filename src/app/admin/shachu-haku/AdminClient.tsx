@@ -196,6 +196,7 @@ export default function AdminClient() {
     west: number;
   } | null>(null);
   const lastListFiltersRef = useRef<string | null>(null);
+  const prevActiveTabRef = useRef<'map' | 'list'>(activeTab);
 
   // Use custom hook for map bounds loading with optimized data fetching
   const {
@@ -203,6 +204,7 @@ export default function AdminClient() {
     cleanup: cleanupMapBoundsLoader,
     reloadIfNeeded,
     initialLoadDoneRef,
+    lastLoadedBoundsRef,
   } = useMapBoundsLoader({
     loadSpots: getCampingSpotsByBounds,
     setLoading,
@@ -251,6 +253,9 @@ export default function AdminClient() {
       setTotalPages(result.totalPages);
       setTotalCount(result.total);
       setCurrentPage(result.page);
+
+      // Mark initial load as done so switching to map tab doesn't trigger unnecessary API calls
+      initialLoadDoneRef.current = true;
     } catch (error) {
       toast({
         title: 'エラー',
@@ -267,9 +272,18 @@ export default function AdminClient() {
   const handleBoundsChangeWrapper = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       mapBoundsRef.current = bounds;
+
+      // If data is already loaded (from list view) and lastLoadedBoundsRef is null,
+      // set it to current bounds to prevent unnecessary API call
+      if (initialLoadDoneRef.current && !lastLoadedBoundsRef.current) {
+        lastLoadedBoundsRef.current = bounds;
+        // Don't call handleBoundsChange since we already have data
+        return;
+      }
+
       handleBoundsChange(bounds); // Call hook's handler
     },
-    [handleBoundsChange]
+    [handleBoundsChange, initialLoadDoneRef, lastLoadedBoundsRef]
   );
 
   // Reset page when filters change
@@ -324,12 +338,24 @@ export default function AdminClient() {
     // Don't clear promise when leaving list tab to preserve cache
   }, [activeTab, currentPage, searchTerm, typeFilter, spots.length, initialLoadDoneRef]);
 
-  // Reload map data when filters change (if map is active and bounds are available)
+  // Reload map data when switching to map tab or when filters change
   useEffect(() => {
-    if (activeTab === 'map') {
+    const isTabChangedToMap = prevActiveTabRef.current !== 'map' && activeTab === 'map';
+    prevActiveTabRef.current = activeTab;
+
+    if (isTabChangedToMap) {
+      // Tab just changed to map
+      // If data is already loaded (from list view), update lastLoadedBoundsRef
+      // to prevent unnecessary API calls when map initializes
+      if (initialLoadDoneRef.current && mapBoundsRef.current) {
+        lastLoadedBoundsRef.current = mapBoundsRef.current;
+      }
+      // Map component will initialize itself and call handleBoundsChange automatically
+    } else if (activeTab === 'map') {
+      // Already on map tab, reload if filters changed
       reloadIfNeeded(mapBoundsRef.current);
     }
-  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded]);
+  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded, initialLoadDoneRef, lastLoadedBoundsRef]);
 
   // Cleanup on unmount
   useEffect(() => {

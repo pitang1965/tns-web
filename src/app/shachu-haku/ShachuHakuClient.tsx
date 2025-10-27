@@ -207,6 +207,7 @@ export default function ShachuHakuClient() {
     cleanup: cleanupMapBoundsLoader,
     reloadIfNeeded,
     initialLoadDoneRef,
+    lastLoadedBoundsRef,
   } = useMapBoundsLoader({
     loadSpots: getPublicCampingSpotsByBounds,
     setLoading,
@@ -424,29 +425,13 @@ export default function ShachuHakuClient() {
     prevActiveTabRef.current = activeTab;
 
     if (isTabChangedToMap) {
-      // Tab just changed to map - initialize bounds if needed
-      let bounds = mapBoundsRef.current;
-
-      // If map hasn't initialized bounds yet, use savedBounds or calculate from zoom/center
-      if (!bounds) {
-        if (savedBoundsRef.current) {
-          bounds = savedBoundsRef.current;
-          mapBoundsRef.current = savedBoundsRef.current;
-        } else if (mapZoomRef.current && mapCenterRef.current) {
-          bounds = calculateBoundsFromZoomAndCenter(mapCenterRef.current, mapZoomRef.current);
-          mapBoundsRef.current = bounds;
-        }
-      }
-
-      // Trigger reload if we have bounds
-      if (bounds) {
-        handleBoundsChangeWrapper(bounds);
-      }
+      // Tab just changed to map - map component will initialize itself
+      // and call handleBoundsChange automatically, so do nothing here
     } else if (activeTab === 'map') {
       // Already on map tab, reload if filters changed
       reloadIfNeeded(mapBoundsRef.current);
     }
-  }, [searchTerm, typeFilter, activeTab, handleBoundsChangeWrapper, reloadIfNeeded]);
+  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded]);
 
   // Cleanup on unmount
   useEffect(() => {
