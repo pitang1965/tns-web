@@ -357,6 +357,9 @@ export default function ShachuHakuClient() {
   // Create and cache the promise
   useEffect(() => {
     if (activeTab === 'list') {
+      // Check if data is already loaded from map view
+      const isDataAlreadyLoaded = spots.length > 0 && initialLoadDoneRef.current;
+
       // Use savedBounds if available (from map), otherwise calculate from zoom and center
       let bounds:
         | { north: number; south: number; east: number; west: number }
@@ -386,8 +389,8 @@ export default function ShachuHakuClient() {
         page: currentPage,
       });
 
-      // Skip if filters haven't changed
-      if (lastListFiltersRef.current === filtersKey) {
+      // Skip if filters haven't changed and data is already loaded
+      if (lastListFiltersRef.current === filtersKey && isDataAlreadyLoaded) {
         return;
       }
 
@@ -401,10 +404,8 @@ export default function ShachuHakuClient() {
       );
       setCachedListPromise(promise);
       setListPromiseKey((prev) => prev + 1);
-    } else {
-      // Reset when leaving list tab
-      lastListFiltersRef.current = null;
     }
+    // Don't reset lastListFiltersRef when leaving list tab to preserve cache
   }, [
     activeTab,
     currentPage,
@@ -413,6 +414,8 @@ export default function ShachuHakuClient() {
     savedBounds,
     mapZoom,
     mapCenter,
+    spots.length,
+    initialLoadDoneRef,
   ]);
 
   // Reload map data when switching to map tab or when filters change

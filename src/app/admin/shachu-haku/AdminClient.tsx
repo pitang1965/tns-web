@@ -195,6 +195,7 @@ export default function AdminClient() {
     east: number;
     west: number;
   } | null>(null);
+  const lastListFiltersRef = useRef<string | null>(null);
 
   // Use custom hook for map bounds loading with optimized data fetching
   const {
@@ -281,6 +282,9 @@ export default function AdminClient() {
   useEffect(() => {
     console.log('[Admin] List useEffect triggered, activeTab:', activeTab);
     if (activeTab === 'list') {
+      // Check if data is already loaded from map view
+      const isDataAlreadyLoaded = spots.length > 0 && initialLoadDoneRef.current;
+
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
@@ -289,6 +293,22 @@ export default function AdminClient() {
             ? typeFilter
             : undefined,
       };
+
+      // Create a stable string representation of filters for comparison
+      const filtersKey = JSON.stringify({
+        searchTerm: filters.searchTerm,
+        prefecture: filters.prefecture,
+        type: filters.type,
+        page: currentPage,
+      });
+
+      // Skip if filters haven't changed and data is already loaded
+      if (lastListFiltersRef.current === filtersKey && isDataAlreadyLoaded) {
+        console.log('[Admin] Skipping data load - filters unchanged and data already loaded');
+        return;
+      }
+
+      lastListFiltersRef.current = filtersKey;
 
       // Create new promise and dispatch atomic update
       console.log('[Admin] Creating promise with filters:', filters);
@@ -300,12 +320,9 @@ export default function AdminClient() {
       console.log('[Admin] Promise created:', promise);
       dispatchListPromise({ type: 'SET_PROMISE', promise });
       console.log('[Admin] Promise dispatched');
-    } else {
-      // Clear promise when switching away from list tab
-      console.log('[Admin] Clearing promise (not on list tab)');
-      dispatchListPromise({ type: 'CLEAR_PROMISE' });
     }
-  }, [activeTab, currentPage, searchTerm, typeFilter]);
+    // Don't clear promise when leaving list tab to preserve cache
+  }, [activeTab, currentPage, searchTerm, typeFilter, spots.length, initialLoadDoneRef]);
 
   // Reload map data when filters change (if map is active and bounds are available)
   useEffect(() => {
