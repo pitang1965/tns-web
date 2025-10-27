@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -101,6 +101,7 @@ export default function ShachuHakuClient() {
     const tabParam = searchParams.get('tab');
     return tabParam === 'list' ? 'list' : 'map';
   });
+
   const [searchTerm, setSearchTerm] = useState(() => {
     // URLパラメータから検索クエリを取得
     return searchParams.get('q') || '';
@@ -175,12 +176,14 @@ export default function ShachuHakuClient() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
 
-  // Promise key for triggering Suspense re-render
-  const [listPromiseKey, setListPromiseKey] = useState(0);
-
-  // Cache the promise to avoid creating new ones on every render
-  const [cachedListPromise, setCachedListPromise] =
-    useState<Promise<any> | null>(null);
+  // List view data and loading state
+  const [listData, setListData] = useState<{
+    spots: CampingSpotWithId[];
+    total: number;
+    page: number;
+    totalPages: number;
+  } | null>(null);
+  const [listLoading, setListLoading] = useState(false);
 
   // Bounds state for map view - use ref instead of state to prevent re-renders
   const mapBoundsRef = useRef<{
@@ -355,11 +358,13 @@ export default function ShachuHakuClient() {
   }, [searchTerm, typeFilter, clientFilters]);
 
   // Load spots for list view when tab, filters, or page changes
-  // Create and cache the promise
   useEffect(() => {
     if (activeTab === 'list') {
       // Check if data is already loaded from map view
-      const isDataAlreadyLoaded = spots.length > 0 && initialLoadDoneRef.current;
+      const isDataAlreadyLoaded =
+        spots.length > 0 && initialLoadDoneRef.current;
+      // Check if this is first time switching to list view
+      const isFirstListView = lastListFiltersRef.current === null;
 
       // Use savedBounds if available (from map), otherwise calculate from zoom and center
       let bounds:
@@ -381,32 +386,54 @@ export default function ShachuHakuClient() {
       const filtersKey = JSON.stringify({
         searchTerm: filters.searchTerm,
         type: filters.type,
-        bounds: bounds ? {
-          north: bounds.north.toFixed(4),
-          south: bounds.south.toFixed(4),
-          east: bounds.east.toFixed(4),
-          west: bounds.west.toFixed(4),
-        } : null,
+        bounds: bounds
+          ? {
+              north: bounds.north.toFixed(4),
+              south: bounds.south.toFixed(4),
+              east: bounds.east.toFixed(4),
+              west: bounds.west.toFixed(4),
+            }
+          : null,
         page: currentPage,
       });
 
-      // Skip if filters haven't changed and data is already loaded
-      if (lastListFiltersRef.current === filtersKey && isDataAlreadyLoaded) {
+      // Skip if we already initiated a request with the same filters (prevents multiple API calls during loading)
+      if (lastListFiltersRef.current === filtersKey) {
         return;
       }
 
-      lastListFiltersRef.current = filtersKey;
+      // If first time switching to list view and data is already loaded from map,
+      // use existing data immediately without loading
+      if (isFirstListView && isDataAlreadyLoaded && currentPage === 1) {
+        lastListFiltersRef.current = filtersKey;
+        setListData({
+          spots: spots,
+          total: spots.length,
+          page: 1,
+          totalPages: Math.ceil(spots.length / pageSize),
+        });
+        return;
+      }
 
-      // Create new promise and cache it
-      const promise = getPublicCampingSpotsWithPagination(
-        currentPage,
-        pageSize,
-        filters
-      );
-      setCachedListPromise(promise);
-      setListPromiseKey((prev) => prev + 1);
+      // Load data from API
+      lastListFiltersRef.current = filtersKey;
+      setListLoading(true);
+
+      getPublicCampingSpotsWithPagination(currentPage, pageSize, filters)
+        .then((data) => {
+          setListData(data);
+          setListLoading(false);
+        })
+        .catch((error) => {
+          console.error('[Public] Error loading list data:', error);
+          toast({
+            title: 'エラー',
+            description: '車中泊スポットの読み込みに失敗しました',
+            variant: 'destructive',
+          });
+          setListLoading(false);
+        });
     }
-    // Don't reset lastListFiltersRef when leaving list tab to preserve cache
   }, [
     activeTab,
     currentPage,
@@ -415,13 +442,17 @@ export default function ShachuHakuClient() {
     savedBounds,
     mapZoom,
     mapCenter,
+    spots,
     spots.length,
     initialLoadDoneRef,
+    pageSize,
+    toast,
   ]);
 
   // Reload map data when switching to map tab or when filters change
   useEffect(() => {
-    const isTabChangedToMap = prevActiveTabRef.current !== 'map' && activeTab === 'map';
+    const isTabChangedToMap =
+      prevActiveTabRef.current !== 'map' && activeTab === 'map';
     prevActiveTabRef.current = activeTab;
 
     if (isTabChangedToMap) {
@@ -580,7 +611,8 @@ export default function ShachuHakuClient() {
                 <MapPin className='w-5 h-5' />
                 {loading ? (
                   <span className='flex items-center gap-2'>
-                    車中泊スポット地図 (読み込み中... <Spinner className='size-4' />)
+                    車中泊スポット地図 (読み込み中...{' '}
+                    <Spinner className='size-4' />)
                   </span>
                 ) : (
                   `車中泊スポット地図 (${filteredSpots.length}件${
@@ -624,51 +656,13 @@ export default function ShachuHakuClient() {
               </Card>
             )}
 
-            {/* List - use + Suspense */}
-            {cachedListPromise ? (
-              <>
-                <Suspense
-                  fallback={
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className='flex items-center gap-2'>
-                          車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className='space-y-4'>
-                          {[...Array(5)].map((_, i) => (
-                            <div key={i} className='border rounded-lg p-4'>
-                              <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
-                              <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
-                              <div className='flex gap-2'>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  }
-                  key={`list-${listPromiseKey}`}
-                >
-                  <SpotsList
-                    spotsPromise={cachedListPromise}
-                    onSpotSelect={handleListSpotSelect}
-                    onNavigateToDetail={handleNavigateToSpotDetail}
-                    onPageChange={setCurrentPage}
-                    clientFilters={clientFilters}
-                  />
-                </Suspense>
-              </>
-            ) : (
+            {/* List - loading state pattern */}
+            {listLoading || !listData ? (
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center gap-2'>
-                    車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
+                    車中泊スポット一覧 (読み込み中...{' '}
+                    <Spinner className='size-4' />)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -688,6 +682,17 @@ export default function ShachuHakuClient() {
                   </div>
                 </CardContent>
               </Card>
+            ) : (
+              <SpotsList
+                spots={listData.spots}
+                total={listData.total}
+                page={listData.page}
+                totalPages={listData.totalPages}
+                onSpotSelect={handleListSpotSelect}
+                onNavigateToDetail={handleNavigateToSpotDetail}
+                onPageChange={setCurrentPage}
+                clientFilters={clientFilters}
+              />
             )}
           </div>
         )}

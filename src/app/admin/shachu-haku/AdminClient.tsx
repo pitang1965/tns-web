@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  Suspense,
-  useReducer,
-} from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -24,15 +17,8 @@ import {
   getCampingSpotsWithPagination,
 } from '../../actions/campingSpots';
 import { getCampingSpotSubmissions } from '../../actions/campingSpotSubmissions';
-import {
-  CampingSpotWithId,
-  CampingSpotTypeLabels,
-  PrefectureOptions,
-} from '@/data/schemas/campingSpot';
-import {
-  calculateSecurityLevel,
-  calculateQuietnessLevel,
-} from '@/lib/campingSpotUtils';
+import { CampingSpotWithId } from '@/data/schemas/campingSpot';
+
 import {
   PREFECTURE_COORDINATES,
   REGION_COORDINATES,
@@ -70,25 +56,6 @@ const ShachuHakuForm = dynamic(
     ssr: false,
   }
 );
-
-// Reducer for atomic Promise + key updates
-type ListPromiseAction =
-  | { type: 'SET_PROMISE'; promise: Promise<any> }
-  | { type: 'CLEAR_PROMISE' };
-
-function listPromiseReducer(
-  state: { promise: Promise<any> | null; key: number },
-  action: ListPromiseAction
-): { promise: Promise<any> | null; key: number } {
-  switch (action.type) {
-    case 'SET_PROMISE':
-      return { promise: action.promise, key: state.key + 1 };
-    case 'CLEAR_PROMISE':
-      return { promise: null, key: state.key };
-    default:
-      return state;
-  }
-}
 
 // スポットタイプごとの色分け関数
 const getTypeColor = (type: string) => {
@@ -182,11 +149,14 @@ export default function AdminClient() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
 
-  // Use reducer for atomic Promise + key updates
-  const [listPromiseState, dispatchListPromise] = useReducer(
-    listPromiseReducer,
-    { promise: null, key: 0 }
-  );
+  // List view data and loading state
+  const [listData, setListData] = useState<{
+    spots: CampingSpotWithId[];
+    total: number;
+    page: number;
+    totalPages: number;
+  } | null>(null);
+  const [listLoading, setListLoading] = useState(false);
 
   // Bounds state for map view - use ref instead of state to prevent re-renders
   const mapBoundsRef = useRef<{
@@ -292,20 +262,18 @@ export default function AdminClient() {
   }, [searchTerm, typeFilter]);
 
   // Load spots for list view when tab, filters, or page changes
-  // Create and cache the promise with atomic updates
   useEffect(() => {
-    console.log('[Admin] List useEffect triggered, activeTab:', activeTab);
     if (activeTab === 'list') {
       // Check if data is already loaded from map view
-      const isDataAlreadyLoaded = spots.length > 0 && initialLoadDoneRef.current;
+      const isDataAlreadyLoaded =
+        spots.length > 0 && initialLoadDoneRef.current;
+      // Check if this is first time switching to list view
+      const isFirstListView = lastListFiltersRef.current === null;
 
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
-        type:
-          typeFilter !== 'all'
-            ? typeFilter
-            : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
       };
 
       // Create a stable string representation of filters for comparison
@@ -316,31 +284,50 @@ export default function AdminClient() {
         page: currentPage,
       });
 
-      // Skip if filters haven't changed and data is already loaded
-      if (lastListFiltersRef.current === filtersKey && isDataAlreadyLoaded) {
-        console.log('[Admin] Skipping data load - filters unchanged and data already loaded');
+      // Skip if we already initiated a request with the same filters (prevents multiple API calls during loading)
+      if (lastListFiltersRef.current === filtersKey) {
         return;
       }
 
-      lastListFiltersRef.current = filtersKey;
+      // Note: Unlike the public page, admin list view shows ALL data (not bounded by map view),
+      // so we always need to fetch from API, even when switching from map view.
+      // Map view shows only spots in visible area, while list view shows all spots.
 
-      // Create new promise and dispatch atomic update
-      console.log('[Admin] Creating promise with filters:', filters);
-      const promise = getCampingSpotsWithPagination(
-        currentPage,
-        pageSize,
-        filters
-      );
-      console.log('[Admin] Promise created:', promise);
-      dispatchListPromise({ type: 'SET_PROMISE', promise });
-      console.log('[Admin] Promise dispatched');
+      // Load data from API
+      lastListFiltersRef.current = filtersKey;
+      setListLoading(true);
+
+      getCampingSpotsWithPagination(currentPage, pageSize, filters)
+        .then((data) => {
+          setListData(data);
+          setListLoading(false);
+        })
+        .catch((error) => {
+          console.error('[Admin] Error loading list data:', error);
+          toast({
+            title: 'エラー',
+            description: '車中泊スポットの読み込みに失敗しました',
+            variant: 'destructive',
+          });
+          setListLoading(false);
+        });
     }
-    // Don't clear promise when leaving list tab to preserve cache
-  }, [activeTab, currentPage, searchTerm, typeFilter, spots.length, initialLoadDoneRef]);
+  }, [
+    activeTab,
+    currentPage,
+    searchTerm,
+    typeFilter,
+    spots,
+    spots.length,
+    initialLoadDoneRef,
+    pageSize,
+    toast,
+  ]);
 
   // Reload map data when switching to map tab or when filters change
   useEffect(() => {
-    const isTabChangedToMap = prevActiveTabRef.current !== 'map' && activeTab === 'map';
+    const isTabChangedToMap =
+      prevActiveTabRef.current !== 'map' && activeTab === 'map';
     prevActiveTabRef.current = activeTab;
 
     if (isTabChangedToMap) {
@@ -355,7 +342,14 @@ export default function AdminClient() {
       // Already on map tab, reload if filters changed
       reloadIfNeeded(mapBoundsRef.current);
     }
-  }, [searchTerm, typeFilter, activeTab, reloadIfNeeded, initialLoadDoneRef, lastLoadedBoundsRef]);
+  }, [
+    searchTerm,
+    typeFilter,
+    activeTab,
+    reloadIfNeeded,
+    initialLoadDoneRef,
+    lastLoadedBoundsRef,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -488,10 +482,7 @@ export default function AdminClient() {
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
-        type:
-          typeFilter !== 'all'
-            ? typeFilter
-            : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
@@ -513,10 +504,7 @@ export default function AdminClient() {
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
-        type:
-          typeFilter !== 'all'
-            ? typeFilter
-            : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
       };
       loadListSpotsRef.current?.(currentPage, filters);
     } else if (activeTab === 'map' && mapBoundsRef.current) {
@@ -545,7 +533,6 @@ export default function AdminClient() {
         '../../actions/campingSpots'
       );
       const exportSpots = await getCampingSpotsForExport();
-      console.log('[Export] Total spots fetched:', exportSpots.length);
 
       const headers = [
         'name',
@@ -648,21 +635,15 @@ export default function AdminClient() {
           csvRows.push(fields.map(escapeCSVField).join(','));
           processedCount++;
         } catch (error) {
-          console.error(`[Export] Error processing spot ${index}:`, spot.name, error);
           errorCount++;
         }
       });
 
-      console.log('[Export] Processing complete:', {
-        totalFetched: exportSpots.length,
-        processedCount,
-        errorCount,
-        csvRowsCount: csvRows.length - 1 // -1 for header
-      });
-
       // Use \r\n for Windows compatibility and to avoid issues with quoted newlines
       const csvContent = csvRows.join('\r\n');
-      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(['\ufeff' + csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = `shachu-haku-spots-${
@@ -675,7 +656,6 @@ export default function AdminClient() {
         description: 'エクスポートに失敗しました',
         variant: 'destructive',
       });
-      console.error('Export error:', error);
     }
   };
 
@@ -847,56 +827,42 @@ export default function AdminClient() {
         {/* List Tab Content */}
         {activeTab === 'list' && (
           <div className='space-y-4'>
-            {listPromiseState.promise ? (
-              <>
-                {/* Spots List - use + Suspense */}
-                <Suspense
-                  fallback={
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className='flex items-center gap-2'>
-                          車中泊スポット一覧 (読み込み中... <Spinner className='size-4' />)
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className='space-y-4'>
-                          {[...Array(5)].map((_, i) => (
-                            <div key={i} className='border rounded-lg p-4'>
-                              <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
-                              <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
-                              <div className='flex gap-2'>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                                <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                              </div>
-                            </div>
-                          ))}
+            {/* List - loading state pattern */}
+            {listLoading || !listData ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center gap-2'>
+                    車中泊スポット一覧 (読み込み中...{' '}
+                    <Spinner className='size-4' />)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className='space-y-4'>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className='border rounded-lg p-4'>
+                        <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
+                        <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
+                        <div className='flex gap-2'>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  }
-                  key={`list-${listPromiseState.key}`}
-                >
-                  <AdminSpotsList
-                    spotsPromise={listPromiseState.promise}
-                    onSpotSelect={handleSpotSelect}
-                    onPageChange={setCurrentPage}
-                    clientFilters={clientFilters}
-                  />
-                </Suspense>
-              </>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
-              <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-                {[...Array(4)].map((_, i) => (
-                  <Card key={i}>
-                    <CardContent className='p-4'>
-                      <div className='h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-10 mb-2'></div>
-                      <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-24'></div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <AdminSpotsList
+                spots={listData.spots}
+                total={listData.total}
+                page={listData.page}
+                totalPages={listData.totalPages}
+                onSpotSelect={handleSpotSelect}
+                onPageChange={setCurrentPage}
+                clientFilters={clientFilters}
+              />
             )}
           </div>
         )}

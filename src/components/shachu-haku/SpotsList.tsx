@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -58,12 +57,10 @@ const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
 };
 
 interface SpotsListProps {
-  spotsPromise: Promise<{
-    spots: CampingSpotWithId[];
-    total: number;
-    page: number;
-    totalPages: number;
-  }>;
+  spots: CampingSpotWithId[];
+  total: number;
+  page: number;
+  totalPages: number;
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onNavigateToDetail: (spotId: string) => void;
   onPageChange: (page: number) => void;
@@ -71,14 +68,15 @@ interface SpotsListProps {
 }
 
 export function SpotsList({
-  spotsPromise,
+  spots,
+  total,
+  page,
+  totalPages,
   onSpotSelect,
   onNavigateToDetail,
   onPageChange,
   clientFilters,
 }: SpotsListProps) {
-  const { spots, total, page, totalPages } = use(spotsPromise);
-
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
   const hasFilters = hasActiveClientFilters(clientFilters);

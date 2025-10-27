@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,26 +58,24 @@ const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
 };
 
 interface AdminSpotsListProps {
-  spotsPromise: Promise<{
-    spots: CampingSpotWithId[];
-    total: number;
-    page: number;
-    totalPages: number;
-  }>;
+  spots: CampingSpotWithId[];
+  total: number;
+  page: number;
+  totalPages: number;
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onPageChange: (page: number) => void;
   clientFilters: ClientSideFilterValues;
 }
 
 export function AdminSpotsList({
-  spotsPromise,
+  spots,
+  total,
+  page,
+  totalPages,
   onSpotSelect,
   onPageChange,
   clientFilters,
 }: AdminSpotsListProps) {
-  // use フックでPromiseを直接扱う（React 19の新機能）
-  const { spots, total, page, totalPages } = use(spotsPromise);
-
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
   const hasFilters = hasActiveClientFilters(clientFilters);
