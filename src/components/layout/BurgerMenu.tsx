@@ -27,9 +27,16 @@ export function BurgerMenu() {
   const { user } = useUser();
 
   // Check if user is admin
+  // Safe access to environment variable for client-side rendering
+  const adminEmails =
+    typeof window !== 'undefined'
+      ? process.env.NEXT_PUBLIC_ADMIN_EMAILS
+      : undefined;
+
   const isAdmin =
     user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
+    adminEmails
+      ?.split(',')
       .map((email) => email.trim())
       .includes(user.email);
 
@@ -43,7 +50,7 @@ export function BurgerMenu() {
   };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
       <DropdownMenuTrigger className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2'>
         <svg
           className='w-5 h-5'
@@ -60,7 +67,11 @@ export function BurgerMenu() {
           />
         </svg>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent
+        align='start'
+        className='w-56 md:w-64'
+        sideOffset={8}
+      >
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/'

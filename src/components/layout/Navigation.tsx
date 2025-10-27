@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { isAdmin } from '@/lib/userUtils';
 
 const activeClassNames =
   'underline decoration-1 underline-offset-4 decoration-current';
@@ -52,11 +53,7 @@ export function Navigation() {
   }
 
   // Check if user is admin
-  const isAdmin =
-    user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email);
+  const userIsAdmin = isAdmin(user);
 
   return (
     <div className='flex items-center space-x-4'>
@@ -72,7 +69,7 @@ export function Navigation() {
         <BookHeart className='mr-1' />
         旅程
       </NavLink>
-      {isAdmin ? (
+      {userIsAdmin ? (
         <DropdownMenu>
           <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none'>
             <MapPin className='mr-1' />
@@ -87,7 +84,10 @@ export function Navigation() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href='/admin/shachu-haku' className='flex items-center w-full'>
+              <Link
+                href='/admin/shachu-haku'
+                className='flex items-center w-full'
+              >
                 <MapPin className='mr-1 h-4 w-4' />
                 管理者用
               </Link>

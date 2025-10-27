@@ -2,12 +2,25 @@ import type { User } from '@auth0/nextjs-auth0/types';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 /**
+ * 管理者メールアドレスのリストを安全に取得する
+ * クライアントサイドとサーバーサイドの両方で動作する
+ */
+function getAdminEmails(): string | undefined {
+  // process が定義されているかチェック（クライアントサイドで undefined の場合がある）
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NEXT_PUBLIC_ADMIN_EMAILS;
+  }
+  return undefined;
+}
+
+/**
  * ユーザーが管理者かどうかを判定する
  */
 export function isAdmin(user: User | null | undefined): boolean {
+  const adminEmails = getAdminEmails();
   return !!(
     user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
+    adminEmails?.split(',')
       .map(email => email.trim())
       .includes(user.email)
   );

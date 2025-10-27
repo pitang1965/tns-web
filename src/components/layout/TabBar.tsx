@@ -6,6 +6,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
 import { Info, Search, BookHeart, CircleUser, MapPin, Users } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
+import { isAdmin } from '@/lib/userUtils';
 
 const activeClassNames = 'text-blue-500 dark:text-blue-400';
 const inactiveClassNames = 'text-gray-600 dark:text-gray-400';
@@ -42,10 +43,7 @@ export function TabBar() {
   }
 
   // Check if user is admin
-  const isAdmin = user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map(email => email.trim())
-      .includes(user.email);
+  const userIsAdmin = isAdmin(user);
 
   // For admin users, determine which admin tab to show based on current path
   const getAdminTab = () => {
@@ -64,7 +62,7 @@ export function TabBar() {
         <TabLink href='/' icon={<Info />} label='情報' />
         <TabLink href='/search' icon={<Search />} label='検索' />
         <TabLink href='/itineraries' icon={<BookHeart />} label='旅程一覧' />
-        {isAdmin ? (
+        {userIsAdmin ? (
           getAdminTab()
         ) : (
           <TabLink href='/shachu-haku' icon={<MapPin />} label='車中泊' />
