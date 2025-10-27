@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
@@ -16,6 +16,13 @@ import ItineraryUrlTracker from '@/components/common/ItineraryUrlTracker';
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
 
 export const metadata: Metadata = {
   title: '車旅のしおり',
