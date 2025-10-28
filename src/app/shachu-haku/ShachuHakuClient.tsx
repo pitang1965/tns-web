@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -543,6 +543,22 @@ export default function ShachuHakuClient() {
   // Apply client-side filters to spots
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
 
+  // Filter spots within visible bounds
+  const visibleSpots = useMemo(() => {
+    if (!savedBounds) return filteredSpots;
+
+    return filteredSpots.filter((spot) => {
+      const lat = spot.coordinates[1];
+      const lng = spot.coordinates[0];
+      return (
+        lat <= savedBounds.north &&
+        lat >= savedBounds.south &&
+        lng <= savedBounds.east &&
+        lng >= savedBounds.west
+      );
+    });
+  }, [filteredSpots, savedBounds]);
+
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
@@ -615,9 +631,9 @@ export default function ShachuHakuClient() {
                     <Spinner className='size-4' />)
                   </span>
                 ) : (
-                  `車中泊スポット地図 (${filteredSpots.length}件${
+                  `車中泊スポット地図 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件${
                     hasActiveClientFilters(clientFilters)
-                      ? ` / ${spots.length}件中`
+                      ? ` / 全${spots.length}件中`
                       : ''
                   })`
                 )}

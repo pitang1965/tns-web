@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -143,6 +143,14 @@ export default function AdminClient() {
   ]); // Japan center
   const [mapZoom, setMapZoom] = useState(5);
 
+  // Saved bounds from map (used for calculating visible spots)
+  const [savedBounds, setSavedBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
+
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -238,10 +246,11 @@ export default function AdminClient() {
     }
   };
 
-  // Wrapper for handleBoundsChange that saves mapBoundsRef
+  // Wrapper for handleBoundsChange that saves mapBoundsRef and savedBounds
   const handleBoundsChangeWrapper = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       mapBoundsRef.current = bounds;
+      setSavedBounds(bounds); // Save bounds for visible spots calculation
 
       // If data is already loaded (from list view) and lastLoadedBoundsRef is null,
       // set it to current bounds to prevent unnecessary API call
@@ -527,6 +536,22 @@ export default function AdminClient() {
   // Apply client-side filters to spots
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
 
+  // Filter spots within visible bounds
+  const visibleSpots = useMemo(() => {
+    if (!savedBounds) return filteredSpots;
+
+    return filteredSpots.filter((spot) => {
+      const lat = spot.coordinates[1];
+      const lng = spot.coordinates[0];
+      return (
+        lat <= savedBounds.north &&
+        lat >= savedBounds.south &&
+        lng <= savedBounds.east &&
+        lng >= savedBounds.west
+      );
+    });
+  }, [filteredSpots, savedBounds]);
+
   const exportToCSV = async () => {
     try {
       const { getCampingSpotsForExport } = await import(
@@ -779,13 +804,13 @@ export default function AdminClient() {
                     地図から編集 (読み込み中... <Spinner className='size-4' />)
                   </span>
                 ) : totalCount > 0 ? (
-                  `地図から編集 (全${totalCount}件中${
+                  `地図から編集 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件 / 全${totalCount}件${
                     hasActiveClientFilters(clientFilters)
-                      ? `${filteredSpots.length}件 / 範囲内${spots.length}件`
-                      : `${spots.length}件`
+                      ? ` / フィルター前${spots.length}件`
+                      : ''
                   })`
                 ) : (
-                  `地図から編集 (${filteredSpots.length}件)`
+                  `地図から編集 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件)`
                 )}
               </CardTitle>
             </CardHeader>
