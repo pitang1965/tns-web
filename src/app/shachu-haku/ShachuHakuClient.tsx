@@ -13,11 +13,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 
-import { MapPin, Info, Plus } from 'lucide-react';
+import { MapPin, Info, Plus, Share2 } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
 } from '../actions/campingSpots';
+import { handleCampingSpotShare } from '@/lib/shareUtils';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -540,6 +541,32 @@ export default function ShachuHakuClient() {
     );
   };
 
+  // Handle share
+  const handleShare = async () => {
+    const success = await handleCampingSpotShare({
+      searchTerm,
+      typeFilter,
+      tab: activeTab,
+      zoom: mapZoom,
+      center: mapCenter,
+      bounds: savedBounds,
+      clientFilters,
+    });
+
+    if (success) {
+      toast({
+        title: '共有しました',
+        description: '車中泊スポット情報を共有しました',
+      });
+    } else {
+      toast({
+        title: 'エラー',
+        description: '共有に失敗しました',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Apply client-side filters to spots
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
 
@@ -570,6 +597,14 @@ export default function ShachuHakuClient() {
             </div>
           </div>
           <div className='flex flex-col sm:flex-row gap-2'>
+            <Button
+              onClick={handleShare}
+              variant='outline'
+              className='w-full sm:w-auto'
+            >
+              <Share2 className='w-4 h-4 mr-2' />
+              車中泊情報を共有
+            </Button>
             <Link href='/shachu-haku/submit'>
               <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto'>
                 <Plus className='w-4 h-4 mr-2' />

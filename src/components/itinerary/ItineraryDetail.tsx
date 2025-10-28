@@ -154,7 +154,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             onBack={actions.handleBack}
             onEdit={access.isOwner ? actions.handleEdit : undefined}
             onDelete={access.isOwner ? actions.handleDeleteConfirm : undefined}
-            shareData={{
+            shareItineraryData={{
               title: metadata.title,
               dayIndex: dayParamHook.selectedDay + 1,
               date: currentDayPlan.date || undefined,

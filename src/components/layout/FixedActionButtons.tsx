@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -15,7 +14,10 @@ import {
   BookPlus,
   Loader2,
 } from 'lucide-react';
-import { handleShare, type ShareData } from '@/lib/shareUtils';
+import {
+  handleItineraryShare,
+  type ShareItineraryData,
+} from '@/lib/shareUtils';
 
 export type FixedActionButtonsProps = {
   mode?: 'detail' | 'edit' | 'create';
@@ -27,8 +29,8 @@ export type FixedActionButtonsProps = {
   onCreate?: (e: React.MouseEvent) => void;
   customButtons?: React.ReactNode;
   disabled?: boolean;
-  // 共有用のプロパティ
-  shareData?: ShareData;
+  // 共有用のプロパティ（旅程用）
+  shareItineraryData?: ShareItineraryData;
 };
 
 export function FixedActionButtons({
@@ -40,18 +42,19 @@ export function FixedActionButtons({
   onBack,
   onCreate,
   customButtons,
-  shareData,
+  shareItineraryData,
   disabled = false,
 }: FixedActionButtonsProps) {
   // 共有機能
   const onShare = () => {
-    if (shareData) {
-      handleShare(shareData);
+    if (shareItineraryData) {
+      handleItineraryShare(shareItineraryData);
     }
   };
 
   // 共有ボタンが無効かどうかを判定
-  const isShareDisabled = disabled || (shareData && shareData.isPublic === false);
+  const isShareDisabled =
+    disabled || (shareItineraryData && shareItineraryData.isPublic === false);
 
   return (
     <div className='fixed top-16 right-4 flex gap-2 z-50'>
@@ -75,7 +78,7 @@ export function FixedActionButtons({
       {mode === 'detail' && (
         <>
           {/* 共有ボタン - 詳細モードでのみ表示 */}
-          {shareData && shareData.id && (
+          {shareItineraryData && shareItineraryData.id && (
             <Tooltip>
               <TooltipTrigger
                 onClick={onShare}
@@ -85,7 +88,11 @@ export function FixedActionButtons({
                 <Share2 className='h-5 w-5' />
               </TooltipTrigger>
               <TooltipContent side="top">
-                <p>{shareData.isPublic === false ? '公開設定を有効にしてください' : '旅程を共有'}</p>
+                <p>
+                  {shareItineraryData.isPublic === false
+                    ? '公開設定を有効にしてください'
+                    : '旅程を共有'}
+                </p>
               </TooltipContent>
             </Tooltip>
           )}
