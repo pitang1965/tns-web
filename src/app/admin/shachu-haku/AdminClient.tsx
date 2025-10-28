@@ -706,7 +706,7 @@ export default function AdminClient() {
   return (
     <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
       <div className='space-y-4'>
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-4 py-3'>
           <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
           <div className='flex gap-2'>
             <Link href='/admin/submissions'>
