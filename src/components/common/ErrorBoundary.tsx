@@ -1,7 +1,8 @@
 'use client';
 
 import React, { ErrorInfo, ReactNode } from 'react';
-import { H2, LargeText, Text } from '@/components/common/Typography';
+import { H2, Text } from '@/components/common/Typography';
+import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 
 interface ErrorBoundaryProps {
@@ -48,12 +49,33 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div>
-          <H2>問題が発生しました。ご不便をおかけして申し訳ございません。</H2>
+        <div className='flex flex-col items-center justify-center min-h-[400px] p-6'>
+          <H2 className='mb-4'>
+            問題が発生しました。ご不便をおかけして申し訳ございません。
+          </H2>
+
+          {/* アクションボタン */}
+          <div className='flex gap-4 mt-6 mb-8'>
+            <Button
+              onClick={() =>
+                this.setState({ hasError: false, error: null, errorInfo: null })
+              }
+              variant='default'
+            >
+              再試行
+            </Button>
+            <Button onClick={() => window.location.reload()} variant='outline'>
+              ページをリロード
+            </Button>
+          </div>
+
           {/* エラーの詳細は開発環境でのみ表示する */}
           {process.env.NODE_ENV === 'development' && (
-            <details style={{ whiteSpace: 'pre-wrap' }}>
-              <summary className="text-lg mb-6 text-gray-700 dark:text-gray-300 cursor-pointer">
+            <details
+              className='w-full max-w-3xl'
+              style={{ whiteSpace: 'pre-wrap' }}
+            >
+              <summary className='text-lg mb-6 text-gray-700 dark:text-gray-300 cursor-pointer'>
                 エラー詳細 (開発環境のみ)
               </summary>
               <Text>{this.state.error && this.state.error.toString()}</Text>
