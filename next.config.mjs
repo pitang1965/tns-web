@@ -88,36 +88,66 @@ const withPWA = withPWAInit({
       }
     },
     {
+      // Next.jsの静的JSファイル（ハッシュ付き）は長期キャッシュOK
+      urlPattern: /\/_next\/static\/.+\.js$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'next-static-js-assets',
+        expiration: {
+          maxEntries: 64,
+          maxAgeSeconds: 365 * 24 * 60 * 60 // 1年（ハッシュが変わるため安全）
+        }
+      }
+    },
+    {
+      // その他のJSファイルは短期キャッシュ
       urlPattern: /\.(?:js)$/i,
-      handler: 'StaleWhileRevalidate',
+      handler: 'NetworkFirst',
       options: {
         cacheName: 'static-js-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
+          maxAgeSeconds: 60 * 60 // 1時間（デプロイ後に更新されるように）
+        },
+        networkTimeoutSeconds: 5
+      }
+    },
+    {
+      // Next.jsの静的CSSファイル（ハッシュ付き）は長期キャッシュOK
+      urlPattern: /\/_next\/static\/.+\.css$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'next-static-css-assets',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 365 * 24 * 60 * 60 // 1年（ハッシュが変わるため安全）
         }
       }
     },
     {
+      // その他のCSSファイルは短期キャッシュ
       urlPattern: /\.(?:css|less)$/i,
-      handler: 'StaleWhileRevalidate',
+      handler: 'NetworkFirst',
       options: {
         cacheName: 'static-style-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
+          maxAgeSeconds: 60 * 60 // 1時間
+        },
+        networkTimeoutSeconds: 5
       }
     },
     {
+      // Next.jsのApp RouterデータはキャッシュしないでネットワークFirst
       urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
-      handler: 'StaleWhileRevalidate',
+      handler: 'NetworkFirst',
       options: {
         cacheName: 'next-data',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
+          maxAgeSeconds: 60 // 1分のみ（頻繁に更新される可能性があるため）
+        },
+        networkTimeoutSeconds: 5
       }
     },
     {
@@ -128,21 +158,25 @@ const withPWA = withPWAInit({
         cacheName: 'apis',
         expiration: {
           maxEntries: 16,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
+          maxAgeSeconds: 5 * 60 // 5分（APIは新鮮なデータを返すべき）
         },
         networkTimeoutSeconds: 10 // 10秒でタイムアウト後、キャッシュを使用
       }
     },
     {
-      urlPattern: /.*/i,
+      // HTMLページはネットワーク優先で短期キャッシュ
+      urlPattern: ({ request, url }) => {
+        // HTMLドキュメントのみマッチ（Accept: text/html）
+        return request.destination === 'document';
+      },
       handler: 'NetworkFirst',
       options: {
-        cacheName: 'others',
+        cacheName: 'pages',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
+          maxAgeSeconds: 60 // 1分のみ（新デプロイ後すぐ更新されるように）
         },
-        networkTimeoutSeconds: 10
+        networkTimeoutSeconds: 5
       }
     }
   ]
