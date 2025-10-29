@@ -2,10 +2,15 @@
 
 import { useState } from 'react';
 import { Path, useFormContext } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { LocationView } from '@/components/itinerary/LocationView';
 import { PlaceNavigationButton } from '@/components/itinerary/PlaceNavigationButton';
 import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
@@ -75,15 +80,24 @@ export function CoordinateInput({
         <Label className='whitespace-nowrap block mb-2'>座標</Label>
         <div className='flex gap-2'>
           <div className='flex-1'>
-            <Input
-              type='number'
-              step='any'
-              placeholder='緯度'
-              {...register(latPath, {
-                setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
-                onChange: () => trigger(lonPath), // 経度
-              })}
-            />
+            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+              <InputGroupAddon className='border-r-0'>
+                <InputGroupText className='text-xs'>緯度</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                type='number'
+                step='any'
+                placeholder='35.6762'
+                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                {...register(latPath, {
+                  setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
+                  onChange: () => trigger(lonPath), // 経度
+                })}
+              />
+              <InputGroupAddon align='inline-end' className='border-l-0'>
+                <InputGroupText>°</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
             {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
               ?.location?.latitude && (
               <SmallText>
@@ -95,15 +109,24 @@ export function CoordinateInput({
             )}
           </div>
           <div className='flex-1'>
-            <Input
-              type='number'
-              step='any'
-              placeholder='経度'
-              {...register(lonPath, {
-                setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
-                onChange: () => trigger(latPath), // 緯度
-              })}
-            />
+            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+              <InputGroupAddon className='border-r-0'>
+                <InputGroupText className='text-xs'>経度</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                type='number'
+                step='any'
+                placeholder='139.6503'
+                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                {...register(lonPath, {
+                  setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
+                  onChange: () => trigger(latPath), // 緯度
+                })}
+              />
+              <InputGroupAddon align='inline-end' className='border-l-0'>
+                <InputGroupText>°</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
             {errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.place
               ?.location?.longitude && (
               <SmallText>

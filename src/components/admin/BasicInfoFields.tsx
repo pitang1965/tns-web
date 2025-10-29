@@ -27,6 +27,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupButton,
+  InputGroupText,
 } from '@/components/ui/input-group';
 import {
   CampingSpotWithId,
@@ -43,7 +44,9 @@ const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => <LoadingState variant='card' message='地図を読み込み中...' />,
+    loading: () => (
+      <LoadingState variant='card' message='地図を読み込み中...' />
+    ),
   }
 );
 
@@ -135,27 +138,48 @@ export function BasicInfoFields({
 
       {/* Coordinates */}
       <div className='space-y-4'>
+        <Label className="after:content-['*'] after:ml-0.5 after:text-red-500">
+          座標
+        </Label>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
-            <Label
-              htmlFor='lat'
-              className="after:content-['*'] after:ml-0.5 after:text-red-500"
-            >
-              緯度
-            </Label>
-            <Input id='lat' type='number' step='any' {...register('lat')} />
+            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+              <InputGroupAddon className='border-r-0'>
+                <InputGroupText className='text-xs'>緯度</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                id='lat'
+                type='number'
+                step='any'
+                placeholder='35.6762'
+                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                {...register('lat')}
+              />
+              <InputGroupAddon align='inline-end' className='border-l-0'>
+                <InputGroupText>°</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
             {errors.lat && (
               <p className='text-sm text-red-500'>{errors.lat.message}</p>
             )}
           </div>
           <div>
-            <Label
-              htmlFor='lng'
-              className="after:content-['*'] after:ml-0.5 after:text-red-500"
-            >
-              経度
-            </Label>
-            <Input id='lng' type='number' step='any' {...register('lng')} />
+            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+              <InputGroupAddon className='border-r-0'>
+                <InputGroupText className='text-xs'>経度</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                id='lng'
+                type='number'
+                step='any'
+                placeholder='139.6503'
+                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                {...register('lng')}
+              />
+              <InputGroupAddon align='inline-end' className='border-l-0'>
+                <InputGroupText>°</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
             {errors.lng && (
               <p className='text-sm text-red-500'>{errors.lng.message}</p>
             )}
@@ -253,7 +277,10 @@ export function BasicInfoFields({
                 variant='ghost'
                 size='icon-sm'
                 disabled={!urlValue}
-                onClick={() => urlValue && window.open(urlValue, '_blank', 'noopener,noreferrer')}
+                onClick={() =>
+                  urlValue &&
+                  window.open(urlValue, '_blank', 'noopener,noreferrer')
+                }
                 title='新しいタブで開く'
                 className='h-8 w-8'
               >

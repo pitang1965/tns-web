@@ -32,6 +32,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupButton,
+  InputGroupText,
 } from '@/components/ui/input-group';
 import { Send, Info, MapPin, Map, Link, ExternalLink } from 'lucide-react';
 import {
@@ -48,7 +49,9 @@ const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => <LoadingState variant='card' message='地図を読み込み中...' />,
+    loading: () => (
+      <LoadingState variant='card' message='地図を読み込み中...' />
+    ),
   }
 );
 
@@ -57,22 +60,16 @@ const SubmissionFormSchema = z.object({
   name: z.string().min(1, '名称を入力してください').trim(),
   lat: z
     .string()
-    .refine(
-      (val) => val === '' || !isNaN(Number(val)),
-      {
-        message: '有効な緯度を入力してください',
-      }
-    )
+    .refine((val) => val === '' || !isNaN(Number(val)), {
+      message: '有効な緯度を入力してください',
+    })
     .optional()
     .or(z.literal('')),
   lng: z
     .string()
-    .refine(
-      (val) => val === '' || !isNaN(Number(val)),
-      {
-        message: '有効な経度を入力してください',
-      }
-    )
+    .refine((val) => val === '' || !isNaN(Number(val)), {
+      message: '有効な経度を入力してください',
+    })
     .optional()
     .or(z.literal('')),
   prefecture: z.string().min(1, '都道府県を選択してください'),
@@ -196,9 +193,10 @@ export default function CampingSpotSubmissionForm({
       console.error('Submission error:', error);
       toast({
         title: 'エラー',
-        description: error instanceof Error
-          ? error.message
-          : '投稿に失敗しました。もう一度お試しください。',
+        description:
+          error instanceof Error
+            ? error.message
+            : '投稿に失敗しました。もう一度お試しください。',
         variant: 'destructive',
       });
     } finally {
@@ -343,13 +341,23 @@ export default function CampingSpotSubmissionForm({
                           placeholder='例: https://www.example.com'
                           {...field}
                         />
-                        <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+                        <InputGroupAddon
+                          align='inline-end'
+                          className='border-l-0 pr-2'
+                        >
                           <InputGroupButton
                             type='button'
                             variant='ghost'
                             size='icon-sm'
                             disabled={!field.value}
-                            onClick={() => field.value && window.open(field.value, '_blank', 'noopener,noreferrer')}
+                            onClick={() =>
+                              field.value &&
+                              window.open(
+                                field.value,
+                                '_blank',
+                                'noopener,noreferrer'
+                              )
+                            }
                             title='新しいタブで開く'
                             className='h-8 w-8'
                           >
@@ -371,34 +379,73 @@ export default function CampingSpotSubmissionForm({
             <div className='space-y-4'>
               <h3 className='text-lg font-semibold'>位置情報</h3>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='lat'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>緯度</FormLabel>
-                      <FormControl>
-                        <Input placeholder='35.123456' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className='space-y-2'>
+                <FormLabel>座標</FormLabel>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <FormField
+                    control={form.control}
+                    name='lat'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+                            <InputGroupAddon className='border-r-0'>
+                              <InputGroupText className='text-xs'>
+                                緯度
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
+                              type='number'
+                              step='any'
+                              placeholder='35.6762'
+                              className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                              {...field}
+                            />
+                            <InputGroupAddon
+                              align='inline-end'
+                              className='border-l-0'
+                            >
+                              <InputGroupText>°</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name='lng'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>経度</FormLabel>
-                      <FormControl>
-                        <Input placeholder='139.123456' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name='lng'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+                            <InputGroupAddon className='border-r-0'>
+                              <InputGroupText className='text-xs'>
+                                経度
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
+                              type='number'
+                              step='any'
+                              placeholder='139.6503'
+                              className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                              {...field}
+                            />
+                            <InputGroupAddon
+                              align='inline-end'
+                              className='border-l-0'
+                            >
+                              <InputGroupText>°</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <div className='space-y-4'>
@@ -423,7 +470,8 @@ export default function CampingSpotSubmissionForm({
                     </Button>
                   </ButtonGroup>
                   <p className='text-xs text-gray-500 dark:text-gray-400'>
-                    Google Maps の URL や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
+                    Google Maps の URL
+                    や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
                   </p>
                 </div>
 
