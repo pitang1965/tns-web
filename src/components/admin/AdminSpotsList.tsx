@@ -118,8 +118,7 @@ export function AdminSpotsList({
           {filteredSpots.map((spot) => (
             <div
               key={spot._id}
-              className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
-              onClick={() => onSpotSelect(spot)}
+              className='border rounded-lg p-4 hover:shadow-md transition-shadow'
             >
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
@@ -171,13 +170,7 @@ export function AdminSpotsList({
                 </div>
                 <div className='flex gap-2'>
                   <Link href={`/admin/shachu-haku/${spot._id}`}>
-                    <Button
-                      size='sm'
-                      variant='outline'
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                    >
+                    <Button size='sm' variant='outline' className='cursor-pointer'>
                       <Edit className='w-4 h-4' />
                     </Button>
                   </Link>
