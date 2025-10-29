@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { LoadingState } from '@/components/common/LoadingState';
-import { Map, MapPin } from 'lucide-react';
+import { Map, MapPin, Link, ExternalLink } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -22,6 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupButton,
+} from '@/components/ui/input-group';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -56,6 +62,8 @@ export function BasicInfoFields({
   setValue,
   errors,
 }: BasicInfoFieldsProps) {
+  // URL値を監視
+  const urlValue = watch('url');
   const { toast } = useToast();
   const [showMap, setShowMap] = useState(false);
 
@@ -228,12 +236,31 @@ export function BasicInfoFields({
         </div>
         <div>
           <Label htmlFor='url'>URL</Label>
-          <Input
-            id='url'
-            type='url'
-            {...register('url')}
-            placeholder='URL（任意）'
-          />
+          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+            <InputGroupAddon className='border-r-0'>
+              <Link className='h-4 w-4' />
+            </InputGroupAddon>
+            <InputGroupInput
+              id='url'
+              type='url'
+              className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+              {...register('url')}
+              placeholder='URL（任意）'
+            />
+            <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+              <InputGroupButton
+                type='button'
+                variant='ghost'
+                size='icon-sm'
+                disabled={!urlValue}
+                onClick={() => urlValue && window.open(urlValue, '_blank', 'noopener,noreferrer')}
+                title='新しいタブで開く'
+                className='h-8 w-8'
+              >
+                <ExternalLink className='h-4 w-4' />
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
           {errors.url && (
             <p className='text-sm text-red-500'>{errors.url.message}</p>
           )}

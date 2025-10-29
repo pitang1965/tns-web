@@ -1,7 +1,7 @@
 'use client';
 
 import { PlaceForm } from './PlaceForm';
-import { FieldErrors } from 'react-hook-form';
+import { FieldErrors, useFormContext } from 'react-hook-form';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { ActivityControls } from './ActivityControls.tsx';
 import { useActivityTime } from '@/hooks/useActivityTime';
@@ -13,9 +13,11 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
+  InputGroupButton,
 } from '@/components/ui/input-group';
 import { SmallText } from '@/components/common/Typography';
 import { useActivityForm } from '@/hooks/useActivityForm';
+import { Link, ExternalLink } from 'lucide-react';
 
 type ActivityFormProps = {
   dayIndex: number;
@@ -53,6 +55,10 @@ export function ActivityForm({
     dayIndex,
     activityIndex
   );
+  const { watch } = useFormContext<ClientItineraryInput>();
+
+  // URL値を監視
+  const urlValue = watch(`dayPlans.${dayIndex}.activities.${activityIndex}.url`);
 
   // アクティビティのタイトル表示を生成
   const activityHeader = total
@@ -155,11 +161,30 @@ export function ActivityForm({
 
         <div className='space-y-2'>
           <Label>URL</Label>
-          <Input
-            type='url'
-            {...getFieldRegister('url')}
-            placeholder='https://example.com'
-          />
+          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+            <InputGroupAddon className='border-r-0'>
+              <Link className='h-4 w-4' />
+            </InputGroupAddon>
+            <InputGroupInput
+              type='url'
+              className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+              {...getFieldRegister('url')}
+              placeholder='https://example.com'
+            />
+            <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+              <InputGroupButton
+                type='button'
+                variant='ghost'
+                size='icon-sm'
+                disabled={!urlValue}
+                onClick={() => urlValue && window.open(urlValue, '_blank', 'noopener,noreferrer')}
+                title='新しいタブで開く'
+                className='h-8 w-8'
+              >
+                <ExternalLink className='h-4 w-4' />
+              </InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
           {getFieldError('url') && (
             <SmallText>{getFieldError('url')}</SmallText>
           )}

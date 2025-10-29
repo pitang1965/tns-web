@@ -27,7 +27,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Send, Info, MapPin, Map } from 'lucide-react';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupButton,
+} from '@/components/ui/input-group';
+import { Send, Info, MapPin, Map, Link, ExternalLink } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -327,11 +333,30 @@ export default function CampingSpotSubmissionForm({
                   <FormItem>
                     <FormLabel>参考URL</FormLabel>
                     <FormControl>
-                      <Input
-                        type='url'
-                        placeholder='例: https://www.example.com'
-                        {...field}
-                      />
+                      <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+                        <InputGroupAddon className='border-r-0'>
+                          <Link className='h-4 w-4' />
+                        </InputGroupAddon>
+                        <InputGroupInput
+                          type='url'
+                          className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                          placeholder='例: https://www.example.com'
+                          {...field}
+                        />
+                        <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+                          <InputGroupButton
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            disabled={!field.value}
+                            onClick={() => field.value && window.open(field.value, '_blank', 'noopener,noreferrer')}
+                            title='新しいタブで開く'
+                            className='h-8 w-8'
+                          >
+                            <ExternalLink className='h-4 w-4' />
+                          </InputGroupButton>
+                        </InputGroupAddon>
+                      </InputGroup>
                     </FormControl>
                     <div className='text-xs text-gray-500 dark:text-gray-400'>
                       公式サイトや詳細情報のURLがあれば入力してください
