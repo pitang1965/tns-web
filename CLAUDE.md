@@ -155,20 +155,42 @@ Required environment variables (see README.md for full details):
 
 - All shadcn/ui components must be placed in `src/components/ui/` directory
 - When adding new shadcn/ui components, use: `npx shadcn@latest add [component-name]`
-- If components are mistakenly placed in other directories (like `@/components/ui/`), move them to the correct location
-- Clean up any incorrectly created directories after moving components
 
-**IMPORTANT - Import Path Convention:**
+**CRITICAL - Post-Installation Verification Steps:**
 
-- This project uses `@/lib/utils` for the cn() utility function
-- shadcn/ui CLI may generate files with `@/utils` imports, which is INCORRECT for this project
-- After installing any shadcn/ui component, always verify and fix import paths:
-  - ❌ Wrong: `import { cn } from "@/utils"`
-  - ✅ Correct: `import { cn } from "@/lib/utils"`
-- Check these files after running `npx shadcn@latest add`:
-  - Any newly created files in `src/components/ui/`
-  - Any updated files (button.tsx, separator.tsx, etc.)
-- Run `npx tsc --noEmit` after adding components to catch import errors early
+After running `npx shadcn@latest add [component-name]`, ALWAYS perform these checks:
+
+1. **Verify Installation Location:**
+   ```bash
+   # Check if file was installed in the wrong location
+   find . -name "*[component-name]*" -type f 2>/dev/null
+   ```
+   - ✅ Correct: `./src/components/ui/[component-name].tsx`
+   - ❌ Wrong: `./@/components/ui/[component-name].tsx` or any other location
+
+2. **Move if Necessary:**
+   ```bash
+   # If installed in wrong location, move it
+   mv "./@/components/ui/[component-name].tsx" "src/components/ui/[component-name].tsx"
+   # Clean up incorrect directory
+   rm -rf "./@"
+   ```
+
+3. **Fix Import Paths:**
+   - This project uses `@/lib/utils` for the cn() utility function
+   - shadcn/ui CLI often generates files with `@/utils` imports, which is INCORRECT
+   - Check and fix in newly created/updated files:
+     - ❌ Wrong: `import { cn } from "@/utils"`
+     - ✅ Correct: `import { cn } from "@/lib/utils"`
+
+4. **Verify with TypeScript:**
+   ```bash
+   npx tsc --noEmit
+   ```
+   - This will catch any import path errors or type issues
+
+**Common Issue:**
+The shadcn CLI sometimes creates files in `./@/components/ui/` instead of `src/components/ui/`. Always check and correct the installation location immediately after running the add command.
 
 ## Git Commit Guidelines
 
