@@ -55,15 +55,7 @@ class ErrorBoundary extends React.Component<
           </H2>
 
           {/* アクションボタン */}
-          <div className='flex gap-4 mt-6 mb-8'>
-            <Button
-              onClick={() =>
-                this.setState({ hasError: false, error: null, errorInfo: null })
-              }
-              variant='default'
-            >
-              再試行
-            </Button>
+          <div className='mt-6 mb-8'>
             <Button onClick={() => window.location.reload()} variant='outline'>
               ページをリロード
             </Button>
