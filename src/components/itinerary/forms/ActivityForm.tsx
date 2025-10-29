@@ -8,6 +8,12 @@ import { useActivityTime } from '@/hooks/useActivityTime';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { SmallText } from '@/components/common/Typography';
 import { useActivityForm } from '@/hooks/useActivityForm';
 
@@ -123,19 +129,25 @@ export function ActivityForm({
 
         <div className='space-y-2'>
           <Label>予算</Label>
-          <Input
-            type='number'
-            {...register(
-              `dayPlans.${dayIndex}.activities.${activityIndex}.cost`,
-              {
-                setValueAs: (value: string) => {
-                  if (value === '') return null;
-                  return Number(value);
-                },
-              }
-            )}
-            placeholder='0'
-          />
+          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+            <InputGroupAddon className='border-r-0'>
+              <InputGroupText>¥</InputGroupText>
+            </InputGroupAddon>
+            <InputGroupInput
+              type='number'
+              className='pl-8 border-l-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+              {...register(
+                `dayPlans.${dayIndex}.activities.${activityIndex}.cost`,
+                {
+                  setValueAs: (value: string) => {
+                    if (value === '') return null;
+                    return Number(value);
+                  },
+                }
+              )}
+              placeholder='0'
+            />
+          </InputGroup>
           {getFieldError('cost') && (
             <SmallText>{getFieldError('cost')}</SmallText>
           )}

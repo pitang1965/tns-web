@@ -5,6 +5,12 @@ import { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors } from 'rea
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { ShachuHakuFormData } from './validationSchemas';
 
 interface PricingFieldsProps {
@@ -42,13 +48,20 @@ export function PricingFields({ register, watch, setValue, errors }: PricingFiel
       {isFree === false && (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
-            <Label htmlFor='pricePerNight'>一泊料金 (円)</Label>
-            <Input
-              id='pricePerNight'
-              type='number'
-              min='0'
-              {...register('pricePerNight')}
-            />
+            <Label htmlFor='pricePerNight'>一泊料金</Label>
+            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+              <InputGroupAddon className='border-r-0'>
+                <InputGroupText>¥</InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
+                id='pricePerNight'
+                type='number'
+                min='0'
+                className='pl-8 border-l-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                {...register('pricePerNight')}
+                placeholder='0'
+              />
+            </InputGroup>
           </div>
           <div>
             <Label htmlFor='priceNote'>料金備考</Label>
