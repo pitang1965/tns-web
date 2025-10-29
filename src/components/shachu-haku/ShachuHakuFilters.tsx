@@ -10,6 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group';
 import { MapPin, Search, Navigation, Filter } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
@@ -102,15 +107,16 @@ export default function ShachuHakuFilters({
               </span>
             </div>
             <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-              <div className='relative flex-1'>
-                <Search className='absolute left-3 top-2.5 h-4 w-4 text-gray-400' />
-                <Input
+              <InputGroup className='flex-1'>
+                <InputGroupAddon>
+                  <Search className='h-4 w-4' />
+                </InputGroupAddon>
+                <InputGroupInput
                   placeholder='名前で検索...'
                   value={searchTerm}
                   onChange={(e) => onSearchTermChange(e.target.value)}
-                  className='pl-10 h-9'
                 />
-              </div>
+              </InputGroup>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
                 <SelectTrigger className='h-9 w-full sm:w-[180px]'>
                   <SelectValue placeholder='全種別' />
@@ -189,15 +195,16 @@ export default function ShachuHakuFilters({
               絞り込み:
             </span>
             <div className='flex gap-2 flex-1'>
-              <div className='relative flex-1 max-w-xs'>
-                <Search className='absolute left-3 top-2.5 h-4 w-4 text-gray-400' />
-                <Input
+              <InputGroup className='flex-1 max-w-xs'>
+                <InputGroupAddon>
+                  <Search className='h-4 w-4' />
+                </InputGroupAddon>
+                <InputGroupInput
                   placeholder='名前で検索...'
                   value={searchTerm}
                   onChange={(e) => onSearchTermChange(e.target.value)}
-                  className='pl-10 h-9'
                 />
-              </div>
+              </InputGroup>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
                 <SelectTrigger className='h-9 w-[180px]'>
                   <SelectValue placeholder='全種別' />
