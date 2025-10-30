@@ -15,9 +15,13 @@ interface Filters {
 }
 
 interface UseMapBoundsLoaderOptions {
-  loadSpots: (bounds: Bounds, filters?: Filters) => Promise<CampingSpotWithId[]>;
+  loadSpots: (
+    bounds: Bounds,
+    filters?: Filters
+  ) => Promise<CampingSpotWithId[] | { spots: CampingSpotWithId[]; total: number }>;
   setLoading: (loading: boolean) => void;
   setSpots: (spots: CampingSpotWithId[]) => void;
+  setTotalCount?: (total: number) => void;
   toast: (options: {
     title: string;
     description: string;
@@ -42,6 +46,7 @@ export function useMapBoundsLoader({
   loadSpots,
   setLoading,
   setSpots,
+  setTotalCount,
   toast,
   filters,
   onLoadSuccess,
@@ -104,15 +109,26 @@ export function useMapBoundsLoader({
     try {
       setLoading(true);
 
-      const data = await loadSpots(bounds, requestFilters);
+      const result = await loadSpots(bounds, requestFilters);
 
       // Only update state if this request wasn't aborted
       if (!currentController.signal.aborted) {
-        setSpots(data);
-
-        // Call optional success callback (for additional processing like getting total count)
-        if (onLoadSuccess) {
-          await onLoadSuccess(data, bounds, requestFilters);
+        // Handle both array and object return types
+        if (Array.isArray(result)) {
+          // Legacy: array of spots
+          setSpots(result);
+          if (onLoadSuccess) {
+            await onLoadSuccess(result, bounds, requestFilters);
+          }
+        } else {
+          // New: object with spots and total
+          setSpots(result.spots);
+          if (setTotalCount) {
+            setTotalCount(result.total);
+          }
+          if (onLoadSuccess) {
+            await onLoadSuccess(result.spots, bounds, requestFilters);
+          }
         }
       }
     } catch (error) {

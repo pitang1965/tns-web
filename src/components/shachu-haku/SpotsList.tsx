@@ -17,6 +17,7 @@ import {
   filterSpotsClientSide,
   hasActiveClientFilters,
 } from '@/lib/clientSideFilterSpots';
+import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 
 // スポットタイプごとの色分け関数
 const getTypeColor = (type: string) => {
@@ -65,6 +66,8 @@ interface SpotsListProps {
   onNavigateToDetail: (spotId: string) => void;
   onPageChange: (page: number) => void;
   clientFilters: ClientSideFilterValues;
+  searchTerm?: string;
+  typeFilter?: string;
 }
 
 export function SpotsList({
@@ -76,10 +79,19 @@ export function SpotsList({
   onNavigateToDetail,
   onPageChange,
   clientFilters,
+  searchTerm = '',
+  typeFilter = 'all',
 }: SpotsListProps) {
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
   const hasFilters = hasActiveClientFilters(clientFilters);
+
+  // Generate active filter descriptions for display
+  const activeFilterDescriptions = getActiveFilterDescriptions(
+    searchTerm,
+    typeFilter,
+    clientFilters
+  );
 
   const pageSize = 20;
 
@@ -104,15 +116,20 @@ export function SpotsList({
     <Card>
       <CardHeader>
         <CardTitle>
-          車中泊スポット一覧 (
           {hasFilters
-            ? `${filteredSpots.length}件 / ${total}件中`
+            ? `このページに${filteredSpots.length}件表示中`
             : `${total}件中 ${(page - 1) * pageSize + 1}-${Math.min(
                 page * pageSize,
                 total
               )}件を表示`}
-          )
         </CardTitle>
+        {activeFilterDescriptions.length > 0 && (
+          <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+            {activeFilterDescriptions.map((desc, index) => (
+              <div key={index}>{desc}</div>
+            ))}
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <div className='space-y-4'>

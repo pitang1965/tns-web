@@ -36,8 +36,8 @@ import { SpotsList } from '@/components/shachu-haku/SpotsList';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import {
   filterSpotsClientSide,
-  hasActiveClientFilters,
 } from '@/lib/clientSideFilterSpots';
+import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -586,6 +586,12 @@ export default function ShachuHakuClient() {
     });
   }, [filteredSpots, savedBounds]);
 
+  // Generate active filter descriptions for display
+  const activeFilterDescriptions = useMemo(
+    () => getActiveFilterDescriptions(searchTerm, typeFilter, clientFilters),
+    [searchTerm, typeFilter, clientFilters]
+  );
+
   return (
     <div className='container mx-auto p-6 space-y-6'>
       <div className='space-y-4'>
@@ -662,17 +668,19 @@ export default function ShachuHakuClient() {
                 <MapPin className='w-5 h-5' />
                 {loading ? (
                   <span className='flex items-center gap-2'>
-                    車中泊スポット地図 (読み込み中...{' '}
-                    <Spinner className='size-4' />)
+                    読み込み中... <Spinner className='size-4' />
                   </span>
                 ) : (
-                  `車中泊スポット地図 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件${
-                    hasActiveClientFilters(clientFilters)
-                      ? ` / 全${spots.length}件中`
-                      : ''
-                  })`
+                  `表示範囲内: ${visibleSpots.length}件`
                 )}
               </CardTitle>
+              {!loading && activeFilterDescriptions.length > 0 && (
+                <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                  {activeFilterDescriptions.map((desc, index) => (
+                    <div key={index}>{desc}</div>
+                  ))}
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
@@ -743,6 +751,8 @@ export default function ShachuHakuClient() {
                 onNavigateToDetail={handleNavigateToSpotDetail}
                 onPageChange={setCurrentPage}
                 clientFilters={clientFilters}
+                searchTerm={searchTerm}
+                typeFilter={typeFilter}
               />
             )}
           </div>

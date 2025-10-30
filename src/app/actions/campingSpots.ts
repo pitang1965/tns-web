@@ -470,9 +470,27 @@ export async function getCampingSpotsByBounds(
     query.type = options.type;
   }
 
-  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
+  // Get total count without bounds filter for "全○○件中" display
+  const totalQuery: any = {};
+  if (options?.searchTerm) {
+    totalQuery.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+  if (options?.prefecture && options.prefecture !== 'all') {
+    totalQuery.prefecture = options.prefecture;
+  }
+  if (options?.type && options.type !== 'all') {
+    totalQuery.type = options.type;
+  }
 
-  return JSON.parse(JSON.stringify(spots));
+  const [spots, total] = await Promise.all([
+    CampingSpot.find(query).sort({ createdAt: -1 }).lean(),
+    CampingSpot.countDocuments(totalQuery),
+  ]);
+
+  return {
+    spots: JSON.parse(JSON.stringify(spots)),
+    total,
+  };
 }
 
 // Admin function for list view with pagination

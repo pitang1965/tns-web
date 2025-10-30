@@ -30,6 +30,7 @@ import {
   filterSpotsClientSide,
   hasActiveClientFilters,
 } from '@/lib/clientSideFilterSpots';
+import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { celebrateSubmission } from '@/lib/confetti';
 
 // Dynamically import the map component to avoid SSR issues
@@ -187,16 +188,12 @@ export default function AdminClient() {
     loadSpots: getCampingSpotsByBounds,
     setLoading,
     setSpots,
+    setTotalCount,
     toast,
     filters: {
       searchTerm,
       prefectureFilter: 'all',
       typeFilter,
-    },
-    // Admin-specific: also get total count for display
-    onLoadSuccess: async (data, bounds, filters) => {
-      const totalResult = await getCampingSpotsWithPagination(1, 1, filters);
-      setTotalCount(totalResult.total);
     },
   });
 
@@ -552,6 +549,12 @@ export default function AdminClient() {
     });
   }, [filteredSpots, savedBounds]);
 
+  // Generate active filter descriptions for display
+  const activeFilterDescriptions = useMemo(
+    () => getActiveFilterDescriptions(searchTerm, typeFilter, clientFilters),
+    [searchTerm, typeFilter, clientFilters]
+  );
+
   const exportToCSV = async () => {
     try {
       const { getCampingSpotsForExport } = await import(
@@ -801,18 +804,19 @@ export default function AdminClient() {
                 <MapPin className='w-5 h-5' />
                 {loading ? (
                   <span className='flex items-center gap-2'>
-                    地図から編集 (読み込み中... <Spinner className='size-4' />)
+                    読み込み中... <Spinner className='size-4' />
                   </span>
-                ) : totalCount > 0 ? (
-                  `地図から編集 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件 / 全${totalCount}件${
-                    hasActiveClientFilters(clientFilters)
-                      ? ` / フィルター前${spots.length}件`
-                      : ''
-                  })`
                 ) : (
-                  `地図から編集 (表示範囲内: ${visibleSpots.length}件 / 取得済み: ${filteredSpots.length}件)`
+                  `表示範囲内: ${visibleSpots.length}件（全${totalCount}件中）`
                 )}
               </CardTitle>
+              {!loading && activeFilterDescriptions.length > 0 && (
+                <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                  {activeFilterDescriptions.map((desc, index) => (
+                    <div key={index}>{desc}</div>
+                  ))}
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <ShachuHakuMap
