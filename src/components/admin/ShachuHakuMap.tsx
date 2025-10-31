@@ -40,6 +40,12 @@ interface ShachuHakuMapProps {
   }) => void;
   initialCenter?: [number, number];
   initialZoom?: number;
+  initialBounds?: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -51,6 +57,7 @@ export default function ShachuHakuMap({
   onBoundsChange,
   initialCenter = [139.6917, 35.6895],
   initialZoom = 9,
+  initialBounds,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -59,7 +66,6 @@ export default function ShachuHakuMap({
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
   const currentZoomRef = useRef<number>(9);
-  const [displayZoom, setDisplayZoom] = useState(9);
   const [markerUpdateTrigger, setMarkerUpdateTrigger] = useState(0);
   const isUserInteractionRef = useRef(false);
 
@@ -138,9 +144,12 @@ export default function ShachuHakuMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: initialCenter,
-      zoom: initialZoom,
-      minZoom: 6, //  全国表示を防ぐための最小ズーム（北海道は表示できる）
+      center: initialBounds ? [
+        (initialBounds.west + initialBounds.east) / 2,
+        (initialBounds.south + initialBounds.north) / 2
+      ] : initialCenter,
+      zoom: initialBounds ? 5 : initialZoom, // Temporary zoom, will be replaced by fitBounds
+      minZoom: 3.5, //  北海道全域程度まで表示可能、それ以上はズームアウト不可
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
         [154.0, 46.0]  // 北東端（東端、北端）北海道より北
@@ -169,8 +178,22 @@ export default function ShachuHakuMap({
       restoreConsoleWarn();
 
       setMapLoaded(true);
+
+      // If initialBounds is provided, fit the map to those bounds
+      if (initialBounds) {
+        map.current.fitBounds(
+          [
+            [initialBounds.west, initialBounds.south],
+            [initialBounds.east, initialBounds.north],
+          ],
+          {
+            padding: 0, // No padding for consistent display across devices
+            duration: 0, // No animation on initial load
+          }
+        );
+      }
+
       currentZoomRef.current = map.current.getZoom();
-      setDisplayZoom(Math.round(map.current.getZoom() * 10) / 10);
 
       try {
         // 日本語ラベルを設定
@@ -243,7 +266,6 @@ export default function ShachuHakuMap({
         const newZoom = map.current.getZoom();
         const oldZoom = currentZoomRef.current;
         currentZoomRef.current = newZoom;
-        setDisplayZoom(Math.round(newZoom * 10) / 10);
 
         const crossedThreshold =
           (oldZoom < 9 && newZoom >= 9) || (oldZoom >= 9 && newZoom < 9);
@@ -411,30 +433,71 @@ export default function ShachuHakuMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only run on initial map load
 
-  // Update map center and zoom when props change (for jump functionality)
+  // Track last applied initialBounds to prevent infinite loop while allowing prefecture jumps
+  const lastAppliedBoundsRef = useRef<typeof initialBounds | null>(null);
+
+  // Update map center/zoom/bounds when props change (for jump functionality)
+  // IMPORTANT: Only apply if initialBounds value has actually changed (not same object from URL update)
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
 
-    // Get current center and zoom
-    const currentCenter = map.current.getCenter();
-    const currentZoom = map.current.getZoom();
+    // If initialBounds is provided, check if it's different from last applied
+    if (initialBounds) {
+      // Check if this is a new bounds value (different from last applied)
+      const isSameBounds = lastAppliedBoundsRef.current &&
+        Math.abs(lastAppliedBoundsRef.current.north - initialBounds.north) < 0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.south - initialBounds.south) < 0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.east - initialBounds.east) < 0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.west - initialBounds.west) < 0.0001;
 
-    // Check if center or zoom has changed significantly
-    const centerChanged =
-      Math.abs(currentCenter.lng - initialCenter[0]) > 0.001 ||
-      Math.abs(currentCenter.lat - initialCenter[1]) > 0.001;
-    const zoomChanged = Math.abs(currentZoom - initialZoom) > 0.1;
+      // Only apply if bounds have changed (e.g., prefecture jump)
+      if (!isSameBounds) {
+        lastAppliedBoundsRef.current = { ...initialBounds }; // Save the applied bounds
 
-    // If changed, update the map (this is programmatic, not user interaction)
-    if (centerChanged || zoomChanged) {
-      isUserInteractionRef.current = false; // Mark as programmatic change
-      map.current.flyTo({
-        center: initialCenter,
-        zoom: initialZoom,
-        duration: 1000, // Smooth animation
-      });
+        const currentBounds = map.current.getBounds();
+        if (!currentBounds) return;
+
+        // Check if map bounds differ from target bounds
+        const boundsChanged =
+          Math.abs(currentBounds.getNorth() - initialBounds.north) > 0.01 ||
+          Math.abs(currentBounds.getSouth() - initialBounds.south) > 0.01 ||
+          Math.abs(currentBounds.getEast() - initialBounds.east) > 0.01 ||
+          Math.abs(currentBounds.getWest() - initialBounds.west) > 0.01;
+
+        if (boundsChanged) {
+          isUserInteractionRef.current = false; // Mark as programmatic change
+          map.current.fitBounds(
+            [
+              [initialBounds.west, initialBounds.south],
+              [initialBounds.east, initialBounds.north],
+            ],
+            {
+              padding: 0, // No padding for consistent display across devices
+              duration: 1000, // Smooth animation
+            }
+          );
+        }
+      }
+    } else if (!initialBounds) {
+      // Fallback to center/zoom if bounds not provided (for jump functionality)
+      const currentCenter = map.current.getCenter();
+      const currentZoom = map.current.getZoom();
+
+      const centerChanged =
+        Math.abs(currentCenter.lng - initialCenter[0]) > 0.001 ||
+        Math.abs(currentCenter.lat - initialCenter[1]) > 0.001;
+      const zoomChanged = Math.abs(currentZoom - initialZoom) > 0.1;
+
+      if (centerChanged || zoomChanged) {
+        isUserInteractionRef.current = false; // Mark as programmatic change
+        map.current.flyTo({
+          center: initialCenter,
+          zoom: initialZoom,
+          duration: 1000, // Smooth animation
+        });
+      }
     }
-  }, [initialCenter, initialZoom, mapLoaded]);
+  }, [initialCenter, initialZoom, initialBounds, mapLoaded]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on calculated security level
@@ -605,9 +668,6 @@ export default function ShachuHakuMap({
           スポット数: {spots.length}
         </div>
       </div>
-      {/* <div className='absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600 text-sm'>
-        ズームレベル: {displayZoom.toFixed(1)}
-      </div> */}
     </div>
   );
 }

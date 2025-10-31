@@ -155,19 +155,41 @@ export default function ShachuHakuClient() {
     east: number;
     west: number;
   } | null>(() => {
-    // URLパラメータから境界を取得
-    const north = searchParams.get('bounds_north');
-    const south = searchParams.get('bounds_south');
-    const east = searchParams.get('bounds_east');
-    const west = searchParams.get('bounds_west');
-    if (north && south && east && west) {
+    // 新形式: center+span を取得してboundsに変換
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
+    const latSpan = searchParams.get('lat_span');
+    const lngSpan = searchParams.get('lng_span');
+
+    if (lat && lng && latSpan && lngSpan) {
+      const centerLat = parseFloat(lat);
+      const centerLng = parseFloat(lng);
+      const latSpanVal = parseFloat(latSpan);
+      const lngSpanVal = parseFloat(lngSpan);
+
       return {
-        north: parseFloat(north),
-        south: parseFloat(south),
-        east: parseFloat(east),
-        west: parseFloat(west),
+        north: centerLat + latSpanVal / 2,
+        south: centerLat - latSpanVal / 2,
+        east: centerLng + lngSpanVal / 2,
+        west: centerLng - lngSpanVal / 2,
       };
     }
+
+    // 旧形式: bounds_* を直接取得（後方互換性）
+    const boundsNorth = searchParams.get('bounds_north');
+    const boundsSouth = searchParams.get('bounds_south');
+    const boundsEast = searchParams.get('bounds_east');
+    const boundsWest = searchParams.get('bounds_west');
+
+    if (boundsNorth && boundsSouth && boundsEast && boundsWest) {
+      return {
+        north: parseFloat(boundsNorth),
+        south: parseFloat(boundsSouth),
+        east: parseFloat(boundsEast),
+        west: parseFloat(boundsWest),
+      };
+    }
+
     return null;
   });
 
@@ -211,7 +233,6 @@ export default function ShachuHakuClient() {
     cleanup: cleanupMapBoundsLoader,
     reloadIfNeeded,
     initialLoadDoneRef,
-    lastLoadedBoundsRef,
   } = useMapBoundsLoader({
     loadSpots: getPublicCampingSpotsByBounds,
     setLoading,
@@ -279,6 +300,10 @@ export default function ShachuHakuClient() {
     [handleBoundsChange]
   );
 
+  // Track last URL to prevent unnecessary updates
+  const lastUrlRef = useRef<string>('');
+  const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Update URL when filters or map state change (skip initial mount)
   useEffect(() => {
     // Skip URL update on initial mount to preserve URL parameters
@@ -287,7 +312,14 @@ export default function ShachuHakuClient() {
       return;
     }
 
-    const params = new URLSearchParams();
+    // Clear any pending URL update
+    if (urlUpdateTimeoutRef.current) {
+      clearTimeout(urlUpdateTimeoutRef.current);
+    }
+
+    // Debounce URL updates to prevent infinite loop
+    urlUpdateTimeoutRef.current = setTimeout(() => {
+      const params = new URLSearchParams();
 
     // Add active tab if it's 'list'
     if (activeTab === 'list') {
@@ -324,24 +356,42 @@ export default function ShachuHakuClient() {
       params.set('max_elevation', clientFilters.maxElevation.toString());
     }
 
-    // Add map zoom and center (for both map and list tabs to maintain filter state)
-    params.set('zoom', mapZoom.toFixed(2));
-    params.set('lat', mapCenter[1].toFixed(6));
-    params.set('lng', mapCenter[0].toFixed(6));
-
-    // Add bounds if available (for consistent filtering between map and list)
+    // Add center and span if bounds are available (for consistent display range across devices)
     if (savedBounds) {
-      params.set('bounds_north', savedBounds.north.toFixed(6));
-      params.set('bounds_south', savedBounds.south.toFixed(6));
-      params.set('bounds_east', savedBounds.east.toFixed(6));
-      params.set('bounds_west', savedBounds.west.toFixed(6));
+      const centerLat = (savedBounds.north + savedBounds.south) / 2;
+      const centerLng = (savedBounds.east + savedBounds.west) / 2;
+      const latSpan = savedBounds.north - savedBounds.south;
+      const lngSpan = savedBounds.east - savedBounds.west;
+
+      // Round to 7 decimal places (Google Maps standard)
+      params.set('lat', centerLat.toFixed(7));
+      params.set('lng', centerLng.toFixed(7));
+      params.set('lat_span', latSpan.toFixed(7));
+      params.set('lng_span', lngSpan.toFixed(7));
+    } else {
+      // Only add center if bounds are not available (fallback to zoom-based display)
+      params.set('lat', mapCenter[1].toFixed(6));
+      params.set('lng', mapCenter[0].toFixed(6));
+      params.set('zoom', mapZoom.toFixed(2));
     }
 
-    // Update URL without reload
-    const newUrl = params.toString()
-      ? `/shachu-haku?${params.toString()}`
-      : '/shachu-haku';
-    router.replace(newUrl, { scroll: false });
+      // Update URL without reload
+      const newUrl = params.toString()
+        ? `/shachu-haku?${params.toString()}`
+        : '/shachu-haku';
+
+      // Only update if URL actually changed (prevents infinite loop from floating point errors)
+      if (newUrl !== lastUrlRef.current) {
+        lastUrlRef.current = newUrl;
+        router.replace(newUrl, { scroll: false });
+      }
+    }, 500); // 500ms debounce
+
+    return () => {
+      if (urlUpdateTimeoutRef.current) {
+        clearTimeout(urlUpdateTimeoutRef.current);
+      }
+    };
   }, [
     searchTerm,
     typeFilter,
@@ -495,8 +545,19 @@ export default function ShachuHakuClient() {
   const handlePrefectureJump = (prefecture: string) => {
     const coords = PREFECTURE_COORDINATES[prefecture];
     if (coords) {
-      setMapCenter([coords.lng, coords.lat]);
-      setMapZoom(coords.zoom);
+      const center: [number, number] = [coords.lng, coords.lat];
+
+      // Calculate bounds directly from center and span for consistent display across devices
+      const bounds = {
+        north: coords.lat + coords.lat_span / 2,
+        south: coords.lat - coords.lat_span / 2,
+        east: coords.lng + coords.lng_span / 2,
+        west: coords.lng - coords.lng_span / 2,
+      };
+
+      setMapCenter(center);
+      setMapZoom(9); // Default zoom, will be overridden by fitBounds
+      setSavedBounds(bounds);
     }
   };
 
@@ -504,8 +565,19 @@ export default function ShachuHakuClient() {
   const handleRegionJump = (region: string) => {
     const coords = REGION_COORDINATES[region];
     if (coords) {
-      setMapCenter([coords.lng, coords.lat]);
-      setMapZoom(coords.zoom);
+      const center: [number, number] = [coords.lng, coords.lat];
+
+      // Calculate bounds directly from center and span for consistent display across devices
+      const bounds = {
+        north: coords.lat + coords.lat_span / 2,
+        south: coords.lat - coords.lat_span / 2,
+        east: coords.lng + coords.lng_span / 2,
+        west: coords.lng - coords.lng_span / 2,
+      };
+
+      setMapCenter(center);
+      setMapZoom(9); // Default zoom, will be overridden by fitBounds
+      setSavedBounds(bounds);
     }
   };
 
@@ -522,8 +594,16 @@ export default function ShachuHakuClient() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setMapCenter([position.coords.longitude, position.coords.latitude]);
-        setMapZoom(12);
+        const center: [number, number] = [position.coords.longitude, position.coords.latitude];
+        const zoom = 12;
+
+        // Calculate bounds from center and zoom for consistent display across devices
+        const bounds = calculateBoundsFromZoomAndCenter(center, zoom);
+
+        setMapCenter(center);
+        setMapZoom(zoom);
+        setSavedBounds(bounds);
+
         toast({
           title: '成功',
           description: '現在地に移動しました',
@@ -690,6 +770,7 @@ export default function ShachuHakuClient() {
                 onBoundsChange={handleBoundsChangeWrapper}
                 initialZoom={mapZoom}
                 initialCenter={mapCenter}
+                initialBounds={savedBounds || undefined}
                 onZoomChange={setMapZoom}
                 onCenterChange={setMapCenter}
               />

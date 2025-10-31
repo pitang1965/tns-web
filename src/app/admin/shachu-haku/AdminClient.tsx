@@ -23,13 +23,11 @@ import {
   PREFECTURE_COORDINATES,
   REGION_COORDINATES,
 } from '@/lib/prefectureCoordinates';
+import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
-import {
-  filterSpotsClientSide,
-  hasActiveClientFilters,
-} from '@/lib/clientSideFilterSpots';
+import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { celebrateSubmission } from '@/lib/confetti';
 
@@ -430,8 +428,19 @@ export default function AdminClient() {
   const handlePrefectureJump = (prefecture: string) => {
     const coords = PREFECTURE_COORDINATES[prefecture];
     if (coords) {
-      setMapCenter([coords.lng, coords.lat]);
-      setMapZoom(coords.zoom);
+      const center: [number, number] = [coords.lng, coords.lat];
+
+      // Calculate bounds directly from center and span for consistent display across devices
+      const bounds = {
+        north: coords.lat + coords.lat_span / 2,
+        south: coords.lat - coords.lat_span / 2,
+        east: coords.lng + coords.lng_span / 2,
+        west: coords.lng - coords.lng_span / 2,
+      };
+
+      setMapCenter(center);
+      setMapZoom(9); // Default zoom, will be overridden by fitBounds
+      setSavedBounds(bounds);
     }
   };
 
@@ -439,8 +448,19 @@ export default function AdminClient() {
   const handleRegionJump = (region: string) => {
     const coords = REGION_COORDINATES[region];
     if (coords) {
-      setMapCenter([coords.lng, coords.lat]);
-      setMapZoom(coords.zoom);
+      const center: [number, number] = [coords.lng, coords.lat];
+
+      // Calculate bounds directly from center and span for consistent display across devices
+      const bounds = {
+        north: coords.lat + coords.lat_span / 2,
+        south: coords.lat - coords.lat_span / 2,
+        east: coords.lng + coords.lng_span / 2,
+        west: coords.lng - coords.lng_span / 2,
+      };
+
+      setMapCenter(center);
+      setMapZoom(9); // Default zoom, will be overridden by fitBounds
+      setSavedBounds(bounds);
     }
   };
 
@@ -457,8 +477,19 @@ export default function AdminClient() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setMapCenter([position.coords.longitude, position.coords.latitude]);
-        setMapZoom(12);
+        const center: [number, number] = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
+        const zoom = 12;
+
+        // Calculate bounds from center and zoom for consistent display across devices
+        const bounds = calculateBoundsFromZoomAndCenter(center, zoom);
+
+        setMapCenter(center);
+        setMapZoom(zoom);
+        setSavedBounds(bounds);
+
         toast({
           title: '成功',
           description: '現在地に移動しました',
@@ -826,6 +857,7 @@ export default function AdminClient() {
                 onBoundsChange={handleBoundsChangeWrapper}
                 initialCenter={mapCenter}
                 initialZoom={mapZoom}
+                initialBounds={savedBounds || undefined}
                 onCreateSpot={(coordinates) => {
                   setSelectedSpot({
                     coordinates,
