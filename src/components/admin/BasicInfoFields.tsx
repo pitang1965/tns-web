@@ -119,28 +119,30 @@ export function BasicInfoFields({
         </div>
         <div>
           <Label
-            htmlFor='prefecture'
+            htmlFor='type'
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
           >
-            都道府県
+            種別
           </Label>
           <Select
-            onValueChange={(value) => setValue('prefecture', value)}
-            value={watch('prefecture')}
+            onValueChange={(value) =>
+              setValue('type', value as CampingSpotType)
+            }
+            value={typeValue}
           >
             <SelectTrigger>
-              <SelectValue placeholder='都道府県を選択' />
+              <SelectValue placeholder='種別を選択' />
             </SelectTrigger>
             <SelectContent>
-              {PrefectureOptions.map((prefecture) => (
-                <SelectItem key={prefecture} value={prefecture}>
-                  {prefecture}
+              {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.prefecture && (
-            <p className='text-sm text-red-500'>{errors.prefecture.message}</p>
+          {errors.type && (
+            <p className='text-sm text-red-500'>{errors.type.message}</p>
           )}
         </div>
       </div>
@@ -268,71 +270,66 @@ export function BasicInfoFields({
           )}
         </div>
         <div>
-          <Label htmlFor='url'>URL</Label>
-          <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-            <InputGroupAddon className='border-r-0'>
-              <Link className='h-4 w-4' />
-            </InputGroupAddon>
-            <InputGroupInput
-              id='url'
-              type='url'
-              className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-              {...register('url')}
-              placeholder='URL（任意）'
-            />
-            <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
-              <InputGroupButton
-                type='button'
-                variant='ghost'
-                size='icon-sm'
-                disabled={!urlValue}
-                onClick={() =>
-                  urlValue &&
-                  window.open(urlValue, '_blank', 'noopener,noreferrer')
-                }
-                title='新しいタブで開く'
-                className='h-8 w-8'
-              >
-                <ExternalLink className='h-4 w-4' />
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
-          {errors.url && (
-            <p className='text-sm text-red-500'>{errors.url.message}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Type and Basic Properties */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-        <div>
           <Label
-            htmlFor='type'
+            htmlFor='prefecture'
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
           >
-            種別
+            都道府県
           </Label>
           <Select
-            onValueChange={(value) =>
-              setValue('type', value as CampingSpotType)
-            }
-            value={typeValue}
+            onValueChange={(value) => setValue('prefecture', value)}
+            value={watch('prefecture')}
           >
             <SelectTrigger>
-              <SelectValue placeholder='種別を選択' />
+              <SelectValue placeholder='都道府県を選択' />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
-                  {label}
+              {PrefectureOptions.map((prefecture) => (
+                <SelectItem key={prefecture} value={prefecture}>
+                  {prefecture}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.type && (
-            <p className='text-sm text-red-500'>{errors.type.message}</p>
+          {errors.prefecture && (
+            <p className='text-sm text-red-500'>{errors.prefecture.message}</p>
           )}
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor='url'>URL</Label>
+        <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
+          <InputGroupAddon className='border-r-0'>
+            <Link className='h-4 w-4' />
+          </InputGroupAddon>
+          <InputGroupInput
+            id='url'
+            type='url'
+            className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+            {...register('url')}
+            placeholder='URL（任意）'
+          />
+          <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+            <InputGroupButton
+              type='button'
+              variant='ghost'
+              size='icon-sm'
+              disabled={!urlValue}
+              onClick={() =>
+                urlValue &&
+                window.open(urlValue, '_blank', 'noopener,noreferrer')
+              }
+              title='新しいタブで開く'
+              className='h-8 w-8'
+            >
+              <ExternalLink className='h-4 w-4' />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+        {errors.url && (
+          <p className='text-sm text-red-500'>{errors.url.message}</p>
+        )}
       </div>
 
       {/* Capacity */}

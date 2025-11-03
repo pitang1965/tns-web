@@ -272,36 +272,6 @@ export default function CampingSpotSubmissionForm({
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
-                  name='prefecture'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
-                        都道府県
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='都道府県を選択' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {PrefectureOptions.map((prefecture) => (
-                            <SelectItem key={prefecture} value={prefecture}>
-                              {prefecture}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name='type'
                   render={({ field }) => (
                     <FormItem>
@@ -325,6 +295,36 @@ export default function CampingSpotSubmissionForm({
                               </SelectItem>
                             )
                           )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='prefecture'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        都道府県
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='都道府県を選択' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PrefectureOptions.map((prefecture) => (
+                            <SelectItem key={prefecture} value={prefecture}>
+                              {prefecture}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
