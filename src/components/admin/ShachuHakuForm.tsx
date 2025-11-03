@@ -374,7 +374,16 @@ export default function ShachuHakuForm({
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            onKeyDown={(e) => {
+              // Enterキーでの送信を無効化（textareaでの改行は許可）
+              if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+                e.preventDefault();
+              }
+            }}
+            className='space-y-6'
+          >
             <BasicInfoFields
               spot={spot}
               register={register}

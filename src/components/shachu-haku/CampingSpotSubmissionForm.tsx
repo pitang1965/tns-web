@@ -248,7 +248,16 @@ export default function CampingSpotSubmissionForm({
 
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            onKeyDown={(e) => {
+              // Enterキーでの送信を無効化（textareaでの改行は許可）
+              if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+                e.preventDefault();
+              }
+            }}
+            className='space-y-6'
+          >
             {/* 基本情報 */}
             <div className='space-y-4'>
               <h3 className='text-lg font-semibold'>基本情報</h3>
