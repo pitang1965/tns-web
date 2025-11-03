@@ -70,6 +70,22 @@ export default function ShachuHakuFilters({
 
   const activeFiltersCount = countActiveFilters();
 
+  // Wrap handlers to auto-close filters on mobile after location jump
+  const handlePrefectureJump = (prefecture: string) => {
+    onPrefectureJump(prefecture);
+    setIsOpen(false);
+  };
+
+  const handleRegionJump = (region: string) => {
+    onRegionJump(region);
+    setIsOpen(false);
+  };
+
+  const handleCurrentLocation = () => {
+    onCurrentLocation();
+    setIsOpen(false);
+  };
+
   return (
     <Card className='mb-4'>
       <CardContent className='pt-4 pb-4'>
@@ -77,7 +93,7 @@ export default function ShachuHakuFilters({
         <Collapsible
           open={isOpen}
           onOpenChange={setIsOpen}
-          className='block xl:hidden'
+          className='block 2xl:hidden'
         >
           {/* Trigger Button */}
           <CollapsibleTrigger asChild>
@@ -117,7 +133,7 @@ export default function ShachuHakuFilters({
 
               <div className='flex flex-wrap gap-1 items-center'>
                 <Button
-                  onClick={onCurrentLocation}
+                  onClick={handleCurrentLocation}
                   size='sm'
                   variant='outline'
                   className='h-7 text-xs'
@@ -131,14 +147,14 @@ export default function ShachuHakuFilters({
                     key={region}
                     variant='ghost'
                     size='sm'
-                    onClick={() => onRegionJump(region)}
+                    onClick={() => handleRegionJump(region)}
                     className='text-xs px-2 h-7'
                   >
                     {region}
                   </Button>
                 ))}
 
-                <Select onValueChange={onPrefectureJump}>
+                <Select onValueChange={handlePrefectureJump}>
                   <SelectTrigger className='w-[120px] h-7 text-xs'>
                     <SelectValue placeholder='都道府県...' />
                   </SelectTrigger>
@@ -194,8 +210,8 @@ export default function ShachuHakuFilters({
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Desktop Layout (xl and above) */}
-        <div className='hidden xl:flex gap-4 items-center'>
+        {/* Desktop Layout (2xl and above) */}
+        <div className='hidden 2xl:flex gap-4 items-center'>
           {/* Location Jump */}
           <div className='flex items-center gap-2'>
             <MapPin className='w-4 h-4 text-gray-500 dark:text-gray-400' />
