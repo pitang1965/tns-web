@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { LoadingState } from '@/components/common/LoadingState';
 import { Map, MapPin, Link, ExternalLink } from 'lucide-react';
 import { useAutoSetSpotType } from '@/hooks/useAutoSetSpotType';
+import { useAutoSetPrefecture } from '@/hooks/useAutoSetPrefecture';
 import {
   Select,
   SelectContent,
@@ -76,6 +77,14 @@ export function BasicInfoFields({
   const typeValue = watch('type');
 
   useAutoSetSpotType(nameValue, typeValue, setValue, toast, {
+    skipAutoSet: !!spot?._id, // 編集モード（_idがある）の場合はスキップ
+  });
+
+  // 住所から都道府県を自動設定する機能
+  const addressValue = watch('address');
+  const prefectureValue = watch('prefecture');
+
+  useAutoSetPrefecture(addressValue, prefectureValue, setValue, toast, {
     skipAutoSet: !!spot?._id, // 編集モード（_idがある）の場合はスキップ
   });
 
