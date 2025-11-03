@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { LoadingState } from '@/components/common/LoadingState';
 import { Map, MapPin, Link, ExternalLink } from 'lucide-react';
+import { useAutoSetSpotType } from '@/hooks/useAutoSetSpotType';
 import {
   Select,
   SelectContent,
@@ -70,6 +71,14 @@ export function BasicInfoFields({
   const { toast } = useToast();
   const [showMap, setShowMap] = useState(false);
 
+  // 名称から種別を自動設定する機能
+  const nameValue = watch('name');
+  const typeValue = watch('type');
+
+  useAutoSetSpotType(nameValue, typeValue, setValue, toast, {
+    skipAutoSet: !!spot?._id, // 編集モード（_idがある）の場合はスキップ
+  });
+
   const showOnMap = () => {
     const lat = watch('lat');
     const lng = watch('lng');
@@ -117,7 +126,7 @@ export function BasicInfoFields({
           </Label>
           <Select
             onValueChange={(value) => setValue('prefecture', value)}
-            defaultValue={spot?.prefecture}
+            value={watch('prefecture')}
           >
             <SelectTrigger>
               <SelectValue placeholder='都道府県を選択' />
@@ -307,7 +316,7 @@ export function BasicInfoFields({
             onValueChange={(value) =>
               setValue('type', value as CampingSpotType)
             }
-            defaultValue={spot?.type}
+            value={typeValue}
           >
             <SelectTrigger>
               <SelectValue placeholder='種別を選択' />

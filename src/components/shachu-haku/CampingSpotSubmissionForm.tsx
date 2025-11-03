@@ -12,6 +12,7 @@ import { LoadingState } from '@/components/common/LoadingState';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useAutoSetSpotType } from '@/hooks/useAutoSetSpotType';
 import {
   Select,
   SelectContent,
@@ -127,6 +128,14 @@ export default function CampingSpotSubmissionForm({
       agreement: false,
     },
   });
+
+  // 名称から種別を自動設定する機能
+  useAutoSetSpotType(
+    form.watch('name'),
+    form.watch('type'),
+    form.setValue,
+    toast
+  );
 
   const onSubmit = async (data: SubmissionFormData) => {
     try {

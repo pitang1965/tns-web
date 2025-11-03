@@ -96,7 +96,8 @@ export default function ShachuHakuForm({
 
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
-    if (spot) {
+    if (spot && spot._id) {
+      // 編集モード：spotの値でフォームを初期化
       const formValues = {
         name: spot.name,
         lat: spot.coordinates[1].toString(),
@@ -146,8 +147,13 @@ export default function ShachuHakuForm({
         notes: formValues.notes,
       });
       reset(formValues);
+    } else if (spot && !spot._id) {
+      // 新規作成（地図クリック）：座標のみ設定、他はデフォルト値のまま（自動設定を妨げない）
+      setValue('lat', spot.coordinates[1].toString());
+      setValue('lng', spot.coordinates[0].toString());
+      // type は defaultValues の 'other' のまま（useAutoSetSpotTypeが動作できるように）
     } else {
-      // 新規作成の場合はデフォルト値にリセット
+      // 新規作成（ボタンクリック）の場合はデフォルト値にリセット
       reset({
         name: '',
         lat: '',
@@ -189,7 +195,8 @@ export default function ShachuHakuForm({
         notes: ''
       });
     }
-  }, [spot, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spot]);
 
 
   const onSubmit = async (data: ShachuHakuFormData) => {
