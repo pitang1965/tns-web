@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
+import { HelpCircle } from 'lucide-react';
 import { LoginButton } from '@/components/auth/LoginButton';
 import { ModeToggle } from '@/components/common/ModeToggle';
 import { UserAvatar } from '@/components/common/UserAvatar';
@@ -10,6 +11,7 @@ import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { useEnvironment } from '@/hooks/useEnvironment';
+import { Button } from '@/components/ui/button';
 
 function EnvironmentBadge() {
   const environment = useEnvironment();
@@ -66,6 +68,16 @@ export function Header() {
           </div>
 
           {isClient && !user && <LoginButton />}
+          <Link href='/help'>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='hover:bg-gray-100 dark:hover:bg-gray-800'
+              aria-label='ヘルプ'
+            >
+              <HelpCircle className='h-5 w-5' />
+            </Button>
+          </Link>
           <ModeToggle />
         </div>
         {isClient && user && <UserAvatar user={user} />}
