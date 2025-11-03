@@ -430,10 +430,13 @@ export default function AdminClient() {
     if (coords) {
       const center: [number, number] = [coords.lng, coords.lat];
 
+      // Calculate lat_span from lng_span and aspect_ratio
+      const latSpan = coords.lng_span / coords.aspect_ratio;
+
       // Calculate bounds directly from center and span for consistent display across devices
       const bounds = {
-        north: coords.lat + coords.lat_span / 2,
-        south: coords.lat - coords.lat_span / 2,
+        north: coords.lat + latSpan / 2,
+        south: coords.lat - latSpan / 2,
         east: coords.lng + coords.lng_span / 2,
         west: coords.lng - coords.lng_span / 2,
       };
@@ -450,10 +453,13 @@ export default function AdminClient() {
     if (coords) {
       const center: [number, number] = [coords.lng, coords.lat];
 
+      // Calculate lat_span from lng_span and aspect_ratio
+      const latSpan = coords.lng_span / coords.aspect_ratio;
+
       // Calculate bounds directly from center and span for consistent display across devices
       const bounds = {
-        north: coords.lat + coords.lat_span / 2,
-        south: coords.lat - coords.lat_span / 2,
+        north: coords.lat + latSpan / 2,
+        south: coords.lat - latSpan / 2,
         east: coords.lng + coords.lng_span / 2,
         west: coords.lng - coords.lng_span / 2,
       };

@@ -175,7 +175,7 @@ export default function ShachuHakuMap({
           ]
         : initialCenter,
       zoom: initialBounds ? 5 : initialZoom, // Temporary zoom, will be replaced by fitBounds
-      minZoom: 4.5, // 北海道全域程度まで表示可能、それ以上はズームアウト不可
+      minZoom: 3.5, // 小画面デバイス（iPhone SEなど）でも北海道全域を表示可能
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
         [154.0, 46.0], // 北東端（東端、北端）北海道より北

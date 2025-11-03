@@ -155,12 +155,29 @@ export default function ShachuHakuClient() {
     east: number;
     west: number;
   } | null>(() => {
-    // 新形式: center+span を取得してboundsに変換
+    // 新形式: center+lng_span+aspect_ratio を取得してboundsに変換
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
-    const latSpan = searchParams.get('lat_span');
     const lngSpan = searchParams.get('lng_span');
+    const aspectRatio = searchParams.get('aspect_ratio');
 
+    if (lat && lng && lngSpan && aspectRatio) {
+      const centerLat = parseFloat(lat);
+      const centerLng = parseFloat(lng);
+      const lngSpanVal = parseFloat(lngSpan);
+      const aspectRatioVal = parseFloat(aspectRatio);
+      const latSpanVal = lngSpanVal / aspectRatioVal; // lat_span = lng_span / aspect_ratio
+
+      return {
+        north: centerLat + latSpanVal / 2,
+        south: centerLat - latSpanVal / 2,
+        east: centerLng + lngSpanVal / 2,
+        west: centerLng - lngSpanVal / 2,
+      };
+    }
+
+    // 旧形式（lat_span指定）: 後方互換性のため
+    const latSpan = searchParams.get('lat_span');
     if (lat && lng && latSpan && lngSpan) {
       const centerLat = parseFloat(lat);
       const centerLng = parseFloat(lng);
@@ -356,18 +373,19 @@ export default function ShachuHakuClient() {
       params.set('max_elevation', clientFilters.maxElevation.toString());
     }
 
-    // Add center and span if bounds are available (for consistent display range across devices)
+    // Add center, lng_span, and aspect_ratio if bounds are available (for consistent display range across devices)
     if (savedBounds) {
       const centerLat = (savedBounds.north + savedBounds.south) / 2;
       const centerLng = (savedBounds.east + savedBounds.west) / 2;
       const latSpan = savedBounds.north - savedBounds.south;
       const lngSpan = savedBounds.east - savedBounds.west;
+      const aspectRatio = lngSpan / latSpan; // aspect_ratio = lng_span / lat_span
 
       // Round to 7 decimal places (Google Maps standard)
       params.set('lat', centerLat.toFixed(7));
       params.set('lng', centerLng.toFixed(7));
-      params.set('lat_span', latSpan.toFixed(7));
       params.set('lng_span', lngSpan.toFixed(7));
+      params.set('aspect_ratio', aspectRatio.toFixed(2)); // aspect_ratioは小数点2桁で十分
     } else {
       // Only add center if bounds are not available (fallback to zoom-based display)
       params.set('lat', mapCenter[1].toFixed(6));
@@ -547,10 +565,13 @@ export default function ShachuHakuClient() {
     if (coords) {
       const center: [number, number] = [coords.lng, coords.lat];
 
+      // Calculate lat_span from lng_span and aspect_ratio
+      const latSpan = coords.lng_span / coords.aspect_ratio;
+
       // Calculate bounds directly from center and span for consistent display across devices
       const bounds = {
-        north: coords.lat + coords.lat_span / 2,
-        south: coords.lat - coords.lat_span / 2,
+        north: coords.lat + latSpan / 2,
+        south: coords.lat - latSpan / 2,
         east: coords.lng + coords.lng_span / 2,
         west: coords.lng - coords.lng_span / 2,
       };
@@ -567,10 +588,13 @@ export default function ShachuHakuClient() {
     if (coords) {
       const center: [number, number] = [coords.lng, coords.lat];
 
+      // Calculate lat_span from lng_span and aspect_ratio
+      const latSpan = coords.lng_span / coords.aspect_ratio;
+
       // Calculate bounds directly from center and span for consistent display across devices
       const bounds = {
-        north: coords.lat + coords.lat_span / 2,
-        south: coords.lat - coords.lat_span / 2,
+        north: coords.lat + latSpan / 2,
+        south: coords.lat - latSpan / 2,
         east: coords.lng + coords.lng_span / 2,
         west: coords.lng - coords.lng_span / 2,
       };
