@@ -56,7 +56,11 @@ class ErrorBoundary extends React.Component<
 
           {/* アクションボタン */}
           <div className='mt-6 mb-8'>
-            <Button onClick={() => window.location.reload()} variant='outline'>
+            <Button
+              onClick={() => window.location.reload()}
+              variant='default'
+              className='cursor-pointer active:scale-95 transition-transform'
+            >
               ページをリロード
             </Button>
           </div>
