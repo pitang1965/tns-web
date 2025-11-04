@@ -30,6 +30,7 @@ import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilte
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { celebrateSubmission } from '@/lib/confetti';
+import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -106,6 +107,34 @@ export default function AdminClient() {
     process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
       .map((email) => email.trim())
       .includes(user.email);
+
+  // Use custom hook for filter persistence
+  const {
+    searchTerm,
+    setSearchTerm,
+    typeFilter,
+    setTypeFilter,
+    clientFilters,
+    setClientFilters,
+    activeTab,
+    setActiveTab,
+    mapZoom,
+    setMapZoom,
+    mapCenter,
+    setMapCenter,
+    savedBounds,
+    setSavedBounds,
+    handleResetAll: handleResetAllFromHook,
+  } = useShachuHakuFilters({
+    searchParams,
+    onResetComplete: () => {
+      toast({
+        title: '条件をリセットしました',
+        description: '全ての表示条件がリセットされました',
+      });
+    },
+  });
+
   const [spots, setSpots] = useState<CampingSpotWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
@@ -114,41 +143,6 @@ export default function AdminClient() {
   const [showForm, setShowForm] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [pendingSubmissionsCount, setPendingSubmissionsCount] = useState(0);
-  const [activeTab, setActiveTab] = useState<'map' | 'list'>(() => {
-    // URLパラメータからタブを決定
-    const tabParam = searchParams.get('tab');
-    return tabParam === 'list' ? 'list' : 'map';
-  });
-  const [searchTerm, setSearchTerm] = useState(() => {
-    // URLパラメータから検索クエリを取得
-    return searchParams.get('q') || '';
-  });
-  const [typeFilter, setTypeFilter] = useState(() => {
-    // URLパラメータから種別フィルターを取得
-    return searchParams.get('type') || 'all';
-  });
-  const [clientFilters, setClientFilters] = useState<ClientSideFilterValues>({
-    pricingFilter: 'all',
-    minSecurityLevel: 0,
-    minQuietnessLevel: 0,
-    maxToiletDistance: null,
-    minElevation: null,
-    maxElevation: null,
-  });
-
-  // Map state for jump functionality
-  const [mapCenter, setMapCenter] = useState<[number, number]>([
-    138.2529, 36.2048,
-  ]); // Japan center
-  const [mapZoom, setMapZoom] = useState(5);
-
-  // Saved bounds from map (used for calculating visible spots)
-  const [savedBounds, setSavedBounds] = useState<{
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  } | null>(null);
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
@@ -805,6 +799,7 @@ export default function AdminClient() {
           onCurrentLocation={handleCurrentLocation}
           clientFilters={clientFilters}
           onClientFiltersChange={setClientFilters}
+          onResetAll={handleResetAllFromHook}
         />
 
         {/* Tab Navigation */}

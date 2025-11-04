@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
@@ -21,7 +20,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { MapPin, Search, Navigation, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Search, Navigation, Filter, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -39,6 +38,7 @@ interface ShachuHakuFiltersProps {
   onCurrentLocation: () => void;
   clientFilters: ClientSideFilterValues;
   onClientFiltersChange: (filters: ClientSideFilterValues) => void;
+  onResetAll: () => void;
 }
 
 export default function ShachuHakuFilters({
@@ -51,6 +51,7 @@ export default function ShachuHakuFilters({
   onCurrentLocation,
   clientFilters,
   onClientFiltersChange,
+  onResetAll,
 }: ShachuHakuFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -207,6 +208,21 @@ export default function ShachuHakuFilters({
                 />
               </div>
             </div>
+
+            {/* Reset All Button */}
+            {activeFiltersCount > 0 && (
+              <div className='pt-2 border-t border-gray-200 dark:border-gray-700'>
+                <Button
+                  onClick={onResetAll}
+                  variant='outline'
+                  size='sm'
+                  className='w-full h-8 text-xs cursor-pointer active:scale-95 transition-transform'
+                >
+                  <RotateCcw className='w-3 h-3 mr-1' />
+                  全ての条件をリセット
+                </Button>
+              </div>
+            )}
           </CollapsibleContent>
         </Collapsible>
 
@@ -296,6 +312,18 @@ export default function ShachuHakuFilters({
                   onFiltersChange={onClientFiltersChange}
                 />
               </div>
+              {/* Reset All Button */}
+              {activeFiltersCount > 0 && (
+                <Button
+                  onClick={onResetAll}
+                  variant='outline'
+                  size='sm'
+                  className='h-8 text-xs cursor-pointer active:scale-95 transition-transform whitespace-nowrap'
+                >
+                  <RotateCcw className='w-3 h-3 mr-1' />
+                  全てリセット
+                </Button>
+              )}
             </div>
           </div>
         </div>

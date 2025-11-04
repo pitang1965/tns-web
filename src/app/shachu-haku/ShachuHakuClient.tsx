@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
+import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 
 import { MapPin, Info, Plus, Share2 } from 'lucide-react';
 import {
@@ -92,123 +93,39 @@ export default function ShachuHakuClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  // Use custom hook for filter persistence
+  const {
+    searchTerm,
+    setSearchTerm,
+    typeFilter,
+    setTypeFilter,
+    clientFilters,
+    setClientFilters,
+    activeTab,
+    setActiveTab,
+    mapZoom,
+    setMapZoom,
+    mapCenter,
+    setMapCenter,
+    savedBounds,
+    setSavedBounds,
+    handleResetAll: handleResetAllFromHook,
+  } = useShachuHakuFilters({
+    searchParams,
+    onResetComplete: () => {
+      toast({
+        title: '条件をリセットしました',
+        description: '全ての表示条件がリセットされました',
+      });
+    },
+  });
+
   const [spots, setSpots] = useState<CampingSpotWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
     null
   );
-  const [activeTab, setActiveTab] = useState<'map' | 'list'>(() => {
-    // URLパラメータからタブを決定
-    const tabParam = searchParams.get('tab');
-    return tabParam === 'list' ? 'list' : 'map';
-  });
-
-  const [searchTerm, setSearchTerm] = useState(() => {
-    // URLパラメータから検索クエリを取得
-    return searchParams.get('q') || '';
-  });
-  const [typeFilter, setTypeFilter] = useState(() => {
-    // URLパラメータから種別フィルターを取得
-    return searchParams.get('type') || 'all';
-  });
-  const [clientFilters, setClientFilters] = useState<ClientSideFilterValues>(
-    () => {
-      // URLパラメータからクライアント側フィルターを取得
-      return {
-        pricingFilter:
-          (searchParams.get(
-            'pricing'
-          ) as ClientSideFilterValues['pricingFilter']) || 'all',
-        minSecurityLevel: parseInt(searchParams.get('min_security') || '0'),
-        minQuietnessLevel: parseInt(searchParams.get('min_quietness') || '0'),
-        maxToiletDistance: searchParams.get('max_toilet_dist')
-          ? parseInt(searchParams.get('max_toilet_dist')!)
-          : null,
-        minElevation: searchParams.get('min_elevation')
-          ? parseInt(searchParams.get('min_elevation')!)
-          : null,
-        maxElevation: searchParams.get('max_elevation')
-          ? parseInt(searchParams.get('max_elevation')!)
-          : null,
-      };
-    }
-  );
-
-  // Map state for zoom and center
-  const [mapZoom, setMapZoom] = useState(() => {
-    const zoom = searchParams.get('zoom');
-    return zoom ? parseFloat(zoom) : 9;
-  });
-  const [mapCenter, setMapCenter] = useState<[number, number]>(() => {
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    if (lat && lng) {
-      return [parseFloat(lng), parseFloat(lat)];
-    }
-    return [139.6917, 35.6895]; // デフォルト: 東京
-  });
-
-  // Saved bounds from map (used for list view filtering)
-  const [savedBounds, setSavedBounds] = useState<{
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  } | null>(() => {
-    // 新形式: center+lng_span+aspect_ratio を取得してboundsに変換
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    const lngSpan = searchParams.get('lng_span');
-    const aspectRatio = searchParams.get('aspect_ratio');
-
-    if (lat && lng && lngSpan && aspectRatio) {
-      const centerLat = parseFloat(lat);
-      const centerLng = parseFloat(lng);
-      const lngSpanVal = parseFloat(lngSpan);
-      const aspectRatioVal = parseFloat(aspectRatio);
-      const latSpanVal = lngSpanVal / aspectRatioVal; // lat_span = lng_span / aspect_ratio
-
-      return {
-        north: centerLat + latSpanVal / 2,
-        south: centerLat - latSpanVal / 2,
-        east: centerLng + lngSpanVal / 2,
-        west: centerLng - lngSpanVal / 2,
-      };
-    }
-
-    // 旧形式（lat_span指定）: 後方互換性のため
-    const latSpan = searchParams.get('lat_span');
-    if (lat && lng && latSpan && lngSpan) {
-      const centerLat = parseFloat(lat);
-      const centerLng = parseFloat(lng);
-      const latSpanVal = parseFloat(latSpan);
-      const lngSpanVal = parseFloat(lngSpan);
-
-      return {
-        north: centerLat + latSpanVal / 2,
-        south: centerLat - latSpanVal / 2,
-        east: centerLng + lngSpanVal / 2,
-        west: centerLng - lngSpanVal / 2,
-      };
-    }
-
-    // 旧形式: bounds_* を直接取得（後方互換性）
-    const boundsNorth = searchParams.get('bounds_north');
-    const boundsSouth = searchParams.get('bounds_south');
-    const boundsEast = searchParams.get('bounds_east');
-    const boundsWest = searchParams.get('bounds_west');
-
-    if (boundsNorth && boundsSouth && boundsEast && boundsWest) {
-      return {
-        north: parseFloat(boundsNorth),
-        south: parseFloat(boundsSouth),
-        east: parseFloat(boundsEast),
-        west: parseFloat(boundsWest),
-      };
-    }
-
-    return null;
-  });
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
@@ -736,6 +653,7 @@ export default function ShachuHakuClient() {
           onCurrentLocation={handleCurrentLocation}
           clientFilters={clientFilters}
           onClientFiltersChange={setClientFilters}
+          onResetAll={handleResetAllFromHook}
         />
 
         {/* Tab Navigation */}
