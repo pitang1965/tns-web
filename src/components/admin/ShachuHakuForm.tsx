@@ -139,6 +139,9 @@ export default function ShachuHakuForm({
         notes: spot.notes || ''
       };
       console.log('Setting form values:', {
+        name: formValues.name,
+        type: formValues.type,
+        prefecture: formValues.prefecture,
         quietnessLevel: formValues.quietnessLevel,
         securityLevel: formValues.securityLevel,
         overallRating: formValues.overallRating,
@@ -147,6 +150,13 @@ export default function ShachuHakuForm({
         notes: formValues.notes,
       });
       reset(formValues);
+
+      // reset後に明示的にSelectフィールドの値を設定
+      // これによりSelectコンポーネントが確実に値を受け取る
+      setTimeout(() => {
+        setValue('type', formValues.type, { shouldValidate: true });
+        setValue('prefecture', formValues.prefecture, { shouldValidate: true });
+      }, 0);
     } else if (spot && !spot._id) {
       // 新規作成（地図クリック）：座標のみ設定、他はデフォルト値のまま（自動設定を妨げない）
       setValue('lat', spot.coordinates[1].toString());
