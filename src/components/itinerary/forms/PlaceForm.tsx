@@ -53,12 +53,12 @@ export function PlaceForm({
             );
           }}
         >
-          <SelectTrigger>
+          <SelectTrigger className='cursor-pointer'>
             <SelectValue placeholder="タイプを選択" />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(PLACE_TYPES).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
+              <SelectItem key={value} value={value} className='cursor-pointer'>
                 {String(label)}
               </SelectItem>
             ))}

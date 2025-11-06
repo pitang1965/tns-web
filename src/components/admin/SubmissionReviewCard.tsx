@@ -155,7 +155,7 @@ export default function SubmissionReviewCard({
               <>
                 <Button
                   size='sm'
-                  className='bg-green-600 hover:bg-green-700'
+                  className='bg-green-600 hover:bg-green-700 cursor-pointer'
                   onClick={() => onEdit(submission)}
                 >
                   <Edit className='w-4 h-4 mr-1' />
@@ -167,7 +167,7 @@ export default function SubmissionReviewCard({
                   onOpenChange={setShowRejectDialog}
                 >
                   <DialogTrigger asChild>
-                    <Button size='sm' variant='destructive'>
+                    <Button size='sm' variant='destructive' className='cursor-pointer'>
                       <XCircle className='w-4 h-4 mr-1' />
                       却下
                     </Button>
@@ -195,12 +195,14 @@ export default function SubmissionReviewCard({
                           onClick={handleReject}
                           disabled={loading || !reviewNotes.trim()}
                           variant='destructive'
+                          className='cursor-pointer'
                         >
                           {loading ? '処理中...' : '却下する'}
                         </Button>
                         <Button
                           variant='outline'
                           onClick={() => setShowRejectDialog(false)}
+                          className='cursor-pointer'
                         >
                           キャンセル
                         </Button>
@@ -220,6 +222,7 @@ export default function SubmissionReviewCard({
                   <Button
                     size='sm'
                     variant='outline'
+                    className='cursor-pointer'
                     title={`投稿履歴を削除（${
                       submission.status === 'approved'
                         ? '承認済みスポットデータは保持されます'
@@ -276,12 +279,14 @@ export default function SubmissionReviewCard({
                         onClick={handleDelete}
                         disabled={loading}
                         variant='destructive'
+                        className='cursor-pointer'
                       >
                         {loading ? '削除中...' : '履歴を削除する'}
                       </Button>
                       <Button
                         variant='outline'
                         onClick={() => setShowDeleteDialog(false)}
+                        className='cursor-pointer'
                       >
                         キャンセル
                       </Button>

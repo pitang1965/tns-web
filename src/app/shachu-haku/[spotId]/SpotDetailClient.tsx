@@ -272,15 +272,16 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               onClick={openCurrentLocationRoute}
               variant='outline'
               size='sm'
+              className='cursor-pointer'
             >
               <Navigation className='w-4 h-4 mr-2' />
               ルート検索
             </Button>
-            <Button onClick={showOnMap} variant='outline' size='sm'>
+            <Button onClick={showOnMap} variant='outline' size='sm' className='cursor-pointer'>
               <Map className='w-4 h-4 mr-2' />
               地図で表示
             </Button>
-            <Button onClick={handleShare} variant='outline' size='sm'>
+            <Button onClick={handleShare} variant='outline' size='sm' className='cursor-pointer'>
               <Share2 className='w-4 h-4 mr-2' />
               共有
             </Button>
@@ -368,7 +369,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
                   </p>
                 </div>
                 <Link href='/shachu-haku/submit'>
-                  <Button className='bg-blue-600 hover:bg-blue-700 text-white'>
+                  <Button className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'>
                     <Plus className='w-4 h-4 mr-2' />
                     スポット情報を投稿する
                   </Button>

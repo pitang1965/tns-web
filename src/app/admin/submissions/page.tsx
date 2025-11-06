@@ -159,7 +159,7 @@ export default function SubmissionsAdminPage() {
     <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
       <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-bold'>投稿管理</h1>
-        <Button onClick={handleRefresh} variant='outline' disabled={loading}>
+        <Button onClick={handleRefresh} variant='outline' disabled={loading} className='cursor-pointer'>
           <RefreshCw
             className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
           />
@@ -229,16 +229,16 @@ export default function SubmissionsAdminPage() {
       {/* Tabs for filtering */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className='grid w-full grid-cols-4'>
-          <TabsTrigger value='pending'>
+          <TabsTrigger value='pending' className='cursor-pointer'>
             承認待ち ({submissionStats.pending})
           </TabsTrigger>
-          <TabsTrigger value='approved'>
+          <TabsTrigger value='approved' className='cursor-pointer'>
             承認済み ({submissionStats.approved})
           </TabsTrigger>
-          <TabsTrigger value='rejected'>
+          <TabsTrigger value='rejected' className='cursor-pointer'>
             却下 ({submissionStats.rejected})
           </TabsTrigger>
-          <TabsTrigger value='all'>
+          <TabsTrigger value='all' className='cursor-pointer'>
             すべて ({submissionStats.total})
           </TabsTrigger>
         </TabsList>

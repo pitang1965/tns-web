@@ -77,7 +77,7 @@ export const DayRouteNavigationButton: React.FC<
       variant='outline'
       size='sm'
       onClick={openFullRoute}
-      className={`flex items-center gap-2 ${className}`}
+      className={`flex items-center gap-2 cursor-pointer ${className}`}
     >
       <Route className='w-4 h-4' />
       <span>全体ルート検索</span>

@@ -21,7 +21,7 @@ export const ItineraryList: React.FC<Props> = ({ itinerariesPromise }) => {
 
   return (
     <div className='flex flex-col gap-2'>
-      <Button onClick={handleCreateNew} size='sm' className='w-20'>
+      <Button onClick={handleCreateNew} size='sm' className='w-20 cursor-pointer'>
         新規作成
       </Button>
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>

@@ -91,6 +91,7 @@ export function ActivityControls({
               moveActivity(dayIndex, activityIndex, activityIndex - 1)
             }
             title='上に移動'
+            className='cursor-pointer'
           >
             <MoveUp className='h-4 w-4' />
           </Button>
@@ -104,6 +105,7 @@ export function ActivityControls({
               moveActivity(dayIndex, activityIndex, activityIndex + 1)
             }
             title='下に移動'
+            className='cursor-pointer'
           >
             <MoveDown className='h-4 w-4' />
           </Button>
@@ -114,6 +116,7 @@ export function ActivityControls({
           size='sm'
           onClick={() => setIsDeleteConfirmOpen(true)}
           title='削除'
+          className='cursor-pointer'
         >
           <Trash2 className='h-4 w-4' />
         </Button>
@@ -124,21 +127,22 @@ export function ActivityControls({
               variant='outline'
               size='sm'
               title='その他のオプション'
+              className='cursor-pointer'
             >
               <MoreVertical className='h-4 w-4' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuItem onClick={handleShiftSubsequentActivities}>
+            <DropdownMenuItem onClick={handleShiftSubsequentActivities} className='cursor-pointer'>
               以降のアクティビティの時間をずらす
             </DropdownMenuItem>
             {isPreviousDayAvailable && (
-              <DropdownMenuItem onClick={() => setIsPrevDayConfirmOpen(true)}>
+              <DropdownMenuItem onClick={() => setIsPrevDayConfirmOpen(true)} className='cursor-pointer'>
                 前日の末尾に移動
               </DropdownMenuItem>
             )}
             {isNextDayAvailable && (
-              <DropdownMenuItem onClick={() => setIsNextDayConfirmOpen(true)}>
+              <DropdownMenuItem onClick={() => setIsNextDayConfirmOpen(true)} className='cursor-pointer'>
                 翌日の先頭に移動
               </DropdownMenuItem>
             )}

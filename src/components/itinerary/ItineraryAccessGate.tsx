@@ -26,7 +26,7 @@ export const ItineraryAccessGate: React.FC<ItineraryAccessGateProps> = ({
         <LargeText>
           この旅程は非公開に設定されています。閲覧するには認証が必要です。
         </LargeText>
-        <Button onClick={onLogin}>ログイン</Button>
+        <Button onClick={onLogin} className='cursor-pointer'>ログイン</Button>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export const ItineraryAccessGate: React.FC<ItineraryAccessGateProps> = ({
     <div className='container mx-auto p-8 text-center'>
       <H2>アクセス権限がありません</H2>
       <LargeText>この旅程を閲覧する権限がありません。</LargeText>
-      <Button onClick={onBack} variant='secondary'>
+      <Button onClick={onBack} variant='secondary' className='cursor-pointer'>
         戻る
       </Button>
     </div>

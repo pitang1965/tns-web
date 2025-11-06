@@ -203,7 +203,7 @@ export default function HeroMapSection({
               />
               <button
                 type='submit'
-                className='w-full px-4 sm:px-8 py-2 sm:py-4 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-colors shadow-lg hover:shadow-xl'
+                className='w-full px-4 sm:px-8 py-2 sm:py-4 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-colors shadow-lg hover:shadow-xl cursor-pointer'
               >
                 検索
               </button>

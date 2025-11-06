@@ -56,7 +56,7 @@ export function Header() {
         <div className='md:hidden'>
           <BurgerMenu />
         </div>
-        <Link href='/' className='text-xl ml-auto cursor-pointer'>
+        <Link href='/' className='text-xl ml-auto'>
           車旅のしおり
         </Link>
         <Suspense fallback={null}>
@@ -72,7 +72,7 @@ export function Header() {
             <Button
               variant='ghost'
               size='icon'
-              className='hover:bg-gray-100 dark:hover:bg-gray-800'
+              className='hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
               aria-label='ヘルプ'
             >
               <HelpCircle className='h-5 w-5' />

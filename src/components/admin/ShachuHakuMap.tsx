@@ -576,7 +576,7 @@ export default function ShachuHakuMap({
             spot.notes
               ? `<div class="mt-2 text-gray-700">
                   <strong class="text-gray-900">備考:</strong>
-                  <span class="break-words">
+                  <span class="wrap-break-word">
                     <span id="${spotId}-short"${
                   isNotesLong ? '' : ' style="display: none;"'
                 }>${truncatedNotes}</span>

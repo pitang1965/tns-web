@@ -71,7 +71,7 @@ export function Navigation() {
       </NavLink>
       {userIsAdmin ? (
         <DropdownMenu>
-          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none'>
+          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
             <MapPin className='mr-1' />
             車中泊スポット
             <ChevronDown className='ml-1 h-3 w-3' />

@@ -292,14 +292,14 @@ export default function CampingSpotSubmissionForm({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className='cursor-pointer'>
                             <SelectValue placeholder='車中泊場所の種別を選択' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {Object.entries(CampingSpotTypeLabels).map(
                             ([key, label]) => (
-                              <SelectItem key={key} value={key}>
+                              <SelectItem key={key} value={key} className='cursor-pointer'>
                                 {label}
                               </SelectItem>
                             )
@@ -324,13 +324,13 @@ export default function CampingSpotSubmissionForm({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className='cursor-pointer'>
                             <SelectValue placeholder='都道府県を選択' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {PrefectureOptions.map((prefecture) => (
-                            <SelectItem key={prefecture} value={prefecture}>
+                            <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
                               {prefecture}
                             </SelectItem>
                           ))}
@@ -481,7 +481,7 @@ export default function CampingSpotSubmissionForm({
                       variant='outline'
                       size='sm'
                       onClick={() => setShowMap(!showMap)}
-                      className='flex-1'
+                      className='flex-1 cursor-pointer'
                     >
                       <MapPin className='w-4 h-4' />
                       {showMap ? '選択完了' : '地図で選択'}
@@ -518,7 +518,7 @@ export default function CampingSpotSubmissionForm({
                     size='sm'
                     onClick={handleShowOnMap}
                     disabled={!form.watch('lat') || !form.watch('lng')}
-                    className='w-full'
+                    className='w-full cursor-pointer'
                   >
                     <Map className='w-4 h-4' />
                     地図で表示
@@ -691,7 +691,7 @@ export default function CampingSpotSubmissionForm({
               )}
             />
 
-            <Button type='submit' disabled={loading} className='w-full'>
+            <Button type='submit' disabled={loading} className='w-full cursor-pointer'>
               <Send className='w-4 h-4 mr-2' />
               {loading ? '投稿中...' : '投稿する'}
             </Button>

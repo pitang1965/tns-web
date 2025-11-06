@@ -164,7 +164,7 @@ export default function CSVImportDialog({
             <Upload className='w-5 h-5' />
             CSVインポート
           </CardTitle>
-          <Button variant='outline' size='sm' onClick={onClose}>
+          <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
             <X className='w-4 h-4' />
           </Button>
         </CardHeader>
@@ -191,7 +191,7 @@ export default function CSVImportDialog({
                 variant='outline'
                 size='sm'
                 onClick={downloadTemplate}
-                className='text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                className='text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer'
               >
                 <Download className='w-4 h-4 mr-2' />
                 テンプレートをダウンロード
@@ -217,6 +217,7 @@ export default function CSVImportDialog({
                 variant='outline'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={importing}
+                className='cursor-pointer'
               >
                 ファイルを選択
               </Button>
@@ -236,7 +237,7 @@ export default function CSVImportDialog({
                 <Button
                   onClick={handleImport}
                   disabled={importing}
-                  className='bg-green-600 hover:bg-green-700'
+                  className='bg-green-600 hover:bg-green-700 cursor-pointer'
                 >
                   {importing ? 'インポート中...' : 'インポート開始'}
                 </Button>
@@ -342,10 +343,11 @@ export default function CSVImportDialog({
                     setFile(null);
                     setResult(null);
                   }}
+                  className='cursor-pointer'
                 >
                   新しいファイルを選択
                 </Button>
-                <Button onClick={onClose}>閉じる</Button>
+                <Button onClick={onClose} className='cursor-pointer'>閉じる</Button>
               </div>
             </div>
           )}

@@ -283,7 +283,7 @@ export default function SubmissionEditForm({
       <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
         <CardHeader className='flex flex-row items-center justify-between'>
           <CardTitle>投稿の編集と承認</CardTitle>
-          <Button variant='outline' size='sm' onClick={onClose}>
+          <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
             <X className='w-4 h-4' />
           </Button>
         </CardHeader>
@@ -334,13 +334,13 @@ export default function SubmissionEditForm({
 
             {/* Submit Buttons */}
             <div className='flex justify-end gap-2'>
-              <Button type='button' variant='outline' onClick={onClose}>
+              <Button type='button' variant='outline' onClick={onClose} className='cursor-pointer'>
                 キャンセル
               </Button>
               <Button
                 type='submit'
                 disabled={loading}
-                className='bg-green-600 hover:bg-green-700'
+                className='bg-green-600 hover:bg-green-700 cursor-pointer'
               >
                 <Save className='w-4 h-4 mr-2' />
                 {loading ? '処理中...' : '承認して作成'}

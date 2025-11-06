@@ -136,7 +136,7 @@ export function RatingFields({ register, errors, watch, spot }: RatingFieldsProp
                 variant='outline'
                 size='sm'
                 onClick={handleCheckElevation}
-                className='h-7 text-xs'
+                className='h-7 text-xs cursor-pointer'
               >
                 <ExternalLink className='w-3 h-3 mr-1' />
                 標高を調べる

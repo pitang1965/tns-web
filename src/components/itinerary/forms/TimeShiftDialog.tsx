@@ -108,10 +108,10 @@ export function TimeShiftDialog({
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="cursor-pointer">
                 キャンセル
               </Button>
-              <Button type="submit">適用</Button>
+              <Button type="submit" className="cursor-pointer">適用</Button>
             </DialogFooter>
           </form>
         </Form>

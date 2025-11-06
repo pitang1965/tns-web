@@ -744,7 +744,10 @@ export default function AdminClient() {
           <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
           <div className='flex gap-2'>
             <Link href='/admin/submissions'>
-              <Button variant='outline' className='hidden md:flex relative'>
+              <Button
+                variant='outline'
+                className='hidden md:flex relative cursor-pointer'
+              >
                 <Users className='w-4 h-4 mr-2' />
                 投稿管理
                 {pendingSubmissionsCount > 0 && (
@@ -760,7 +763,7 @@ export default function AdminClient() {
             <Button
               onClick={() => setShowImportDialog(true)}
               variant='outline'
-              className='hidden md:flex'
+              className='hidden md:flex cursor-pointer'
             >
               <Upload className='w-4 h-4 mr-2' />
               CSVインポート
@@ -768,21 +771,24 @@ export default function AdminClient() {
             <Button
               onClick={exportToCSV}
               variant='outline'
-              className='hidden md:flex'
+              className='hidden md:flex cursor-pointer'
             >
               <Download className='w-4 h-4 mr-2' />
               CSVエクスポート
             </Button>
             <Button
               onClick={() => setShowForm(true)}
-              className='hidden md:flex'
+              className='hidden md:flex cursor-pointer'
             >
               <Plus className='w-4 h-4 mr-2' />
               新規追加
             </Button>
           </div>
         </div>
-        <Button onClick={() => setShowForm(true)} className='md:hidden w-full'>
+        <Button
+          onClick={() => setShowForm(true)}
+          className='md:hidden w-full cursor-pointer'
+        >
           <Plus className='w-4 h-4 mr-2' />
           新規追加
         </Button>
@@ -807,7 +813,7 @@ export default function AdminClient() {
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('map')}
-            className='rounded-b-none'
+            className='rounded-b-none cursor-pointer'
           >
             <MapPin className='w-4 h-4 mr-2' />
             地図表示
@@ -815,7 +821,7 @@ export default function AdminClient() {
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('list')}
-            className='rounded-b-none'
+            className='rounded-b-none cursor-pointer'
           >
             一覧表示
           </Button>

@@ -140,7 +140,7 @@ export function DayPlanForm({
               variant='outline'
               size='sm'
               onClick={handleSortActivitiesByTime}
-              className='flex items-center gap-1'
+              className='flex items-center gap-1 cursor-pointer'
               type='button'
             >
               <Clock className='h-4 w-4' />
@@ -154,7 +154,7 @@ export function DayPlanForm({
               variant='outline'
               size='sm'
               onClick={() => setShowFullMap(true)}
-              className='flex items-center gap-1'
+              className='flex items-center gap-1 cursor-pointer'
             >
               <Map className='h-4 w-4' />
               <span>ルートマップ</span>
@@ -210,7 +210,7 @@ export function DayPlanForm({
           type='button'
           variant='outline'
           onClick={() => addActivity(dayIndex)}
-          className='w-full'
+          className='w-full cursor-pointer'
         >
           <PlusCircle className='h-4 w-4 mr-2' />
           アクティビティを追加

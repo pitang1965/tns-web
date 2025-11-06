@@ -137,7 +137,7 @@ export default function ShachuHakuFilters({
                   onClick={handleCurrentLocation}
                   size='sm'
                   variant='outline'
-                  className='h-7 text-xs'
+                  className='h-7 text-xs cursor-pointer'
                 >
                   <Navigation className='w-3 h-3 mr-1' />
                   現在地
@@ -149,19 +149,19 @@ export default function ShachuHakuFilters({
                     variant='ghost'
                     size='sm'
                     onClick={() => handleRegionJump(region)}
-                    className='text-xs px-2 h-7'
+                    className='text-xs px-2 h-7 cursor-pointer'
                   >
                     {region}
                   </Button>
                 ))}
 
                 <Select onValueChange={handlePrefectureJump}>
-                  <SelectTrigger className='w-[120px] h-7 text-xs'>
+                  <SelectTrigger className='w-[120px] h-7 text-xs cursor-pointer'>
                     <SelectValue placeholder='都道府県...' />
                   </SelectTrigger>
                   <SelectContent>
                     {PrefectureOptions.map((prefecture) => (
-                      <SelectItem key={prefecture} value={prefecture}>
+                      <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
                         {prefecture}
                       </SelectItem>
                     ))}
@@ -190,13 +190,13 @@ export default function ShachuHakuFilters({
                   />
                 </InputGroup>
                 <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                  <SelectTrigger className='h-9 w-full sm:w-[180px]'>
+                  <SelectTrigger className='h-9 w-full sm:w-[180px] cursor-pointer'>
                     <SelectValue placeholder='全種別' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='all'>全種別</SelectItem>
+                    <SelectItem value='all' className='cursor-pointer'>全種別</SelectItem>
                     {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>
+                      <SelectItem key={key} value={key} className='cursor-pointer'>
                         {label}
                       </SelectItem>
                     ))}
@@ -239,7 +239,7 @@ export default function ShachuHakuFilters({
               onClick={onCurrentLocation}
               size='sm'
               variant='outline'
-              className='h-7 text-xs'
+              className='h-7 text-xs cursor-pointer'
             >
               <Navigation className='w-3 h-3 mr-1' />
               現在地
@@ -252,7 +252,7 @@ export default function ShachuHakuFilters({
                   variant='ghost'
                   size='sm'
                   onClick={() => onRegionJump(region)}
-                  className='text-xs px-2 h-7'
+                  className='text-xs px-2 h-7 cursor-pointer'
                 >
                   {region}
                 </Button>
@@ -260,12 +260,12 @@ export default function ShachuHakuFilters({
             </div>
 
             <Select onValueChange={onPrefectureJump}>
-              <SelectTrigger className='w-[120px] h-7 text-xs'>
+              <SelectTrigger className='w-[120px] h-7 text-xs cursor-pointer'>
                 <SelectValue placeholder='都道府県...' />
               </SelectTrigger>
               <SelectContent>
                 {PrefectureOptions.map((prefecture) => (
-                  <SelectItem key={prefecture} value={prefecture}>
+                  <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
                     {prefecture}
                   </SelectItem>
                 ))}
@@ -294,13 +294,13 @@ export default function ShachuHakuFilters({
                 />
               </InputGroup>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                <SelectTrigger className='h-9 w-[180px]'>
+                <SelectTrigger className='h-9 w-[180px] cursor-pointer'>
                   <SelectValue placeholder='全種別' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='all'>全種別</SelectItem>
+                  <SelectItem value='all' className='cursor-pointer'>全種別</SelectItem>
                   {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
+                    <SelectItem key={key} value={key} className='cursor-pointer'>
                       {label}
                     </SelectItem>
                   ))}

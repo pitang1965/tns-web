@@ -203,6 +203,7 @@ export function AdminSpotsList({
                 variant='outline'
                 onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
+                className='cursor-pointer'
               >
                 前へ
               </Button>
@@ -213,6 +214,7 @@ export function AdminSpotsList({
                 variant='outline'
                 onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
+                className='cursor-pointer'
               >
                 次へ
               </Button>

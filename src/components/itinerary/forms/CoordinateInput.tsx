@@ -154,7 +154,7 @@ export function CoordinateInput({
               variant='outline'
               size='sm'
               onClick={() => setShowMap(!showMap)}
-              className='flex-1'
+              className='flex-1 cursor-pointer'
             >
               <MapPin className='w-4 h-4' />
               {showMap ? '選択完了' : '地図で選択'}

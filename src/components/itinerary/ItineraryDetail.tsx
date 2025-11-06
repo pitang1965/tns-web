@@ -73,11 +73,11 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             {error}
           </div>
           <div className='flex gap-3'>
-            <Button variant='outline' onClick={actions.handleBack}>
+            <Button variant='outline' onClick={actions.handleBack} className='cursor-pointer'>
               旅程一覧に戻る
             </Button>
             {access.isOwner && (
-              <Button onClick={actions.handleEdit}>旅程を編集</Button>
+              <Button onClick={actions.handleEdit} className='cursor-pointer'>旅程を編集</Button>
             )}
           </div>
         </div>
@@ -123,7 +123,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
                 この旅程を編集するには
                 <Button
                   variant='link'
-                  className='p-0 mx-1 h-auto'
+                  className='p-0 mx-1 h-auto cursor-pointer'
                   onClick={actions.handleLogin}
                 >
                   ログイン

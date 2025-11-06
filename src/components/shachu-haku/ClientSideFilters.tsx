@@ -54,7 +54,7 @@ export default function ClientSideFilters({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className='relative inline-flex items-center justify-center h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground'
+          className='relative inline-flex items-center justify-center h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer'
           type='button'
         >
           <MoreVertical className='h-4 w-4' />
@@ -73,7 +73,7 @@ export default function ClientSideFilters({
               variant='ghost'
               size='sm'
               onClick={handleReset}
-              className='h-8 px-2'
+              className='h-8 px-2 cursor-pointer'
             >
               <FilterX className='h-4 w-4 mr-1' />
               リセット

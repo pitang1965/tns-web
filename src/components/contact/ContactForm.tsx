@@ -148,7 +148,7 @@ export function ContactForm() {
         )}
       </div>
 
-      <Button type='submit' disabled={isSubmitting} className='w-full'>
+      <Button type='submit' disabled={isSubmitting} className='w-full cursor-pointer'>
         {isSubmitting ? '送信中...' : 'お問い合わせを送信'}
       </Button>
     </form>

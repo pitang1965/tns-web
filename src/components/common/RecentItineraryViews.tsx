@@ -75,7 +75,7 @@ export default function RecentItineraryViews() {
             variant='ghost'
             size='sm'
             onClick={clearHistory}
-            className='text-muted-foreground hover:text-destructive'
+            className='text-muted-foreground hover:text-destructive cursor-pointer'
           >
             履歴をクリア
           </Button>
@@ -127,7 +127,7 @@ export default function RecentItineraryViews() {
                 variant='ghost'
                 size='sm'
                 onClick={() => removeUrl(item.url)}
-                className='opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto text-muted-foreground hover:text-destructive'
+                className='opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto text-muted-foreground hover:text-destructive cursor-pointer'
               >
                 <X size={14} />
               </Button>

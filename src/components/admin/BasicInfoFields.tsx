@@ -139,12 +139,12 @@ export function BasicInfoFields({
             }
             value={typeValue}
           >
-            <SelectTrigger>
+            <SelectTrigger className='cursor-pointer'>
               <SelectValue placeholder='種別を選択' />
             </SelectTrigger>
             <SelectContent>
               {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
+                <SelectItem key={key} value={key} className='cursor-pointer'>
                   {label}
                 </SelectItem>
               ))}
@@ -221,7 +221,7 @@ export function BasicInfoFields({
                 variant='outline'
                 size='sm'
                 onClick={() => setShowMap(!showMap)}
-                className='flex-1'
+                className='flex-1 cursor-pointer'
               >
                 <MapPin className='w-4 h-4' />
                 {showMap ? '選択完了' : '地図で選択'}
@@ -254,7 +254,7 @@ export function BasicInfoFields({
               size='sm'
               onClick={showOnMap}
               disabled={!watch('lat') || !watch('lng')}
-              className='w-full'
+              className='w-full cursor-pointer'
             >
               <Map className='w-4 h-4' />
               地図で表示
@@ -289,12 +289,12 @@ export function BasicInfoFields({
             onValueChange={(value) => setValue('prefecture', value)}
             value={watch('prefecture')}
           >
-            <SelectTrigger>
+            <SelectTrigger className='cursor-pointer'>
               <SelectValue placeholder='都道府県を選択' />
             </SelectTrigger>
             <SelectContent>
               {PrefectureOptions.map((prefecture) => (
-                <SelectItem key={prefecture} value={prefecture}>
+                <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
                   {prefecture}
                 </SelectItem>
               ))}

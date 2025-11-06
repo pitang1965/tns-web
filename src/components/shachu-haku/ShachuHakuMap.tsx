@@ -595,7 +595,7 @@ export default function ShachuHakuMap({
           <div class="mt-3 pt-2 border-t border-gray-200">
             <button
               onclick="window.location.href='/shachu-haku/${spot._id}'"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors"
+              class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
             >
               もっと見る
             </button>

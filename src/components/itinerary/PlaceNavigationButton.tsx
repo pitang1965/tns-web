@@ -74,24 +74,24 @@ export const PlaceNavigationButton: React.FC<PlaceNavigationButtonProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-3 w-full'
+          className='inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-3 w-full cursor-pointer'
         >
           <MapPin className='w-4 h-4' />
           地図を開く
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={openCurrentLocationRoute}>
+        <DropdownMenuItem onClick={openCurrentLocationRoute} className='cursor-pointer'>
           <Navigation className='mr-2 h-4 w-4' />
           <span>現在地からのルート検索</span>
         </DropdownMenuItem>
         {canShowMultiWaypointRoute() && (
-          <DropdownMenuItem onClick={openCurrentToFinalRoute}>
+          <DropdownMenuItem onClick={openCurrentToFinalRoute} className='cursor-pointer'>
             <Route className='mr-2 h-4 w-4' />
             <span>現在地から最終地までのルート検索</span>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={showOnMap}>
+        <DropdownMenuItem onClick={showOnMap} className='cursor-pointer'>
           <Map className='mr-2 h-4 w-4' />
           <span>地図で表示</span>
         </DropdownMenuItem>

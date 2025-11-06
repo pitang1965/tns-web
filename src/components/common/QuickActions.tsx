@@ -57,7 +57,7 @@ export default function QuickActions() {
               <Link key={action.href} href={action.href}>
                 <Button
                   variant='ghost'
-                  className={`w-full h-auto p-4 flex flex-col items-start space-y-2 ${action.color} ${action.textColor} hover:scale-105 transition-all duration-200`}
+                  className={`w-full h-auto p-4 flex flex-col items-start space-y-2 ${action.color} ${action.textColor} hover:scale-105 transition-all duration-200 cursor-pointer`}
                 >
                   <div className='flex items-center gap-2 w-full'>
                     <Icon size={20} />

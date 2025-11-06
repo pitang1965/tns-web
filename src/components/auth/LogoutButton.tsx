@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 export function LogoutButton() {
   return (
-    <Button onClick={() => (window.location.href = '/auth/logout')}>
+    <Button onClick={() => (window.location.href = '/auth/logout')} className='cursor-pointer'>
       ログアウト
     </Button>
   );

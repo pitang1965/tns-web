@@ -52,7 +52,7 @@ export const CoordinatesFromClipboardButton: React.FC<
       type='button'
       variant='outline'
       size='sm'
-      className={className}
+      className={`cursor-pointer ${className}`}
       onClick={handleGoogleMapsUrl}
     >
       <ClipboardPaste className='w-4 h-4' />

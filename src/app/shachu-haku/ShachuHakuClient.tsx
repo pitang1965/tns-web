@@ -627,13 +627,13 @@ export default function ShachuHakuClient() {
             <Button
               onClick={handleShare}
               variant='outline'
-              className='w-full sm:w-auto'
+              className='w-full sm:w-auto cursor-pointer'
             >
               <Share2 className='w-4 h-4 mr-2' />
               車中泊情報を共有
             </Button>
             <Link href='/shachu-haku/submit'>
-              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto'>
+              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto cursor-pointer'>
                 <Plus className='w-4 h-4 mr-2' />
                 スポット投稿
               </Button>
@@ -661,7 +661,7 @@ export default function ShachuHakuClient() {
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
             onClick={() => handleTabChange('map')}
-            className='rounded-b-none'
+            className='rounded-b-none cursor-pointer'
           >
             <MapPin className='w-4 h-4 mr-2' />
             地図表示
@@ -669,7 +669,7 @@ export default function ShachuHakuClient() {
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
             onClick={() => handleTabChange('list')}
-            className='rounded-b-none'
+            className='rounded-b-none cursor-pointer'
           >
             一覧表示
           </Button>
@@ -793,6 +793,7 @@ export default function ShachuHakuClient() {
                   variant='outline'
                   size='sm'
                   onClick={() => setSelectedSpot(null)}
+                  className='cursor-pointer'
                 >
                   ✕
                 </Button>

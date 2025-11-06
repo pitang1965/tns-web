@@ -83,7 +83,7 @@ export function NearbyFacilityFields({
                 const url = `https://www.google.com/maps?q=${lat},${lng}`;
                 window.open(url, '_blank');
               }}
-              className='p-1 h-auto self-start sm:self-center'
+              className='p-1 h-auto self-start sm:self-center cursor-pointer'
               title='地図で表示'
             >
               <Map className='w-4 h-4' />
@@ -154,7 +154,7 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Map className='w-4 h-4' />
                   地図で表示
@@ -171,7 +171,7 @@ export function NearbyFacilityFields({
                       watch('nearbyToiletLng') || ''
                     );
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Route className='w-4 h-4' />
                   ルート検索
@@ -256,7 +256,7 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Map className='w-4 h-4' />
                   地図で表示
@@ -273,7 +273,7 @@ export function NearbyFacilityFields({
                       watch('nearbyConvenienceLng') || ''
                     );
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Route className='w-4 h-4' />
                   ルート検索
@@ -358,7 +358,7 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Map className='w-4 h-4' />
                   地図で表示
@@ -375,7 +375,7 @@ export function NearbyFacilityFields({
                       watch('nearbyBathLng') || ''
                     );
                   }}
-                  className='flex items-center gap-1'
+                  className='flex items-center gap-1 cursor-pointer'
                 >
                   <Route className='w-4 h-4' />
                   ルート検索

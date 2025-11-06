@@ -64,7 +64,7 @@ export function FixedActionButtons({
           <TooltipTrigger
             onClick={(e) => onBack(e)}
             disabled={disabled}
-            className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground'
+            className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer'
           >
             <ArrowLeft className='h-5 w-5' />
           </TooltipTrigger>
@@ -83,7 +83,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onShare}
                 disabled={isShareDisabled}
-                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground ${isShareDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground ${isShareDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <Share2 className='h-5 w-5' />
               </TooltipTrigger>
@@ -102,7 +102,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onEdit}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-secondary hover:bg-secondary/80'
+                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-secondary hover:bg-secondary/80 cursor-pointer'
               >
                 <Edit className='h-5 w-5' />
               </TooltipTrigger>
@@ -116,7 +116,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onDelete}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground'
+                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer'
               >
                 <Trash className='h-5 w-5' />
               </TooltipTrigger>
@@ -130,7 +130,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onAdd}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground'
+                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer'
               >
                 <Plus className='h-5 w-5' />
               </TooltipTrigger>
@@ -150,7 +150,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onDelete}
                 disabled={disabled}
-                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground'
+                className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer'
               >
                 <Trash className='h-5 w-5' />
               </TooltipTrigger>
@@ -164,7 +164,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onSave(e)}
                 disabled={disabled}
-                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110'}`}
+                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110 cursor-pointer'}`}
               >
                 {disabled ? (
                   <Loader2 className='h-5 w-5 animate-spin' />
@@ -188,7 +188,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onCreate(e)}
                 disabled={disabled}
-                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110'}`}
+                className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110 cursor-pointer'}`}
               >
                 {disabled ? (
                   <Loader2 className='h-5 w-5 animate-spin' />

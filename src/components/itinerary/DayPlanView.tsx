@@ -85,7 +85,7 @@ export function DayPlanView({ day, dayIndex }: DayPlanProps) {
               variant='outline'
               size='sm'
               onClick={() => setShowFullMap(true)}
-              className='flex items-center gap-1'
+              className='flex items-center gap-1 cursor-pointer'
             >
               <Map className='h-4 w-4' />
               <span>ルートマップ</span>

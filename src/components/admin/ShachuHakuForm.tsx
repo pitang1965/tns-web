@@ -364,11 +364,12 @@ export default function ShachuHakuForm({
                 size='sm'
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
+                className='cursor-pointer'
               >
                 <Trash2 className='w-4 h-4' />
               </Button>
             )}
-            <Button variant='outline' size='sm' onClick={onClose}>
+            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
               <X className='w-4 h-4' />
             </Button>
           </div>
@@ -424,10 +425,10 @@ export default function ShachuHakuForm({
 
             {/* Submit Buttons */}
             <div className='flex justify-end gap-2'>
-              <Button type='button' variant='outline' onClick={onClose}>
+              <Button type='button' variant='outline' onClick={onClose} className='cursor-pointer'>
                 キャンセル
               </Button>
-              <Button type='submit' disabled={loading}>
+              <Button type='submit' disabled={loading} className='cursor-pointer'>
                 <Save className='w-4 h-4 mr-2' />
                 {loading ? '保存中...' : isEdit ? '更新' : '作成'}
               </Button>

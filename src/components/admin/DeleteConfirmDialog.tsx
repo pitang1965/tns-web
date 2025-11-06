@@ -28,13 +28,14 @@ export function DeleteConfirmDialog({
             「{spot?.name}」を削除しますか？この操作は取り消せません。
           </p>
           <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={onCancel} disabled={loading}>
+            <Button variant='outline' onClick={onCancel} disabled={loading} className='cursor-pointer'>
               キャンセル
             </Button>
             <Button
               variant='destructive'
               onClick={onConfirm}
               disabled={loading}
+              className='cursor-pointer'
             >
               削除
             </Button>
