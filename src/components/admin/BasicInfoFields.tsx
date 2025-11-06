@@ -134,6 +134,7 @@ export function BasicInfoFields({
             種別
           </Label>
           <Select
+            key={spot?._id ? `type-${spot._id}` : 'type-new'}
             onValueChange={(value) =>
               setValue('type', value as CampingSpotType)
             }
@@ -286,6 +287,7 @@ export function BasicInfoFields({
             都道府県
           </Label>
           <Select
+            key={spot?._id ? `prefecture-${spot._id}` : 'prefecture-new'}
             onValueChange={(value) => setValue('prefecture', value)}
             value={watch('prefecture')}
           >
