@@ -14,6 +14,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ItineraryUrlTracker from '@/components/common/ItineraryUrlTracker';
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
+import { InAppBrowserWarning } from '@/components/common/InAppBrowserWarning';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -110,6 +111,7 @@ export default function RootLayout({
                   <div className='flex flex-col min-h-screen bg-background text-foreground'>
                     <ItineraryUrlTracker />
                     <Header />
+                    <InAppBrowserWarning />
                     <AdSense />
                     <main className='flex-1 relative'>
                       <div className='pt-12 pb-16'>{children}</div>
