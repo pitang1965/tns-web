@@ -6,14 +6,22 @@ import { useEffect, useState } from 'react';
  * User Agentとアプリ内ブラウザ検出のデバッグページ
  */
 export default function DebugUserAgentPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [userAgent, setUserAgent] = useState('');
   const [isInAppBrowser, setIsInAppBrowser] = useState(false);
   const [matchedPattern, setMatchedPattern] = useState<string[]>([]);
   const [localStorageValue, setLocalStorageValue] = useState('');
+  const [today, setToday] = useState('');
 
   useEffect(() => {
+    setIsMounted(true);
+
     const ua = navigator.userAgent || navigator.vendor;
     setUserAgent(ua);
+
+    // 今日の日付を取得
+    const todayDate = new Date().toDateString();
+    setToday(todayDate);
 
     // LocalStorageの値を確認
     try {
@@ -58,6 +66,20 @@ export default function DebugUserAgentPage() {
     }
   };
 
+  // SSR時のHydrationエラーを防ぐため、マウント前は読み込み中を表示
+  if (!isMounted) {
+    return (
+      <div className='container mx-auto px-4 py-8 max-w-4xl'>
+        <h1 className='text-2xl font-bold mb-6'>
+          User Agent デバッグページ
+        </h1>
+        <div className='text-center py-12'>
+          <p className='text-muted-foreground'>読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='container mx-auto px-4 py-8 max-w-4xl'>
       <h1 className='text-2xl font-bold mb-6'>
@@ -99,10 +121,22 @@ export default function DebugUserAgentPage() {
         {/* LocalStorage状態 */}
         <div className='bg-card border rounded-lg p-4'>
           <h2 className='text-lg font-semibold mb-2'>LocalStorage状態</h2>
-          <p className='mb-3'>
-            <strong>inAppBrowserWarningDismissed:</strong>{' '}
-            <code className='bg-muted px-2 py-1 rounded'>{localStorageValue}</code>
-          </p>
+          <div className='space-y-2 mb-3'>
+            <p>
+              <strong>今日の日付:</strong>{' '}
+              <code className='bg-muted px-2 py-1 rounded'>{today}</code>
+            </p>
+            <p>
+              <strong>閉じた日付:</strong>{' '}
+              <code className='bg-muted px-2 py-1 rounded'>{localStorageValue}</code>
+            </p>
+            <p>
+              <strong>同じ日？:</strong>{' '}
+              <span className={localStorageValue === today ? 'text-red-600' : 'text-green-600'}>
+                {localStorageValue === today ? 'はい（非表示）' : 'いいえ（表示）'}
+              </span>
+            </p>
+          </div>
           <button
             onClick={handleClearLocalStorage}
             className='bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded'
@@ -122,25 +156,25 @@ export default function DebugUserAgentPage() {
               </span>
             </li>
             <li>
-              ✓ LocalStorageに閉じた記録がない:{' '}
+              ✓ 今日は閉じていない（閉じた日付≠今日）:{' '}
               <span
                 className={
-                  localStorageValue !== 'true' ? 'text-green-600' : 'text-red-600'
+                  localStorageValue !== today ? 'text-green-600' : 'text-red-600'
                 }
               >
-                {localStorageValue !== 'true' ? 'はい' : 'いいえ'}
+                {localStorageValue !== today ? 'はい' : 'いいえ'}
               </span>
             </li>
             <li className='mt-3 font-bold'>
               バナーが表示されるはず:{' '}
               <span
                 className={
-                  isInAppBrowser && localStorageValue !== 'true'
+                  isInAppBrowser && localStorageValue !== today
                     ? 'text-green-600'
                     : 'text-red-600'
                 }
               >
-                {isInAppBrowser && localStorageValue !== 'true'
+                {isInAppBrowser && localStorageValue !== today
                   ? 'はい'
                   : 'いいえ'}
               </span>

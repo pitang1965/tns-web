@@ -11,6 +11,7 @@ import { Navigation } from '@/components/layout/Navigation';
 import { BurgerMenu } from '@/components/layout/BurgerMenu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { useEnvironment } from '@/hooks/useEnvironment';
+import { useInAppBrowserWarning } from '@/hooks/useInAppBrowserWarning';
 import { Button } from '@/components/ui/button';
 
 function EnvironmentBadge() {
@@ -32,28 +33,10 @@ function EnvironmentBadge() {
 export function Header() {
   const { user, error, isLoading } = useUser();
   const [isClient, setIsClient] = useState(false);
-  const [showInAppWarning, setShowInAppWarning] = useState(false);
+  const { showWarning: showInAppWarning, handleDismiss: handleDismissWarning } = useInAppBrowserWarning();
 
   useEffect(() => {
     setIsClient(true);
-
-    // アプリ内ブラウザ警告の表示判定
-    try {
-      const hasDismissed = localStorage.getItem('inAppBrowserWarningDismissed');
-      if (hasDismissed === 'true') return;
-
-      const userAgent = navigator.userAgent || navigator.vendor;
-      const isInAppBrowser =
-        /Twitter|TwitterAndroid|FBAN|FBAV|Instagram|Line|FB_IAB|KAKAOTALK/i.test(
-          userAgent
-        );
-
-      if (isInAppBrowser) {
-        setShowInAppWarning(true);
-      }
-    } catch (error) {
-      console.error('Failed to check in-app browser:', error);
-    }
   }, []);
 
   // バナー表示時にメインコンテンツの位置を調整
@@ -105,15 +88,6 @@ export function Header() {
       }
     };
   }, [showInAppWarning]);
-
-  const handleDismissWarning = () => {
-    setShowInAppWarning(false);
-    try {
-      localStorage.setItem('inAppBrowserWarningDismissed', 'true');
-    } catch (error) {
-      console.error('Failed to save warning state:', error);
-    }
-  };
 
   // Show loading spinner while checking authentication status
   if (isLoading) return <LoadingSpinner />;
