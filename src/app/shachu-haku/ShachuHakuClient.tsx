@@ -35,9 +35,7 @@ import {
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotsList } from '@/components/shachu-haku/SpotsList';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
-import {
-  filterSpotsClientSide,
-} from '@/lib/clientSideFilterSpots';
+import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 
 // Dynamically import the map component to avoid SSR issues
@@ -255,60 +253,63 @@ export default function ShachuHakuClient() {
     urlUpdateTimeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams();
 
-    // Add active tab if it's 'list'
-    if (activeTab === 'list') {
-      params.set('tab', 'list');
-    }
+      // Add active tab if it's 'list'
+      if (activeTab === 'list') {
+        params.set('tab', 'list');
+      }
 
-    // Add search term
-    if (searchTerm) {
-      params.set('q', searchTerm);
-    }
+      // Add search term
+      if (searchTerm) {
+        params.set('q', searchTerm);
+      }
 
-    // Add type filter
-    if (typeFilter && typeFilter !== 'all') {
-      params.set('type', typeFilter);
-    }
+      // Add type filter
+      if (typeFilter && typeFilter !== 'all') {
+        params.set('type', typeFilter);
+      }
 
-    // Add client-side filters
-    if (clientFilters.pricingFilter !== 'all') {
-      params.set('pricing', clientFilters.pricingFilter);
-    }
-    if (clientFilters.minSecurityLevel > 0) {
-      params.set('min_security', clientFilters.minSecurityLevel.toString());
-    }
-    if (clientFilters.minQuietnessLevel > 0) {
-      params.set('min_quietness', clientFilters.minQuietnessLevel.toString());
-    }
-    if (clientFilters.maxToiletDistance !== null) {
-      params.set('max_toilet_dist', clientFilters.maxToiletDistance.toString());
-    }
-    if (clientFilters.minElevation !== null) {
-      params.set('min_elevation', clientFilters.minElevation.toString());
-    }
-    if (clientFilters.maxElevation !== null) {
-      params.set('max_elevation', clientFilters.maxElevation.toString());
-    }
+      // Add client-side filters
+      if (clientFilters.pricingFilter !== 'all') {
+        params.set('pricing', clientFilters.pricingFilter);
+      }
+      if (clientFilters.minSecurityLevel > 0) {
+        params.set('min_security', clientFilters.minSecurityLevel.toString());
+      }
+      if (clientFilters.minQuietnessLevel > 0) {
+        params.set('min_quietness', clientFilters.minQuietnessLevel.toString());
+      }
+      if (clientFilters.maxToiletDistance !== null) {
+        params.set(
+          'max_toilet_dist',
+          clientFilters.maxToiletDistance.toString()
+        );
+      }
+      if (clientFilters.minElevation !== null) {
+        params.set('min_elevation', clientFilters.minElevation.toString());
+      }
+      if (clientFilters.maxElevation !== null) {
+        params.set('max_elevation', clientFilters.maxElevation.toString());
+      }
 
-    // Add center, lng_span, and aspect_ratio if bounds are available (for consistent display range across devices)
-    if (savedBounds) {
-      const centerLat = (savedBounds.north + savedBounds.south) / 2;
-      const centerLng = (savedBounds.east + savedBounds.west) / 2;
-      const latSpan = savedBounds.north - savedBounds.south;
-      const lngSpan = savedBounds.east - savedBounds.west;
-      const aspectRatio = lngSpan / latSpan; // aspect_ratio = lng_span / lat_span
+      // Add center, lng_span, and aspect_ratio if bounds are available (for consistent display range across devices)
+      if (savedBounds) {
+        const centerLat = (savedBounds.north + savedBounds.south) / 2;
+        const centerLng = (savedBounds.east + savedBounds.west) / 2;
+        const latSpan = savedBounds.north - savedBounds.south;
+        const lngSpan = savedBounds.east - savedBounds.west;
+        const aspectRatio = lngSpan / latSpan; // aspect_ratio = lng_span / lat_span
 
-      // Round to 7 decimal places (Google Maps standard)
-      params.set('lat', centerLat.toFixed(7));
-      params.set('lng', centerLng.toFixed(7));
-      params.set('lng_span', lngSpan.toFixed(7));
-      params.set('aspect_ratio', aspectRatio.toFixed(2)); // aspect_ratioは小数点2桁で十分
-    } else {
-      // Only add center if bounds are not available (fallback to zoom-based display)
-      params.set('lat', mapCenter[1].toFixed(6));
-      params.set('lng', mapCenter[0].toFixed(6));
-      params.set('zoom', mapZoom.toFixed(2));
-    }
+        // Round to 7 decimal places (Google Maps standard)
+        params.set('lat', centerLat.toFixed(7));
+        params.set('lng', centerLng.toFixed(7));
+        params.set('lng_span', lngSpan.toFixed(7));
+        params.set('aspect_ratio', aspectRatio.toFixed(2)); // aspect_ratioは小数点2桁で十分
+      } else {
+        // Only add center if bounds are not available (fallback to zoom-based display)
+        params.set('lat', mapCenter[1].toFixed(6));
+        params.set('lng', mapCenter[0].toFixed(6));
+        params.set('zoom', mapZoom.toFixed(2));
+      }
 
       // Update URL without reload
       const newUrl = params.toString()
@@ -458,7 +459,8 @@ export default function ShachuHakuClient() {
   }, [cleanupMapBoundsLoader]);
 
   const handleSpotSelect = (spot: CampingSpotWithId) => {
-    // マップからのスポットクリック時は何もしない（ポップアップのみ表示）
+    // マップからのスポットクリック時にカスタムポップアップを表示
+    setSelectedSpot(spot);
   };
 
   const handleListSpotSelect = (spot: CampingSpotWithId) => {
@@ -535,7 +537,10 @@ export default function ShachuHakuClient() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const center: [number, number] = [position.coords.longitude, position.coords.latitude];
+        const center: [number, number] = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
         const zoom = 12;
 
         // Calculate bounds from center and zoom for consistent display across devices
@@ -686,22 +691,88 @@ export default function ShachuHakuClient() {
         >
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <MapPin className='w-5 h-5' />
-                {loading ? (
-                  <span className='flex items-center gap-2'>
-                    読み込み中... <Spinner className='size-4' />
-                  </span>
-                ) : (
-                  `表示範囲内: ${visibleSpots.length}件`
-                )}
-              </CardTitle>
-              {!loading && activeFilterDescriptions.length > 0 && (
-                <div className='text-sm text-muted-foreground space-y-1 mt-2'>
-                  {activeFilterDescriptions.map((desc, index) => (
-                    <div key={index}>{desc}</div>
-                  ))}
+              {/* カスタムポップアップ - マップ表示時に選択されたスポット情報を表示 */}
+              {activeTab === 'map' && selectedSpot ? (
+                <div className='bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg p-3 relative'>
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => setSelectedSpot(null)}
+                    className='absolute top-1 right-1 h-7 w-7 p-0 cursor-pointer'
+                    title='閉じる'
+                  >
+                    ✕
+                  </Button>
+                  <h3 className='font-semibold text-base mb-2 pr-8 leading-tight'>
+                    {selectedSpot.name}
+                  </h3>
+                  <div className='space-y-2'>
+                    <div className='flex gap-1.5 flex-wrap'>
+                      <Badge
+                        className={`${getTypeColor(
+                          selectedSpot.type
+                        )} text-white text-xs`}
+                      >
+                        {CampingSpotTypeLabels[selectedSpot.type]}
+                      </Badge>
+                      <Badge
+                        className={`${getPricingColor(
+                          selectedSpot.pricing.isFree,
+                          selectedSpot.pricing.pricePerNight
+                        )} text-white text-xs`}
+                      >
+                        {selectedSpot.pricing.isFree
+                          ? '無料'
+                          : selectedSpot.pricing.pricePerNight
+                          ? `¥${selectedSpot.pricing.pricePerNight}`
+                          : '有料：？円'}
+                      </Badge>
+                      <Badge
+                        className={`${getRatingColor(
+                          calculateSecurityLevel(selectedSpot)
+                        )} text-white text-xs`}
+                      >
+                        🔒 {calculateSecurityLevel(selectedSpot)}/5
+                      </Badge>
+                      <Badge
+                        className={`${getRatingColor(
+                          calculateQuietnessLevel(selectedSpot)
+                        )} text-white text-xs`}
+                      >
+                        🔇 {calculateQuietnessLevel(selectedSpot)}/5
+                      </Badge>
+                    </div>
+                    <Button
+                      onClick={() =>
+                        handleNavigateToSpotDetail(selectedSpot._id)
+                      }
+                      className='w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer py-2'
+                      size='sm'
+                    >
+                      もっと見る
+                    </Button>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <CardTitle className='flex items-center gap-2'>
+                    <MapPin className='w-5 h-5' />
+                    {loading ? (
+                      <span className='flex items-center gap-2'>
+                        読み込み中... <Spinner className='size-4' />
+                      </span>
+                    ) : (
+                      `表示範囲内: ${visibleSpots.length}件`
+                    )}
+                  </CardTitle>
+                  {!loading && activeFilterDescriptions.length > 0 && (
+                    <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                      {activeFilterDescriptions.map((desc, index) => (
+                        <div key={index}>{desc}</div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </CardHeader>
             <CardContent>
@@ -783,7 +854,7 @@ export default function ShachuHakuClient() {
       </div>
 
       {/* Selected Spot Detail Modal for List View */}
-      {selectedSpot && (
+      {selectedSpot && activeTab === 'list' && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
           <Card className='w-full max-w-2xl max-h-[90vh] overflow-auto'>
             <CardHeader>

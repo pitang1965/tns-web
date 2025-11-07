@@ -409,36 +409,42 @@ export default function ShachuHakuMap({
         .setLngLat(spot.coordinates)
         .addTo(map.current!);
 
-      // Create popup
-      const popup = new mapboxgl.Popup({
-        offset: 25,
-        closeButton: true,
-        closeOnClick: false,
-        className: 'custom-popup',
-      }).setHTML(createPopupHTML(spot, readonly));
+      // Create popup only for admin mode
+      if (!readonly) {
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: true,
+          closeOnClick: false,
+          className: 'custom-popup',
+        }).setHTML(createPopupHTML(spot, readonly));
 
-      marker.setPopup(popup);
+        marker.setPopup(popup);
+      }
 
       // Click event
       markerElement.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent map click event from firing
 
-        // Close all existing popups first
-        const existingPopups = document.querySelectorAll('.mapboxgl-popup');
-        existingPopups.forEach((popup) => {
-          const closeButton = popup.querySelector(
-            '.mapboxgl-popup-close-button'
-          ) as HTMLElement;
-          if (closeButton) {
-            closeButton.click();
-          }
-        });
+        if (readonly) {
+          // For readonly mode (public view), call callback to show custom popup
+          onSpotSelect(spot);
+        } else {
+          // For admin mode, show Mapbox popup
+          // Close all existing popups first
+          const existingPopups = document.querySelectorAll('.mapboxgl-popup');
+          existingPopups.forEach((popup) => {
+            const closeButton = popup.querySelector(
+              '.mapboxgl-popup-close-button'
+            ) as HTMLElement;
+            if (closeButton) {
+              closeButton.click();
+            }
+          });
 
-        // Then show this marker's popup
-        marker.togglePopup();
+          // Then show this marker's popup
+          marker.togglePopup();
 
-        // For admin mode, also call the spot selection handler
-        if (!readonly) {
+          // Also call the spot selection handler
           onSpotSelect(spot);
         }
       });
