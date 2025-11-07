@@ -18,6 +18,7 @@ import {
   setupJapaneseLabels,
   setupPOIFilters,
 } from '@/lib/mapboxIcons';
+import { getMarkerColorByRating } from '@/lib/spotColorUtils';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface ShachuHakuMapProps {
@@ -563,11 +564,7 @@ export default function ShachuHakuMap({
   const getMarkerColor = (spot: CampingSpotWithId): string => {
     // Color based on overall rating
     const rating = calculateSecurityLevel(spot);
-    if (rating >= 5) return '#22c55e'; // green
-    if (rating >= 4) return '#3b82f6'; // blue
-    if (rating >= 3) return '#f59e0b'; // yellow
-    if (rating >= 2) return '#f97316'; // orange
-    return '#ef4444'; // red
+    return getMarkerColorByRating(rating);
   };
 
   const createPopupHTML = (

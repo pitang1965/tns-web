@@ -37,6 +37,11 @@ import {
   safeSocialShare,
   safeClipboardWrite,
 } from '@/lib/browserDetection';
+import {
+  getTypeColor,
+  getRatingColor,
+  getPricingColor,
+} from '@/lib/spotColorUtils';
 
 // Dynamically import the map components to avoid SSR issues
 const FacilityMap = dynamic(
@@ -48,44 +53,6 @@ const FacilityMap = dynamic(
     ),
   }
 );
-
-// スポットタイプごとの色分け関数
-const getTypeColor = (type: string) => {
-  switch (type) {
-    case 'roadside_station':
-      return 'bg-blue-600';
-    case 'sa_pa':
-      return 'bg-purple-600';
-    case 'rv_park':
-      return 'bg-emerald-600';
-    case 'convenience_store':
-      return 'bg-cyan-600';
-    case 'parking_lot':
-      return 'bg-slate-600';
-    case 'other':
-      return 'bg-gray-600';
-    default:
-      return 'bg-gray-500';
-  }
-};
-
-// 評価レベルごとの色分け関数
-const getRatingColor = (rating: number) => {
-  if (rating >= 5) return 'bg-green-600';
-  if (rating >= 4) return 'bg-blue-600';
-  if (rating >= 3) return 'bg-yellow-600';
-  if (rating >= 2) return 'bg-orange-600';
-  return 'bg-red-600';
-};
-
-// 料金レベルごとの色分け関数
-const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
-  if (isFree) return 'bg-green-500';
-  if (!pricePerNight) return 'bg-gray-500';
-  if (pricePerNight <= 1000) return 'bg-yellow-500';
-  if (pricePerNight <= 2000) return 'bg-orange-500';
-  return 'bg-red-500';
-};
 
 interface SpotDetailClientProps {
   spot: CampingSpotWithId;

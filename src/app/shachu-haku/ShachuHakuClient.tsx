@@ -37,6 +37,11 @@ import { SpotsList } from '@/components/shachu-haku/SpotsList';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
+import {
+  getTypeColor,
+  getRatingColor,
+  getPricingColor,
+} from '@/lib/spotColorUtils';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -48,44 +53,6 @@ const ShachuHakuMap = dynamic(
     ),
   }
 );
-
-// スポットタイプごとの色分け関数
-const getTypeColor = (type: string) => {
-  switch (type) {
-    case 'roadside_station':
-      return 'bg-blue-600 hover:bg-blue-700';
-    case 'sa_pa':
-      return 'bg-purple-600 hover:bg-purple-700';
-    case 'rv_park':
-      return 'bg-emerald-600 hover:bg-emerald-700';
-    case 'convenience_store':
-      return 'bg-cyan-600 hover:bg-cyan-700';
-    case 'parking_lot':
-      return 'bg-slate-600 hover:bg-slate-700';
-    case 'other':
-      return 'bg-gray-600 hover:bg-gray-700';
-    default:
-      return 'bg-gray-500 hover:bg-gray-600';
-  }
-};
-
-// 評価レベルごとの色分け関数
-const getRatingColor = (rating: number) => {
-  if (rating >= 5) return 'bg-green-600 hover:bg-green-700';
-  if (rating >= 4) return 'bg-blue-600 hover:bg-blue-700';
-  if (rating >= 3) return 'bg-yellow-600 hover:bg-yellow-700';
-  if (rating >= 2) return 'bg-orange-600 hover:bg-orange-700';
-  return 'bg-red-600 hover:bg-red-700';
-};
-
-// 料金レベルごとの色分け関数
-const getPricingColor = (isFree: boolean, pricePerNight?: number) => {
-  if (isFree) return 'bg-green-500 hover:bg-green-600'; // 無料：緑色
-  if (!pricePerNight) return 'bg-gray-500 hover:bg-gray-600'; // 料金未設定：グレー
-  if (pricePerNight <= 1000) return 'bg-yellow-500 hover:bg-yellow-600'; // 1000円以下：黄色
-  if (pricePerNight <= 2000) return 'bg-orange-500 hover:bg-orange-600'; // 1001-2000円：オレンジ色
-  return 'bg-red-500 hover:bg-red-600'; // 2001円以上：赤色
-};
 
 export default function ShachuHakuClient() {
   const router = useRouter();
