@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
+import { useLocationNavigation } from '@/hooks/useLocationNavigation';
+import { useSpotFiltering } from '@/hooks/useSpotFiltering';
 
 import { MapPin, Info, Plus, Share2 } from 'lucide-react';
 import {
@@ -19,14 +21,8 @@ import {
 } from '../actions/campingSpots';
 import { handleCampingSpotShare } from '@/lib/shareUtils';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-import {
-  PREFECTURE_COORDINATES,
-  REGION_COORDINATES,
-} from '@/lib/prefectureCoordinates';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotsList } from '@/components/shachu-haku/SpotsList';
-import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
-import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 
 // Dynamically import the map component to avoid SSR issues
@@ -431,94 +427,14 @@ export default function ShachuHakuClient() {
     // URL update is handled by useEffect
   };
 
-  // Handle prefecture jump
-  const handlePrefectureJump = (prefecture: string) => {
-    const coords = PREFECTURE_COORDINATES[prefecture];
-    if (coords) {
-      const center: [number, number] = [coords.lng, coords.lat];
-
-      // Calculate lat_span from lng_span and aspect_ratio
-      const latSpan = coords.lng_span / coords.aspect_ratio;
-
-      // Calculate bounds directly from center and span for consistent display across devices
-      const bounds = {
-        north: coords.lat + latSpan / 2,
-        south: coords.lat - latSpan / 2,
-        east: coords.lng + coords.lng_span / 2,
-        west: coords.lng - coords.lng_span / 2,
-      };
-
-      setMapCenter(center);
-      setMapZoom(9); // Default zoom, will be overridden by fitBounds
-      setSavedBounds(bounds);
-    }
-  };
-
-  // Handle region jump
-  const handleRegionJump = (region: string) => {
-    const coords = REGION_COORDINATES[region];
-    if (coords) {
-      const center: [number, number] = [coords.lng, coords.lat];
-
-      // Calculate lat_span from lng_span and aspect_ratio
-      const latSpan = coords.lng_span / coords.aspect_ratio;
-
-      // Calculate bounds directly from center and span for consistent display across devices
-      const bounds = {
-        north: coords.lat + latSpan / 2,
-        south: coords.lat - latSpan / 2,
-        east: coords.lng + coords.lng_span / 2,
-        west: coords.lng - coords.lng_span / 2,
-      };
-
-      setMapCenter(center);
-      setMapZoom(9); // Default zoom, will be overridden by fitBounds
-      setSavedBounds(bounds);
-    }
-  };
-
-  // Handle current location jump
-  const handleCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast({
-        title: 'エラー',
-        description: 'お使いのブラウザは位置情報取得に対応していません',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const center: [number, number] = [
-          position.coords.longitude,
-          position.coords.latitude,
-        ];
-        const zoom = 12;
-
-        // Calculate bounds from center and zoom for consistent display across devices
-        const bounds = calculateBoundsFromZoomAndCenter(center, zoom);
-
-        setMapCenter(center);
-        setMapZoom(zoom);
-        setSavedBounds(bounds);
-
-        toast({
-          title: '成功',
-          description: '現在地に移動しました',
-        });
-      },
-      (error) => {
-        toast({
-          title: 'エラー',
-          description:
-            '位置情報の取得に失敗しました。ブラウザの設定を確認してください。',
-          variant: 'destructive',
-        });
-        console.error('Geolocation error:', error);
-      }
-    );
-  };
+  // Use location navigation hook
+  const { handlePrefectureJump, handleRegionJump, handleCurrentLocation } =
+    useLocationNavigation({
+      setMapCenter,
+      setMapZoom,
+      setSavedBounds,
+      toast,
+    });
 
   // Handle share
   const handleShare = async () => {
@@ -546,30 +462,15 @@ export default function ShachuHakuClient() {
     }
   };
 
-  // Apply client-side filters to spots
-  const filteredSpots = filterSpotsClientSide(spots, clientFilters);
-
-  // Filter spots within visible bounds
-  const visibleSpots = useMemo(() => {
-    if (!savedBounds) return filteredSpots;
-
-    return filteredSpots.filter((spot) => {
-      const lat = spot.coordinates[1];
-      const lng = spot.coordinates[0];
-      return (
-        lat <= savedBounds.north &&
-        lat >= savedBounds.south &&
-        lng <= savedBounds.east &&
-        lng >= savedBounds.west
-      );
+  // Use spot filtering hook
+  const { filteredSpots, visibleSpots, activeFilterDescriptions } =
+    useSpotFiltering({
+      spots,
+      clientFilters,
+      savedBounds,
+      searchTerm,
+      typeFilter,
     });
-  }, [filteredSpots, savedBounds]);
-
-  // Generate active filter descriptions for display
-  const activeFilterDescriptions = useMemo(
-    () => getActiveFilterDescriptions(searchTerm, typeFilter, clientFilters),
-    [searchTerm, typeFilter, clientFilters]
-  );
 
   return (
     <div className='container mx-auto p-6 space-y-6'>
