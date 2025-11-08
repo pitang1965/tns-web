@@ -2,19 +2,11 @@ import { useMemo } from 'react';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
-
-interface ClientFilters {
-  pricingFilter: string;
-  minSecurityLevel: number;
-  minQuietnessLevel: number;
-  maxToiletDistance: number | null;
-  minElevation: number | null;
-  maxElevation: number | null;
-}
+import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 
 interface UseSpotFilteringProps {
   spots: CampingSpotWithId[];
-  clientFilters: ClientFilters;
+  clientFilters: ClientSideFilterValues;
   savedBounds: {
     north: number;
     south: number;
