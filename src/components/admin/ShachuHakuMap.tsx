@@ -3,15 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 
-import { formatDistance } from '@/lib/formatDistance';
-import {
-  CampingSpotWithId,
-  CampingSpotTypeLabels,
-} from '@/data/schemas/campingSpot';
-import {
-  calculateSecurityLevel,
-  calculateQuietnessLevel,
-} from '@/lib/campingSpotUtils';
+import { CampingSpotWithId } from '@/data/schemas/campingSpot';
+import { calculateSecurityLevel } from '@/lib/campingSpotUtils';
 import {
   suppressImageWarnings,
   handleMapError,
@@ -367,9 +360,6 @@ export default function ShachuHakuMap({
         markerElement.textContent = calculateSecurityLevel(spot).toString();
       }
 
-      // Add simple tooltip using title attribute
-      markerElement.title = spot.name;
-
       const marker = new mapboxgl.Marker({
         element: markerElement,
         anchor: 'center',
@@ -377,18 +367,9 @@ export default function ShachuHakuMap({
         .setLngLat(spot.coordinates)
         .addTo(map.current!);
 
-      // Create popup
-      const popup = new mapboxgl.Popup({
-        offset: 25,
-        closeButton: true,
-        closeOnClick: false,
-        className: 'custom-popup',
-      }).setHTML(createPopupHTML(spot));
-
-      marker.setPopup(popup);
-
-      // Click event
-      markerElement.addEventListener('click', () => {
+      // Click event - call callback to show custom popup
+      markerElement.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent map click event from firing
         onSpotSelect(spot);
       });
 
@@ -497,120 +478,6 @@ export default function ShachuHakuMap({
     // Color based on calculated security level
     const rating = calculateSecurityLevel(spot);
     return getMarkerColorByRating(rating);
-  };
-
-  const createPopupHTML = (spot: CampingSpotWithId): string => {
-    const isNotesLong = spot.notes && spot.notes.length > 100;
-    const truncatedNotes = isNotesLong
-      ? spot.notes?.substring(0, 100) + '...'
-      : spot.notes;
-    const spotId = `spot-${spot._id}`;
-
-    return `
-      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(280px, 50vw, 400px); max-height: 70vh; overflow-y: auto;">
-        <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${
-          spot.name
-        }</h3>
-        <div class="space-y-1 text-sm text-gray-700">
-          <div><strong class="text-gray-900">種別:</strong> ${
-            CampingSpotTypeLabels[spot.type]
-          }</div>
-          <div><strong class="text-gray-900">都道府県:</strong> ${
-            spot.prefecture
-          }</div>
-          <div><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(
-            spot
-          )}/5 🔒</div>
-          <div><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(
-            spot
-          )}/5 🔇</div>
-          <div><strong class="text-gray-900">料金:</strong> ${
-            spot.pricing.isFree
-              ? '無料'
-              : spot.pricing.pricePerNight
-              ? `¥${spot.pricing.pricePerNight}/泊`
-              : '有料：？円/泊'
-          }</div>
-          ${
-            spot.distanceToToilet
-              ? `<div><strong class="text-gray-900">トイレ:</strong> ${formatDistance(
-                  spot.distanceToToilet
-                )}</div>`
-              : ''
-          }
-          ${
-            spot.distanceToBath
-              ? `<div><strong class="text-gray-900">入浴施設:</strong> ${formatDistance(
-                  spot.distanceToBath
-                )}</div>`
-              : ''
-          }
-          ${
-            spot.distanceToConvenience
-              ? `<div><strong class="text-gray-900">コンビニ:</strong> ${formatDistance(
-                  spot.distanceToConvenience
-                )}</div>`
-              : ''
-          }
-          ${
-            spot.elevation
-              ? `<div><strong class="text-gray-900">標高:</strong> ${spot.elevation}m</div>`
-              : ''
-          }
-          <div class="flex gap-1 mt-2 flex-wrap">
-            ${
-              spot.hasRoof
-                ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">屋根付き</span>'
-                : ''
-            }
-            ${
-              spot.hasPowerOutlet
-                ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">電源</span>'
-                : ''
-            }
-          </div>
-          ${
-            spot.notes
-              ? `<div class="mt-2 text-gray-700">
-                  <strong class="text-gray-900">備考:</strong>
-                  <span class="wrap-break-word">
-                    <span id="${spotId}-short"${
-                  isNotesLong ? '' : ' style="display: none;"'
-                }>${truncatedNotes}</span>
-                    <span id="${spotId}-full" style="display: ${
-                  isNotesLong ? 'none' : 'inline'
-                };">${spot.notes}</span>
-                  </span>
-                  ${
-                    isNotesLong
-                      ? `
-                    <button
-                      id="${spotId}-toggle"
-                      onclick="
-                        const short = document.getElementById('${spotId}-short');
-                        const full = document.getElementById('${spotId}-full');
-                        const btn = document.getElementById('${spotId}-toggle');
-                        if (full.style.display === 'none') {
-                          short.style.display = 'none';
-                          full.style.display = 'inline';
-                          btn.textContent = '閉じる';
-                        } else {
-                          short.style.display = 'inline';
-                          full.style.display = 'none';
-                          btn.textContent = 'もっと見る';
-                        }
-                      "
-                      class="ml-1 text-blue-600 hover:text-blue-800 underline text-xs cursor-pointer"
-                    >もっと見る</button>
-                  `
-                      : ''
-                  }
-                </div>`
-              : ''
-          }
-        </div>
-      </div>
-    `;
   };
 
   if (!MAPBOX_TOKEN) {

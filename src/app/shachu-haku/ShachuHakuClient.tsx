@@ -34,9 +34,9 @@ import {
 } from '@/lib/prefectureCoordinates';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotsList } from '@/components/shachu-haku/SpotsList';
-import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
+import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 import {
   getTypeColor,
   getRatingColor,
@@ -660,66 +660,21 @@ export default function ShachuHakuClient() {
             <CardHeader>
               {/* カスタムポップアップ - マップ表示時に選択されたスポット情報を表示 */}
               {activeTab === 'map' && selectedSpot ? (
-                <div className='bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg p-3 relative'>
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={() => setSelectedSpot(null)}
-                    className='absolute top-1 right-1 h-7 w-7 p-0 cursor-pointer'
-                    title='閉じる'
-                  >
-                    ✕
-                  </Button>
-                  <h3 className='font-semibold text-base mb-2 pr-8 leading-tight'>
-                    {selectedSpot.name}
-                  </h3>
-                  <div className='space-y-2'>
-                    <div className='flex gap-1.5 flex-wrap'>
-                      <Badge
-                        className={`${getTypeColor(
-                          selectedSpot.type
-                        )} text-white text-xs`}
-                      >
-                        {CampingSpotTypeLabels[selectedSpot.type]}
-                      </Badge>
-                      <Badge
-                        className={`${getPricingColor(
-                          selectedSpot.pricing.isFree,
-                          selectedSpot.pricing.pricePerNight
-                        )} text-white text-xs`}
-                      >
-                        {selectedSpot.pricing.isFree
-                          ? '無料'
-                          : selectedSpot.pricing.pricePerNight
-                          ? `¥${selectedSpot.pricing.pricePerNight}`
-                          : '有料：？円'}
-                      </Badge>
-                      <Badge
-                        className={`${getRatingColor(
-                          calculateSecurityLevel(selectedSpot)
-                        )} text-white text-xs`}
-                      >
-                        🔒 {calculateSecurityLevel(selectedSpot)}/5
-                      </Badge>
-                      <Badge
-                        className={`${getRatingColor(
-                          calculateQuietnessLevel(selectedSpot)
-                        )} text-white text-xs`}
-                      >
-                        🔇 {calculateQuietnessLevel(selectedSpot)}/5
-                      </Badge>
-                    </div>
+                <SpotPopup
+                  spot={selectedSpot}
+                  onClose={() => setSelectedSpot(null)}
+                  actionButton={
                     <Button
                       onClick={() =>
                         handleNavigateToSpotDetail(selectedSpot._id)
                       }
-                      className='w-full bg-blue-600 hover:bg-blue-700 text-white cursor-pointer py-2'
+                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
                       size='sm'
                     >
                       もっと見る
                     </Button>
-                  </div>
-                </div>
+                  }
+                />
               ) : (
                 <>
                   <CardTitle className='flex items-center gap-2'>

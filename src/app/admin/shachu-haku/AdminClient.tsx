@@ -12,13 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
+import { formatDistance } from '@/lib/formatDistance';
 import {
   getCampingSpotsByBounds,
   getCampingSpotsWithPagination,
 } from '../../actions/campingSpots';
 import { getCampingSpotSubmissions } from '../../actions/campingSpotSubmissions';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-
 import {
   PREFECTURE_COORDINATES,
   REGION_COORDINATES,
@@ -31,6 +31,7 @@ import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { celebrateSubmission } from '@/lib/confetti';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
+import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -372,8 +373,13 @@ export default function AdminClient() {
   }, [searchTerm, typeFilter, activeTab, router]);
 
   const handleSpotSelect = (spot: CampingSpotWithId) => {
+    // Set selected spot to show custom popup (for map view)
+    setSelectedSpot(spot);
+  };
+
+  const handleNavigateToEdit = (spotId: string) => {
     // Navigate to the edit page with the spot ID
-    router.push(`/admin/shachu-haku/${spot._id}`);
+    router.push(`/admin/shachu-haku/${spotId}`);
   };
 
   const handleFormClose = () => {
@@ -801,22 +807,41 @@ export default function AdminClient() {
         >
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <MapPin className='w-5 h-5' />
-                {loading ? (
-                  <span className='flex items-center gap-2'>
-                    読み込み中... <Spinner className='size-4' />
-                  </span>
-                ) : (
-                  `表示範囲内: ${visibleSpots.length}件（全${totalCount}件中）`
-                )}
-              </CardTitle>
-              {!loading && activeFilterDescriptions.length > 0 && (
-                <div className='text-sm text-muted-foreground space-y-1 mt-2'>
-                  {activeFilterDescriptions.map((desc, index) => (
-                    <div key={index}>{desc}</div>
-                  ))}
-                </div>
+              {/* カスタムポップアップ - マップ表示時に選択されたスポット情報を表示 */}
+              {activeTab === 'map' && selectedSpot ? (
+                <SpotPopup
+                  spot={selectedSpot}
+                  onClose={() => setSelectedSpot(null)}
+                  actionButton={
+                    <Button
+                      onClick={() => handleNavigateToEdit(selectedSpot._id)}
+                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
+                      size='sm'
+                    >
+                      編集
+                    </Button>
+                  }
+                />
+              ) : (
+                <>
+                  <CardTitle className='flex items-center gap-2'>
+                    <MapPin className='w-5 h-5' />
+                    {loading ? (
+                      <span className='flex items-center gap-2'>
+                        読み込み中... <Spinner className='size-4' />
+                      </span>
+                    ) : (
+                      `表示範囲内: ${visibleSpots.length}件（全${totalCount}件中）`
+                    )}
+                  </CardTitle>
+                  {!loading && activeFilterDescriptions.length > 0 && (
+                    <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                      {activeFilterDescriptions.map((desc, index) => (
+                        <div key={index}>{desc}</div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </CardHeader>
             <CardContent>

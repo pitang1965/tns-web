@@ -400,9 +400,6 @@ export default function ShachuHakuMap({
         markerElement.textContent = calculateSecurityLevel(spot).toString();
       }
 
-      // Add simple tooltip using title attribute
-      markerElement.title = spot.name;
-
       const marker = new mapboxgl.Marker({
         element: markerElement,
         anchor: 'center',
@@ -573,7 +570,7 @@ export default function ShachuHakuMap({
   ): string => {
     return `
       <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
-        <h3 class="font-semibold text-lg mb-2 text-gray-900 break-words">${
+        <h3 class="font-semibold text-lg mb-2 text-gray-900 wrap-break-word">${
           spot.name
         }</h3>
         <div class="space-y-1 text-sm text-gray-700">
