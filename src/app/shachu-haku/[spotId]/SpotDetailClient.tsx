@@ -298,7 +298,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FacilityMap spot={spot} />
+              <FacilityMap spot={spot} showTitle={false} showLegend={true} />
             </CardContent>
           </Card>
 

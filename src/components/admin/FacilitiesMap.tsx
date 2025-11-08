@@ -2,8 +2,8 @@
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { MapPin } from 'lucide-react';
 import { formatDistance } from '@/lib/formatDistance';
-import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import {
   suppressImageWarnings,
   handleMapError,
@@ -12,11 +12,7 @@ import {
   setupJapaneseLabels,
   setupPOIFilters,
 } from '@/lib/mapboxIcons';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { FacilityLegend, LegendItem } from '@/components/common/FacilityLegend';
 import { UseFormWatch } from 'react-hook-form';
 import { ShachuHakuFormData } from './validationSchemas';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -42,17 +38,28 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const currentPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isLegendOpen, setIsLegendOpen] = useState(true);
   const [isMapMoving, setIsMapMoving] = useState(false);
   const [currentZoom, setCurrentZoom] = useState(12);
 
   // マーカーの凡例データ
-  const legendItems = [
+  const legendItems: LegendItem[] = [
     { type: 'camping', label: '車中泊スポット', icon: '🛏️', color: '#e74c3c' },
     { type: 'toilet', label: 'トイレ', icon: '🚻', color: '#3498db' },
     { type: 'convenience', label: 'コンビニ', icon: '🏪', color: '#2ecc71' },
     { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f39c12' },
   ];
+
+  // 距離データを取得する関数
+  const getDistance = (type: string): number | undefined => {
+    if (type === 'toilet') {
+      return parseFloat(watch('distanceToToilet') || '0') || undefined;
+    } else if (type === 'convenience') {
+      return parseFloat(watch('distanceToConvenience') || '0') || undefined;
+    } else if (type === 'bath') {
+      return parseFloat(watch('distanceToBath') || '0') || undefined;
+    }
+    return undefined;
+  };
 
   // 現在開いているポップアップを閉じる
   const closeCurrentPopup = () => {
@@ -534,11 +541,21 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
   return (
     <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 relative'>
-      <div className='flex items-center gap-2 mb-3'>
-        <MapPin className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-        <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
-          施設マップ
-        </h3>
+      <div className='flex items-center justify-between mb-3 gap-4 flex-wrap'>
+        <div className='flex items-center gap-2'>
+          <MapPin className='w-5 h-5 text-blue-600 dark:text-blue-400' />
+          <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+            施設マップ
+          </h3>
+        </div>
+
+        {facilities.length > 0 && (
+          <FacilityLegend
+            legendItems={legendItems}
+            facilityExists={facilityExists}
+            getDistance={getDistance}
+          />
+        )}
       </div>
 
       <div
@@ -547,75 +564,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       />
 
       {facilities.length > 0 && (
-        <>
-
-          {/* 凡例 */}
-          <div className='absolute top-16 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-600 z-40'>
-            <Collapsible open={isLegendOpen} onOpenChange={setIsLegendOpen}>
-              <CollapsibleTrigger className='flex items-center justify-between w-full p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors'>
-                <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
-                  凡例
-                </h4>
-                {isLegendOpen ? (
-                  <ChevronUp className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                ) : (
-                  <ChevronDown className='w-4 h-4 text-gray-600 dark:text-gray-400' />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent className='px-3 pb-3'>
-                <div className='space-y-2'>
-                  {legendItems.map((item) => {
-                    const exists = facilityExists(item.type);
-
-                    // 距離データを取得（座標の有無に関わらず）
-                    let distance: number | undefined;
-                    if (item.type === 'toilet') {
-                      distance =
-                        parseFloat(watch('distanceToToilet') || '0') || undefined;
-                    } else if (item.type === 'convenience') {
-                      distance =
-                        parseFloat(watch('distanceToConvenience') || '0') ||
-                        undefined;
-                    } else if (item.type === 'bath') {
-                      distance =
-                        parseFloat(watch('distanceToBath') || '0') || undefined;
-                    }
-
-                    return (
-                      <div
-                        key={item.type}
-                        className={`flex items-center gap-2 text-sm ${
-                          exists
-                            ? 'text-gray-700 dark:text-gray-300'
-                            : 'text-gray-400 dark:text-gray-500'
-                        }`}
-                      >
-                        <div
-                          className='w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs'
-                          style={{
-                            backgroundColor: exists ? item.color : '#e5e7eb',
-                          }}
-                        >
-                          <span style={{ fontSize: '10px' }}>{item.icon}</span>
-                        </div>
-                        <span>{item.label}</span>
-                        {item.type !== 'camping' && distance && (
-                          <span className='text-xs text-gray-500 dark:text-gray-400'>
-                            ({formatDistance(distance)})
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-
         <p className='text-xs text-gray-500 mt-2'>
           マーカーをクリックすると詳細が表示されます
         </p>
-      </>
       )}
     </div>
   );
