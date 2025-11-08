@@ -4,13 +4,11 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { formatDistance } from '@/lib/formatDistance';
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
 import { useMapBoundsLoader } from '@/hooks/useMapBoundsLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 
@@ -20,14 +18,7 @@ import {
   getPublicCampingSpotsWithPagination,
 } from '../actions/campingSpots';
 import { handleCampingSpotShare } from '@/lib/shareUtils';
-import {
-  CampingSpotWithId,
-  CampingSpotTypeLabels,
-} from '@/data/schemas/campingSpot';
-import {
-  calculateSecurityLevel,
-  calculateQuietnessLevel,
-} from '@/lib/campingSpotUtils';
+import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import {
   PREFECTURE_COORDINATES,
   REGION_COORDINATES,
@@ -37,11 +28,6 @@ import { SpotsList } from '@/components/shachu-haku/SpotsList';
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
-import {
-  getTypeColor,
-  getRatingColor,
-  getPricingColor,
-} from '@/lib/spotColorUtils';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -774,105 +760,6 @@ export default function ShachuHakuClient() {
           </div>
         )}
       </div>
-
-      {/* Selected Spot Detail Modal for List View */}
-      {selectedSpot && activeTab === 'list' && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-          <Card className='w-full max-w-2xl max-h-[90vh] overflow-auto'>
-            <CardHeader>
-              <CardTitle className='flex justify-between items-center'>
-                {selectedSpot.name}
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => setSelectedSpot(null)}
-                  className='cursor-pointer'
-                >
-                  ✕
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-4'>
-                <div>
-                  <h4 className='font-semibold'>基本情報</h4>
-                  <p className='text-sm text-gray-600 dark:text-gray-300'>
-                    {selectedSpot.address}
-                  </p>
-                  <div className='flex gap-2 mt-2'>
-                    <Badge
-                      className={`${getTypeColor(
-                        selectedSpot.type
-                      )} text-white`}
-                    >
-                      {CampingSpotTypeLabels[selectedSpot.type]}
-                    </Badge>
-                    <Badge
-                      className={`${getPricingColor(
-                        selectedSpot.pricing.isFree,
-                        selectedSpot.pricing.pricePerNight
-                      )} text-white`}
-                    >
-                      {selectedSpot.pricing.isFree
-                        ? '無料'
-                        : selectedSpot.pricing.pricePerNight
-                        ? `¥${selectedSpot.pricing.pricePerNight}`
-                        : '有料：？円'}
-                    </Badge>
-                    <Badge
-                      className={`${getRatingColor(
-                        calculateSecurityLevel(selectedSpot)
-                      )} text-white`}
-                    >
-                      治安 {calculateSecurityLevel(selectedSpot)}/5 🔒
-                    </Badge>
-                    <Badge
-                      className={`${getRatingColor(
-                        calculateQuietnessLevel(selectedSpot)
-                      )} text-white`}
-                    >
-                      静けさ {calculateQuietnessLevel(selectedSpot)}/5 🔇
-                    </Badge>
-                  </div>
-                </div>
-
-                {selectedSpot.notes && (
-                  <div>
-                    <h4 className='font-semibold'>備考</h4>
-                    <p className='text-sm text-gray-700 dark:text-gray-300'>
-                      {selectedSpot.notes}
-                    </p>
-                  </div>
-                )}
-
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
-                  {selectedSpot.distanceToToilet && (
-                    <div>
-                      トイレまで:{' '}
-                      {formatDistance(selectedSpot.distanceToToilet)}
-                    </div>
-                  )}
-                  {selectedSpot.distanceToBath && (
-                    <div>
-                      入浴施設まで:{' '}
-                      {formatDistance(selectedSpot.distanceToBath)}
-                    </div>
-                  )}
-                  {selectedSpot.distanceToConvenience && (
-                    <div>
-                      コンビニまで:{' '}
-                      {formatDistance(selectedSpot.distanceToConvenience)}
-                    </div>
-                  )}
-                  {selectedSpot.elevation && (
-                    <div>標高: {selectedSpot.elevation}m</div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

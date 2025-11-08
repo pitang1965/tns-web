@@ -12,7 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
-import { formatDistance } from '@/lib/formatDistance';
 import {
   getCampingSpotsByBounds,
   getCampingSpotsWithPagination,
@@ -26,7 +25,6 @@ import {
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
-import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { celebrateSubmission } from '@/lib/confetti';
