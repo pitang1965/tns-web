@@ -96,6 +96,17 @@ export default function ShachuHakuMap({
       const style = document.createElement('style');
       style.id = 'shachu-haku-marker-styles';
       style.textContent = `
+        /* Expanded hover area for easier targeting */
+        .shachu-haku-marker-hover::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: -10px;
+          right: -10px;
+          bottom: -10px;
+          cursor: pointer;
+          border-radius: 50%;
+        }
         .shachu-haku-marker-hover:hover {
           box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 0 6px rgba(255,255,255,0.9), 0 0 0 8px rgba(59,130,246,0.5) !important;
           z-index: 1000 !important;
@@ -616,7 +627,7 @@ export default function ShachuHakuMap({
   return (
     <div className='relative w-full'>
       {/* Consistent 16:10 aspect ratio across all devices, with max height limits */}
-      <div className='w-full aspect-[16/10] max-h-[300px] sm:max-h-[600px]'>
+      <div className='w-full aspect-16/10 max-h-[300px] sm:max-h-[600px]'>
         <div ref={mapContainer} className='w-full h-full rounded-lg' />
       </div>
     </div>
