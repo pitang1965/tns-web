@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, MousePointer2, Filter, Search } from 'lucide-react';
+import { ArrowLeft, MapPin, MousePointer2, Filter, Search, Share2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'ヘルプ | 車旅のしおり',
@@ -88,18 +88,18 @@ export default function HelpPage() {
               <div className='flex items-start'>
                 <span className='font-semibold mr-2'>・</span>
                 <div>
-                  <span className='font-semibold'>
-                    地図をダブルクリック（管理者のみ）：
+                  <span className='font-semibold'>マップの拡大・縮小：</span>
+                  <span className='ml-2'>
+                    ピンチ操作またはマウスホイールで調整できます
                   </span>
-                  <span className='ml-2'>新しいスポットを作成できます</span>
                 </div>
               </div>
               <div className='flex items-start'>
                 <span className='font-semibold mr-2'>・</span>
                 <div>
-                  <span className='font-semibold'>マップの拡大・縮小：</span>
+                  <span className='font-semibold'>表示範囲の変更：</span>
                   <span className='ml-2'>
-                    ピンチ操作またはマウスホイールで調整できます
+                    「現在付近」「地域」「都道府県」のボタンで表示エリアを切り替えられます
                   </span>
                 </div>
               </div>
@@ -113,19 +113,48 @@ export default function HelpPage() {
               フィルター機能
             </h3>
             <div className='space-y-2 text-gray-700 dark:text-gray-300'>
-              <p>
+              <p className='mb-3'>
                 マップ上部のフィルターを使用して、表示するスポットを絞り込めます：
               </p>
-              <div className='pl-4 space-y-1'>
-                <div>・評価点で絞り込み（1〜5点）</div>
-                <div>・施設タイプで絞り込み（道の駅、公園など）</div>
-                <div>・設備で絞り込み（トイレ、水道など）</div>
+              <div className='pl-4 space-y-2'>
+                <div>
+                  <span className='font-semibold'>・評価点：</span>
+                  <span className='ml-2'>1〜5点で絞り込み</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・施設タイプ：</span>
+                  <span className='ml-2'>道の駅、公園、駐車場などで絞り込み</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・料金：</span>
+                  <span className='ml-2'>無料のみ、有料のみで絞り込み</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・治安レベル：</span>
+                  <span className='ml-2'>安全性の高いスポットを選択</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・静けさレベル：</span>
+                  <span className='ml-2'>静かに過ごせるスポットを選択</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・トイレまでの距離：</span>
+                  <span className='ml-2'>近い順で絞り込み</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・標高：</span>
+                  <span className='ml-2'>標高の範囲で絞り込み</span>
+                </div>
+                <div>
+                  <span className='font-semibold'>・設備：</span>
+                  <span className='ml-2'>トイレ、水道、電源などの有無で絞り込み</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* 検索機能 */}
-          <div>
+          <div className='mb-6'>
             <h3 className='text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200 flex items-center'>
               <Search className='w-5 h-5 mr-2' />
               検索機能
@@ -134,6 +163,27 @@ export default function HelpPage() {
               <p>検索ボックスを使用して、スポット名や場所で検索できます。</p>
               <p className='text-sm text-gray-600 dark:text-gray-400'>
                 ※検索結果はリアルタイムで表示されます
+              </p>
+            </div>
+          </div>
+
+          {/* SNS共有機能 */}
+          <div>
+            <h3 className='text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200 flex items-center'>
+              <Share2 className='w-5 h-5 mr-2' />
+              SNS共有機能
+            </h3>
+            <div className='space-y-2 text-gray-700 dark:text-gray-300'>
+              <p>
+                スポットの詳細情報から、車中泊スポット情報をSNSで共有できます。
+              </p>
+              <div className='pl-4 space-y-1 mt-2'>
+                <div>・X（旧Twitter）で共有</div>
+                <div>・Facebookで共有</div>
+                <div>・LINEで共有</div>
+              </div>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>
+                ※スポット名、評価、URLが自動的に設定されます
               </p>
             </div>
           </div>
