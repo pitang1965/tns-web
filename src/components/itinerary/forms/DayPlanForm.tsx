@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Map, Clock } from 'lucide-react';
+import { PlusCircle, Map, Clock, Tent } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { H3 } from '@/components/common/Typography';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { AddCampingSpotDialog } from '../AddCampingSpotDialog';
 
 type DayPlanFormProps = {
   day: { date: string | null; activities: any[]; notes?: string };
@@ -40,6 +41,7 @@ export function DayPlanForm({
   moveToNextDay,
 }: DayPlanFormProps) {
   const [showFullMap, setShowFullMap] = useState(false);
+  const [showCampingSpotDialog, setShowCampingSpotDialog] = useState(false);
   const {
     formState: { errors },
     watch,
@@ -79,6 +81,13 @@ export function DayPlanForm({
     const sortedActivities = sortActivitiesByTime(activities);
 
     setValue(`dayPlans.${dayIndex}.activities`, sortedActivities, {
+      shouldValidate: true,
+    });
+  };
+
+  const handleAddCampingSpot = (activity: any) => {
+    const activities = watch(`dayPlans.${dayIndex}.activities`) || [];
+    setValue(`dayPlans.${dayIndex}.activities`, [...activities, activity], {
       shouldValidate: true,
     });
   };
@@ -206,16 +215,35 @@ export function DayPlanForm({
           />
         ))}
 
-        <Button
-          type='button'
-          variant='outline'
-          onClick={() => addActivity(dayIndex)}
-          className='w-full cursor-pointer'
-        >
-          <PlusCircle className='h-4 w-4 mr-2' />
-          アクティビティを追加
-        </Button>
+        <div className='flex gap-2'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => addActivity(dayIndex)}
+            className='flex-1 cursor-pointer'
+          >
+            <PlusCircle className='h-4 w-4 mr-2' />
+            アクティビティを追加
+          </Button>
+
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => setShowCampingSpotDialog(true)}
+            className='flex-1 cursor-pointer'
+          >
+            <Tent className='h-4 w-4 mr-2' />
+            車中泊スポットを追加
+          </Button>
+        </div>
       </div>
+
+      {/* 車中泊スポット追加ダイアログ */}
+      <AddCampingSpotDialog
+        open={showCampingSpotDialog}
+        onOpenChange={setShowCampingSpotDialog}
+        onAdd={handleAddCampingSpot}
+      />
 
       {/* フルスクリーンマップダイアログ */}
       <Dialog open={showFullMap} onOpenChange={setShowFullMap}>

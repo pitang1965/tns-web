@@ -364,6 +364,51 @@ export async function getPublicCampingSpotsWithPagination(
   };
 }
 
+// Public function to get nearest camping spots from a coordinate
+export async function getNearestCampingSpots(
+  latitude: number,
+  longitude: number,
+  limit: number = 5,
+  maxDistance?: number // in meters
+) {
+  await ensureDbConnection();
+
+  const query: any = {
+    coordinates: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [longitude, latitude], // GeoJSON: [lng, lat]
+        },
+      },
+    },
+  };
+
+  // Add maxDistance filter if provided
+  if (maxDistance !== undefined) {
+    query.coordinates.$near.$maxDistance = maxDistance;
+  }
+
+  const spots = await CampingSpot.find(query).limit(limit).lean();
+
+  // Calculate distance for each spot and add it to the result
+  const spotsWithDistance = spots.map((spot) => {
+    const distance = calculateDistance(
+      latitude,
+      longitude,
+      spot.coordinates[1], // lat
+      spot.coordinates[0] // lng
+    );
+
+    return {
+      ...spot,
+      distance: Math.round(distance), // Distance in meters, rounded
+    };
+  });
+
+  return JSON.parse(JSON.stringify(spotsWithDistance));
+}
+
 export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
   await ensureDbConnection();

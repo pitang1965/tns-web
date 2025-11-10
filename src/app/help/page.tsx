@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin, MousePointer2, Filter, Search, Share2 } from 'lucide-react';
+import { ArrowLeft, MapPin, MousePointer2, Filter, Search, Share2, Tent } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'ヘルプ | 車旅のしおり',
@@ -218,6 +218,51 @@ export default function HelpPage() {
               <p>
                 公開設定を「公開」にすることで、他のユーザーとしおりを共有できます。旅の思い出を共有しましょう。
               </p>
+            </div>
+            <div>
+              <h3 className='text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200 flex items-center'>
+                <Tent className='w-5 h-5 mr-2' />
+                車中泊スポットの追加
+              </h3>
+              <p className='mb-3'>
+                旅程編集画面から、車中泊スポットを簡単にアクティビティとして追加できます。
+              </p>
+              <div className='bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3'>
+                <div>
+                  <h4 className='font-semibold text-gray-800 dark:text-gray-200 mb-2'>
+                    使い方：
+                  </h4>
+                  <ol className='list-decimal list-inside space-y-2 pl-2'>
+                    <li>旅程編集画面で任意の日を選択</li>
+                    <li>「車中泊スポットを追加」ボタン（テントアイコン）をクリック</li>
+                    <li>地図上で検索したい地点をクリック
+                      <span className='text-sm text-gray-600 dark:text-gray-400 ml-2'>
+                        （例：前のアクティビティの近く）
+                      </span>
+                    </li>
+                    <li>「スポットを検索」をクリック</li>
+                    <li>表示された最寄り5件から選択</li>
+                    <li>「アクティビティに追加」で確定</li>
+                  </ol>
+                </div>
+                <div>
+                  <h4 className='font-semibold text-gray-800 dark:text-gray-200 mb-2'>
+                    自動入力される情報：
+                  </h4>
+                  <div className='pl-4 space-y-1 text-sm'>
+                    <div>・タイトル：「車中泊：[スポット名]」</div>
+                    <div>・場所：スポット名、座標、住所</div>
+                    <div>・費用：無料 or 1泊料金</div>
+                    <div>・説明：料金、施設距離、設備、セキュリティなど詳細情報</div>
+                    <div>・URL：スポットの詳細ページ（ある場合）</div>
+                  </div>
+                </div>
+                <div className='pt-2 border-t border-gray-200 dark:border-gray-600'>
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>
+                    💡 ヒント：車中泊マップで事前にスポットを確認してから、旅程に追加すると計画が立てやすくなります。
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

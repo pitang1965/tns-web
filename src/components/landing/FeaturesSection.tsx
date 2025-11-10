@@ -8,7 +8,7 @@ const features = [
     icon: FileText,
     title: '旅程作成・共有',
     description:
-      '複数日にわたる旅行計画を簡単に作成。公開設定で他のユーザーと共有も可能です。',
+      '複数日にわたる旅行計画を簡単に作成。公開設定で他のユーザーと共有も可能です。車中泊スポットも簡単追加。',
     link: '/itineraries',
   },
   {
@@ -63,7 +63,7 @@ export default function FeaturesSection() {
                 className='group bg-white dark:bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'
               >
                 <div className='flex items-start space-x-4'>
-                  <div className='flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors'>
+                  <div className='shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors'>
                     <Icon className='w-6 h-6 text-blue-600 dark:text-blue-400' />
                   </div>
                   <div className='flex-1'>
