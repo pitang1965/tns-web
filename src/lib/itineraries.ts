@@ -294,3 +294,21 @@ export async function updateItinerary(
     throw error;
   }
 }
+
+// 管理者用：全ての旅程を取得
+export async function getAllItineraries(): Promise<ClientItineraryDocument[]> {
+  const db = await getDatabase();
+
+  try {
+    const itineraries = await db
+      .collection<ServerItineraryDocument>('itineraries')
+      .find({})
+      .sort({ updatedAt: -1 })
+      .toArray();
+
+    return itineraries.map(toClientItinerary);
+  } catch (error) {
+    console.error('Error in getAllItineraries:', error);
+    return [];
+  }
+}

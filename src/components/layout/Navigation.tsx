@@ -10,7 +10,6 @@ import {
   BookHeart,
   CircleUser,
   MapPin,
-  Plus,
   Mail,
   ChevronDown,
 } from 'lucide-react';
@@ -65,10 +64,37 @@ export function Navigation() {
         <Search className='mr-1' />
         検索
       </NavLink>
-      <NavLink href='/itineraries'>
-        <BookHeart className='mr-1' />
-        旅程
-      </NavLink>
+      {userIsAdmin ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
+            <BookHeart className='mr-1' />
+            旅程
+            <ChevronDown className='ml-1 h-3 w-3' />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild>
+              <Link href='/itineraries' className='flex items-center w-full'>
+                <BookHeart className='mr-1 h-4 w-4' />
+                一般用
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href='/admin/itineraries'
+                className='flex items-center w-full'
+              >
+                <BookHeart className='mr-1 h-4 w-4' />
+                管理者用
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <NavLink href='/itineraries'>
+          <BookHeart className='mr-1' />
+          旅程
+        </NavLink>
+      )}
       {userIsAdmin ? (
         <DropdownMenu>
           <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>

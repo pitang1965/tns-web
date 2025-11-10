@@ -92,16 +92,45 @@ export function BurgerMenu() {
             検索
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <Link
-            href='/itineraries'
-            className='flex items-center'
-            onClick={(e) => handleItemClick(e, '/itineraries')}
-          >
-            <BookHeart className='mr-1' />
-            旅程
-          </Link>
-        </DropdownMenuItem>
+        {isAdmin ? (
+          <>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Link
+                href='/itineraries'
+                className='flex items-center justify-between w-full'
+                onClick={(e) => handleItemClick(e, '/itineraries')}
+              >
+                <div className='flex items-center'>
+                  <BookHeart className='mr-1' />
+                  旅程 (一般用)
+                </div>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <Link
+                href='/admin/itineraries'
+                className='flex items-center justify-between w-full'
+                onClick={(e) => handleItemClick(e, '/admin/itineraries')}
+              >
+                <div className='flex items-center'>
+                  <BookHeart className='mr-1' />
+                  旅程 (管理者用)
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href='/itineraries'
+              className='flex items-center'
+              onClick={(e) => handleItemClick(e, '/itineraries')}
+            >
+              <BookHeart className='mr-1' />
+              旅程
+            </Link>
+          </DropdownMenuItem>
+        )}
         {isAdmin ? (
           <>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
