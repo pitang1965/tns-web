@@ -21,7 +21,7 @@ import {
 import { getMarkerColorByRating } from '@/lib/spotColorUtils';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface ShachuHakuMapProps {
+type ShachuHakuMapProps = {
   spots: CampingSpotWithId[];
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onCreateSpot?: (coordinates: [number, number]) => void;
@@ -42,7 +42,7 @@ interface ShachuHakuMapProps {
   };
   onZoomChange?: (zoom: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-}
+};
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 

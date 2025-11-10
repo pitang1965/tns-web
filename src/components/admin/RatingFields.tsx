@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { ShachuHakuFormData } from './validationSchemas';
 
-interface RatingFieldsProps {
+type RatingFieldsProps = {
   register: UseFormRegister<ShachuHakuFormData>;
   errors: FieldErrors<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;

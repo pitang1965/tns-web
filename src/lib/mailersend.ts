@@ -1,4 +1,4 @@
-interface EmailData {
+type EmailData = {
   to: string;
   subject: string;
   text: string;
@@ -7,13 +7,13 @@ interface EmailData {
     email: string;
     name?: string;
   };
-}
+};
 
-interface MailerSendResponse {
+type MailerSendResponse = {
   success: boolean;
   message?: string;
   error?: string;
-}
+};
 
 export class MailerSendClient {
   private apiToken: string;

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 
-interface CoordinatesFromClipboardButtonProps {
+type CoordinatesFromClipboardButtonProps = {
   onCoordinatesExtracted: (
     latitude: number | string,
     longitude: number | string

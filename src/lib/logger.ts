@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 
-export interface Logger {
+export type Logger = {
   error(error: Error, extraInfo?: Record<string, any>): void;
   info(message: string, extraInfo?: Record<string, any>): void;
   warn(message: string, extraInfo?: Record<string, any>): void;
   debug(message: string, extraInfo?: Record<string, any>): void;
-}
+};
 
 class SentryLogger implements Logger {
   error(error: Error, extraInfo: Record<string, any> = {}) {

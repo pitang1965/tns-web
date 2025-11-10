@@ -1,20 +1,18 @@
 import { useEffect, useRef } from 'react';
 
-interface UseAutoSetSpotTypeOptions {
+type UseAutoSetSpotTypeOptions = {
   /**
    * 自動設定をスキップするかどうか（編集モード時など）
    */
   skipAutoSet?: boolean;
-}
+};
 
-interface ToastFunction {
-  (options: {
-    title: string;
-    description: string;
-    duration?: number;
-    variant?: 'default' | 'destructive';
-  }): void;
-}
+type ToastFunction = (options: {
+  title: string;
+  description: string;
+  duration?: number;
+  variant?: 'default' | 'destructive';
+}) => void;
 
 /**
  * 名称から種別を自動設定するカスタムフック

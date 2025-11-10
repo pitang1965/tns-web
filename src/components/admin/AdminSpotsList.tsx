@@ -25,7 +25,7 @@ import {
   getPricingColor,
 } from '@/lib/spotColorUtils';
 
-interface AdminSpotsListProps {
+type AdminSpotsListProps = {
   spots: CampingSpotWithId[];
   total: number;
   page: number;

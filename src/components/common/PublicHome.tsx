@@ -20,7 +20,7 @@ const HeroMapSection = dynamic(
   }
 );
 
-interface PublicHomeProps {
+type PublicHomeProps = {
   initialSpots?: any[];
 }
 

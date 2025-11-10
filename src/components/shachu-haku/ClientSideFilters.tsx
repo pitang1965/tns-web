@@ -21,10 +21,10 @@ export type ClientSideFilterValues = {
   maxElevation: number | null;
 };
 
-interface ClientSideFiltersProps {
+type ClientSideFiltersProps = {
   filters: ClientSideFilterValues;
   onFiltersChange: (filters: ClientSideFilterValues) => void;
-}
+};
 
 export default function ClientSideFilters({
   filters,

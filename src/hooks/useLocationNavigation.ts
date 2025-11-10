@@ -5,7 +5,7 @@ import {
 } from '@/lib/prefectureCoordinates';
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 
-interface UseLocationNavigationProps {
+type UseLocationNavigationProps = {
   setMapCenter: (center: [number, number]) => void;
   setMapZoom: (zoom: number) => void;
   setSavedBounds: (bounds: {
@@ -19,7 +19,7 @@ interface UseLocationNavigationProps {
     description: string;
     variant?: 'default' | 'destructive';
   }) => void;
-}
+};
 
 /**
  * Custom hook for location navigation (prefecture, region, current location)

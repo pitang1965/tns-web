@@ -21,7 +21,7 @@ import { FeatureFields } from './FeatureFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 
-interface SubmissionEditFormProps {
+type SubmissionEditFormProps = {
   submission: CampingSpotSubmissionWithId;
   onClose: () => void;
   onSuccess: () => void;

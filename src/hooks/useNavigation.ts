@@ -12,12 +12,12 @@ type ClientActivity =
   ClientItineraryDocument['dayPlans'][number]['activities'][number];
 type Activity = ServerActivity | ClientActivity;
 
-interface UseNavigationProps {
+type UseNavigationProps = {
   latitude?: number;
   longitude?: number;
   activities?: Activity[];
   currentActivityIndex?: number;
-}
+};
 
 export const useNavigation = ({
   latitude,

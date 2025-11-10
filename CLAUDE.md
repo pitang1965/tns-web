@@ -149,6 +149,64 @@ Required environment variables (see README.md for full details):
 - Responsive design with mobile-first approach
 - Japanese language support (locale: ja_JP)
 
+## TypeScript Guidelines
+
+### Type Definitions
+
+**IMPORTANT: Always use `type` instead of `interface` for new type definitions**
+
+This project follows modern TypeScript best practices by preferring `type` over `interface` for consistency and flexibility.
+
+**Use `type` for:**
+- ✅ Component Props
+- ✅ Function parameters and return types
+- ✅ Object type definitions
+- ✅ Union types and intersections
+- ✅ Mapped types and conditional types
+
+**Example:**
+```typescript
+// ✅ Correct - Use type
+type UserProfileProps = {
+  name: string;
+  email: string;
+  onUpdate: (data: UserData) => void;
+}
+
+// ❌ Avoid - Don't use interface
+interface UserProfileProps {
+  name: string;
+  email: string;
+  onUpdate: (data: UserData) => void;
+}
+```
+
+**Exceptions (when `interface` is acceptable):**
+- Mongoose model definitions that extend `Document`
+- React component types that extend React built-in types (e.g., `React.HTMLAttributes`)
+- When declaration merging is explicitly needed (rare cases)
+- Third-party library integration that requires `interface`
+
+**Example of valid `interface` usage:**
+```typescript
+// ✅ Valid - Mongoose Document extension
+export interface ICampingSpot extends Document {
+  name: string;
+  coordinates: [number, number];
+}
+
+// ✅ Valid - React type extension
+interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  customProp: string;
+}
+```
+
+**Why `type` over `interface`:**
+1. **Consistency**: Using `type` throughout the codebase reduces cognitive load
+2. **Flexibility**: `type` supports union types, intersections, and mapped types
+3. **Modern Practice**: TypeScript community increasingly prefers `type` for general use
+4. **Clarity**: The `= {` syntax makes it clear you're defining a type alias
+
 ### UI Component Guidelines
 
 **shadcn/ui Components:**

@@ -1,20 +1,20 @@
 import { useRef, useCallback } from 'react';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
-interface Bounds {
+type Bounds = {
   north: number;
   south: number;
   east: number;
   west: number;
-}
+};
 
-interface Filters {
+type Filters = {
   searchTerm?: string;
   prefecture?: string;
   type?: string;
-}
+};
 
-interface UseMapBoundsLoaderOptions {
+type UseMapBoundsLoaderOptions = {
   loadSpots: (
     bounds: Bounds,
     filters?: Filters
@@ -33,7 +33,7 @@ interface UseMapBoundsLoaderOptions {
     typeFilter: string;
   };
   onLoadSuccess?: (data: CampingSpotWithId[], bounds: Bounds, filters: Filters) => Promise<void>;
-}
+};
 
 /**
  * Custom hook for managing map bounds changes with optimized data loading

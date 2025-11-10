@@ -28,7 +28,7 @@ import {
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
 
-interface ShachuHakuFiltersProps {
+type ShachuHakuFiltersProps = {
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
   typeFilter: string;
@@ -39,7 +39,7 @@ interface ShachuHakuFiltersProps {
   clientFilters: ClientSideFilterValues;
   onClientFiltersChange: (filters: ClientSideFilterValues) => void;
   onResetAll: () => void;
-}
+};
 
 export default function ShachuHakuFilters({
   searchTerm,

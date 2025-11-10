@@ -17,7 +17,7 @@ import { isInAppBrowser } from '@/lib/browserDetection';
 import { FacilityLegend, LegendItem } from '@/components/common/FacilityLegend';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface FacilityMapProps {
+type FacilityMapProps = {
   spot: CampingSpotWithId;
   /** タイトルを表示するかどうか（デフォルト: false、親でCardTitle等を使う想定） */
   showTitle?: boolean;
@@ -25,14 +25,14 @@ interface FacilityMapProps {
   title?: string;
   /** 凡例を表示するかどうか（デフォルト: true） */
   showLegend?: boolean;
-}
+};
 
-interface FacilityMarker {
+type FacilityMarker = {
   coordinates: [number, number];
   type: 'camping' | 'toilet' | 'convenience' | 'bath';
   name: string;
   distance?: number;
-}
+};
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 

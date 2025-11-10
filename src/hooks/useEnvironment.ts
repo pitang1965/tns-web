@@ -4,9 +4,9 @@ import { use } from 'react';
 
 export type Environment = 'development' | 'production' | 'unknown';
 
-interface EnvironmentResponse {
+type EnvironmentResponse = {
   environment: Environment;
-}
+};
 
 // 環境情報を取得するPromiseをキャッシュ
 let environmentPromise: Promise<EnvironmentResponse> | null = null;

@@ -54,9 +54,9 @@ const FacilityMap = dynamic(
   }
 );
 
-interface SpotDetailClientProps {
+type SpotDetailClientProps = {
   spot: CampingSpotWithId;
-}
+};
 
 export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const { toast } = useToast();

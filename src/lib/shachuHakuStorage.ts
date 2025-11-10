@@ -2,7 +2,7 @@ import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilte
 
 const STORAGE_KEY = 'shachu-haku-filters';
 
-export interface SavedShachuHakuFilters {
+export type SavedShachuHakuFilters = {
   searchTerm: string;
   typeFilter: string;
   clientFilters: ClientSideFilterValues;
@@ -13,7 +13,7 @@ export interface SavedShachuHakuFilters {
   lng_span?: number;
   aspect_ratio?: number;
   zoom?: number; // Fallback when bounds are not available
-}
+};
 
 /**
  * ローカルストレージにフィルター条件を保存する

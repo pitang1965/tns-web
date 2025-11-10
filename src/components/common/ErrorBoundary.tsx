@@ -5,11 +5,11 @@ import { H2, Text } from '@/components/common/Typography';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 
-interface ErrorBoundaryProps {
+type ErrorBoundaryProps = {
   children: ReactNode;
 }
 
-interface ErrorBoundaryState {
+type ErrorBoundaryState = {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;

@@ -98,9 +98,9 @@ const SubmissionFormSchema = z.object({
 
 type SubmissionFormData = z.infer<typeof SubmissionFormSchema>;
 
-interface CampingSpotSubmissionFormProps {
+type CampingSpotSubmissionFormProps = {
   onSuccess?: () => void;
-}
+};
 
 export default function CampingSpotSubmissionForm({
   onSuccess,

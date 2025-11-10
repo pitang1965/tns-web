@@ -16,7 +16,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-interface HeroMapSectionProps {
+type HeroMapSectionProps = {
   initialSpots?: any[];
 }
 

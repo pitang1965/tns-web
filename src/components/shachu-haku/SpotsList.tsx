@@ -24,7 +24,7 @@ import {
   getPricingColor,
 } from '@/lib/spotColorUtils';
 
-interface SpotsListProps {
+type SpotsListProps = {
   spots: CampingSpotWithId[];
   total: number;
   page: number;
@@ -35,7 +35,7 @@ interface SpotsListProps {
   clientFilters: ClientSideFilterValues;
   searchTerm?: string;
   typeFilter?: string;
-}
+};
 
 export function SpotsList({
   spots,

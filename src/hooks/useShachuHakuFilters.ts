@@ -7,10 +7,10 @@ import {
   clearFiltersFromLocalStorage,
 } from '@/lib/shachuHakuStorage';
 
-interface UseShachuHakuFiltersOptions {
+type UseShachuHakuFiltersOptions = {
   searchParams: ReadonlyURLSearchParams;
   onResetComplete?: () => void;
-}
+};
 
 export const useShachuHakuFilters = ({
   searchParams,

@@ -2,9 +2,9 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 
-interface UseItineraryActionsProps {
+type UseItineraryActionsProps = {
   id: string;
-}
+};
 
 export const useItineraryActions = ({ id }: UseItineraryActionsProps) => {
   const router = useRouter();

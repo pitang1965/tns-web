@@ -52,13 +52,13 @@ const SimpleLocationPicker = dynamic(
   }
 );
 
-interface BasicInfoFieldsProps {
+type BasicInfoFieldsProps = {
   spot?: CampingSpotWithId | null;
   register: UseFormRegister<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;
   setValue: UseFormSetValue<ShachuHakuFormData>;
   errors: FieldErrors<ShachuHakuFormData>;
-}
+};
 
 export function BasicInfoFields({
   spot,

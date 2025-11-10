@@ -31,7 +31,7 @@ import {
   deleteSubmission,
 } from '../../app/actions/campingSpotSubmissions';
 
-interface SubmissionReviewCardProps {
+type SubmissionReviewCardProps = {
   submission: CampingSpotSubmissionWithId;
   onUpdate: () => void;
   onEdit: (submission: CampingSpotSubmissionWithId) => void;

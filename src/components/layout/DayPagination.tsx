@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/pagination';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
-interface DayPaginationProps {
+type DayPaginationProps = {
   dayPlans?: DayPlan[];
   totalDays?: number;
   currentDayPlan?: DayPlan | null;

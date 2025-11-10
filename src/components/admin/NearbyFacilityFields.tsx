@@ -14,12 +14,12 @@ import { Map, Route, Copy } from 'lucide-react';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
 import { ShachuHakuFormData } from './validationSchemas';
 
-interface NearbyFacilityFieldsProps {
+type NearbyFacilityFieldsProps = {
   register: UseFormRegister<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;
   setValue: UseFormSetValue<ShachuHakuFormData>;
   errors: FieldErrors<ShachuHakuFormData>;
-}
+};
 
 export function NearbyFacilityFields({
   register,

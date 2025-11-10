@@ -4,7 +4,7 @@ import { filterSpotsClientSide } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 
-interface UseSpotFilteringProps {
+type UseSpotFilteringProps = {
   spots: CampingSpotWithId[];
   clientFilters: ClientSideFilterValues;
   savedBounds: {
@@ -15,7 +15,7 @@ interface UseSpotFilteringProps {
   } | null;
   searchTerm: string;
   typeFilter: string;
-}
+};
 
 /**
  * Custom hook for filtering camping spots

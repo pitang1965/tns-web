@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { H2, LargeText } from '@/components/common/Typography';
 import { MapPin, FileText, Users } from 'lucide-react';
 
-interface Stats {
+type Stats = {
   campingSpots: number;
   itineraries: number;
   submissions: number;

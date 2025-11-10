@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { H2, LargeText } from '@/components/common/Typography';
 
-interface ItineraryAccessGateProps {
+type ItineraryAccessGateProps = {
   needsLogin: boolean;
   hasAccess: boolean;
   onLogin: () => void;

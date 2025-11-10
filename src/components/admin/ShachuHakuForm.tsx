@@ -26,7 +26,7 @@ import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
-interface ShachuHakuFormProps {
+type ShachuHakuFormProps = {
   spot?: CampingSpotWithId | null;
   onClose: () => void;
   onSuccess: () => void;

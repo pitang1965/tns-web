@@ -17,13 +17,13 @@ import { UseFormWatch } from 'react-hook-form';
 import { ShachuHakuFormData } from './validationSchemas';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface FacilitiesMapProps {
+type FacilitiesMapProps = {
   watch: UseFormWatch<ShachuHakuFormData>;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-interface FacilityData {
+type FacilityData = {
   type: 'camping' | 'toilet' | 'convenience' | 'bath';
   lat: number;
   lng: number;

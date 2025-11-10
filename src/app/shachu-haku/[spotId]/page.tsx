@@ -99,9 +99,9 @@ export const generateMetadata = async ({
   }
 };
 
-interface SpotDetailPageProps {
+type SpotDetailPageProps = {
   params: Promise<{ spotId: string }>;
-}
+};
 
 export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
   const { spotId } = await params;

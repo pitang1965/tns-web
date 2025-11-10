@@ -13,10 +13,10 @@ type ItineraryMetadata = {
   dayPlanSummaries: { date: string | null; notes?: string }[];
 };
 
-interface UseItineraryAccessProps {
+type UseItineraryAccessProps = {
   user: User | null | undefined;
   metadata: ItineraryMetadata | null | undefined;
-}
+};
 
 export const useItineraryAccess = ({
   user,

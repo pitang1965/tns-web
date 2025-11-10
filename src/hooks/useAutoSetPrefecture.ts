@@ -1,21 +1,19 @@
 import { useEffect, useRef } from 'react';
 import { PrefectureOptions } from '@/data/schemas/campingSpot';
 
-interface UseAutoSetPrefectureOptions {
+type UseAutoSetPrefectureOptions = {
   /**
    * 自動設定をスキップするかどうか（編集モード時など）
    */
   skipAutoSet?: boolean;
-}
+};
 
-interface ToastFunction {
-  (options: {
-    title: string;
-    description: string;
-    duration?: number;
-    variant?: 'default' | 'destructive';
-  }): void;
-}
+type ToastFunction = (options: {
+  title: string;
+  description: string;
+  duration?: number;
+  variant?: 'default' | 'destructive';
+}) => void;
 
 /**
  * 住所から都道府県を自動設定し、郵便番号を削除するカスタムフック

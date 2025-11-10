@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ShachuHakuFormData } from './validationSchemas';
 
-interface FeatureFieldsProps {
+type FeatureFieldsProps = {
   register: UseFormRegister<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;
   setValue: UseFormSetValue<ShachuHakuFormData>;

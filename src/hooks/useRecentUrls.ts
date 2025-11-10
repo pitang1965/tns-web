@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 
-interface RecentUrl {
+type RecentUrl = {
   url: string;
   title: string;
   timestamp: number;
-}
+};
 
 const STORAGE_KEY = 'recent-urls';
 const MAX_RECENT_URLS = 5;

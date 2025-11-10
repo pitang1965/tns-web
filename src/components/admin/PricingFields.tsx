@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/input-group';
 import { ShachuHakuFormData } from './validationSchemas';
 
-interface PricingFieldsProps {
+type PricingFieldsProps = {
   register: UseFormRegister<ShachuHakuFormData>;
   watch: UseFormWatch<ShachuHakuFormData>;
   setValue: UseFormSetValue<ShachuHakuFormData>;

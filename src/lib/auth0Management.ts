@@ -1,16 +1,16 @@
-interface Auth0ManagementToken {
+type Auth0ManagementToken = {
   access_token: string;
   token_type: string;
   expires_in: number;
-}
+};
 
-interface Auth0UserStats {
+type Auth0UserStats = {
   total: number;
   activeUsers: number;
   newUsersToday: number;
   newUsersThisWeek: number;
   newUsersThisMonth: number;
-}
+};
 
 export class Auth0ManagementClient {
   private domain: string;

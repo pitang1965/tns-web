@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 type LoadingVariant = 'fullscreen' | 'overlay' | 'inline' | 'card';
 
-interface LoadingStateProps {
+type LoadingStateProps = {
   /** ローディング表示のバリエーション */
   variant?: LoadingVariant;
   /** カスタムメッセージ (デフォルト: "読み込み中...") */

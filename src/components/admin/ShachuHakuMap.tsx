@@ -16,7 +16,7 @@ import {
 import { getMarkerColorByRating } from '@/lib/spotColorUtils';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface ShachuHakuMapProps {
+type ShachuHakuMapProps = {
   spots: CampingSpotWithId[];
   onSpotSelect: (spot: CampingSpotWithId) => void;
   onCreateSpot: (coordinates: [number, number]) => void;

@@ -17,11 +17,11 @@ import {
 } from '@/lib/spotColorUtils';
 import { formatDistance } from '@/lib/formatDistance';
 
-interface SpotPopupProps {
+type SpotPopupProps = {
   spot: CampingSpotWithId;
   onClose: () => void;
   actionButton: React.ReactNode;
-}
+};
 
 export function SpotPopup({ spot, onClose, actionButton }: SpotPopupProps) {
   return (

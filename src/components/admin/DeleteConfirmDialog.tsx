@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
-interface DeleteConfirmDialogProps {
+type DeleteConfirmDialogProps = {
   spot?: CampingSpotWithId | null;
   loading: boolean;
   onConfirm: () => void;

@@ -6,7 +6,7 @@ import { setupJapaneseLabels, handleMapError } from '@/lib/mapboxIcons';
 import { LoadingState } from '@/components/common/LoadingState';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-interface SimpleLocationPickerProps {
+type SimpleLocationPickerProps = {
   onLocationSelect: (lat: number, lng: number) => void;
   initialLat?: number;
   initialLng?: number;

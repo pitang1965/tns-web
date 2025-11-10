@@ -9,14 +9,14 @@ import {
 } from '@/components/ui/collapsible';
 import { formatDistance } from '@/lib/formatDistance';
 
-export interface LegendItem {
+export type LegendItem = {
   type: string;
   label: string;
   icon: string;
   color: string;
 }
 
-interface FacilityLegendProps {
+type FacilityLegendProps = {
   legendItems: LegendItem[];
   facilityExists: (type: string) => boolean;
   getDistance?: (type: string) => number | undefined;
