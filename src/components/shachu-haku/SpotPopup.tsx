@@ -21,11 +21,19 @@ type SpotPopupProps = {
   spot: CampingSpotWithId;
   onClose: () => void;
   actionButton: React.ReactNode;
+  className?: string;
 };
 
-export function SpotPopup({ spot, onClose, actionButton }: SpotPopupProps) {
+export function SpotPopup({
+  spot,
+  onClose,
+  actionButton,
+  className = '',
+}: SpotPopupProps) {
   return (
-    <div className='bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg p-3 relative max-h-[60vh] overflow-y-auto'>
+    <div
+      className={`bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg p-2 sm:p-3 relative overflow-y-auto flex flex-col ${className}`}
+    >
       <Button
         variant='ghost'
         size='sm'

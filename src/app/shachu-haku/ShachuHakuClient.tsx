@@ -74,6 +74,8 @@ export default function ShachuHakuClient() {
     null
   );
 
+  const [isLandscape, setIsLandscape] = useState(false);
+
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -407,6 +409,25 @@ export default function ShachuHakuClient() {
     };
   }, [cleanupMapBoundsLoader]);
 
+  // Detect screen orientation (landscape vs portrait)
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    // Initial check
+    checkOrientation();
+
+    // Listen for resize and orientation change events
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
   const handleSpotSelect = (spot: CampingSpotWithId) => {
     // マップからのスポットクリック時にカスタムポップアップを表示
     setSelectedSpot(spot);
@@ -472,9 +493,31 @@ export default function ShachuHakuClient() {
       typeFilter,
     });
 
+  // Render spot popup (shared between portrait and landscape)
+  const spotPopup = useMemo(() => {
+    if (!selectedSpot) return null;
+
+    return (
+      <SpotPopup
+        spot={selectedSpot}
+        onClose={() => setSelectedSpot(null)}
+        actionButton={
+          <Button
+            onClick={() => handleNavigateToSpotDetail(selectedSpot._id)}
+            className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
+            size='sm'
+          >
+            もっと見る
+          </Button>
+        }
+        className={isLandscape ? 'h-full' : 'max-h-[60vh]'}
+      />
+    );
+  }, [selectedSpot, isLandscape]);
+
   return (
-    <div className='container mx-auto p-6 space-y-6'>
-      <div className='space-y-4'>
+    <div className='container mx-auto p-2 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6'>
+      <div className='space-y-3 sm:space-y-4'>
         <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4'>
           <div>
             <h1 className='text-3xl font-bold'>車中泊スポット</h1>
@@ -544,28 +587,14 @@ export default function ShachuHakuClient() {
           }}
         >
           <Card>
-            <CardHeader>
-              {/* カスタムポップアップ - マップ表示時に選択されたスポット情報を表示 */}
-              {activeTab === 'map' && selectedSpot ? (
-                <SpotPopup
-                  spot={selectedSpot}
-                  onClose={() => setSelectedSpot(null)}
-                  actionButton={
-                    <Button
-                      onClick={() =>
-                        handleNavigateToSpotDetail(selectedSpot._id)
-                      }
-                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
-                      size='sm'
-                    >
-                      もっと見る
-                    </Button>
-                  }
-                />
+            <CardHeader className='!px-3 !pt-1.5 !pb-0 sm:!px-6 sm:!pt-6 sm:!pb-3 space-y-0'>
+              {/* カスタムポップアップ - ポートレート時はヘッダーに表示 */}
+              {activeTab === 'map' && selectedSpot && !isLandscape ? (
+                spotPopup
               ) : (
                 <>
-                  <CardTitle className='flex items-center gap-2'>
-                    <MapPin className='w-5 h-5' />
+                  <CardTitle className='flex items-center gap-2 text-base sm:text-lg md:text-xl mb-0'>
+                    <MapPin className='w-4 h-4 sm:w-5 sm:h-5' />
                     {loading ? (
                       <span className='flex items-center gap-2'>
                         読み込み中... <Spinner className='size-4' />
@@ -584,18 +613,30 @@ export default function ShachuHakuClient() {
                 </>
               )}
             </CardHeader>
-            <CardContent>
-              <ShachuHakuMap
-                spots={filteredSpots}
-                onSpotSelect={handleSpotSelect}
-                readonly={true}
-                onBoundsChange={handleBoundsChangeWrapper}
-                initialZoom={mapZoom}
-                initialCenter={mapCenter}
-                initialBounds={savedBounds || undefined}
-                onZoomChange={setMapZoom}
-                onCenterChange={setMapCenter}
-              />
+            <CardContent className='!px-3 !pt-2 !pb-3 sm:!px-6 sm:!pt-3 sm:!pb-6'>
+              {/* ランドスケープ時は地図とポップアップを横並びに */}
+              <div className={isLandscape ? 'flex gap-2 sm:gap-4 items-stretch' : ''}>
+                <div className={isLandscape ? 'flex-1 min-w-0' : ''}>
+                  <ShachuHakuMap
+                    spots={filteredSpots}
+                    onSpotSelect={handleSpotSelect}
+                    readonly={true}
+                    onBoundsChange={handleBoundsChangeWrapper}
+                    initialZoom={mapZoom}
+                    initialCenter={mapCenter}
+                    initialBounds={savedBounds || undefined}
+                    onZoomChange={setMapZoom}
+                    onCenterChange={setMapCenter}
+                    isLandscape={isLandscape}
+                  />
+                </div>
+                {/* ランドスケープ時はポップアップを右側に表示 */}
+                {activeTab === 'map' && selectedSpot && isLandscape && (
+                  <div className='w-64 sm:w-80 shrink-0 flex flex-col'>
+                    <div className='flex-1'>{spotPopup}</div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -42,6 +42,7 @@ type ShachuHakuMapProps = {
   };
   onZoomChange?: (zoom: number) => void;
   onCenterChange?: (center: [number, number]) => void;
+  isLandscape?: boolean;
 };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -57,6 +58,7 @@ export default function ShachuHakuMap({
   initialBounds,
   onZoomChange,
   onCenterChange,
+  isLandscape = false,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -626,7 +628,7 @@ export default function ShachuHakuMap({
 
   return (
     <div className='relative w-full'>
-      {/* Consistent 16:10 aspect ratio across all devices, with max height limits */}
+      {/* 16:10 aspect ratio with max height limits */}
       <div className='w-full aspect-16/10 max-h-[300px] sm:max-h-[600px]'>
         <div ref={mapContainer} className='w-full h-full rounded-lg' />
       </div>

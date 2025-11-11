@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { isPremiumMember } from '@/lib/userUtils';
+import { useState, useEffect } from 'react';
 
 export function AdSense() {
   const pathname = usePathname();
@@ -11,8 +12,31 @@ export function AdSense() {
   const isAdminPage = pathname.startsWith('/admin');
   const isPremium = isPremiumMember(user);
   const isTopPage = pathname === '/';
+  const [isLandscape, setIsLandscape] = useState(false);
 
-  if (isAdminPage || isPremium || !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
+  // Detect screen orientation (landscape vs portrait)
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    // Initial check
+    checkOrientation();
+
+    // Listen for resize and orientation change events
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
+  // Hide ads on mobile landscape to save screen space and avoid AdSense errors
+  const isMobileLandscape = isLandscape && typeof window !== 'undefined' && window.innerWidth < 768;
+
+  if (isAdminPage || isPremium || !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || isMobileLandscape) {
     return null;
   }
 
