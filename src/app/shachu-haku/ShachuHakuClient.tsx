@@ -22,7 +22,7 @@ import {
 import { handleCampingSpotShare } from '@/lib/shareUtils';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
-import { SpotsList } from '@/components/shachu-haku/SpotsList';
+import { ShachuHakuSpotsList } from '@/components/shachu-haku/ShachuHakuSpotsList';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 
 // Dynamically import the map component to avoid SSR issues
@@ -686,7 +686,7 @@ export default function ShachuHakuClient() {
                 </CardContent>
               </Card>
             ) : (
-              <SpotsList
+              <ShachuHakuSpotsList
                 spots={listData.spots}
                 total={listData.total}
                 page={listData.page}
