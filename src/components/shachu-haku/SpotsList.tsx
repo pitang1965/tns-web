@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Info } from 'lucide-react';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -104,7 +103,7 @@ export function SpotsList({
             <div
               key={spot._id}
               className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
-              onClick={() => onSpotSelect(spot)}
+              onClick={() => onNavigateToDetail(spot._id)}
             >
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
@@ -153,19 +152,6 @@ export function SpotsList({
                       {spot.notes}
                     </p>
                   )}
-                </div>
-                <div className='flex gap-2'>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onNavigateToDetail(spot._id);
-                    }}
-                    className='cursor-pointer'
-                  >
-                    <Info className='w-4 h-4' />
-                  </Button>
                 </div>
               </div>
             </div>
