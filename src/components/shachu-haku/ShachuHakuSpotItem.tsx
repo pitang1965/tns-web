@@ -26,7 +26,7 @@ export function ShachuHakuSpotItem({
 }: ShachuHakuSpotItemProps) {
   return (
     <div
-      className='border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
+      className='border rounded-lg p-4 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 cursor-pointer'
       onClick={() => onNavigateToDetail(spot._id)}
     >
       <div className='flex justify-between items-start'>
