@@ -398,12 +398,24 @@ export default function AdminClient() {
 
     // Reload spots based on current tab
     if (activeTab === 'list') {
+      // Clear the last filters ref to force re-fetch
+      lastListFiltersRef.current = null;
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type: typeFilter !== 'all' ? typeFilter : undefined,
       };
-      loadListSpotsRef.current?.(currentPage, filters);
+      // Manually trigger data reload for list view
+      setListLoading(true);
+      getCampingSpotsWithPagination(currentPage, pageSize, filters)
+        .then((data) => {
+          setListData(data);
+          setListLoading(false);
+        })
+        .catch((error) => {
+          console.error('[Admin] Error reloading list data:', error);
+          setListLoading(false);
+        });
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);
@@ -420,12 +432,24 @@ export default function AdminClient() {
   const handleImportSuccess = (result: { success: number; errors: any[] }) => {
     // Reload spots based on current tab
     if (activeTab === 'list') {
+      // Clear the last filters ref to force re-fetch
+      lastListFiltersRef.current = null;
       const filters = {
         searchTerm: searchTerm || undefined,
         prefecture: undefined,
         type: typeFilter !== 'all' ? typeFilter : undefined,
       };
-      loadListSpotsRef.current?.(currentPage, filters);
+      // Manually trigger data reload for list view
+      setListLoading(true);
+      getCampingSpotsWithPagination(currentPage, pageSize, filters)
+        .then((data) => {
+          setListData(data);
+          setListLoading(false);
+        })
+        .catch((error) => {
+          console.error('[Admin] Error reloading list data:', error);
+          setListLoading(false);
+        });
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);

@@ -146,6 +146,7 @@ export async function approveSubmission(id: string, reviewNotes?: string) {
   await submission.save();
 
   revalidatePath('/admin/shachu-haku');
+  revalidatePath('/shachu-haku');
   revalidatePath('/admin/submissions');
 
   return { success: true, spotId: newSpot._id.toString() };

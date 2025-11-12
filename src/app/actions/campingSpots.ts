@@ -683,7 +683,8 @@ export async function createCampingSpot(data: FormData) {
   const newSpot = new CampingSpot(finalData);
   await newSpot.save();
 
-  revalidatePath('/admin/camping-spots');
+  revalidatePath('/admin/shachu-haku');
+  revalidatePath('/shachu-haku');
   return { success: true, id: newSpot._id.toString() };
 }
 
@@ -806,7 +807,8 @@ export async function updateCampingSpot(id: string, data: FormData) {
     throw new Error('Camping spot not found');
   }
 
-  revalidatePath('/admin/camping-spots');
+  revalidatePath('/admin/shachu-haku');
+  revalidatePath('/shachu-haku');
   return { success: true };
 }
 
@@ -820,7 +822,8 @@ export async function deleteCampingSpot(id: string) {
     throw new Error('Camping spot not found');
   }
 
-  revalidatePath('/admin/camping-spots');
+  revalidatePath('/admin/shachu-haku');
+  revalidatePath('/shachu-haku');
   return { success: true };
 }
 
@@ -998,7 +1001,8 @@ export async function importCampingSpotsFromCSV(csvData: string) {
     }
   }
 
-  revalidatePath('/admin/camping-spots');
+  revalidatePath('/admin/shachu-haku');
+  revalidatePath('/shachu-haku');
   return results;
 }
 
