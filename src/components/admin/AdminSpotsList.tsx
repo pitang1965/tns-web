@@ -102,7 +102,7 @@ export function AdminSpotsList({
           {filteredSpots.map((spot) => (
             <div
               key={spot._id}
-              className='border rounded-lg p-4 hover:shadow-md transition-shadow'
+              className='border rounded-lg p-4 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:border-gray-600 transition-all duration-200'
             >
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
@@ -154,8 +154,13 @@ export function AdminSpotsList({
                 </div>
                 <div className='flex gap-2'>
                   <Link href={`/admin/shachu-haku/${spot._id}`}>
-                    <Button size='sm' variant='outline' className='cursor-pointer'>
-                      <Edit className='w-4 h-4' />
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      className='cursor-pointer hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 dark:hover:bg-blue-950 transition-colors duration-200'
+                    >
+                      <Edit className='w-4 h-4 mr-1' />
+                      編集
                     </Button>
                   </Link>
                 </div>
