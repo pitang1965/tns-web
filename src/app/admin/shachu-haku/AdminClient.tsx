@@ -12,11 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
-import {
-  getCampingSpotsByBounds,
-  getCampingSpotsWithPagination,
-} from '../../actions/campingSpots';
-import { getCampingSpotSubmissions } from '../../actions/campingSpotSubmissions';
+import { getCampingSpotsByBounds } from '../../actions/campingSpots';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
@@ -25,6 +21,9 @@ import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 import { useLocationNavigation } from '@/hooks/useLocationNavigation';
 import { useSpotFiltering } from '@/hooks/useSpotFiltering';
+import { usePendingSubmissions } from '@/hooks/usePendingSubmissions';
+import { useAdminSpotForm } from '@/hooks/useAdminSpotForm';
+import { useAdminListData } from '@/hooks/useAdminListData';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -92,29 +91,26 @@ export default function AdminClient() {
     },
   });
 
+  // State for map view
   const [spots, setSpots] = useState<CampingSpotWithId[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
-    null
-  );
-  const [showForm, setShowForm] = useState(false);
-  const [showImportDialog, setShowImportDialog] = useState(false);
-  const [pendingSubmissionsCount, setPendingSubmissionsCount] = useState(0);
-
-  // Pagination state for list view
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 20;
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
-  // List view data and loading state
-  const [listData, setListData] = useState<{
-    spots: CampingSpotWithId[];
-    total: number;
-    page: number;
-    totalPages: number;
-  } | null>(null);
-  const [listLoading, setListLoading] = useState(false);
+  // Use custom hooks
+  const { pendingCount: pendingSubmissionsCount } = usePendingSubmissions({
+    isAdmin: !!isAdmin,
+  });
+
+  const {
+    selectedSpot,
+    showForm,
+    isNewSpot,
+    openForm,
+    closeForm,
+    handleSpotSelect,
+    clearSelection,
+  } = useAdminSpotForm();
 
   // Bounds state for map view - use ref instead of state to prevent re-renders
   const mapBoundsRef = useRef<{
@@ -123,7 +119,6 @@ export default function AdminClient() {
     east: number;
     west: number;
   } | null>(null);
-  const lastListFiltersRef = useRef<string | null>(null);
   const prevActiveTabRef = useRef<'map' | 'list'>(activeTab);
 
   // Use custom hook for map bounds loading with optimized data fetching
@@ -146,51 +141,21 @@ export default function AdminClient() {
     },
   });
 
-  // Load spots for list view with pagination - NO dependencies
-  const loadListSpotsRef = useRef<
-    | ((
-        page: number,
-        filters?: {
-          searchTerm?: string;
-          prefecture?: string;
-          type?: string;
-        }
-      ) => Promise<void>)
-    | null
-  >(null);
-  loadListSpotsRef.current = async (
-    page: number,
-    filters?: {
-      searchTerm?: string;
-      prefecture?: string;
-      type?: string;
-    }
-  ) => {
-    try {
-      setLoading(true);
-      const result = await getCampingSpotsWithPagination(
-        page,
-        pageSize,
-        filters
-      );
-      setSpots(result.spots);
-      setTotalPages(result.totalPages);
-      setTotalCount(result.total);
-      setCurrentPage(result.page);
-
-      // Mark initial load as done so switching to map tab doesn't trigger unnecessary API calls
-      initialLoadDoneRef.current = true;
-    } catch (error) {
-      toast({
-        title: 'エラー',
-        description: '車中泊スポットの読み込みに失敗しました',
-        variant: 'destructive',
-      });
-      console.error('Error loading spots:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use custom hook for list view data management
+  const {
+    listData,
+    listLoading,
+    setCurrentPage,
+    refreshListData,
+    lastListFiltersRef,
+  } = useAdminListData({
+    activeTab,
+    searchTerm,
+    typeFilter,
+    pageSize: 20,
+    toast,
+    initialLoadDoneRef,
+  });
 
   // Wrapper for handleBoundsChange that saves mapBoundsRef and savedBounds
   const handleBoundsChangeWrapper = useCallback(
@@ -210,74 +175,6 @@ export default function AdminClient() {
     },
     [handleBoundsChange, initialLoadDoneRef, lastLoadedBoundsRef]
   );
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, typeFilter]);
-
-  // Load spots for list view when tab, filters, or page changes
-  useEffect(() => {
-    if (activeTab === 'list') {
-      // Check if data is already loaded from map view
-      const isDataAlreadyLoaded =
-        spots.length > 0 && initialLoadDoneRef.current;
-      // Check if this is first time switching to list view
-      const isFirstListView = lastListFiltersRef.current === null;
-
-      const filters = {
-        searchTerm: searchTerm || undefined,
-        prefecture: undefined,
-        type: typeFilter !== 'all' ? typeFilter : undefined,
-      };
-
-      // Create a stable string representation of filters for comparison
-      const filtersKey = JSON.stringify({
-        searchTerm: filters.searchTerm,
-        prefecture: filters.prefecture,
-        type: filters.type,
-        page: currentPage,
-      });
-
-      // Skip if we already initiated a request with the same filters (prevents multiple API calls during loading)
-      if (lastListFiltersRef.current === filtersKey) {
-        return;
-      }
-
-      // Note: Unlike the public page, admin list view shows ALL data (not bounded by map view),
-      // so we always need to fetch from API, even when switching from map view.
-      // Map view shows only spots in visible area, while list view shows all spots.
-
-      // Load data from API
-      lastListFiltersRef.current = filtersKey;
-      setListLoading(true);
-
-      getCampingSpotsWithPagination(currentPage, pageSize, filters)
-        .then((data) => {
-          setListData(data);
-          setListLoading(false);
-        })
-        .catch((error) => {
-          console.error('[Admin] Error loading list data:', error);
-          toast({
-            title: 'エラー',
-            description: '車中泊スポットの読み込みに失敗しました',
-            variant: 'destructive',
-          });
-          setListLoading(false);
-        });
-    }
-  }, [
-    activeTab,
-    currentPage,
-    searchTerm,
-    typeFilter,
-    spots,
-    spots.length,
-    initialLoadDoneRef,
-    pageSize,
-    toast,
-  ]);
 
   // Reload map data when switching to map tab or when filters change
   useEffect(() => {
@@ -313,25 +210,6 @@ export default function AdminClient() {
     };
   }, [cleanupMapBoundsLoader]);
 
-  // Load pending submissions count
-  useEffect(() => {
-    const loadPendingCount = async () => {
-      try {
-        const submissions = await getCampingSpotSubmissions();
-        const pendingCount = submissions.filter(
-          (s: { status: string }) => s.status === 'pending'
-        ).length;
-        setPendingSubmissionsCount(pendingCount);
-      } catch (error) {
-        console.error('Error loading pending submissions count:', error);
-      }
-    };
-
-    if (isAdmin) {
-      loadPendingCount();
-    }
-  }, [isAdmin]);
-
   // Update URL when filters or tab change (on user interaction)
   const isInitialMountRef = useRef(true);
   useEffect(() => {
@@ -365,19 +243,9 @@ export default function AdminClient() {
     router.replace(newUrl, { scroll: false });
   }, [searchTerm, typeFilter, activeTab, router]);
 
-  const handleSpotSelect = (spot: CampingSpotWithId) => {
-    // Set selected spot to show custom popup (for map view)
-    setSelectedSpot(spot);
-  };
-
   const handleNavigateToEdit = (spotId: string) => {
     // Navigate to the edit page with the spot ID
     router.push(`/admin/shachu-haku/${spotId}`);
-  };
-
-  const handleFormClose = () => {
-    setShowForm(false);
-    setSelectedSpot(null);
   };
 
   // Use location navigation hook
@@ -391,7 +259,6 @@ export default function AdminClient() {
 
   const handleFormSuccess = () => {
     // 新規作成時は紙吹雪でお祝い
-    const isNewSpot = !selectedSpot?._id;
     if (isNewSpot) {
       celebrateSubmission();
     }
@@ -400,27 +267,13 @@ export default function AdminClient() {
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
       lastListFiltersRef.current = null;
-      const filters = {
-        searchTerm: searchTerm || undefined,
-        prefecture: undefined,
-        type: typeFilter !== 'all' ? typeFilter : undefined,
-      };
       // Manually trigger data reload for list view
-      setListLoading(true);
-      getCampingSpotsWithPagination(currentPage, pageSize, filters)
-        .then((data) => {
-          setListData(data);
-          setListLoading(false);
-        })
-        .catch((error) => {
-          console.error('[Admin] Error reloading list data:', error);
-          setListLoading(false);
-        });
+      refreshListData();
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);
     }
-    handleFormClose();
+    closeForm();
     toast({
       title: isNewSpot ? '🎉 作成完了' : '成功',
       description: isNewSpot
@@ -434,22 +287,8 @@ export default function AdminClient() {
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
       lastListFiltersRef.current = null;
-      const filters = {
-        searchTerm: searchTerm || undefined,
-        prefecture: undefined,
-        type: typeFilter !== 'all' ? typeFilter : undefined,
-      };
       // Manually trigger data reload for list view
-      setListLoading(true);
-      getCampingSpotsWithPagination(currentPage, pageSize, filters)
-        .then((data) => {
-          setListData(data);
-          setListLoading(false);
-        })
-        .catch((error) => {
-          console.error('[Admin] Error reloading list data:', error);
-          setListLoading(false);
-        });
+      refreshListData();
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);
@@ -668,7 +507,7 @@ export default function AdminClient() {
               CSVエクスポート
             </Button>
             <Button
-              onClick={() => setShowForm(true)}
+              onClick={() => openForm()}
               className='hidden md:flex cursor-pointer'
             >
               <Plus className='w-4 h-4 mr-2' />
@@ -677,7 +516,7 @@ export default function AdminClient() {
           </div>
         </div>
         <Button
-          onClick={() => setShowForm(true)}
+          onClick={() => openForm()}
           className='md:hidden w-full cursor-pointer'
         >
           <Plus className='w-4 h-4 mr-2' />
@@ -733,7 +572,7 @@ export default function AdminClient() {
               {activeTab === 'map' && selectedSpot ? (
                 <SpotPopup
                   spot={selectedSpot}
-                  onClose={() => setSelectedSpot(null)}
+                  onClose={clearSelection}
                   actionButton={
                     <Button
                       onClick={() => handleNavigateToEdit(selectedSpot._id)}
@@ -776,7 +615,7 @@ export default function AdminClient() {
                 initialZoom={mapZoom}
                 initialBounds={savedBounds || undefined}
                 onCreateSpot={(coordinates) => {
-                  setSelectedSpot({
+                  openForm({
                     coordinates,
                     name: '',
                     prefecture: '',
@@ -795,7 +634,6 @@ export default function AdminClient() {
                     notes: '',
                     isVerified: false,
                   } as any);
-                  setShowForm(true);
                 }}
               />
             </CardContent>
@@ -850,7 +688,7 @@ export default function AdminClient() {
         <ShachuHakuForm
           key={selectedSpot?._id || 'new'}
           spot={selectedSpot}
-          onClose={handleFormClose}
+          onClose={closeForm}
           onSuccess={handleFormSuccess}
         />
       )}
