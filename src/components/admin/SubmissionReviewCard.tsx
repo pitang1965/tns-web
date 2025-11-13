@@ -193,11 +193,12 @@ export default function SubmissionReviewCard({
                       <div className='flex gap-2'>
                         <Button
                           onClick={handleReject}
-                          disabled={loading || !reviewNotes.trim()}
+                          isLoading={loading}
+                          disabled={!reviewNotes.trim()}
                           variant='destructive'
                           className='cursor-pointer'
                         >
-                          {loading ? '処理中...' : '却下する'}
+                          却下する
                         </Button>
                         <Button
                           variant='outline'
@@ -277,11 +278,11 @@ export default function SubmissionReviewCard({
                     <div className='flex gap-2'>
                       <Button
                         onClick={handleDelete}
-                        disabled={loading}
+                        isLoading={loading}
                         variant='destructive'
                         className='cursor-pointer'
                       >
-                        {loading ? '削除中...' : '履歴を削除する'}
+                        履歴を削除する
                       </Button>
                       <Button
                         variant='outline'

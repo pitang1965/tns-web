@@ -55,7 +55,7 @@ export const PublicItineraryItem: React.FC<Props> = ({ itinerary }) => {
   };
 
   return (
-    <Card className='flex flex-col h-full'>
+    <Card interactive className='flex flex-col h-full'>
       <CardHeader>
         <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
         {itinerary.owner && (

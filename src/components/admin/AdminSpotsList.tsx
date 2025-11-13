@@ -102,7 +102,7 @@ export function AdminSpotsList({
           {filteredSpots.map((spot) => (
             <div
               key={spot._id}
-              className='border rounded-lg p-4 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:border-gray-600 transition-all duration-200'
+              className='border rounded-lg p-4 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:border-gray-600 active:scale-[0.98] transition-all duration-200 cursor-pointer'
             >
               <div className='flex justify-between items-start'>
                 <div className='flex-1'>
