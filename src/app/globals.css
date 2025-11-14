@@ -190,4 +190,27 @@
     position: relative;
     z-index: 10;
   }
+
+  /* ボタンとインタラクティブ要素の押下フィードバック */
+  button:not(:disabled):active,
+  a[role="button"]:active,
+  [data-slot="button"]:not(:disabled):active {
+    transform: scale(0.97);
+    transition: transform 75ms;
+  }
+
+  /* カード型コンポーネントのホバー・押下フィードバック */
+  .interactive-card {
+    transition: all 200ms;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .interactive-card:active {
+    transform: scale(0.98);
+    transition: transform 75ms;
+  }
 }

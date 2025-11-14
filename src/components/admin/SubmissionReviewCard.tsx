@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -193,11 +194,11 @@ export default function SubmissionReviewCard({
                       <div className='flex gap-2'>
                         <Button
                           onClick={handleReject}
-                          isLoading={loading}
-                          disabled={!reviewNotes.trim()}
+                          disabled={loading || !reviewNotes.trim()}
                           variant='destructive'
                           className='cursor-pointer'
                         >
+                          {loading && <Spinner />}
                           却下する
                         </Button>
                         <Button
@@ -278,10 +279,11 @@ export default function SubmissionReviewCard({
                     <div className='flex gap-2'>
                       <Button
                         onClick={handleDelete}
-                        isLoading={loading}
+                        disabled={loading}
                         variant='destructive'
                         className='cursor-pointer'
                       >
+                        {loading && <Spinner />}
                         履歴を削除する
                       </Button>
                       <Button

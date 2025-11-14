@@ -34,7 +34,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   };
 
   return (
-    <Card interactive className='flex flex-col h-full'>
+    <Card className='flex flex-col h-full interactive-card'>
       <CardHeader>
         <div className='flex flex-col gap-2'>
           <div className='flex items-start justify-between gap-2'>

@@ -529,14 +529,14 @@ export default function ShachuHakuClient() {
             <Button
               onClick={handleShare}
               variant='outline'
-              className='w-full sm:w-auto cursor-pointer'
+              className='w-full sm:w-auto cursor-pointer whitespace-nowrap'
             >
-              <Share2 className='w-4 h-4 mr-2' />
+              <Share2 className='w-4 h-4' />
               車中泊情報を共有
             </Button>
             <Link href='/shachu-haku/submit'>
-              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto cursor-pointer'>
-                <Plus className='w-4 h-4 mr-2' />
+              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto cursor-pointer whitespace-nowrap'>
+                <Plus className='w-4 h-4' />
                 スポット投稿
               </Button>
             </Link>
