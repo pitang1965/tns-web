@@ -3,9 +3,8 @@ import { H2 } from '@/components/common/Typography';
 import { getItineraries } from '@/lib/itineraries';
 import { auth0 } from '@/lib/auth0';
 import UserStats from '@/components/common/UserStats';
-import RecentItineraries from '@/components/common/RecentItineraries';
 import QuickActions from '@/components/common/QuickActions';
-import RecentItineraryViews from '@/components/common/RecentItineraryViews';
+import RecentViews from '@/components/common/RecentViews';
 import PremiumBadge from '@/components/common/PremiumBadge';
 import ItineraryLimitStatus from '@/components/common/ItineraryLimitStatus';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
@@ -28,19 +27,11 @@ async function DashboardContent() {
       {/* Statistics */}
       <UserStats itineraries={itineraries} />
 
-      {/* Main Content Grid */}
-      <div className='grid gap-6 lg:grid-cols-3'>
-        {/* Left Column */}
-        <div className='lg:col-span-2 space-y-6'>
-          <RecentItineraries itineraries={itineraries} limit={4} />
-          <QuickActions />
-        </div>
-
-        {/* Right Column */}
-        <div className='space-y-6'>
-          <ItineraryLimitStatus user={session?.user} itineraries={itineraries} />
-          <RecentItineraryViews />
-        </div>
+      {/* Main Content - Single Column */}
+      <div className='space-y-6'>
+        <QuickActions />
+        <ItineraryLimitStatus user={session?.user} itineraries={itineraries} />
+        <RecentViews />
       </div>
     </>
   );

@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { formatDistance } from '@/lib/formatDistance';
+import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
   ArrowLeft,
   Share2,
@@ -61,7 +63,16 @@ type SpotDetailClientProps = {
 export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { addUrl } = useRecentUrls();
   const isFromList = searchParams.get('from') === 'list';
+
+  // 閲覧履歴に追加
+  useEffect(() => {
+    if (spot && spot.name) {
+      addUrl(pathname, spot.name);
+    }
+  }, [spot, pathname, addUrl]);
 
   // 座標の有効性をチェック
   const isValidCoordinate = (

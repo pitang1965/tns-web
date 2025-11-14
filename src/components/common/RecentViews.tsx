@@ -1,30 +1,83 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, ExternalLink, X, Calendar, MapPin } from 'lucide-react';
+import { Eye, X, MapPin, Map } from 'lucide-react';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { SmallText } from './Typography';
 
-export default function RecentItineraryViews() {
+type ViewType = 'itinerary' | 'campingSpot' | 'other';
+
+type ViewInfo = {
+  type: ViewType;
+  id?: string;
+};
+
+export default function RecentViews() {
   const { recentUrls, removeUrl, clearHistory } = useRecentUrls();
 
-  // 旅程関連のURLのみをフィルタリング
-  const itineraryUrls = recentUrls.filter(
-    (item) =>
-      item.url.includes('/itineraries/') &&
-      !item.url.includes('/new') &&
-      !item.url.endsWith('/itineraries')
-  );
+  // URLの種類を判定
+  const getViewInfo = (url: string): ViewInfo => {
+    // 車中泊スポット: /shachu-haku/[spotId]
+    const campingSpotMatch = url.match(/^\/shachu-haku\/([^\/]+)$/);
+    if (campingSpotMatch) {
+      return { type: 'campingSpot', id: campingSpotMatch[1] };
+    }
 
-  if (itineraryUrls.length === 0) {
+    // 旅程: /itineraries/[id] (day パラメータを含む場合もある)
+    const itineraryMatch = url.match(/^\/itineraries\/([^\/]+)/);
+    if (itineraryMatch && !url.includes('/new') && !url.endsWith('/itineraries')) {
+      return { type: 'itinerary', id: itineraryMatch[1] };
+    }
+
+    return { type: 'other' };
+  };
+
+  // 表示対象のURLをフィルタリング
+  const relevantUrls = recentUrls.filter((item) => {
+    const info = getViewInfo(item.url);
+    return info.type === 'itinerary' || info.type === 'campingSpot';
+  });
+
+  const getViewIcon = (type: ViewType) => {
+    switch (type) {
+      case 'campingSpot':
+        return <Map size={14} className='text-green-500' />;
+      case 'itinerary':
+        return <MapPin size={14} className='text-purple-500' />;
+      default:
+        return <Eye size={14} />;
+    }
+  };
+
+  const getViewBadge = (type: ViewType) => {
+    switch (type) {
+      case 'campingSpot':
+        return (
+          <Badge variant='secondary' className='text-xs'>
+            車中泊
+          </Badge>
+        );
+      case 'itinerary':
+        return (
+          <Badge variant='secondary' className='text-xs'>
+            旅程
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (relevantUrls.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <Clock size={20} />
-            最近見た旅程
+            <Eye size={20} />
+            閲覧履歴
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -52,25 +105,14 @@ export default function RecentItineraryViews() {
     }
   };
 
-  const getItineraryInfo = (url: string) => {
-    // URLから旅程IDと日程を抽出
-    const match = url.match(/\/itineraries\/([^\/]+)(?:\/day\/(\d+))?/);
-    if (match) {
-      const itineraryId = match[1];
-      const dayIndex = match[2] ? parseInt(match[2]) + 1 : null;
-      return { itineraryId, dayIndex };
-    }
-    return null;
-  };
-
   return (
     <Card>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3'>
         <CardTitle className='flex items-center gap-2'>
-          <Clock size={20} />
-          最近見た旅程
+          <Eye size={20} />
+          閲覧履歴
         </CardTitle>
-        {itineraryUrls.length > 0 && (
+        {relevantUrls.length > 0 && (
           <Button
             variant='ghost'
             size='sm'
@@ -82,8 +124,8 @@ export default function RecentItineraryViews() {
         )}
       </CardHeader>
       <CardContent className='space-y-3'>
-        {itineraryUrls.map((item, index) => {
-          const info = getItineraryInfo(item.url);
+        {relevantUrls.map((item, index) => {
+          const info = getViewInfo(item.url);
 
           return (
             <div
@@ -96,29 +138,15 @@ export default function RecentItineraryViews() {
                   className='flex items-center gap-2 text-sm hover:text-primary transition-colors'
                 >
                   <div className='flex items-center gap-1 flex-shrink-0'>
-                    {info?.dayIndex ? (
-                      <Calendar size={14} className='text-blue-500' />
-                    ) : (
-                      <ExternalLink size={14} />
-                    )}
+                    {getViewIcon(info.type)}
                   </div>
                   <div className='min-w-0 flex-1'>
-                    <p className='font-medium truncate'>
-                      {item.title}
-                      {info?.dayIndex && (
-                        <span className='text-blue-600 ml-1'>
-                          - {info.dayIndex}日目
-                        </span>
-                      )}
-                    </p>
-                    <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                    <div className='flex items-center gap-2'>
+                      <p className='font-medium truncate'>{item.title}</p>
+                      {getViewBadge(info.type)}
+                    </div>
+                    <div className='flex items-center gap-2 text-xs text-muted-foreground mt-1'>
                       <span>{formatTimestamp(item.timestamp)}</span>
-                      {info?.dayIndex && (
-                        <div className='flex items-center gap-1'>
-                          <MapPin size={10} />
-                          <span>日程詳細</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </Link>

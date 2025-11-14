@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Button } from '@/components/ui/button';
 import { ItineraryToc } from '@/components/layout/ItineraryToc';
@@ -16,6 +18,7 @@ import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { useGetItineraryDay } from '@/hooks/useGetItineraryDay';
 import { useItineraryAccess } from '@/hooks/useItineraryAccess';
 import { useItineraryActions } from '@/hooks/useItineraryActions';
+import { useRecentUrls } from '@/hooks/useRecentUrls';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 type ItineraryDetailProps = {
@@ -24,6 +27,9 @@ type ItineraryDetailProps = {
 
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   const { user } = useUser();
+  const pathname = usePathname();
+  const { addUrl } = useRecentUrls();
+
   // 最初は基本メタデータだけを取得（日程の総数を知るため）
   const { itinerary: metadataOnly, loading: metadataLoading } =
     useGetItinerary(id);
@@ -53,6 +59,18 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   // 読み込み状態を合成
   const loading = metadataLoading || dayLoading;
   const error = dayError;
+
+  // 閲覧履歴に追加
+  useEffect(() => {
+    if (metadata && access.hasAccess) {
+      const title = metadata.title || '旅程を表示';
+      const dayDisplay = metadata.totalDays > 1 && currentDayIndex !== null
+        ? ` ${currentDayIndex + 1}日目`
+        : '';
+      const fullTitle = `${title}${dayDisplay}`;
+      addUrl(pathname, fullTitle);
+    }
+  }, [metadata, access.hasAccess, currentDayIndex, pathname, addUrl]);
 
   const renderDayPlan = (dayPlan: DayPlan, index: number) => {
     return <DayPlanView key={index} day={dayPlan} dayIndex={index} />;
