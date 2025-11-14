@@ -257,10 +257,16 @@ export default function AdminClient() {
       toast,
     });
 
-  const handleFormSuccess = () => {
+  const handleFormSuccess = (createdId?: string) => {
     // 新規作成時は紙吹雪でお祝い
     if (isNewSpot) {
       celebrateSubmission();
+    }
+
+    // 新規作成時は編集ページにリダイレクト
+    if (isNewSpot && createdId) {
+      router.push(`/admin/shachu-haku/${createdId}`);
+      return;
     }
 
     // Reload spots based on current tab

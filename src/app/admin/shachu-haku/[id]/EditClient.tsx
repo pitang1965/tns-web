@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { getCampingSpotById } from '../../../actions/campingSpots';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { LoadingState } from '@/components/common/LoadingState';
+import { useRecentUrls } from '@/hooks/useRecentUrls';
 
 // Dynamically import the form component to avoid SSR issues
 const ShachuHakuForm = dynamic(
@@ -25,6 +26,8 @@ export default function EditClient() {
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
+  const { addUrl } = useRecentUrls();
   const id = params?.id as string;
 
   // Check if user is admin
@@ -65,6 +68,13 @@ export default function EditClient() {
 
     loadSpot();
   }, [id, isLoading, isAdmin, toast]);
+
+  // 閲覧履歴に追加
+  useEffect(() => {
+    if (spot && isAdmin) {
+      addUrl(pathname, spot.name);
+    }
+  }, [spot, isAdmin, pathname, addUrl]);
 
   const handleFormSuccess = () => {
     toast({

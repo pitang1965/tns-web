@@ -129,7 +129,7 @@ export function useItineraryForm({
         });
 
         if (isCreating && result.id) {
-          router.push(`/itineraries/${result.id}`);
+          router.push(`/itineraries/${result.id}/edit`);
         }
       } else {
         toast({

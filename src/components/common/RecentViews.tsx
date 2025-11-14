@@ -1,18 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { Eye, X, MapPin, Map } from 'lucide-react';
+import { Eye, X, Edit, History } from 'lucide-react';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SmallText } from './Typography';
 
-type ViewType = 'itinerary' | 'campingSpot' | 'other';
+type ViewType = 'itinerary' | 'itineraryEdit' | 'campingSpot' | 'campingSpotEdit' | 'other';
 
 type ViewInfo = {
   type: ViewType;
   id?: string;
+  isEdit: boolean;
+  category: 'itinerary' | 'campingSpot' | 'other';
 };
 
 export default function RecentViews() {
@@ -20,50 +22,81 @@ export default function RecentViews() {
 
   // URLの種類を判定
   const getViewInfo = (url: string): ViewInfo => {
-    // 車中泊スポット: /shachu-haku/[spotId]
-    const campingSpotMatch = url.match(/^\/shachu-haku\/([^\/]+)$/);
-    if (campingSpotMatch) {
-      return { type: 'campingSpot', id: campingSpotMatch[1] };
+    // 旅程編集: /itineraries/[id]/edit
+    const itineraryEditMatch = url.match(/^\/itineraries\/([^\/]+)\/edit/);
+    if (itineraryEditMatch) {
+      return {
+        type: 'itineraryEdit',
+        id: itineraryEditMatch[1],
+        isEdit: true,
+        category: 'itinerary',
+      };
     }
 
-    // 旅程: /itineraries/[id] (day パラメータを含む場合もある)
+    // 旅程閲覧: /itineraries/[id]
     const itineraryMatch = url.match(/^\/itineraries\/([^\/]+)/);
     if (itineraryMatch && !url.includes('/new') && !url.endsWith('/itineraries')) {
-      return { type: 'itinerary', id: itineraryMatch[1] };
+      return {
+        type: 'itinerary',
+        id: itineraryMatch[1],
+        isEdit: false,
+        category: 'itinerary',
+      };
     }
 
-    return { type: 'other' };
+    // 管理者用車中泊スポット編集: /admin/shachu-haku/[id]
+    const campingSpotEditMatch = url.match(/^\/admin\/shachu-haku\/([^\/]+)$/);
+    if (campingSpotEditMatch) {
+      return {
+        type: 'campingSpotEdit',
+        id: campingSpotEditMatch[1],
+        isEdit: true,
+        category: 'campingSpot',
+      };
+    }
+
+    // 車中泊スポット閲覧: /shachu-haku/[spotId]
+    const campingSpotMatch = url.match(/^\/shachu-haku\/([^\/]+)$/);
+    if (campingSpotMatch) {
+      return {
+        type: 'campingSpot',
+        id: campingSpotMatch[1],
+        isEdit: false,
+        category: 'campingSpot',
+      };
+    }
+
+    return { type: 'other', isEdit: false, category: 'other' };
   };
 
   // 表示対象のURLをフィルタリング
   const relevantUrls = recentUrls.filter((item) => {
     const info = getViewInfo(item.url);
-    return info.type === 'itinerary' || info.type === 'campingSpot';
+    return info.category === 'itinerary' || info.category === 'campingSpot';
   });
 
-  const getViewIcon = (type: ViewType) => {
-    switch (type) {
-      case 'campingSpot':
-        return <Map size={14} className='text-green-500' />;
-      case 'itinerary':
-        return <MapPin size={14} className='text-purple-500' />;
-      default:
-        return <Eye size={14} />;
+  const getViewIcon = (info: ViewInfo) => {
+    // アイコンは編集/閲覧で決定
+    if (info.isEdit) {
+      return <Edit size={14} className='text-orange-500' />;
+    } else {
+      return <Eye size={14} className='text-blue-500' />;
     }
   };
 
-  const getViewBadge = (type: ViewType) => {
-    switch (type) {
-      case 'campingSpot':
-        return (
-          <Badge variant='secondary' className='text-xs'>
-            車中泊
-          </Badge>
-        );
+  const getViewBadge = (info: ViewInfo) => {
+    // バッジはカテゴリで決定（QuickActionsの色と合わせる）
+    switch (info.category) {
       case 'itinerary':
         return (
-          <Badge variant='secondary' className='text-xs'>
+          <Badge variant='secondary' className='text-xs bg-blue-500 text-white'>
             旅程
+          </Badge>
+        );
+      case 'campingSpot':
+        return (
+          <Badge variant='secondary' className='text-xs bg-purple-500 text-white'>
+            車中泊
           </Badge>
         );
       default:
@@ -76,13 +109,13 @@ export default function RecentViews() {
       <Card>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <Eye size={20} />
-            閲覧履歴
+            <History size={20} />
+            アクセス履歴
           </CardTitle>
         </CardHeader>
         <CardContent>
           <SmallText className='text-muted-foreground'>
-            まだ閲覧履歴がありません
+            まだアクセス履歴がありません
           </SmallText>
         </CardContent>
       </Card>
@@ -109,8 +142,8 @@ export default function RecentViews() {
     <Card>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3'>
         <CardTitle className='flex items-center gap-2'>
-          <Eye size={20} />
-          閲覧履歴
+          <History size={20} />
+          アクセス履歴
         </CardTitle>
         {relevantUrls.length > 0 && (
           <Button
@@ -138,12 +171,12 @@ export default function RecentViews() {
                   className='flex items-center gap-2 text-sm hover:text-primary transition-colors'
                 >
                   <div className='flex items-center gap-1 flex-shrink-0'>
-                    {getViewIcon(info.type)}
+                    {getViewIcon(info)}
                   </div>
                   <div className='min-w-0 flex-1'>
                     <div className='flex items-center gap-2'>
                       <p className='font-medium truncate'>{item.title}</p>
-                      {getViewBadge(info.type)}
+                      {getViewBadge(info)}
                     </div>
                     <div className='flex items-center gap-2 text-xs text-muted-foreground mt-1'>
                       <span>{formatTimestamp(item.timestamp)}</span>

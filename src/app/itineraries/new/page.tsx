@@ -93,7 +93,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
       console.log('Server action result:', result);
       setIsSubmitting(false);
       if (result.success) {
-        router.push(`/itineraries/${result.id}`);
+        router.push(`/itineraries/${result.id}/edit`);
       } else {
         setIsLoading(false);
         toast({

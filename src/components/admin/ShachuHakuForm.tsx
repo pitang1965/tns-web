@@ -29,7 +29,7 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 type ShachuHakuFormProps = {
   spot?: CampingSpotWithId | null;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (createdId?: string) => void;
 }
 
 
@@ -315,13 +315,18 @@ export default function ShachuHakuForm({
       formData.append('restrictions', data.restrictions);
       formData.append('amenities', data.amenities);
 
+      let createdId: string | undefined;
+
       if (isEdit) {
         await updateCampingSpot(spot._id, formData);
       } else {
-        await createCampingSpot(formData);
+        const result = await createCampingSpot(formData);
+        if (result.success && result.id) {
+          createdId = result.id;
+        }
       }
 
-      onSuccess();
+      onSuccess(createdId);
     } catch (error) {
       console.error('Save error:', error);
 

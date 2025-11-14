@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { ItineraryToc } from '@/components/layout/ItineraryToc';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
@@ -9,6 +9,7 @@ import { updateItineraryAction } from '@/actions/updateItinerary';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { LoadingState } from '@/components/common/LoadingState';
+import { useRecentUrls } from '@/hooks/useRecentUrls';
 
 type EditItineraryPageProps = {
   params: Promise<{
@@ -22,6 +23,8 @@ export default withPageAuthRequired(function EditItineraryPage({
   const { id } = use(params);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { addUrl } = useRecentUrls();
   const { itinerary, loading, error } = useGetItinerary(id);
 
   // ページタイトルを動的に設定
@@ -32,6 +35,16 @@ export default withPageAuthRequired(function EditItineraryPage({
       document.title = `${itinerary.title}${dayDisplay} | 車旅のしおり`;
     }
   }, [itinerary?.title, searchParams]);
+
+  // 閲覧履歴に追加
+  useEffect(() => {
+    if (itinerary?.title) {
+      const dayParam = searchParams.get('day');
+      const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
+      const title = `${itinerary.title}${dayDisplay}`;
+      addUrl(pathname, title);
+    }
+  }, [itinerary?.title, searchParams, pathname, addUrl]);
 
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data for update:', data);
