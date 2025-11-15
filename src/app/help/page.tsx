@@ -273,7 +273,16 @@ export default function HelpPage() {
             お問い合わせ
           </h2>
           <p className='text-gray-700 dark:text-gray-300'>
-            ご不明な点やご要望がございましたら、お気軽にお問い合わせください。
+            ご不明な点やご要望がございましたら、
+            <a
+              href='https://tabi.over40web.club/contact'
+              className='text-primary hover:underline font-medium'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              お問い合わせフォーム
+            </a>
+            よりお気軽にご連絡ください。
           </p>
         </section>
       </div>
