@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,6 +65,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
             className='flex-1 cursor-pointer'
             onClick={() => router.push(`/itineraries/${itinerary.id}`)}
           >
+            <Eye className='w-4 h-4 mr-1' />
             見る
           </Button>
           {user && itinerary.owner && user.sub === itinerary.owner.id && (
@@ -73,6 +75,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
                 className='flex-1 cursor-pointer'
                 onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
               >
+                <Pencil className='w-4 h-4 mr-1' />
                 編集
               </Button>
               <Button
@@ -81,6 +84,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
                 className='flex-1 cursor-pointer'
                 onClick={() => setIsConfirmOpen(true)}
               >
+                <Trash2 className='w-4 h-4 mr-1' />
                 削除
               </Button>
             </>
