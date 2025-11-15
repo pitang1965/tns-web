@@ -88,10 +88,17 @@ export default function PrivacyPage() {
           8. お問い合わせ窓口
         </h2>
         <p className='mb-6'>
-          本ポリシーに関するお問い合わせやアカウント削除のご依頼は、下記の連絡先までお願いいたします。
+          本ポリシーに関するお問い合わせやアカウント削除のご依頼は、
+          <a
+            href='https://tabi.over40web.club/contact'
+            className='text-primary hover:underline'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            お問い合わせフォーム
+          </a>
+          よりお願いいたします。
         </p>
-        <p className='mb-6'>メールアドレス: pitang1965@gmail.com</p>
-
         <p className='text-sm text-gray-600 mt-8'>
           制定日: 2025年9月23日
           <br />
