@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import { Trash2, Loader2 } from 'lucide-react';
 
 type ConfirmationDialogProps = {
   // ダイアログの表示/非表示を制御
@@ -84,7 +85,17 @@ export function ConfirmationDialog({
                 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
             )}
           >
-            {isProcessing ? `${confirmLabel}中...` : confirmLabel}
+            {isProcessing ? (
+              <>
+                <Loader2 className='w-4 h-4 mr-1 animate-spin' />
+                {confirmLabel}中...
+              </>
+            ) : (
+              <>
+                {variant === 'destructive' && <Trash2 className='w-4 h-4 mr-1' />}
+                {confirmLabel}
+              </>
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
