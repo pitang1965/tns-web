@@ -5,10 +5,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
-  Edit,
+  Pencil,
   Plus,
   Save,
-  Trash,
+  Trash2,
   ArrowLeft,
   Share2,
   BookPlus,
@@ -104,7 +104,7 @@ export function FixedActionButtons({
                 disabled={disabled}
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-secondary hover:bg-secondary/80 cursor-pointer active:scale-95 transition-transform'
               >
-                <Edit className='h-5 w-5' />
+                <Pencil className='h-5 w-5' />
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p>編集</p>
@@ -118,7 +118,7 @@ export function FixedActionButtons({
                 disabled={disabled}
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer active:scale-95 transition-transform'
               >
-                <Trash className='h-5 w-5' />
+                <Trash2 className='h-5 w-5' />
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p>削除</p>
@@ -152,7 +152,7 @@ export function FixedActionButtons({
                 disabled={disabled}
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer active:scale-95 transition-transform'
               >
-                <Trash className='h-5 w-5' />
+                <Trash2 className='h-5 w-5' />
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p>削除</p>
