@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { SmallText } from '@/components/common/Typography';
+import AboutSection from '@/components/landing/AboutSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import StatsSection from '@/components/landing/StatsSection';
 import CTASection from '@/components/landing/CTASection';
@@ -31,6 +32,9 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
       <Suspense fallback={<div className='h-[70vh] bg-gray-100' />}>
         <HeroMapSection initialSpots={initialSpots} />
       </Suspense>
+
+      {/* About Section */}
+      <AboutSection />
 
       {/* Features Section */}
       <FeaturesSection />
