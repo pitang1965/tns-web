@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { importCampingSpotsFromCSV } from '../../app/actions/campingSpots/csv';
 
-interface CSVImportDialogProps {
+type CSVImportDialogProps = {
   onClose: () => void;
   onSuccess: (result: { success: number; errors: any[] }) => void;
 }
