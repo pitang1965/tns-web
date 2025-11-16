@@ -290,7 +290,17 @@ export async function getPublicCampingSpotsByBounds(
   };
 
   if (options?.searchTerm) {
-    query.name = { $regex: options.searchTerm, $options: 'i' };
+    // Split search term by whitespace to support multiple keywords
+    const keywords = options.searchTerm.trim().split(/\s+/);
+
+    // Each keyword must match at least one of: name, prefecture, or address
+    query.$and = keywords.map(keyword => ({
+      $or: [
+        { name: { $regex: keyword, $options: 'i' } },
+        { prefecture: { $regex: keyword, $options: 'i' } },
+        { address: { $regex: keyword, $options: 'i' } }
+      ]
+    }));
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -322,7 +332,17 @@ export async function getPublicCampingSpotsWithPagination(
   const query: any = {};
 
   if (options?.searchTerm) {
-    query.name = { $regex: options.searchTerm, $options: 'i' };
+    // Split search term by whitespace to support multiple keywords
+    const keywords = options.searchTerm.trim().split(/\s+/);
+
+    // Each keyword must match at least one of: name, prefecture, or address
+    query.$and = keywords.map(keyword => ({
+      $or: [
+        { name: { $regex: keyword, $options: 'i' } },
+        { prefecture: { $regex: keyword, $options: 'i' } },
+        { address: { $regex: keyword, $options: 'i' } }
+      ]
+    }));
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {

@@ -185,7 +185,7 @@ export default function ShachuHakuFilters({
                     <Search className='h-4 w-4' />
                   </InputGroupAddon>
                   <InputGroupInput
-                    placeholder='名前で検索...'
+                    placeholder='キーワードで検索...'
                     value={searchTerm}
                     onChange={(e) => onSearchTermChange(e.target.value)}
                   />
@@ -290,7 +290,7 @@ export default function ShachuHakuFilters({
                   <Search className='h-4 w-4' />
                 </InputGroupAddon>
                 <InputGroupInput
-                  placeholder='名前で検索...'
+                  placeholder='キーワードで検索...'
                   value={searchTerm}
                   onChange={(e) => onSearchTermChange(e.target.value)}
                 />

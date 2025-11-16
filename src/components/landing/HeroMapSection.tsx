@@ -196,7 +196,7 @@ export default function HeroMapSection({
             >
               <input
                 type='text'
-                placeholder='地名・エリアで検索...'
+                placeholder='キーワードで検索（例: 千葉県 RVパーク）'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className='w-full px-3 sm:px-6 py-2 sm:py-4 text-sm sm:text-lg rounded-full border-2 border-blue-500 focus:border-blue-600 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-200 dark:bg-gray-800 dark:border-blue-400 dark:text-white transition-all'
