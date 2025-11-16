@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/common/LoadingState';
 import { NearbyCampingSpotsList } from './NearbyCampingSpotsList';
-import { getNearestCampingSpots } from '@/actions/campingSpots';
+import { getNearestCampingSpots } from '../../app/actions/campingSpots/public';
 import {
   CampingSpotWithDistance,
   campingSpotToActivity,

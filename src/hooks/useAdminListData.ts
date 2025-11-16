@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, MutableRefObject } from 'react';
-import { getCampingSpotsWithPagination } from '../app/actions/campingSpots';
+import { getCampingSpotsWithPagination } from '../app/actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
 type ListData = {

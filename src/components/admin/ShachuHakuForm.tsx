@@ -16,7 +16,7 @@ import {
   createCampingSpot,
   updateCampingSpot,
   deleteCampingSpot,
-} from '../../app/actions/campingSpots';
+} from '../../app/actions/campingSpots/admin';
 import { ShachuHakuFormCreateSchema, ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';

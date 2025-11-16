@@ -8,7 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { getCampingSpotById } from '../../../actions/campingSpots';
+import { getCampingSpotById } from '../../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { LoadingState } from '@/components/common/LoadingState';
 import { useRecentUrls } from '@/hooks/useRecentUrls';

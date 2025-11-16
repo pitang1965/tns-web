@@ -18,7 +18,7 @@ import { MapPin, Info, Plus, Share2 } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
-} from '../actions/campingSpots';
+} from '../actions/campingSpots/public';
 import { handleCampingSpotShare } from '@/lib/shareUtils';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';

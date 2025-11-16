@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, Download, MapPin, Plus, Users } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
-import { getCampingSpotsByBounds } from '../../actions/campingSpots';
+import { getCampingSpotsByBounds } from '../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getCampingSpotById } from '../../actions/campingSpots';
+import { getCampingSpotById } from '../../actions/campingSpots/admin';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
 

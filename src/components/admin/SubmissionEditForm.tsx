@@ -11,7 +11,7 @@ import {
   CampingSpotSubmissionWithId,
   CampingSpotType,
 } from '@/data/schemas/campingSpot';
-import { createCampingSpot } from '../../app/actions/campingSpots';
+import { createCampingSpot } from '../../app/actions/campingSpots/admin';
 import { approveSubmissionWithoutCreating } from '../../app/actions/campingSpotSubmissions';
 import { ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
