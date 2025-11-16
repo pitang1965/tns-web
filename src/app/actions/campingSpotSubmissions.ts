@@ -31,7 +31,7 @@ export async function getCampingSpotSubmissions(
   await checkAdminAuth();
   await ensureDbConnection();
 
-  const query: any = {};
+  const query: Record<string, unknown> = {};
   if (status) {
     query.status = status;
   }

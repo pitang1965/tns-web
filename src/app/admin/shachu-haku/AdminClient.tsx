@@ -14,6 +14,7 @@ import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
 import { getCampingSpotsByBounds } from '../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
+import { CSVImportResult } from '../../actions/campingSpots/csv';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
 import { celebrateSubmission } from '@/lib/confetti';
@@ -288,7 +289,7 @@ export default function AdminClient() {
     });
   };
 
-  const handleImportSuccess = (result: { success: number; errors: any[] }) => {
+  const handleImportSuccess = (result: CSVImportResult) => {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
@@ -367,7 +368,7 @@ export default function AdminClient() {
       ];
 
       // Helper function to escape CSV field
-      const escapeCSVField = (field: any): string => {
+      const escapeCSVField = (field: unknown): string => {
         // Use empty string for null/undefined values
         const stringField = field == null ? '' : String(field);
 

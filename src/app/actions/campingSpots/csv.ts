@@ -12,7 +12,18 @@ import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './helpers';
 
-export async function importCampingSpotsFromCSV(csvData: string) {
+export type CSVImportError = {
+  row: number;
+  error: string;
+  data: unknown;
+}
+
+export type CSVImportResult = {
+  success: number;
+  errors: CSVImportError[];
+}
+
+export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImportResult> {
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
@@ -89,9 +100,9 @@ export async function importCampingSpotsFromCSV(csvData: string) {
 
   const headers = rows[0];
 
-  const results = {
+  const results: CSVImportResult = {
     success: 0,
-    errors: [] as { row: number; error: string; data: any }[],
+    errors: [],
   };
 
   // Check if headers are in Japanese or English

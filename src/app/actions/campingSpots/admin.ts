@@ -13,7 +13,7 @@ export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
   await ensureDbConnection();
 
-  const query: any = {};
+  const query: Record<string, unknown> = {};
 
   if (filter) {
     if (filter.prefecture) {
@@ -92,7 +92,7 @@ export async function getCampingSpotsByBounds(
   await checkAdminAuth();
   await ensureDbConnection();
 
-  const query: any = {
+  const query: Record<string, unknown> = {
     coordinates: {
       $geoWithin: {
         $box: [
@@ -116,7 +116,7 @@ export async function getCampingSpotsByBounds(
   }
 
   // Get total count without bounds filter for "全○○件中" display
-  const totalQuery: any = {};
+  const totalQuery: Record<string, unknown> = {};
   if (options?.searchTerm) {
     totalQuery.name = { $regex: options.searchTerm, $options: 'i' };
   }
@@ -152,7 +152,7 @@ export async function getCampingSpotsWithPagination(
   await checkAdminAuth();
   await ensureDbConnection();
 
-  const query: any = {};
+  const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
     query.name = { $regex: options.searchTerm, $options: 'i' };
@@ -304,8 +304,8 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const validatedData = CampingSpotSchema.parse(spotData);
 
   // Prepare update operations - separate set and unset operations
-  const updateOperations: any = { $set: {} };
-  const unsetFields: any = {};
+  const updateOperations: { $set: Record<string, unknown>; $unset?: Record<string, string> } = { $set: {} };
+  const unsetFields: Record<string, string> = {};
 
   // Handle optional fields that should be unset when undefined
   const optionalFields = [
@@ -325,7 +325,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
   ];
 
   Object.keys(validatedData).forEach((key) => {
-    const value = (validatedData as any)[key];
+    const value = (validatedData as Record<string, unknown>)[key];
     if (key === 'pricing' || key === 'security' || key === 'nightNoise') {
       // Skip nested objects here, handle them separately below
       return;

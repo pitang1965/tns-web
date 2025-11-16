@@ -9,7 +9,7 @@ import { ensureDbConnection } from '@/lib/database';
 export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
   await ensureDbConnection();
 
-  const query: any = {};
+  const query: Record<string, unknown> = {};
 
   if (filter) {
     if (filter.prefecture) {
@@ -87,7 +87,7 @@ export async function getPublicCampingSpotsByBounds(
 ) {
   await ensureDbConnection();
 
-  const query: any = {
+  const query: Record<string, unknown> = {
     coordinates: {
       $geoWithin: {
         $box: [
@@ -138,7 +138,7 @@ export async function getPublicCampingSpotsWithPagination(
 ) {
   await ensureDbConnection();
 
-  const query: any = {};
+  const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
     // Split search term by whitespace to support multiple keywords
@@ -202,7 +202,7 @@ export async function getNearestCampingSpots(
 ) {
   await ensureDbConnection();
 
-  const query: any = {
+  const query: Record<string, unknown> = {
     coordinates: {
       $near: {
         $geometry: {
@@ -215,7 +215,7 @@ export async function getNearestCampingSpots(
 
   // Add maxDistance filter if provided
   if (maxDistance !== undefined) {
-    query.coordinates.$near.$maxDistance = maxDistance;
+    (query.coordinates as Record<string, Record<string, unknown>>).$near.$maxDistance = maxDistance;
   }
 
   const spots = await CampingSpot.find(query).limit(limit).lean();

@@ -19,115 +19,116 @@ export async function checkAdminAuth() {
 }
 
 // Helper function to convert FormData to CampingSpot format
-export function convertFormDataToCampingSpot(formObject: Record<string, any>) {
+export function convertFormDataToCampingSpot(formObject: Record<string, unknown>) {
+  const obj = formObject as Record<string, string | boolean | number | undefined>;
   return {
     ...formObject,
-    coordinates: [Number(formObject.lng), Number(formObject.lat)],
+    coordinates: [Number(obj.lng), Number(obj.lat)],
     distanceToToilet:
-      formObject.distanceToToilet && formObject.distanceToToilet.trim() !== ''
-        ? Number(formObject.distanceToToilet)
+      obj.distanceToToilet && String(obj.distanceToToilet).trim() !== ''
+        ? Number(obj.distanceToToilet)
         : undefined,
     distanceToBath:
-      formObject.distanceToBath && formObject.distanceToBath.trim() !== ''
-        ? Number(formObject.distanceToBath)
+      obj.distanceToBath && String(obj.distanceToBath).trim() !== ''
+        ? Number(obj.distanceToBath)
         : undefined,
     distanceToConvenience:
-      formObject.distanceToConvenience &&
-      formObject.distanceToConvenience.trim() !== ''
-        ? Number(formObject.distanceToConvenience)
+      obj.distanceToConvenience &&
+      String(obj.distanceToConvenience).trim() !== ''
+        ? Number(obj.distanceToConvenience)
         : undefined,
     nearbyToiletCoordinates:
-      formObject.nearbyToiletLat &&
-      formObject.nearbyToiletLng &&
-      formObject.nearbyToiletLat.trim() !== '' &&
-      formObject.nearbyToiletLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyToiletLat)) &&
-      !isNaN(Number(formObject.nearbyToiletLng))
+      obj.nearbyToiletLat &&
+      obj.nearbyToiletLng &&
+      String(obj.nearbyToiletLat).trim() !== '' &&
+      String(obj.nearbyToiletLng).trim() !== '' &&
+      !isNaN(Number(obj.nearbyToiletLat)) &&
+      !isNaN(Number(obj.nearbyToiletLng))
         ? [
-            Number(formObject.nearbyToiletLng),
-            Number(formObject.nearbyToiletLat),
+            Number(obj.nearbyToiletLng),
+            Number(obj.nearbyToiletLat),
           ]
         : undefined,
     nearbyConvenienceCoordinates:
-      formObject.nearbyConvenienceLat &&
-      formObject.nearbyConvenienceLng &&
-      formObject.nearbyConvenienceLat.trim() !== '' &&
-      formObject.nearbyConvenienceLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyConvenienceLat)) &&
-      !isNaN(Number(formObject.nearbyConvenienceLng))
+      obj.nearbyConvenienceLat &&
+      obj.nearbyConvenienceLng &&
+      String(obj.nearbyConvenienceLat).trim() !== '' &&
+      String(obj.nearbyConvenienceLng).trim() !== '' &&
+      !isNaN(Number(obj.nearbyConvenienceLat)) &&
+      !isNaN(Number(obj.nearbyConvenienceLng))
         ? [
-            Number(formObject.nearbyConvenienceLng),
-            Number(formObject.nearbyConvenienceLat),
+            Number(obj.nearbyConvenienceLng),
+            Number(obj.nearbyConvenienceLat),
           ]
         : undefined,
     nearbyBathCoordinates:
-      formObject.nearbyBathLat &&
-      formObject.nearbyBathLng &&
-      formObject.nearbyBathLat.trim() !== '' &&
-      formObject.nearbyBathLng.trim() !== '' &&
-      !isNaN(Number(formObject.nearbyBathLat)) &&
-      !isNaN(Number(formObject.nearbyBathLng))
-        ? [Number(formObject.nearbyBathLng), Number(formObject.nearbyBathLat)]
+      obj.nearbyBathLat &&
+      obj.nearbyBathLng &&
+      String(obj.nearbyBathLat).trim() !== '' &&
+      String(obj.nearbyBathLng).trim() !== '' &&
+      !isNaN(Number(obj.nearbyBathLat)) &&
+      !isNaN(Number(obj.nearbyBathLng))
+        ? [Number(obj.nearbyBathLng), Number(obj.nearbyBathLat)]
         : undefined,
     elevation:
-      formObject.elevation && formObject.elevation.trim() !== ''
-        ? Number(formObject.elevation)
+      obj.elevation && String(obj.elevation).trim() !== ''
+        ? Number(obj.elevation)
         : undefined,
     // 新評価システム（客観的データ）
     security: {
-      hasGate: formObject.securityHasGate === 'true',
-      hasLighting: formObject.securityHasLighting === 'true',
-      hasStaff: formObject.securityHasStaff === 'true',
+      hasGate: obj.securityHasGate === 'true',
+      hasLighting: obj.securityHasLighting === 'true',
+      hasStaff: obj.securityHasStaff === 'true',
     },
     nightNoise: {
-      hasNoiseIssues: formObject.nightNoiseHasNoiseIssues === 'true',
-      nearBusyRoad: formObject.nightNoiseNearBusyRoad === 'true',
-      isQuietArea: formObject.nightNoiseIsQuietArea === 'true',
+      hasNoiseIssues: obj.nightNoiseHasNoiseIssues === 'true',
+      nearBusyRoad: obj.nightNoiseNearBusyRoad === 'true',
+      isQuietArea: obj.nightNoiseIsQuietArea === 'true',
     },
     // 旧評価システム（段階的廃止予定）
     quietnessLevel:
-      formObject.quietnessLevel && formObject.quietnessLevel.trim() !== ''
-        ? Number(formObject.quietnessLevel)
+      obj.quietnessLevel && String(obj.quietnessLevel).trim() !== ''
+        ? Number(obj.quietnessLevel)
         : undefined,
     securityLevel:
-      formObject.securityLevel && formObject.securityLevel.trim() !== ''
-        ? Number(formObject.securityLevel)
+      obj.securityLevel && String(obj.securityLevel).trim() !== ''
+        ? Number(obj.securityLevel)
         : undefined,
     overallRating:
-      formObject.overallRating && formObject.overallRating.trim() !== ''
-        ? Number(formObject.overallRating)
+      obj.overallRating && String(obj.overallRating).trim() !== ''
+        ? Number(obj.overallRating)
         : undefined,
-    hasRoof: formObject.hasRoof === 'true',
-    hasPowerOutlet: formObject.hasPowerOutlet === 'true',
+    hasRoof: obj.hasRoof === 'true',
+    hasPowerOutlet: obj.hasPowerOutlet === 'true',
     pricing: {
-      isFree: formObject.isFree === 'true',
-      pricePerNight: formObject.pricePerNight
-        ? Number(formObject.pricePerNight)
+      isFree: obj.isFree === 'true',
+      pricePerNight: obj.pricePerNight
+        ? Number(obj.pricePerNight)
         : undefined,
-      priceNote: formObject.priceNote || undefined,
+      priceNote: (obj.priceNote as string | undefined) || undefined,
     },
     capacity:
-      formObject.capacity && formObject.capacity.trim() !== ''
-        ? Number(formObject.capacity)
+      obj.capacity && String(obj.capacity).trim() !== ''
+        ? Number(obj.capacity)
         : undefined,
     capacityLarge:
-      formObject.capacityLarge && formObject.capacityLarge.trim() !== ''
-        ? Number(formObject.capacityLarge)
+      obj.capacityLarge && String(obj.capacityLarge).trim() !== ''
+        ? Number(obj.capacityLarge)
         : undefined,
-    restrictions: formObject.restrictions
-      ? formObject.restrictions
+    restrictions: obj.restrictions
+      ? String(obj.restrictions)
           .split(',')
           .map((r: string) => r.trim())
           .filter((r: string) => r)
       : [],
-    amenities: formObject.amenities
-      ? formObject.amenities
+    amenities: obj.amenities
+      ? String(obj.amenities)
           .split(',')
           .map((a: string) => a.trim())
           .filter((a: string) => a)
       : [],
-    notes: formObject.notes || undefined,
-    submittedBy: formObject.submittedBy,
+    notes: (obj.notes as string | undefined) || undefined,
+    submittedBy: obj.submittedBy,
     isVerified: false,
   };
 }

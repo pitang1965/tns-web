@@ -14,11 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { importCampingSpotsFromCSV } from '../../app/actions/campingSpots/csv';
+import { importCampingSpotsFromCSV, CSVImportResult } from '../../app/actions/campingSpots/csv';
 
 type CSVImportDialogProps = {
   onClose: () => void;
-  onSuccess: (result: { success: number; errors: any[] }) => void;
+  onSuccess: (result: CSVImportResult) => void;
 }
 
 export default function CSVImportDialog({
@@ -28,10 +28,7 @@ export default function CSVImportDialog({
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{
-    success: number;
-    errors: any[];
-  } | null>(null);
+  const [result, setResult] = useState<CSVImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
