@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import mongoose from 'mongoose';
+import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
 import mailerSend from '@/lib/mailersend';
 import { calculateDistance } from '@/lib/utils/distance';
 
-// Helper function to ensure database connection
-async function ensureDbConnection() {
-  if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI!;
-    // Database name is determined by MONGODB_URI
-    await mongoose.connect(uri);
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {

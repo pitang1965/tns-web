@@ -1,22 +1,10 @@
 import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
+import { ensureDbConnection } from '@/lib/database';
 import clientPromise from '@/lib/mongodb';
 import CampingSpot from '@/lib/models/CampingSpot';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 
 export const dynamic = 'force-dynamic';
-
-async function ensureDbConnection() {
-  if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI!;
-    // データベース名は接続URIから自動取得
-    await mongoose.connect(uri, {
-      connectTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      serverSelectionTimeoutMS: 10000,
-    });
-  }
-}
 
 export async function GET() {
   try {

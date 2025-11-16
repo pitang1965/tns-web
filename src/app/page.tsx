@@ -1,21 +1,10 @@
 import { auth0 } from '@/lib/auth0';
 import PublicHome from '@/components/common/PublicHome';
 import LoggedInHome from '@/components/common/LoggedInHome';
-import mongoose from 'mongoose';
 import CampingSpot, { ICampingSpot } from '@/lib/models/CampingSpot';
+import { ensureDbConnection } from '@/lib/database';
 
 // metadataはsrc\app\layout.tsxのものを使用する
-
-async function ensureDbConnection() {
-  if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI!;
-    await mongoose.connect(uri, {
-      connectTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      serverSelectionTimeoutMS: 10000,
-    });
-  }
-}
 
 async function getFeaturedSpots() {
   try {

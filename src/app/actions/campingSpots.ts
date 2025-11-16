@@ -14,6 +14,7 @@ import {
   CampingSpotCSVJapaneseSchema,
 } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
+import { ensureDbConnection } from '@/lib/database';
 
 // Helper function to check admin authorization
 async function checkAdminAuth() {
@@ -32,55 +33,6 @@ async function checkAdminAuth() {
   return session.user;
 }
 
-// Helper function to ensure database connection with enhanced error handling
-async function ensureDbConnection() {
-  try {
-    if (mongoose.connection.readyState === 0) {
-      // データベース名は MONGODB_URI から自動取得
-      const uri = process.env.MONGODB_URI!;
-
-      // Enhanced connection options for stability in various environments
-      await mongoose.connect(uri, {
-        connectTimeoutMS: 10000, // 10 seconds
-        socketTimeoutMS: 45000, // 45 seconds
-        serverSelectionTimeoutMS: 10000, // 10 seconds
-        maxPoolSize: 10, // Maintain up to 10 socket connections
-        minPoolSize: 2, // Maintain a minimum of 2 socket connections
-      });
-
-      console.log('MongoDB connection established successfully');
-    } else if (mongoose.connection.readyState === 2) {
-      // Connection is connecting, wait for it
-      await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('MongoDB connection timeout'));
-        }, 15000);
-
-        mongoose.connection.once('connected', () => {
-          clearTimeout(timeout);
-          resolve(undefined);
-        });
-
-        mongoose.connection.once('error', (error) => {
-          clearTimeout(timeout);
-          reject(error);
-        });
-      });
-    }
-  } catch (error) {
-    console.error('Failed to establish MongoDB connection:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      readyState: mongoose.connection.readyState,
-      userAgent:
-        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
-    });
-    throw new Error(
-      `Database connection failed: ${
-        error instanceof Error ? error.message : 'Unknown error'
-      }`
-    );
-  }
-}
 
 // Helper function to convert FormData to CampingSpot format
 function convertFormDataToCampingSpot(formObject: Record<string, any>) {

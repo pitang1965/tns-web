@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
-import mongoose from 'mongoose';
+import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import CampingSpot from '@/lib/models/CampingSpot';
 
@@ -22,15 +22,6 @@ async function checkAdminAuth() {
   }
 
   return session.user;
-}
-
-// Helper function to ensure database connection
-async function ensureDbConnection() {
-  if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI!;
-    // Database name is determined by MONGODB_URI
-    await mongoose.connect(uri);
-  }
 }
 
 // Get all submissions with filters
