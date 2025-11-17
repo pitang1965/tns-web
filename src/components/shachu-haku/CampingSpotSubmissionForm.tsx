@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -35,7 +36,7 @@ import {
   InputGroupButton,
   InputGroupText,
 } from '@/components/ui/input-group';
-import { Send, Info, MapPin, Map, Link, ExternalLink } from 'lucide-react';
+import { Send, Info, MapPin, Map, Link, ExternalLink, X } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -105,6 +106,7 @@ type CampingSpotSubmissionFormProps = {
 export default function CampingSpotSubmissionForm({
   onSuccess,
 }: CampingSpotSubmissionFormProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -225,6 +227,33 @@ export default function CampingSpotSubmissionForm({
     if (lat && lng) {
       const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       window.open(url, '_blank');
+    }
+  };
+
+  const handleCancel = () => {
+    // フォームに入力内容があるかチェック（同意チェックは除外）
+    const values = form.getValues();
+    const hasInput =
+      values.name ||
+      values.lat ||
+      values.lng ||
+      values.prefecture ||
+      values.url ||
+      values.type ||
+      values.hasRoof ||
+      values.hasPowerOutlet ||
+      values.pricePerNight ||
+      values.priceNote ||
+      values.notes ||
+      values.submitterName ||
+      values.submitterEmail;
+
+    if (hasInput) {
+      if (window.confirm('入力内容が失われますが、よろしいですか？')) {
+        router.push('/shachu-haku');
+      }
+    } else {
+      router.push('/shachu-haku');
     }
   };
 
@@ -691,10 +720,26 @@ export default function CampingSpotSubmissionForm({
               )}
             />
 
-            <Button type='submit' disabled={loading} className='w-full cursor-pointer'>
-              <Send className='w-4 h-4 mr-2' />
-              {loading ? '投稿中...' : '投稿する'}
-            </Button>
+            <div className='flex flex-col sm:flex-row gap-3'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleCancel}
+                disabled={loading}
+                className='order-2 sm:order-1 cursor-pointer'
+              >
+                <X className='w-4 h-4 mr-2' />
+                キャンセル
+              </Button>
+              <Button
+                type='submit'
+                disabled={loading}
+                className='order-1 sm:order-2 flex-1 cursor-pointer'
+              >
+                <Send className='w-4 h-4 mr-2' />
+                {loading ? '投稿中...' : '投稿する'}
+              </Button>
+            </div>
           </form>
         </Form>
       </CardContent>
