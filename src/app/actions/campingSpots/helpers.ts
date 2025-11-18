@@ -1,23 +1,3 @@
-import { auth0 } from '@/lib/auth0';
-import { redirect } from 'next/navigation';
-
-// Helper function to check admin authorization
-export async function checkAdminAuth() {
-  const session = await auth0.getSession();
-
-  if (!session?.user?.email) {
-    redirect('/auth/login');
-  }
-
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(',').map((email) => email.trim()) || [];
-  if (!adminEmails.includes(session.user.email)) {
-    throw new Error('Unauthorized: Admin access required');
-  }
-
-  return session.user;
-}
-
 // Helper function to convert FormData to CampingSpot format
 export function convertFormDataToCampingSpot(formObject: Record<string, unknown>) {
   const obj = formObject as Record<string, string | boolean | number | undefined>;

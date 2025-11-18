@@ -23,8 +23,8 @@ export {
   getCampingSpotsForExport,
 } from './csv';
 
+// Re-export auth function
+export { checkAdminAuth } from './auth';
+
 // Re-export helpers if needed by consumers
-export {
-  checkAdminAuth,
-  convertFormDataToCampingSpot,
-} from './helpers';
+export { convertFormDataToCampingSpot } from './helpers';

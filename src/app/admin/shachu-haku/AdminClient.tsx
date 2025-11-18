@@ -14,7 +14,7 @@ import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
 import { getCampingSpotsByBounds } from '../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-import { CSVImportResult } from '../../actions/campingSpots/csv';
+import { CSVImportResult, getCampingSpotsForExport } from '../../actions/campingSpots/csv';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
 import { celebrateSubmission } from '@/lib/confetti';
@@ -25,6 +25,7 @@ import { useSpotFiltering } from '@/hooks/useSpotFiltering';
 import { usePendingSubmissions } from '@/hooks/usePendingSubmissions';
 import { useAdminSpotForm } from '@/hooks/useAdminSpotForm';
 import { useAdminListData } from '@/hooks/useAdminListData';
+import { downloadCampingSpotsCSV } from '@/lib/csv/campingSpots';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -325,128 +326,18 @@ export default function AdminClient() {
 
   const exportToCSV = async () => {
     try {
-      const { getCampingSpotsForExport } = await import(
-        '../../actions/campingSpots'
-      );
+      // Use statically imported server action
       const exportSpots = await getCampingSpotsForExport();
 
-      const headers = [
-        'name',
-        'lat',
-        'lng',
-        'prefecture',
-        'address',
-        'url',
-        'type',
-        'distanceToToilet',
-        'distanceToBath',
-        'distanceToConvenience',
-        'nearbyToiletLat',
-        'nearbyToiletLng',
-        'nearbyConvenienceLat',
-        'nearbyConvenienceLng',
-        'nearbyBathLat',
-        'nearbyBathLng',
-        'elevation',
-        'securityHasGate',
-        'securityHasLighting',
-        'securityHasStaff',
-        'nightNoiseHasNoiseIssues',
-        'nightNoiseNearBusyRoad',
-        'nightNoiseIsQuietArea',
-        'hasRoof',
-        'hasPowerOutlet',
-        'hasGate',
-        'isFree',
-        'pricePerNight',
-        'priceNote',
-        'capacity',
-        'capacityLarge',
-        'restrictions',
-        'amenities',
-        'notes',
-      ];
+      // Use the new utility function for CSV export
+      downloadCampingSpotsCSV(exportSpots);
 
-      // Helper function to escape CSV field
-      const escapeCSVField = (field: unknown): string => {
-        // Use empty string for null/undefined values
-        const stringField = field == null ? '' : String(field);
-
-        // Always quote fields that contain special characters
-        if (
-          stringField.includes(',') ||
-          stringField.includes('"') ||
-          stringField.includes('\n') ||
-          stringField.includes('\r')
-        ) {
-          // Escape quotes by doubling them
-          return `"${stringField.replace(/"/g, '""')}"`;
-        }
-        return stringField;
-      };
-
-      const csvRows = [headers.join(',')];
-      let processedCount = 0;
-      let errorCount = 0;
-
-      exportSpots.forEach((spot: CampingSpotWithId, index: number) => {
-        try {
-          const fields = [
-            spot.name,
-            spot.coordinates[1], // lat
-            spot.coordinates[0], // lng
-            spot.prefecture,
-            spot.address || '',
-            spot.url || '',
-            spot.type,
-            spot.distanceToToilet || '',
-            spot.distanceToBath || '',
-            spot.distanceToConvenience || '',
-            spot.nearbyToiletCoordinates?.[1] ?? '', // nearbyToiletLat
-            spot.nearbyToiletCoordinates?.[0] ?? '', // nearbyToiletLng
-            spot.nearbyConvenienceCoordinates?.[1] ?? '', // nearbyConvenienceLat
-            spot.nearbyConvenienceCoordinates?.[0] ?? '', // nearbyConvenienceLng
-            spot.nearbyBathCoordinates?.[1] ?? '', // nearbyBathLat
-            spot.nearbyBathCoordinates?.[0] ?? '', // nearbyBathLng
-            spot.elevation || '',
-            // Security and night noise objective data fields
-            spot.security?.hasGate ? 'true' : 'false',
-            spot.security?.hasLighting ? 'true' : 'false',
-            spot.security?.hasStaff ? 'true' : 'false',
-            spot.nightNoise?.hasNoiseIssues ? 'true' : 'false',
-            spot.nightNoise?.nearBusyRoad ? 'true' : 'false',
-            spot.nightNoise?.isQuietArea ? 'true' : 'false',
-            spot.hasRoof ? 'true' : 'false',
-            spot.hasPowerOutlet ? 'true' : 'false',
-            spot.security?.hasGate ? 'true' : 'false', // hasGate (duplicate for backward compatibility)
-            spot.pricing.isFree ? 'true' : 'false',
-            spot.pricing.pricePerNight || '',
-            spot.pricing.priceNote || '',
-            spot.capacity || '',
-            spot.capacityLarge || '',
-            spot.restrictions.join(','),
-            spot.amenities.join(','),
-            spot.notes || '',
-          ];
-          csvRows.push(fields.map(escapeCSVField).join(','));
-          processedCount++;
-        } catch (error) {
-          errorCount++;
-        }
+      toast({
+        title: 'エクスポート完了',
+        description: `${exportSpots.length}件の車中泊スポットをエクスポートしました`,
       });
-
-      // Use \r\n for Windows compatibility and to avoid issues with quoted newlines
-      const csvContent = csvRows.join('\r\n');
-      const blob = new Blob(['\ufeff' + csvContent], {
-        type: 'text/csv;charset=utf-8;',
-      });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `shachu-haku-spots-${
-        new Date().toISOString().split('T')[0]
-      }.csv`;
-      link.click();
     } catch (error) {
+      console.error('Export error:', error);
       toast({
         title: 'エラー',
         description: 'エクスポートに失敗しました',

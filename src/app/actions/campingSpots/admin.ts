@@ -7,7 +7,8 @@ import {
   CampingSpotFilter,
 } from '@/data/schemas/campingSpot';
 import { ensureDbConnection } from '@/lib/database';
-import { checkAdminAuth, convertFormDataToCampingSpot } from './helpers';
+import { checkAdminAuth } from './auth';
+import { convertFormDataToCampingSpot } from './helpers';
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
@@ -304,7 +305,10 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const validatedData = CampingSpotSchema.parse(spotData);
 
   // Prepare update operations - separate set and unset operations
-  const updateOperations: { $set: Record<string, unknown>; $unset?: Record<string, string> } = { $set: {} };
+  const updateOperations: {
+    $set: Record<string, unknown>;
+    $unset?: Record<string, string>;
+  } = { $set: {} };
   const unsetFields: Record<string, string> = {};
 
   // Handle optional fields that should be unset when undefined

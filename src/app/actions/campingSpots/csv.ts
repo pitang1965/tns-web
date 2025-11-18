@@ -10,7 +10,8 @@ import {
 } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
-import { checkAdminAuth } from './helpers';
+import { checkAdminAuth } from './auth';
+import { parseCSV } from '@/lib/csv/utils';
 
 export type CSVImportError = {
   row: number;
@@ -26,72 +27,6 @@ export type CSVImportResult = {
 export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImportResult> {
   const user = await checkAdminAuth();
   await ensureDbConnection();
-
-  // CSV parser that handles quoted fields with newlines
-  function parseCSV(csvText: string): string[][] {
-    const rows: string[][] = [];
-    const lines = csvText.split('\n');
-    let currentRow: string[] = [];
-    let currentField = '';
-    let inQuotes = false;
-    let i = 0;
-
-    while (i < csvText.length) {
-      const char = csvText[i];
-      const nextChar = csvText[i + 1];
-
-      if (char === '"') {
-        if (inQuotes && nextChar === '"') {
-          // Escaped quote
-          currentField += '"';
-          i += 2;
-          continue;
-        } else {
-          // Toggle quote state
-          inQuotes = !inQuotes;
-          i++;
-          continue;
-        }
-      }
-
-      if (!inQuotes && char === ',') {
-        // Field separator
-        currentRow.push(currentField.trim());
-        currentField = '';
-        i++;
-        continue;
-      }
-
-      if (!inQuotes && (char === '\n' || char === '\r')) {
-        // End of row
-        if (char === '\r' && nextChar === '\n') {
-          i++; // Skip \r in \r\n
-        }
-        currentRow.push(currentField.trim());
-        if (currentRow.some((field) => field.length > 0) || rows.length === 0) {
-          rows.push(currentRow);
-        }
-        currentRow = [];
-        currentField = '';
-        i++;
-        continue;
-      }
-
-      // Regular character
-      currentField += char;
-      i++;
-    }
-
-    // Handle last field/row
-    if (currentField.length > 0 || currentRow.length > 0) {
-      currentRow.push(currentField.trim());
-      if (currentRow.some((field) => field.length > 0)) {
-        rows.push(currentRow);
-      }
-    }
-
-    return rows;
-  }
 
   const rows = parseCSV(csvData.trim());
   if (rows.length === 0) {

@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { importCampingSpotsFromCSV, CSVImportResult } from '../../app/actions/campingSpots/csv';
+import { downloadCampingSpotTemplate } from '@/lib/csv/campingSpots';
 
 type CSVImportDialogProps = {
   onClose: () => void;
@@ -78,79 +79,8 @@ export default function CSVImportDialog({
   };
 
   const downloadTemplate = () => {
-    const headers = [
-      '名称',
-      '緯度',
-      '経度',
-      '都道府県',
-      '住所',
-      'URL',
-      'タイプ',
-      'トイレまでの距離(m)',
-      'お風呂までの距離(m)',
-      'コンビニまでの距離(m)',
-      'トイレ緯度',
-      'トイレ経度',
-      'コンビニ緯度',
-      'コンビニ経度',
-      'お風呂緯度',
-      'お風呂経度',
-      '標高(m)',
-      '静寂レベル(1-5)',
-      '治安レベル(1-5)',
-      '総合評価(1-5)',
-      '屋根あり(true/false)',
-      '電源あり(true/false)',
-      'ゲート付き(true/false)',
-      '無料(true/false)',
-      '1泊料金',
-      '料金備考',
-      '収容台数',
-      '制限事項',
-      '設備',
-      '備考',
-    ];
-
-    const sampleData = [
-      '道の駅サンプル',        // 名称
-      '35.6762',              // 緯度
-      '139.6503',             // 経度
-      '東京都',               // 都道府県
-      '東京都千代田区',       // 住所
-      '',                     // URL - 任意
-      'roadside_station',     // タイプ
-      '',                     // トイレまでの距離(m) - 任意
-      '',                     // お風呂までの距離(m) - 任意
-      '',                     // コンビニまでの距離(m) - 任意
-      '',                     // トイレ緯度 - 任意
-      '',                     // トイレ経度 - 任意
-      '',                     // コンビニ緯度 - 任意
-      '',                     // コンビニ経度 - 任意
-      '',                     // お風呂緯度 - 任意
-      '',                     // お風呂経度 - 任意
-      '',                     // 標高(m) - 任意
-      '',                     // 静寂レベル(1-5) - 任意
-      '',                     // 治安レベル(1-5) - 任意
-      '',                     // 総合評価(1-5) - 任意
-      'true',                 // 屋根あり(true/false)
-      'false',                // 電源あり(true/false)
-      'false',                // ゲート付き(true/false)
-      'true',                 // 無料(true/false)
-      '',                     // 1泊料金
-      '',                     // 料金備考
-      '',                     // 収容台数 - 任意
-      '大型車不可',           // 制限事項
-      'トイレ,自販機',        // 設備
-      '',                     // 備考 - 任意
-    ];
-
-    const csvContent = [headers.join(','), sampleData.join(',')].join('\n');
-
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'camping-spots-template.csv';
-    link.click();
+    // Use the utility function for template download
+    downloadCampingSpotTemplate();
   };
 
   return (
