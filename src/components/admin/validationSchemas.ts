@@ -19,7 +19,9 @@ export const ShachuHakuFormCreateSchema = z.object({
     (val) => !val || /^https?:\/\/.+/.test(val),
     { message: '有効なURLを入力してください' }
   ),
-  type: z.enum(['roadside_station', 'sa_pa', 'rv_park', 'auto_campground', 'onsen_facility', 'convenience_store', 'parking_lot', 'other'] as const),
+  type: z.enum(['roadside_station', 'sa_pa', 'rv_park', 'auto_campground', 'onsen_facility', 'convenience_store', 'parking_lot', 'other'] as const).optional().refine((val) => val !== undefined, {
+    message: '種別を選択してください',
+  }),
   distanceToToilet: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
@@ -82,7 +84,9 @@ export const ShachuHakuFormCreateSchema = z.object({
   ),
   hasRoof: z.boolean(),
   hasPowerOutlet: z.boolean(),
-  isFree: z.boolean().optional(),
+  isFree: z.boolean().optional().refine((val) => val !== undefined, {
+    message: '費用を選択してください',
+  }),
   pricePerNight: z.string().optional().refine(
     (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
     { message: '有効な数値を入力してください（0以上）' }
@@ -111,7 +115,8 @@ export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema.extend({
 
 export const ShachuHakuFormSchema = ShachuHakuFormCreateSchema;
 
-// 両方のスキーマに対応する共通の型（elevationをオプショナルにする）
+// 両方のスキーマ（新規作成/編集）に対応する共通の型
+// elevation: 新規作成では必須、編集では任意のため、型定義ではオプショナルにする
 export type ShachuHakuFormData = Omit<z.infer<typeof ShachuHakuFormCreateSchema>, 'elevation'> & {
   elevation?: string;
 };

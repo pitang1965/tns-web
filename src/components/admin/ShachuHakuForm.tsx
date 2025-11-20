@@ -59,7 +59,7 @@ export default function ShachuHakuForm({
       prefecture: '',
       address: '',
       url: '',
-      type: 'other' as CampingSpotType,
+      type: undefined,
       distanceToToilet: '',
       distanceToBath: '',
       distanceToConvenience: '',
@@ -161,7 +161,7 @@ export default function ShachuHakuForm({
       // 新規作成（地図クリック）：座標のみ設定、他はデフォルト値のまま（自動設定を妨げない）
       setValue('lat', spot.coordinates[1].toString());
       setValue('lng', spot.coordinates[0].toString());
-      // type は defaultValues の 'other' のまま（useAutoSetSpotTypeが動作できるように）
+      // type は defaultValues の undefined のまま（useAutoSetSpotTypeが動作できるように）
     } else {
       // 新規作成（ボタンクリック）の場合はデフォルト値にリセット
       reset({
@@ -171,7 +171,7 @@ export default function ShachuHakuForm({
         prefecture: '',
         address: '',
         url: '',
-        type: 'other' as CampingSpotType,
+        type: undefined,
         distanceToToilet: '',
         distanceToBath: '',
         distanceToConvenience: '',
