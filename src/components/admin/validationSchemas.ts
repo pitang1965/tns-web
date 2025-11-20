@@ -105,18 +105,10 @@ export const ShachuHakuFormCreateSchema = z.object({
   notes: z.string().optional(),
 });
 
-// 編集用（標高任意）
-export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema.extend({
-  elevation: z.string().optional().refine(
-    (val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= -10 && Number(val) <= 3776),
-    { message: '有効な数値を入力してください（-10〜3776）' }
-  ),
-});
+// 編集用も作成用と同じスキーマ（標高は必須）
+export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema;
 
 export const ShachuHakuFormSchema = ShachuHakuFormCreateSchema;
 
-// 両方のスキーマ（新規作成/編集）に対応する共通の型
-// elevation: 新規作成では必須、編集では任意のため、型定義ではオプショナルにする
-export type ShachuHakuFormData = Omit<z.infer<typeof ShachuHakuFormCreateSchema>, 'elevation'> & {
-  elevation?: string;
-};
+// フォームデータの型
+export type ShachuHakuFormData = z.infer<typeof ShachuHakuFormCreateSchema>;

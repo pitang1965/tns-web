@@ -13,7 +13,7 @@ export interface ICampingSpot extends Document {
   nearbyToiletCoordinates?: [number, number]; // [lng, lat]
   nearbyConvenienceCoordinates?: [number, number]; // [lng, lat]
   nearbyBathCoordinates?: [number, number]; // [lng, lat]
-  elevation?: number; // meters
+  elevation: number; // meters
   // 旧評価システム（段階的廃止予定）
   quietnessLevel?: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
   securityLevel?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
@@ -114,6 +114,7 @@ const campingSpotSchema = new Schema<ICampingSpot>({
   nearbyBathCoordinates: [Number],
   elevation: {
     type: Number,
+    required: true,
     min: -10,
     max: 3776,
   },

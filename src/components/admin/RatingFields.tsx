@@ -127,7 +127,7 @@ export function RatingFields({ register, errors, watch, spot }: RatingFieldsProp
             <div className='flex items-center justify-between mb-1'>
               <Label
                 htmlFor='elevation'
-                className={!spot ? "after:content-['*'] after:ml-0.5 after:text-red-500" : ""}
+                className="after:content-['*'] after:ml-0.5 after:text-red-500"
               >
                 標高 (m)
               </Label>

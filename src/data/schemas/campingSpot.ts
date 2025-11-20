@@ -58,7 +58,7 @@ export const CampingSpotSchema = z.object({
     z.number().min(-180).max(180), // longitude
     z.number().min(-90).max(90)    // latitude
   ]).optional(),
-  elevation: z.number().min(-10).max(3776).optional(),
+  elevation: z.number().min(-10, '標高は-10以上で入力してください').max(3776, '標高は3776以下で入力してください'),
   security: CampingSpotSecuritySchema.default({}),
   nightNoise: CampingSpotNightNoiseSchema.default({}),
   hasRoof: z.boolean().default(false),
@@ -382,7 +382,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
       ? [Number(csvRow.nearbyConvenienceLng), Number(csvRow.nearbyConvenienceLat)] : undefined,
     nearbyBathCoordinates: (csvRow.nearbyBathLat && csvRow.nearbyBathLng)
       ? [Number(csvRow.nearbyBathLng), Number(csvRow.nearbyBathLat)] : undefined,
-    elevation: csvRow.elevation ? Number(csvRow.elevation) : undefined,
+    elevation: csvRow.elevation ? Number(csvRow.elevation) : 0,
     security: {
       hasGate: csvRow.securityHasGate === 'true',
       hasLighting: csvRow.securityHasLighting === 'true',
@@ -427,7 +427,7 @@ export function csvJapaneseRowToCampingSpot(csvRow: CampingSpotCSVJapanese): Cam
       ? [Number(csvRow['コンビニ経度']), Number(csvRow['コンビニ緯度'])] : undefined,
     nearbyBathCoordinates: (csvRow['お風呂緯度'] && csvRow['お風呂経度']) 
       ? [Number(csvRow['お風呂経度']), Number(csvRow['お風呂緯度'])] : undefined,
-    elevation: csvRow['標高(m)'] ? Number(csvRow['標高(m)']) : undefined,
+    elevation: csvRow['標高(m)'] ? Number(csvRow['標高(m)']) : 0,
     security: {
       hasGate: csvRow['セキュリティ-ゲート有無(true/false)'] === 'true',
       hasLighting: csvRow['セキュリティ-照明十分(true/false)'] === 'true',
