@@ -87,8 +87,8 @@ importers:
         specifier: 6.20.0
         version: 6.20.0
       mongoose:
-        specifier: 8.19.2
-        version: 8.19.2
+        specifier: 8.20.1
+        version: 8.20.1
       next:
         specifier: 15.5.6
         version: 15.5.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -189,6 +189,7 @@ packages:
 
   '@auth0/nextjs-auth0@4.12.0':
     resolution: {integrity: sha512-2a9dvfJLUV7XJ4CVmNBjhSrpyEFxNnU10Z/msY6Si5UKaDnJiKQ9cgnMuJyh0xIjFlANDr4WsvRPo22gQOJqbw==}
+    deprecated: Please upgrade to 4.12.1 for critical fixes
     peerDependencies:
       next: ^14.2.25 || ^15.2.3
       react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
@@ -3688,8 +3689,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@8.19.2:
-    resolution: {integrity: sha512-ww2T4dBV+suCbOfG5YPwj9pLCfUVyj8FEA1D3Ux1HHqutpLxGyOYEPU06iPRBW4cKr3PJfOSYsIpHWPTkz5zig==}
+  mongoose@8.20.1:
+    resolution: {integrity: sha512-G+n3maddlqkQrP1nXxsI0q20144OSo+pe+HzRRGqaC4yK3FLYKqejqB9cbIi+SX7eoRsnG23LHGYNp8n7mWL2Q==}
     engines: {node: '>=16.20.1'}
 
   mpath@0.9.0:
@@ -8550,7 +8551,7 @@ snapshots:
       bson: 6.10.4
       mongodb-connection-string-url: 3.0.2
 
-  mongoose@8.19.2:
+  mongoose@8.20.1:
     dependencies:
       bson: 6.10.4
       kareem: 2.6.3
