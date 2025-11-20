@@ -6,6 +6,7 @@ import { SmallText } from '@/components/common/Typography';
 import AboutSection from '@/components/landing/AboutSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import StatsSection from '@/components/landing/StatsSection';
+import SNSSection from '@/components/landing/SNSSection';
 import CTASection from '@/components/landing/CTASection';
 import { LoadingState } from '@/components/common/LoadingState';
 
@@ -41,6 +42,9 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
 
       {/* Stats Section */}
       <StatsSection />
+
+      {/* SNS Account Section */}
+      <SNSSection />
 
       {/* CTA Section */}
       <CTASection />
