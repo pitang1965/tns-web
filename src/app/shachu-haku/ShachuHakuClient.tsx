@@ -588,7 +588,7 @@ export default function ShachuHakuClient() {
           }}
         >
           <Card>
-            <CardHeader className='!px-3 !pt-1.5 !pb-0 sm:!px-6 sm:!pt-6 sm:!pb-3 space-y-0'>
+            <CardHeader className='px-3! pt-1.5! pb-0! sm:px-6! sm:pt-6! sm:pb-3! space-y-0'>
               {/* カスタムポップアップ - ポートレート時はヘッダーに表示 */}
               {activeTab === 'map' && selectedSpot && !isLandscape ? (
                 spotPopup
@@ -617,7 +617,7 @@ export default function ShachuHakuClient() {
                 </>
               )}
             </CardHeader>
-            <CardContent className='!px-3 !pt-2 !pb-3 sm:!px-6 sm:!pt-3 sm:!pb-6'>
+            <CardContent className='px-3! pt-2! pb-3! sm:px-6! sm:pt-3! sm:pb-6!'>
               {/* ランドスケープ時は地図とポップアップを横並びに */}
               <div className={isLandscape ? 'flex gap-2 sm:gap-4 items-stretch' : ''}>
                 <div className={isLandscape ? 'flex-1 min-w-0' : ''}>
@@ -653,7 +653,7 @@ export default function ShachuHakuClient() {
               <Card className='bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800'>
                 <CardContent className='pt-4 pb-4'>
                   <div className='flex items-start gap-2'>
-                    <Info className='w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5' />
+                    <Info className='w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5' />
                     <div className='text-sm text-blue-800 dark:text-blue-200'>
                       <strong>地図表示の範囲内</strong>
                       のスポットを表示しています。より広い範囲のスポットを表示するには、地図表示でズームアウトしてから一覧表示に切り替えてください。
