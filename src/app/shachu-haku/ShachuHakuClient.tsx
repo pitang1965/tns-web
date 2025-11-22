@@ -24,6 +24,7 @@ import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { ShachuHakuSpotsList } from '@/components/shachu-haku/ShachuHakuSpotsList';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
+import { AdLink } from '@/components/shachu-haku/AdLink';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -593,15 +594,18 @@ export default function ShachuHakuClient() {
                 spotPopup
               ) : (
                 <>
-                  <CardTitle className='flex items-center gap-2 text-base sm:text-lg md:text-xl mb-0'>
-                    <MapPin className='w-4 h-4 sm:w-5 sm:h-5' />
-                    {loading ? (
-                      <span className='flex items-center gap-2'>
-                        読み込み中... <Spinner className='size-4' />
-                      </span>
-                    ) : (
-                      `表示範囲内: ${visibleSpots.length}件`
-                    )}
+                  <CardTitle className='flex items-center justify-between gap-2 text-base sm:text-lg md:text-xl mb-0'>
+                    <div className='flex items-center gap-2'>
+                      <MapPin className='w-4 h-4 sm:w-5 sm:h-5' />
+                      {loading ? (
+                        <span className='flex items-center gap-2'>
+                          読み込み中... <Spinner className='size-4' />
+                        </span>
+                      ) : (
+                        `表示範囲内: ${visibleSpots.length}件`
+                      )}
+                    </div>
+                    <AdLink />
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
                     <div className='text-sm text-muted-foreground space-y-1 mt-2'>

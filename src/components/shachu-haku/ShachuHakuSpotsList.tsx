@@ -10,6 +10,7 @@ import {
 } from '@/lib/clientSideFilterSpots';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import { ShachuHakuSpotItem } from './ShachuHakuSpotItem';
+import { AdLink } from './AdLink';
 
 type ShachuHakuSpotsListProps = {
   spots: CampingSpotWithId[];
@@ -53,7 +54,10 @@ export function ShachuHakuSpotsList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>車中泊スポット一覧</CardTitle>
+          <CardTitle className='flex items-center justify-between gap-2'>
+            <span>車中泊スポット一覧</span>
+            <AdLink />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className='text-center py-8 text-gray-500'>
@@ -69,13 +73,16 @@ export function ShachuHakuSpotsList({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {hasFilters
-            ? `このページに${filteredSpots.length}件表示中`
-            : `${total}件中 ${(page - 1) * pageSize + 1}-${Math.min(
-                page * pageSize,
-                total
-              )}件を表示`}
+        <CardTitle className='flex items-center justify-between gap-2'>
+          <span>
+            {hasFilters
+              ? `このページに${filteredSpots.length}件表示中`
+              : `${total}件中 ${(page - 1) * pageSize + 1}-${Math.min(
+                  page * pageSize,
+                  total
+                )}件を表示`}
+          </span>
+          <AdLink />
         </CardTitle>
         {activeFilterDescriptions.length > 0 && (
           <div className='text-sm text-muted-foreground space-y-1 mt-2'>
