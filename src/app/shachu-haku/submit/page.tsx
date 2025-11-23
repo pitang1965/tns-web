@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import CampingSpotSubmissionForm from '@/components/shachu-haku/CampingSpotSubmissionForm';
+import ShachuHakuSubmissionForm from '@/components/shachu-haku/ShachuHakuSubmissionForm';
 
 export const metadata: Metadata = {
   title: '車中泊スポット情報の投稿 | 車旅のしおり',
@@ -42,7 +42,7 @@ export default function CampingSpotSubmitPage() {
           </p>
         </div>
 
-        <CampingSpotSubmissionForm />
+        <ShachuHakuSubmissionForm />
 
         <div className='mt-8 text-center'>
           <p className='text-sm text-gray-500 dark:text-gray-400'>

@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { AddCampingSpotDialog } from '../AddCampingSpotDialog';
+import { AddShachuHakuSpotDialog } from '../AddShachuHakuSpotDialog';
 
 type DayPlanFormProps = {
   day: { date: string | null; activities: any[]; notes?: string };
@@ -239,7 +239,7 @@ export function DayPlanForm({
       </div>
 
       {/* 車中泊スポット追加ダイアログ */}
-      <AddCampingSpotDialog
+      <AddShachuHakuSpotDialog
         open={showCampingSpotDialog}
         onOpenChange={setShowCampingSpotDialog}
         onAdd={handleAddCampingSpot}

@@ -21,7 +21,7 @@ const ShachuHakuForm = dynamic(
   }
 );
 
-export default function EditClient() {
+export default function ShachuHakuEditor() {
   const { user, isLoading } = useUser();
   const { toast } = useToast();
   const router = useRouter();

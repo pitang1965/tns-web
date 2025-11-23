@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/common/LoadingState';
-import { NearbyCampingSpotsList } from './NearbyCampingSpotsList';
+import { NearbyShachuHakuSpotsList } from './NearbyShachuHakuSpotsList';
 import { getNearestCampingSpots } from '../../app/actions/campingSpots/public';
 import {
   CampingSpotWithDistance,
@@ -29,7 +29,7 @@ const SimpleLocationPicker = dynamic(
   }
 );
 
-type AddCampingSpotDialogProps = {
+type AddShachuHakuSpotDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (activity: ReturnType<typeof campingSpotToActivity>) => void;
@@ -37,11 +37,11 @@ type AddCampingSpotDialogProps = {
 
 type Step = 'location' | 'spots' | 'loading';
 
-export function AddCampingSpotDialog({
+export function AddShachuHakuSpotDialog({
   open,
   onOpenChange,
   onAdd,
-}: AddCampingSpotDialogProps) {
+}: AddShachuHakuSpotDialogProps) {
   const [step, setStep] = useState<Step>('location');
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
@@ -188,7 +188,7 @@ export function AddCampingSpotDialog({
                 </div>
               )}
 
-              <NearbyCampingSpotsList
+              <NearbyShachuHakuSpotsList
                 spots={nearbySpots}
                 onSelect={handleSpotSelect}
                 selectedSpotId={selectedSpot?._id}

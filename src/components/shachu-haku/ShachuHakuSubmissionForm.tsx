@@ -99,13 +99,13 @@ const SubmissionFormSchema = z.object({
 
 type SubmissionFormData = z.infer<typeof SubmissionFormSchema>;
 
-type CampingSpotSubmissionFormProps = {
+type ShachuHakuSubmissionFormProps = {
   onSuccess?: () => void;
 };
 
-export default function CampingSpotSubmissionForm({
+export default function ShachuHakuSubmissionForm({
   onSuccess,
-}: CampingSpotSubmissionFormProps) {
+}: ShachuHakuSubmissionFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -262,7 +262,7 @@ export default function CampingSpotSubmissionForm({
       <CardHeader>
         <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
           <div className='flex items-start gap-2'>
-            <Info className='w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0' />
+            <Info className='w-5 h-5 text-blue-600 mt-0.5 shrink-0' />
             <div className='text-sm text-blue-800'>
               <p className='font-medium mb-1'>注意</p>
               <ul className='space-y-1 text-blue-700'>
@@ -281,7 +281,10 @@ export default function CampingSpotSubmissionForm({
             onSubmit={form.handleSubmit(onSubmit)}
             onKeyDown={(e) => {
               // Enterキーでの送信を無効化（textareaでの改行は許可）
-              if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+              if (
+                e.key === 'Enter' &&
+                (e.target as HTMLElement).tagName !== 'TEXTAREA'
+              ) {
                 e.preventDefault();
               }
             }}
@@ -328,7 +331,11 @@ export default function CampingSpotSubmissionForm({
                         <SelectContent>
                           {Object.entries(CampingSpotTypeLabels).map(
                             ([key, label]) => (
-                              <SelectItem key={key} value={key} className='cursor-pointer'>
+                              <SelectItem
+                                key={key}
+                                value={key}
+                                className='cursor-pointer'
+                              >
                                 {label}
                               </SelectItem>
                             )
@@ -359,7 +366,11 @@ export default function CampingSpotSubmissionForm({
                         </FormControl>
                         <SelectContent>
                           {PrefectureOptions.map((prefecture) => (
-                            <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
+                            <SelectItem
+                              key={prefecture}
+                              value={prefecture}
+                              className='cursor-pointer'
+                            >
                               {prefecture}
                             </SelectItem>
                           ))}
