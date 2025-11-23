@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Link from 'next/link';
 import { HelpCircle } from 'lucide-react';
@@ -12,6 +12,7 @@ import { BurgerMenu } from '@/components/layout/BurgerMenu';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { useEnvironment } from '@/hooks/useEnvironment';
 import { useInAppBrowserWarning } from '@/hooks/useInAppBrowserWarning';
+import { useIsClient } from '@/hooks/useIsClient';
 import { Button } from '@/components/ui/button';
 
 function EnvironmentBadge() {
@@ -32,12 +33,8 @@ function EnvironmentBadge() {
 
 export function Header() {
   const { user, error, isLoading } = useUser();
-  const [isClient, setIsClient] = useState(false);
+  const isClient = useIsClient();
   const { showWarning: showInAppWarning, handleDismiss: handleDismissWarning } = useInAppBrowserWarning();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // バナー表示時にメインコンテンツの位置を調整
   useEffect(() => {

@@ -26,6 +26,7 @@ import { usePendingSubmissions } from '@/hooks/usePendingSubmissions';
 import { useAdminSpotForm } from '@/hooks/useAdminSpotForm';
 import { useAdminListData } from '@/hooks/useAdminListData';
 import { downloadCampingSpotsCSV } from '@/lib/csv/campingSpots';
+import { useUrlSync } from '@/hooks/useUrlSync';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -214,38 +215,15 @@ export default function AdminClient() {
     };
   }, [cleanupMapBoundsLoader]);
 
-  // Update URL when filters or tab change (on user interaction)
-  const isInitialMountRef = useRef(true);
-  useEffect(() => {
-    // Skip URL update on initial mount to preserve URL parameters
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false;
-      return;
-    }
-
-    const params = new URLSearchParams();
-
-    // Add active tab if it's 'list'
-    if (activeTab === 'list') {
-      params.set('tab', 'list');
-    }
-
-    // Add search term
-    if (searchTerm) {
-      params.set('q', searchTerm);
-    }
-
-    // Add type filter
-    if (typeFilter && typeFilter !== 'all') {
-      params.set('type', typeFilter);
-    }
-
-    // Update URL without reload
-    const newUrl = params.toString()
-      ? `/admin/shachu-haku?${params.toString()}`
-      : '/admin/shachu-haku';
-    router.replace(newUrl, { scroll: false });
-  }, [searchTerm, typeFilter, activeTab, router]);
+  // Sync URL with filters and tab state
+  useUrlSync({
+    params: {
+      tab: activeTab === 'list' ? 'list' : null,
+      q: searchTerm || null,
+      type: typeFilter !== 'all' ? typeFilter : null,
+    },
+    basePath: '/admin/shachu-haku',
+  });
 
   const handleNavigateToEdit = (spotId: string) => {
     // Save the current filtered spot IDs for navigation

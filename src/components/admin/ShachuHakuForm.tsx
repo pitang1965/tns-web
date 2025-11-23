@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/components/ui/use-toast';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { X, Save, Trash2, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,17 +57,17 @@ export default function ShachuHakuForm({
 
   // Ref to store scroll position
   const cardRef = useRef<HTMLDivElement>(null);
-  const scrollPositionRef = useRef<number>(0);
+
+  // Use scroll restoration hook
+  const { saveScrollPosition } = useScrollRestoration(
+    cardRef,
+    'admin-spot-scroll',
+    [spot?.name, spot?.prefecture]
+  );
 
   // Save scroll position and navigate
   const handleNavigateWithScroll = (spotId: string) => {
-    if (cardRef.current) {
-      const scrollPos = cardRef.current.scrollTop;
-      scrollPositionRef.current = scrollPos;
-      // Save to sessionStorage so it persists across page navigation
-      sessionStorage.setItem('admin-spot-scroll', scrollPos.toString());
-      console.log('📍 Saved scroll:', scrollPos);
-    }
+    saveScrollPosition();
     if (onNavigate) {
       onNavigate(spotId);
     }
@@ -122,29 +123,6 @@ export default function ShachuHakuForm({
       notes: '',
     },
   });
-
-  // Restore scroll position after spot data is loaded
-  useEffect(() => {
-    // Get saved scroll position from sessionStorage
-    const savedScroll = sessionStorage.getItem('admin-spot-scroll');
-    const scrollPos = savedScroll ? parseInt(savedScroll, 10) : 0;
-
-    // Only restore if we have a saved position and the spot data has been loaded
-    if (spot && cardRef.current && scrollPos > 0) {
-      console.log('🔄 Restoring scroll to:', scrollPos);
-      // Use requestAnimationFrame and setTimeout to ensure DOM has fully updated
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          if (cardRef.current) {
-            cardRef.current.scrollTop = scrollPos;
-            console.log('✅ Scroll restored');
-            // Clear the saved position after restoring
-            sessionStorage.removeItem('admin-spot-scroll');
-          }
-        }, 100);
-      });
-    }
-  }, [spot?.name, spot?.prefecture]); // Use spot properties that change when new data loads
 
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {

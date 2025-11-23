@@ -13,6 +13,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 import { useLocationNavigation } from '@/hooks/useLocationNavigation';
 import { useSpotFiltering } from '@/hooks/useSpotFiltering';
+import { useOrientation } from '@/hooks/useOrientation';
+import { useUrlSync } from '@/hooks/useUrlSync';
 
 import { MapPin, Info, Plus, Share2 } from 'lucide-react';
 import {
@@ -75,7 +77,8 @@ export default function ShachuHakuClient() {
     null
   );
 
-  const [isLandscape, setIsLandscape] = useState(false);
+  // Use orientation hook
+  const { isLandscape } = useOrientation();
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,7 +102,6 @@ export default function ShachuHakuClient() {
     east: number;
     west: number;
   } | null>(null);
-  const isInitialMountRef = useRef(true);
   const lastListFiltersRef = useRef<string | null>(null);
   const prevActiveTabRef = useRef<'map' | 'list'>(activeTab);
 
@@ -184,112 +186,36 @@ export default function ShachuHakuClient() {
     [handleBoundsChange]
   );
 
-  // Track last URL to prevent unnecessary updates
-  const lastUrlRef = useRef<string>('');
-  const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Update URL when filters or map state change (skip initial mount)
-  useEffect(() => {
-    // Skip URL update on initial mount to preserve URL parameters
-    if (isInitialMountRef.current) {
-      isInitialMountRef.current = false;
-      return;
-    }
-
-    // Clear any pending URL update
-    if (urlUpdateTimeoutRef.current) {
-      clearTimeout(urlUpdateTimeoutRef.current);
-    }
-
-    // Debounce URL updates to prevent infinite loop
-    urlUpdateTimeoutRef.current = setTimeout(() => {
-      const params = new URLSearchParams();
-
-      // Add active tab if it's 'list'
-      if (activeTab === 'list') {
-        params.set('tab', 'list');
-      }
-
-      // Add search term
-      if (searchTerm) {
-        params.set('q', searchTerm);
-      }
-
-      // Add type filter
-      if (typeFilter && typeFilter !== 'all') {
-        params.set('type', typeFilter);
-      }
-
-      // Add client-side filters
-      if (clientFilters.pricingFilter !== 'all') {
-        params.set('pricing', clientFilters.pricingFilter);
-      }
-      if (clientFilters.minSecurityLevel > 0) {
-        params.set('min_security', clientFilters.minSecurityLevel.toString());
-      }
-      if (clientFilters.minQuietnessLevel > 0) {
-        params.set('min_quietness', clientFilters.minQuietnessLevel.toString());
-      }
-      if (clientFilters.maxToiletDistance !== null) {
-        params.set(
-          'max_toilet_dist',
-          clientFilters.maxToiletDistance.toString()
-        );
-      }
-      if (clientFilters.minElevation !== null) {
-        params.set('min_elevation', clientFilters.minElevation.toString());
-      }
-      if (clientFilters.maxElevation !== null) {
-        params.set('max_elevation', clientFilters.maxElevation.toString());
-      }
-
-      // Add center, lng_span, and aspect_ratio if bounds are available (for consistent display range across devices)
-      if (savedBounds) {
-        const centerLat = (savedBounds.north + savedBounds.south) / 2;
-        const centerLng = (savedBounds.east + savedBounds.west) / 2;
-        const latSpan = savedBounds.north - savedBounds.south;
-        const lngSpan = savedBounds.east - savedBounds.west;
-        const aspectRatio = lngSpan / latSpan; // aspect_ratio = lng_span / lat_span
-
-        // Round to 7 decimal places (Google Maps standard)
-        params.set('lat', centerLat.toFixed(7));
-        params.set('lng', centerLng.toFixed(7));
-        params.set('lng_span', lngSpan.toFixed(7));
-        params.set('aspect_ratio', aspectRatio.toFixed(2)); // aspect_ratioは小数点2桁で十分
-      } else {
-        // Only add center if bounds are not available (fallback to zoom-based display)
-        params.set('lat', mapCenter[1].toFixed(6));
-        params.set('lng', mapCenter[0].toFixed(6));
-        params.set('zoom', mapZoom.toFixed(2));
-      }
-
-      // Update URL without reload
-      const newUrl = params.toString()
-        ? `/shachu-haku?${params.toString()}`
-        : '/shachu-haku';
-
-      // Only update if URL actually changed (prevents infinite loop from floating point errors)
-      if (newUrl !== lastUrlRef.current) {
-        lastUrlRef.current = newUrl;
-        router.replace(newUrl, { scroll: false });
-      }
-    }, 500); // 500ms debounce
-
-    return () => {
-      if (urlUpdateTimeoutRef.current) {
-        clearTimeout(urlUpdateTimeoutRef.current);
-      }
-    };
-  }, [
-    searchTerm,
-    typeFilter,
-    clientFilters,
-    activeTab,
-    mapZoom,
-    mapCenter,
-    savedBounds,
-    router,
-  ]);
+  // Sync URL with filters and map state
+  useUrlSync({
+    params: {
+      tab: activeTab === 'list' ? 'list' : null,
+      q: searchTerm || null,
+      type: typeFilter !== 'all' ? typeFilter : null,
+      pricing: clientFilters.pricingFilter !== 'all' ? clientFilters.pricingFilter : null,
+      min_security: clientFilters.minSecurityLevel > 0 ? clientFilters.minSecurityLevel : null,
+      min_quietness: clientFilters.minQuietnessLevel > 0 ? clientFilters.minQuietnessLevel : null,
+      max_toilet_dist: clientFilters.maxToiletDistance !== null ? clientFilters.maxToiletDistance : null,
+      min_elevation: clientFilters.minElevation !== null ? clientFilters.minElevation : null,
+      max_elevation: clientFilters.maxElevation !== null ? clientFilters.maxElevation : null,
+      lat: savedBounds
+        ? ((savedBounds.north + savedBounds.south) / 2).toFixed(7)
+        : mapCenter[1].toFixed(6),
+      lng: savedBounds
+        ? ((savedBounds.east + savedBounds.west) / 2).toFixed(7)
+        : mapCenter[0].toFixed(6),
+      lng_span: savedBounds
+        ? (savedBounds.east - savedBounds.west).toFixed(7)
+        : null,
+      aspect_ratio: savedBounds
+        ? ((savedBounds.east - savedBounds.west) / (savedBounds.north - savedBounds.south)).toFixed(2)
+        : null,
+      zoom: !savedBounds ? mapZoom.toFixed(2) : null,
+    },
+    basePath: '/shachu-haku',
+    debounceMs: 500,
+    enableDuplicateCheck: true,
+  });
 
   // Reset page when filters change
   useEffect(() => {
@@ -409,25 +335,6 @@ export default function ShachuHakuClient() {
       cleanupMapBoundsLoader();
     };
   }, [cleanupMapBoundsLoader]);
-
-  // Detect screen orientation (landscape vs portrait)
-  useEffect(() => {
-    const checkOrientation = () => {
-      setIsLandscape(window.innerWidth > window.innerHeight);
-    };
-
-    // Initial check
-    checkOrientation();
-
-    // Listen for resize and orientation change events
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-
-    return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
-    };
-  }, []);
 
   const handleSpotSelect = (spot: CampingSpotWithId) => {
     // マップからのスポットクリック時にカスタムポップアップを表示
