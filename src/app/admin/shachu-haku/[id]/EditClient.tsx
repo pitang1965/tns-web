@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { getCampingSpotById } from '../../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
@@ -40,6 +40,29 @@ export default function EditClient() {
   const [spot, setSpot] = useState<CampingSpotWithId | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get navigation data from sessionStorage
+  const navigationData = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const stored = sessionStorage.getItem('admin-spot-ids');
+      if (!stored) return null;
+      const spotIds = JSON.parse(stored) as string[];
+      const currentIndex = spotIds.indexOf(id);
+      if (currentIndex === -1) return null;
+
+      return {
+        spotIds,
+        currentIndex,
+        total: spotIds.length,
+        prevId: currentIndex > 0 ? spotIds[currentIndex - 1] : null,
+        nextId: currentIndex < spotIds.length - 1 ? spotIds[currentIndex + 1] : null,
+      };
+    } catch (e) {
+      console.error('Failed to parse navigation data:', e);
+      return null;
+    }
+  }, [id]);
 
   useEffect(() => {
     if (!id || isLoading || !isAdmin) return;
@@ -86,6 +109,10 @@ export default function EditClient() {
 
   const handleFormClose = () => {
     router.push('/admin/shachu-haku');
+  };
+
+  const handleNavigate = (spotId: string) => {
+    router.push(`/admin/shachu-haku/${spotId}`);
   };
 
   if (isLoading || !user) {
@@ -138,20 +165,69 @@ export default function EditClient() {
 
   return (
     <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
-      <div className='flex items-center gap-4'>
-        <Link href='/admin/shachu-haku'>
-          <Button variant='outline' size='sm'>
-            <ArrowLeft className='w-4 h-4 mr-2' />
-            戻る
-          </Button>
-        </Link>
-        <h1 className='text-3xl font-bold'>車中泊スポット編集</h1>
+      <div className='flex flex-col gap-4'>
+        {/* Header section - responsive layout */}
+        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+          <div className='flex items-center gap-4'>
+            <Link href='/admin/shachu-haku'>
+              <Button variant='outline' size='sm'>
+                <ArrowLeft className='w-4 h-4 mr-2' />
+                戻る
+              </Button>
+            </Link>
+            <h1 className='text-2xl md:text-3xl font-bold'>車中泊スポット編集</h1>
+          </div>
+
+          {navigationData && (
+            <div className='flex items-center gap-2 justify-between md:justify-end'>
+              <Link
+                href={
+                  navigationData.prevId
+                    ? `/admin/shachu-haku/${navigationData.prevId}`
+                    : '#'
+                }
+              >
+                <Button
+                  variant='outline'
+                  size='sm'
+                  disabled={!navigationData.prevId}
+                  className='cursor-pointer'
+                >
+                  <ChevronLeft className='w-4 h-4 mr-1' />
+                  前のスポット
+                </Button>
+              </Link>
+              <span className='text-sm text-gray-600 dark:text-gray-400 px-2'>
+                {navigationData.currentIndex + 1} / {navigationData.total}
+              </span>
+              <Link
+                href={
+                  navigationData.nextId
+                    ? `/admin/shachu-haku/${navigationData.nextId}`
+                    : '#'
+                }
+              >
+                <Button
+                  variant='outline'
+                  size='sm'
+                  disabled={!navigationData.nextId}
+                  className='cursor-pointer'
+                >
+                  次のスポット
+                  <ChevronRight className='w-4 h-4 ml-1' />
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
 
       <ShachuHakuForm
         spot={spot}
         onClose={handleFormClose}
         onSuccess={handleFormSuccess}
+        navigationData={navigationData}
+        onNavigate={handleNavigate}
       />
     </div>
   );

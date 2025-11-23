@@ -150,6 +150,8 @@ export default function AdminClient() {
     setCurrentPage,
     refreshListData,
     lastListFiltersRef,
+    allSpotIds,
+    refreshAllSpotIds,
   } = useAdminListData({
     activeTab,
     searchTerm,
@@ -246,6 +248,15 @@ export default function AdminClient() {
   }, [searchTerm, typeFilter, activeTab, router]);
 
   const handleNavigateToEdit = (spotId: string) => {
+    // Save the current filtered spot IDs for navigation
+    if (activeTab === 'map') {
+      // Map view: use visible spots in current bounds
+      const spotIds = visibleSpots.map(s => s._id);
+      sessionStorage.setItem('admin-spot-ids', JSON.stringify(spotIds));
+    } else if (activeTab === 'list') {
+      // List view: use ALL filtered spot IDs (not just current page)
+      sessionStorage.setItem('admin-spot-ids', JSON.stringify(allSpotIds));
+    }
     // Navigate to the edit page with the spot ID
     router.push(`/admin/shachu-haku/${spotId}`);
   };
@@ -259,7 +270,7 @@ export default function AdminClient() {
       toast,
     });
 
-  const handleFormSuccess = (createdId?: string) => {
+  const handleFormSuccess = async (createdId?: string) => {
     // 新規作成時は紙吹雪でお祝い
     if (isNewSpot) {
       celebrateSubmission();
@@ -277,6 +288,8 @@ export default function AdminClient() {
       lastListFiltersRef.current = null;
       // Manually trigger data reload for list view
       refreshListData();
+      // Refresh all spot IDs for navigation
+      refreshAllSpotIds();
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);
@@ -290,13 +303,15 @@ export default function AdminClient() {
     });
   };
 
-  const handleImportSuccess = (result: CSVImportResult) => {
+  const handleImportSuccess = async (result: CSVImportResult) => {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
       lastListFiltersRef.current = null;
       // Manually trigger data reload for list view
       refreshListData();
+      // Refresh all spot IDs for navigation
+      refreshAllSpotIds();
     } else if (activeTab === 'map' && mapBoundsRef.current) {
       // Use the hook's reloadIfNeeded function to reload map data
       reloadIfNeeded(mapBoundsRef.current);
@@ -576,6 +591,7 @@ export default function AdminClient() {
                 onSpotSelect={handleSpotSelect}
                 onPageChange={setCurrentPage}
                 clientFilters={clientFilters}
+                allSpotIds={allSpotIds}
               />
             )}
           </div>

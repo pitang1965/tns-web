@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, MutableRefObject } from 'react';
-import { getCampingSpotsWithPagination } from '../app/actions/campingSpots/admin';
+import { getCampingSpotsWithPagination, getCampingSpotIdsOnly } from '../app/actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
 type ListData = {
@@ -66,6 +66,14 @@ type UseAdminListDataReturn = {
    * Internal ref for tracking last loaded filters (exposed for special cases)
    */
   lastListFiltersRef: MutableRefObject<string | null>;
+  /**
+   * All filtered spot IDs (for navigation across all pages)
+   */
+  allSpotIds: string[];
+  /**
+   * Manually refresh all spot IDs with current filters
+   */
+  refreshAllSpotIds: () => Promise<void>;
 };
 
 /**
@@ -107,6 +115,7 @@ export function useAdminListData({
   const [listData, setListData] = useState<ListData | null>(null);
   const [listLoading, setListLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [allSpotIds, setAllSpotIds] = useState<string[]>([]);
 
   // Track last loaded filters to prevent duplicate requests
   const lastListFiltersRef = useRef<string | null>(null);
@@ -148,6 +157,22 @@ export function useAdminListData({
       setListLoading(false);
     }
   }, [searchTerm, typeFilter, currentPage, pageSize, toast, initialLoadDoneRef]);
+
+  // Refresh all spot IDs with current filters
+  const refreshAllSpotIds = useCallback(async () => {
+    const filters = {
+      searchTerm: searchTerm || undefined,
+      type: typeFilter !== 'all' ? typeFilter : undefined,
+    };
+
+    try {
+      const ids = await getCampingSpotIdsOnly(filters);
+      setAllSpotIds(ids);
+    } catch (error) {
+      console.error('[Admin] Error loading spot IDs:', error);
+      // Don't show toast for ID loading errors as it's background operation
+    }
+  }, [searchTerm, typeFilter]);
 
   // Auto-load data when switching to list tab or when filters/page changes
   useEffect(() => {
@@ -199,6 +224,15 @@ export function useAdminListData({
       });
   }, [activeTab, currentPage, searchTerm, typeFilter, pageSize, toast]);
 
+  // Auto-load all spot IDs when switching to list tab or when filters change
+  useEffect(() => {
+    if (activeTab !== 'list') {
+      return;
+    }
+
+    refreshAllSpotIds();
+  }, [activeTab, searchTerm, typeFilter, refreshAllSpotIds]);
+
   return {
     listData,
     listLoading,
@@ -206,5 +240,7 @@ export function useAdminListData({
     setCurrentPage,
     refreshListData,
     lastListFiltersRef,
+    allSpotIds,
+    refreshAllSpotIds,
   };
 }

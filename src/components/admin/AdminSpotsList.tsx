@@ -35,6 +35,7 @@ type AdminSpotsListProps = {
   clientFilters: ClientSideFilterValues;
   searchTerm?: string;
   typeFilter?: string;
+  allSpotIds?: string[]; // All filtered spot IDs for navigation
 }
 
 export function AdminSpotsList({
@@ -47,6 +48,7 @@ export function AdminSpotsList({
   clientFilters,
   searchTerm = '',
   typeFilter = 'all',
+  allSpotIds,
 }: AdminSpotsListProps) {
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
@@ -153,7 +155,17 @@ export function AdminSpotsList({
                   )}
                 </div>
                 <div className='flex gap-2'>
-                  <Link href={`/admin/shachu-haku/${spot._id}`}>
+                  <Link
+                    href={`/admin/shachu-haku/${spot._id}`}
+                    onClick={() => {
+                      // Save all filtered spot IDs to sessionStorage for navigation
+                      // Use allSpotIds if available (all filtered spots), otherwise fall back to current page
+                      const spotIds = allSpotIds && allSpotIds.length > 0
+                        ? allSpotIds
+                        : filteredSpots.map(s => s._id);
+                      sessionStorage.setItem('admin-spot-ids', JSON.stringify(spotIds));
+                    }}
+                  >
                     <Button
                       size='sm'
                       variant='outline'

@@ -1,13 +1,13 @@
 'use client';
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/components/ui/use-toast';
-import { X, Save, Trash2 } from 'lucide-react';
+import { X, Save, Trash2, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   CampingSpotWithId,
   CampingSpotType,
@@ -26,10 +26,19 @@ import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
+type NavigationData = {
+  currentIndex: number;
+  total: number;
+  prevId: string | null;
+  nextId: string | null;
+}
+
 type ShachuHakuFormProps = {
   spot?: CampingSpotWithId | null;
   onClose: () => void;
   onSuccess: (createdId?: string) => void;
+  navigationData?: NavigationData | null;
+  onNavigate?: (spotId: string) => void;
 }
 
 
@@ -37,11 +46,31 @@ export default function ShachuHakuForm({
   spot,
   onClose,
   onSuccess,
+  navigationData,
+  onNavigate,
 }: ShachuHakuFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const isEdit = !!spot?._id;
+
+  // Ref to store scroll position
+  const cardRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef<number>(0);
+
+  // Save scroll position and navigate
+  const handleNavigateWithScroll = (spotId: string) => {
+    if (cardRef.current) {
+      const scrollPos = cardRef.current.scrollTop;
+      scrollPositionRef.current = scrollPos;
+      // Save to sessionStorage so it persists across page navigation
+      sessionStorage.setItem('admin-spot-scroll', scrollPos.toString());
+      console.log('📍 Saved scroll:', scrollPos);
+    }
+    if (onNavigate) {
+      onNavigate(spotId);
+    }
+  };
 
   const {
     register,
@@ -94,6 +123,29 @@ export default function ShachuHakuForm({
     },
   });
 
+  // Restore scroll position after spot data is loaded
+  useEffect(() => {
+    // Get saved scroll position from sessionStorage
+    const savedScroll = sessionStorage.getItem('admin-spot-scroll');
+    const scrollPos = savedScroll ? parseInt(savedScroll, 10) : 0;
+
+    // Only restore if we have a saved position and the spot data has been loaded
+    if (spot && cardRef.current && scrollPos > 0) {
+      console.log('🔄 Restoring scroll to:', scrollPos);
+      // Use requestAnimationFrame and setTimeout to ensure DOM has fully updated
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (cardRef.current) {
+            cardRef.current.scrollTop = scrollPos;
+            console.log('✅ Scroll restored');
+            // Clear the saved position after restoring
+            sessionStorage.removeItem('admin-spot-scroll');
+          }
+        }, 100);
+      });
+    }
+  }, [spot?.name, spot?.prefecture]); // Use spot properties that change when new data loads
+
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
     if (spot && spot._id) {
@@ -138,17 +190,6 @@ export default function ShachuHakuForm({
         amenities: spot.amenities.join(', '),
         notes: spot.notes || ''
       };
-      console.log('Setting form values:', {
-        name: formValues.name,
-        type: formValues.type,
-        prefecture: formValues.prefecture,
-        quietnessLevel: formValues.quietnessLevel,
-        securityLevel: formValues.securityLevel,
-        overallRating: formValues.overallRating,
-        capacity: formValues.capacity,
-        distanceToToilet: formValues.distanceToToilet,
-        notes: formValues.notes,
-      });
       reset(formValues);
 
       // reset後に明示的にSelectフィールドの値を設定
@@ -369,27 +410,11 @@ export default function ShachuHakuForm({
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
-        <CardHeader className='flex flex-row items-center justify-between'>
+      <Card className='w-full max-w-4xl max-h-[90vh] flex flex-col'>
+        <CardHeader className='shrink-0'>
           <CardTitle>{isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}</CardTitle>
-          <div className='flex gap-2'>
-            {isEdit && (
-              <Button
-                variant='destructive'
-                size='sm'
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={loading}
-                className='cursor-pointer'
-              >
-                <Trash2 className='w-4 h-4' />
-              </Button>
-            )}
-            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
-              <X className='w-4 h-4' />
-            </Button>
-          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent ref={cardRef} className='overflow-auto flex-1'>
           <form
             onSubmit={handleSubmit(onSubmit)}
             onKeyDown={(e) => {
@@ -437,19 +462,69 @@ export default function ShachuHakuForm({
             />
 
             <FacilitiesMap watch={watch} />
-
-            {/* Submit Buttons */}
-            <div className='flex justify-end gap-2'>
-              <Button type='button' variant='outline' onClick={onClose} className='cursor-pointer'>
-                キャンセル
-              </Button>
-              <Button type='submit' disabled={loading} className='cursor-pointer'>
-                <Save className='w-4 h-4 mr-2' />
-                {loading ? '保存中...' : isEdit ? '更新' : '作成'}
-              </Button>
-            </div>
           </form>
         </CardContent>
+
+        {/* Footer with all action buttons */}
+        <CardFooter className='flex flex-col gap-3 border-t pt-4 shrink-0'>
+          {/* Navigation buttons */}
+          {navigationData && onNavigate && (
+            <div className='flex items-center justify-center gap-2 w-full'>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={!navigationData.prevId}
+                onClick={() => navigationData.prevId && handleNavigateWithScroll(navigationData.prevId)}
+                className='cursor-pointer'
+              >
+                <ChevronLeft className='w-4 h-4 mr-1' />
+                前のスポット
+              </Button>
+              <span className='text-sm text-gray-600 dark:text-gray-400 px-2'>
+                {navigationData.currentIndex + 1} / {navigationData.total}
+              </span>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={!navigationData.nextId}
+                onClick={() => navigationData.nextId && handleNavigateWithScroll(navigationData.nextId)}
+                className='cursor-pointer'
+              >
+                次のスポット
+                <ChevronRight className='w-4 h-4 ml-1' />
+              </Button>
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className='flex justify-end gap-2 w-full'>
+            <Button type='button' variant='outline' onClick={onClose} className='cursor-pointer'>
+              <ArrowLeft className='w-4 h-4 mr-2' />
+              戻る
+            </Button>
+            {isEdit && (
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={loading}
+                className='cursor-pointer'
+              >
+                <Trash2 className='w-4 h-4 mr-2' />
+                削除
+              </Button>
+            )}
+            <Button
+              type='submit'
+              disabled={loading}
+              className='cursor-pointer'
+              onClick={handleSubmit(onSubmit)}
+            >
+              <Save className='w-4 h-4 mr-2' />
+              {loading ? '保存中...' : isEdit ? '更新' : '作成'}
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
 
       {showDeleteConfirm && (

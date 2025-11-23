@@ -198,6 +198,52 @@ export async function getCampingSpotsWithPagination(
   };
 }
 
+// Admin function to get only IDs for navigation (lightweight)
+export async function getCampingSpotIdsOnly(options?: {
+  searchTerm?: string;
+  prefecture?: string;
+  type?: string;
+  bounds?: { north: number; south: number; east: number; west: number };
+}) {
+  await checkAdminAuth();
+  await ensureDbConnection();
+
+  const query: Record<string, unknown> = {};
+
+  if (options?.searchTerm) {
+    query.name = { $regex: options.searchTerm, $options: 'i' };
+  }
+
+  if (options?.prefecture && options.prefecture !== 'all') {
+    query.prefecture = options.prefecture;
+  }
+
+  if (options?.type && options.type !== 'all') {
+    query.type = options.type;
+  }
+
+  // Add bounds filter if provided
+  if (options?.bounds) {
+    query.coordinates = {
+      $geoWithin: {
+        $box: [
+          [options.bounds.west, options.bounds.south],
+          [options.bounds.east, options.bounds.north],
+        ],
+      },
+    };
+  }
+
+  // Only select _id field for efficiency
+  const spots = await CampingSpot.find(query)
+    .select('_id')
+    .sort({ createdAt: -1 })
+    .lean<{ _id: unknown }[]>();
+
+  // Return array of ID strings
+  return spots.map((spot) => String(spot._id));
+}
+
 export async function getCampingSpotById(id: string) {
   try {
     // Validate input
