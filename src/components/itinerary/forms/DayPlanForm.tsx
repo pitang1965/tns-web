@@ -4,6 +4,7 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Map, Clock, Tent } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
+import { ActivityOrderList } from './ActivityOrderList';
 import { H3 } from '@/components/common/Typography';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { formatDateWithWeekday } from '@/lib/date';
@@ -179,6 +180,22 @@ export function DayPlanForm({
             activities={activitiesWithLocation}
             compact={true}
             onExpandClick={() => setShowFullMap(true)}
+          />
+        </div>
+      )}
+
+      {/* アクティビティの順序リスト - アクティビティが1つ以上ある場合のみ表示 */}
+      {totalActivities > 0 && (
+        <div className='mb-4 p-3 border border-border/50 rounded-lg bg-muted/10'>
+          <ActivityOrderList
+            activities={watchedActivities.map((activity: any) => ({
+              id: activity.id,
+              title: activity.title,
+            }))}
+            onReorder={(fromIndex, toIndex) =>
+              moveActivity(dayIndex, fromIndex, toIndex)
+            }
+            onAdd={() => addActivity(dayIndex)}
           />
         </div>
       )}
