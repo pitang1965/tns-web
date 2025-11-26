@@ -4,7 +4,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -35,7 +36,19 @@ export function ActivityOrderList({
   onAdd,
 }: ActivityOrderListProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(MouseSensor, {
+      // マウスの場合は10px移動で開始
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      // タッチの場合は250ms遅延、5pxの許容範囲でスクロールと競合しないようにする
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
