@@ -98,6 +98,28 @@ export default function ShachuHakuForm({
     }
   };
 
+  // キャッシュクリア関数
+  const clearShachuHakuCache = async () => {
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames
+            .filter(
+              (name) =>
+                name.includes('shachu-haku') ||
+                name.includes('next-data') ||
+                name.includes('shachu-haku-api')
+            )
+            .map((name) => caches.delete(name))
+        );
+        console.log('車中泊スポットキャッシュをクリアしました');
+      } catch (error) {
+        console.error('キャッシュクリアエラー:', error);
+      }
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -436,6 +458,9 @@ export default function ShachuHakuForm({
         }
       }
 
+      // スポット作成/更新成功後にキャッシュをクリア
+      await clearShachuHakuCache();
+
       onSuccess(createdId);
     } catch (error) {
       console.error('Save error:', error);
@@ -460,6 +485,10 @@ export default function ShachuHakuForm({
     try {
       setLoading(true);
       await deleteCampingSpot(spot._id);
+
+      // スポット削除成功後にキャッシュをクリア
+      await clearShachuHakuCache();
+
       toast({
         title: '成功',
         description: 'スポットを削除しました',

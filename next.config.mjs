@@ -8,6 +8,42 @@ const withPWA = withPWAInit({
   skipWaiting: true,
   // キャッシュ戦略
   runtimeCaching: [
+    // Mapbox静的アセット（スタイル、フォント、スプライト）
+    {
+      urlPattern: /^https:\/\/api\.mapbox\.com\/(styles|fonts|sprites)\/.*$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'mapbox-static-assets',
+        expiration: {
+          maxEntries: 300,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
+        }
+      }
+    },
+    // Mapboxベクトルタイル
+    {
+      urlPattern: /^https:\/\/api\.mapbox\.com\/v4\/.*\.vector\.pbf/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'mapbox-tiles',
+        expiration: {
+          maxEntries: 500,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
+        }
+      }
+    },
+    // Mapboxラスタータイル（画像タイル）
+    {
+      urlPattern: /^https:\/\/api\.mapbox\.com\/.*\.(png|jpg|jpeg)$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'mapbox-raster-tiles',
+        expiration: {
+          maxEntries: 500,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
+        }
+      }
+    },
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
       handler: 'CacheFirst',
@@ -138,7 +174,19 @@ const withPWA = withPWAInit({
       }
     },
     {
-      // Next.jsのApp RouterデータはキャッシュしないでネットワークFirst
+      // 車中泊スポットデータ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
+      urlPattern: /\/_next\/data\/.+\/shachu-haku.*\.json$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'shachu-haku-data',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 30 * 60 // 30分
+        }
+      }
+    },
+    {
+      // その他のNext.jsデータ - NetworkFirst（既存の動作維持）
       urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
       handler: 'NetworkFirst',
       options: {
@@ -151,6 +199,20 @@ const withPWA = withPWAInit({
       }
     },
     {
+      // 車中泊スポットAPI - StaleWhileRevalidate
+      urlPattern: /\/api\/(campingSpots|shachu-haku)\/.*$/i,
+      handler: 'StaleWhileRevalidate',
+      method: 'GET',
+      options: {
+        cacheName: 'shachu-haku-api',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 30 * 60 // 30分
+        }
+      }
+    },
+    {
+      // その他のAPI - NetworkFirst（既存の動作維持）
       urlPattern: /\/api\/.*$/i,
       handler: 'NetworkFirst',
       method: 'GET',
