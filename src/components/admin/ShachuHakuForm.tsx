@@ -107,8 +107,8 @@ export default function ShachuHakuForm({
           cacheNames
             .filter(
               (name) =>
-                name.includes('shachu-haku') ||
-                name.includes('next-data') ||
+                name.includes('shachu-haku-list') ||
+                name.includes('shachu-haku-detail') ||
                 name.includes('shachu-haku-api')
             )
             .map((name) => caches.delete(name))

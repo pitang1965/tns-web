@@ -174,11 +174,23 @@ const withPWA = withPWAInit({
       }
     },
     {
-      // 車中泊スポットデータ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
-      urlPattern: /\/_next\/data\/.+\/shachu-haku.*\.json$/i,
+      // 車中泊スポット一覧・地図データ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
+      urlPattern: /\/_next\/data\/.+\/shachu-haku\.json$/i,
       handler: 'StaleWhileRevalidate',
       options: {
-        cacheName: 'shachu-haku-data',
+        cacheName: 'shachu-haku-list-data',
+        expiration: {
+          maxEntries: 500,
+          maxAgeSeconds: 30 * 60 // 30分
+        }
+      }
+    },
+    {
+      // 車中泊スポット詳細データ - StaleWhileRevalidate
+      urlPattern: /\/_next\/data\/.+\/shachu-haku\/.+\.json$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'shachu-haku-detail-data',
         expiration: {
           maxEntries: 50,
           maxAgeSeconds: 30 * 60 // 30分
@@ -199,14 +211,27 @@ const withPWA = withPWAInit({
       }
     },
     {
-      // 車中泊スポットAPI - StaleWhileRevalidate
-      urlPattern: /\/api\/(campingSpots|shachu-haku)\/.*$/i,
+      // 車中泊スポット一覧API - StaleWhileRevalidate
+      urlPattern: /\/api\/camping-spots\/?$/i,
       handler: 'StaleWhileRevalidate',
       method: 'GET',
       options: {
-        cacheName: 'shachu-haku-api',
+        cacheName: 'shachu-haku-list-api',
         expiration: {
-          maxEntries: 32,
+          maxEntries: 500,
+          maxAgeSeconds: 30 * 60 // 30分
+        }
+      }
+    },
+    {
+      // その他の車中泊スポットAPI - StaleWhileRevalidate
+      urlPattern: /\/api\/camping-spots\/.+$/i,
+      handler: 'StaleWhileRevalidate',
+      method: 'GET',
+      options: {
+        cacheName: 'shachu-haku-detail-api',
+        expiration: {
+          maxEntries: 50,
           maxAgeSeconds: 30 * 60 // 30分
         }
       }
