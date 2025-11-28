@@ -12,7 +12,8 @@
       "mcp__mongodb-readonly__list-collections",
       "mcp__mongodb-readonly__aggregate",
       "Bash(cat:*)",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(find:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

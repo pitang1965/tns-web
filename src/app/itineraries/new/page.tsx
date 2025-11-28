@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { clearItineraryCache } from '@/lib/cacheUtils';
 
 export default withPageAuthRequired(function NewItineraryPage() {
   const { user } = useUser();
@@ -93,6 +94,8 @@ export default withPageAuthRequired(function NewItineraryPage() {
       console.log('Server action result:', result);
       setIsSubmitting(false);
       if (result.success) {
+        // 旅程作成成功後にキャッシュをクリア
+        await clearItineraryCache();
         router.push(`/itineraries/${result.id}/edit`);
       } else {
         setIsLoading(false);

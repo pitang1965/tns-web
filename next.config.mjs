@@ -198,6 +198,30 @@ const withPWA = withPWAInit({
       }
     },
     {
+      // 旅程一覧データ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
+      urlPattern: /\/_next\/data\/.+\/itineraries\.json$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'itinerary-list-data',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60 // 1日
+        }
+      }
+    },
+    {
+      // 旅程詳細データ - StaleWhileRevalidate（1日キャッシュ）
+      urlPattern: /\/_next\/data\/.+\/itineraries\/.+\.json$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'itinerary-detail-data',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60 // 1日
+        }
+      }
+    },
+    {
       // その他のNext.jsデータ - NetworkFirst（既存の動作維持）
       urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
       handler: 'NetworkFirst',
@@ -233,6 +257,19 @@ const withPWA = withPWAInit({
         expiration: {
           maxEntries: 50,
           maxAgeSeconds: 30 * 60 // 30分
+        }
+      }
+    },
+    {
+      // 旅程API - StaleWhileRevalidate（1日キャッシュ）
+      urlPattern: /\/api\/itineraries\/.*$/i,
+      handler: 'StaleWhileRevalidate',
+      method: 'GET',
+      options: {
+        cacheName: 'itinerary-api',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60 // 1日
         }
       }
     },

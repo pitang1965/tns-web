@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/components/ui/use-toast';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { clearShachuHakuCache } from '@/lib/cacheUtils';
 import {
   useCheckMissingFields,
   MissingFields,
@@ -98,27 +99,6 @@ export default function ShachuHakuForm({
     }
   };
 
-  // キャッシュクリア関数
-  const clearShachuHakuCache = async () => {
-    if (typeof window !== 'undefined' && 'caches' in window) {
-      try {
-        const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames
-            .filter(
-              (name) =>
-                name.includes('shachu-haku-list') ||
-                name.includes('shachu-haku-detail') ||
-                name.includes('shachu-haku-api')
-            )
-            .map((name) => caches.delete(name))
-        );
-        console.log('車中泊スポットキャッシュをクリアしました');
-      } catch (error) {
-        console.error('キャッシュクリアエラー:', error);
-      }
-    }
-  };
 
   const {
     register,

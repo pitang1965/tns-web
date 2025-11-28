@@ -10,6 +10,7 @@ import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { useGetItinerary } from '@/hooks/useGetItinerary';
 import { LoadingState } from '@/components/common/LoadingState';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
+import { clearItineraryCache } from '@/lib/cacheUtils';
 
 type EditItineraryPageProps = {
   params: Promise<{
@@ -59,6 +60,10 @@ export default withPageAuthRequired(function EditItineraryPage({
           success: false,
           error: 'サーバーからの応答がありませんでした。',
         };
+      }
+      // 旅程更新成功後にキャッシュをクリア
+      if (result.success) {
+        await clearItineraryCache();
       }
       return result;
     } catch (error) {
