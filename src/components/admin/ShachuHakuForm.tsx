@@ -10,8 +10,9 @@ import {
   useCheckMissingFields,
   MissingFields,
 } from '@/hooks/useCheckMissingFields';
+import { useFormAutoSave } from '@/hooks/useFormAutoSave';
+import { useFormSubmit } from '@/hooks/useFormSubmit';
 import {
-  X,
   Save,
   Trash2,
   ChevronLeft,
@@ -27,11 +28,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-import {
-  createCampingSpot,
-  updateCampingSpot,
-  deleteCampingSpot,
-} from '../../app/actions/campingSpots/admin';
+import { deleteCampingSpot } from '../../app/actions/campingSpots/admin';
 import {
   ShachuHakuFormCreateSchema,
   ShachuHakuFormEditSchema,
@@ -45,6 +42,9 @@ import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { MissingFieldsConfirmDialog } from './MissingFieldsConfirmDialog';
+import { CloseConfirmDialog } from './CloseConfirmDialog';
+import { DEFAULT_FORM_VALUES, AUTO_SAVE_KEY } from '@/constants/formDefaults';
+import { convertSpotToFormValues } from '@/lib/utils/spotFormUtils';
 
 type NavigationData = {
   currentIndex: number;
@@ -69,9 +69,10 @@ export default function ShachuHakuForm({
   onNavigate,
 }: ShachuHakuFormProps) {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showCloseConfirmDialog, setShowCloseConfirmDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [missingFields, setMissingFields] = useState<MissingFields>({
     empty: [],
     unchecked: [],
@@ -111,114 +112,35 @@ export default function ShachuHakuForm({
     resolver: zodResolver(
       isEdit ? ShachuHakuFormEditSchema : ShachuHakuFormCreateSchema
     ),
-    defaultValues: {
-      name: '',
-      lat: '',
-      lng: '',
-      prefecture: '',
-      address: '',
-      url: '',
-      type: undefined,
-      distanceToToilet: '',
-      distanceToBath: '',
-      distanceToConvenience: '',
-      nearbyToiletLat: '',
-      nearbyToiletLng: '',
-      nearbyConvenienceLat: '',
-      nearbyConvenienceLng: '',
-      nearbyBathLat: '',
-      nearbyBathLng: '',
-      elevation: '',
-      // 新評価システム（客観的データ）
-      securityHasGate: false,
-      securityHasLighting: false,
-      securityHasStaff: false,
-      nightNoiseHasNoiseIssues: false,
-      nightNoiseNearBusyRoad: false,
-      nightNoiseIsQuietArea: false,
-      // 旧評価システム（段階的廃止予定）
-      quietnessLevel: '',
-      securityLevel: '',
-      overallRating: '',
-      hasRoof: false,
-      hasPowerOutlet: false,
-      isFree: undefined,
-      pricePerNight: '',
-      priceNote: '',
-      capacity: '',
-      capacityLarge: '',
-      restrictions: '',
-      amenities: '',
-      notes: '',
-    },
+    defaultValues: DEFAULT_FORM_VALUES,
+  });
+
+  // フォーム自動保存フック
+  const { clearStorage, checkHasFormInput } = useFormAutoSave({
+    watch,
+    reset,
+    setValue,
+    isEdit,
+    toast,
+  });
+
+  // フォーム送信フック
+  const { submitForm, loading } = useFormSubmit({
+    isEdit,
+    spot,
+    toast,
+    onSuccess,
+    setShowConfirmDialog,
   });
 
   // コンポーネントマウント時とspotが変わった時にフォームの値を設定
   useEffect(() => {
     if (spot && spot._id) {
       // 編集モード：spotの値でフォームを初期化
-      const formValues = {
-        name: spot.name,
-        lat: spot.coordinates[1].toString(),
-        lng: spot.coordinates[0].toString(),
-        prefecture: spot.prefecture,
-        address: spot.address || '',
-        url: spot.url || '',
-        type: spot.type,
-        distanceToToilet: spot.distanceToToilet?.toString() || '',
-        distanceToBath: spot.distanceToBath?.toString() || '',
-        distanceToConvenience: spot.distanceToConvenience?.toString() || '',
-        nearbyToiletLat:
-          spot.nearbyToiletCoordinates &&
-          spot.nearbyToiletCoordinates.length >= 2
-            ? spot.nearbyToiletCoordinates[1].toString()
-            : '',
-        nearbyToiletLng:
-          spot.nearbyToiletCoordinates &&
-          spot.nearbyToiletCoordinates.length >= 2
-            ? spot.nearbyToiletCoordinates[0].toString()
-            : '',
-        nearbyConvenienceLat:
-          spot.nearbyConvenienceCoordinates &&
-          spot.nearbyConvenienceCoordinates.length >= 2
-            ? spot.nearbyConvenienceCoordinates[1].toString()
-            : '',
-        nearbyConvenienceLng:
-          spot.nearbyConvenienceCoordinates &&
-          spot.nearbyConvenienceCoordinates.length >= 2
-            ? spot.nearbyConvenienceCoordinates[0].toString()
-            : '',
-        nearbyBathLat:
-          spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2
-            ? spot.nearbyBathCoordinates[1].toString()
-            : '',
-        nearbyBathLng:
-          spot.nearbyBathCoordinates && spot.nearbyBathCoordinates.length >= 2
-            ? spot.nearbyBathCoordinates[0].toString()
-            : '',
-        elevation: spot.elevation?.toString() || '',
-        // 新評価システム（客観的データ）
-        securityHasGate: spot.security?.hasGate || false,
-        securityHasLighting: spot.security?.hasLighting || false,
-        securityHasStaff: spot.security?.hasStaff || false,
-        nightNoiseHasNoiseIssues: spot.nightNoise?.hasNoiseIssues || false,
-        nightNoiseNearBusyRoad: spot.nightNoise?.nearBusyRoad || false,
-        nightNoiseIsQuietArea: spot.nightNoise?.isQuietArea || false,
-        // 旧評価システム（段階的廃止予定） - レガシーデータとの互換性のため
-        quietnessLevel: (spot as any).quietnessLevel?.toString() || '',
-        securityLevel: (spot as any).securityLevel?.toString() || '',
-        overallRating: (spot as any).overallRating?.toString() || '',
-        hasRoof: spot.hasRoof,
-        hasPowerOutlet: spot.hasPowerOutlet,
-        isFree: spot.pricing.isFree,
-        pricePerNight: spot.pricing.pricePerNight?.toString() || '',
-        priceNote: spot.pricing.priceNote || '',
-        capacity: spot.capacity?.toString() || '',
-        capacityLarge: spot.capacityLarge?.toString() || '',
-        restrictions: spot.restrictions.join(', '),
-        amenities: spot.amenities.join(', '),
-        notes: spot.notes || '',
-      };
+      // 念のためLocalStorageをクリア（親コンポーネントでもクリアしているが、防御的に）
+      clearStorage();
+
+      const formValues = convertSpotToFormValues(spot);
       reset(formValues);
 
       // reset後に明示的にSelectフィールドの値を設定
@@ -232,51 +154,12 @@ export default function ShachuHakuForm({
       setValue('lat', spot.coordinates[1].toString());
       setValue('lng', spot.coordinates[0].toString());
       // type は defaultValues の undefined のまま（useAutoSetSpotTypeが動作できるように）
-    } else {
-      // 新規作成（ボタンクリック）の場合はデフォルト値にリセット
-      reset({
-        name: '',
-        lat: '',
-        lng: '',
-        prefecture: '',
-        address: '',
-        url: '',
-        type: undefined,
-        distanceToToilet: '',
-        distanceToBath: '',
-        distanceToConvenience: '',
-        nearbyToiletLat: '',
-        nearbyToiletLng: '',
-        nearbyConvenienceLat: '',
-        nearbyConvenienceLng: '',
-        nearbyBathLat: '',
-        nearbyBathLng: '',
-        elevation: '',
-        // 新評価システム（客観的データ）
-        securityHasGate: false,
-        securityHasLighting: false,
-        securityHasStaff: false,
-        nightNoiseHasNoiseIssues: false,
-        nightNoiseNearBusyRoad: false,
-        nightNoiseIsQuietArea: false,
-        // 旧評価システム（段階的廃止予定）
-        quietnessLevel: '',
-        securityLevel: '',
-        overallRating: '',
-        hasRoof: false,
-        hasPowerOutlet: false,
-        isFree: undefined,
-        pricePerNight: '',
-        priceNote: '',
-        capacity: '',
-        capacityLarge: '',
-        restrictions: '',
-        amenities: '',
-        notes: '',
-      });
     }
+    // 新規作成（ボタンクリック）の場合は、useFormAutoSaveフックで自動的に復元される
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spot]);
+
+  // フォームの値が変更されたときの自動保存は、useFormAutoSaveフックで処理される
 
   const handleFormSubmit = async (data: ShachuHakuFormData) => {
     // 未入力項目をチェック
@@ -293,177 +176,13 @@ export default function ShachuHakuForm({
     await submitForm(data);
   };
 
-  const submitForm = async (data: ShachuHakuFormData) => {
-    try {
-      setLoading(true);
-      setShowConfirmDialog(false); // ダイアログを閉じる
-
-      console.log('Form submission data:', {
-        quietnessLevel: data.quietnessLevel,
-        securityLevel: data.securityLevel,
-        overallRating: data.overallRating,
-        capacity: data.capacity,
-        distanceToToilet: data.distanceToToilet,
-        notes: data.notes,
-      });
-
-      const formData = new FormData();
-
-      // Handle required fields
-      formData.append('name', data.name);
-      formData.append('lat', data.lat);
-      formData.append('lng', data.lng);
-      formData.append('prefecture', data.prefecture);
-      formData.append('type', data.type);
-
-      // Handle optional string fields
-      if (data.address && data.address.trim() !== '') {
-        formData.append('address', data.address);
-      }
-      if (data.url && data.url.trim() !== '') {
-        formData.append('url', data.url);
-      }
-      if (data.priceNote && data.priceNote.trim() !== '') {
-        formData.append('priceNote', data.priceNote);
-      }
-      if (data.notes && data.notes.trim() !== '') {
-        formData.append('notes', data.notes);
-      }
-
-      // Handle optional number fields
-      if (data.distanceToToilet && data.distanceToToilet.trim() !== '') {
-        formData.append('distanceToToilet', data.distanceToToilet);
-      }
-      if (data.distanceToBath && data.distanceToBath.trim() !== '') {
-        formData.append('distanceToBath', data.distanceToBath);
-      }
-      if (
-        data.distanceToConvenience &&
-        data.distanceToConvenience.trim() !== ''
-      ) {
-        formData.append('distanceToConvenience', data.distanceToConvenience);
-      }
-      if (data.elevation && data.elevation.trim() !== '') {
-        formData.append('elevation', data.elevation);
-      }
-
-      // Handle nearby coordinates
-      if (
-        data.nearbyToiletLat &&
-        data.nearbyToiletLng &&
-        data.nearbyToiletLat.trim() !== '' &&
-        data.nearbyToiletLng.trim() !== ''
-      ) {
-        formData.append('nearbyToiletLat', data.nearbyToiletLat);
-        formData.append('nearbyToiletLng', data.nearbyToiletLng);
-      }
-      if (
-        data.nearbyConvenienceLat &&
-        data.nearbyConvenienceLng &&
-        data.nearbyConvenienceLat.trim() !== '' &&
-        data.nearbyConvenienceLng.trim() !== ''
-      ) {
-        formData.append('nearbyConvenienceLat', data.nearbyConvenienceLat);
-        formData.append('nearbyConvenienceLng', data.nearbyConvenienceLng);
-      }
-      if (
-        data.nearbyBathLat &&
-        data.nearbyBathLng &&
-        data.nearbyBathLat.trim() !== '' &&
-        data.nearbyBathLng.trim() !== ''
-      ) {
-        formData.append('nearbyBathLat', data.nearbyBathLat);
-        formData.append('nearbyBathLng', data.nearbyBathLng);
-      }
-
-      // 新評価システム（客観的データ）
-      formData.append('securityHasGate', data.securityHasGate.toString());
-      formData.append(
-        'securityHasLighting',
-        data.securityHasLighting.toString()
-      );
-      formData.append('securityHasStaff', data.securityHasStaff.toString());
-      formData.append(
-        'nightNoiseHasNoiseIssues',
-        data.nightNoiseHasNoiseIssues.toString()
-      );
-      formData.append(
-        'nightNoiseNearBusyRoad',
-        data.nightNoiseNearBusyRoad.toString()
-      );
-      formData.append(
-        'nightNoiseIsQuietArea',
-        data.nightNoiseIsQuietArea.toString()
-      );
-
-      // 旧評価システム（段階的廃止予定）
-      if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
-        formData.append('quietnessLevel', data.quietnessLevel);
-      }
-      if (data.securityLevel && data.securityLevel.trim() !== '') {
-        formData.append('securityLevel', data.securityLevel);
-      }
-      if (data.overallRating && data.overallRating.trim() !== '') {
-        formData.append('overallRating', data.overallRating);
-      }
-      if (data.capacity && data.capacity.trim() !== '') {
-        formData.append('capacity', data.capacity);
-      }
-      if (data.capacityLarge && data.capacityLarge.trim() !== '') {
-        formData.append('capacityLarge', data.capacityLarge);
-      }
-      if (data.pricePerNight && data.pricePerNight.trim() !== '') {
-        formData.append('pricePerNight', data.pricePerNight);
-      }
-
-      // Handle boolean fields
-      formData.append('hasRoof', data.hasRoof.toString());
-      formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
-      if (data.isFree !== undefined) {
-        formData.append('isFree', data.isFree.toString());
-      }
-
-      // Handle array fields
-      formData.append('restrictions', data.restrictions);
-      formData.append('amenities', data.amenities);
-
-      let createdId: string | undefined;
-
-      if (isEdit) {
-        await updateCampingSpot(spot._id, formData);
-      } else {
-        const result = await createCampingSpot(formData);
-        if (result.success && result.id) {
-          createdId = result.id;
-        }
-      }
-
-      // スポット作成/更新成功後にキャッシュをクリア
-      await clearShachuHakuCache();
-
-      onSuccess(createdId);
-    } catch (error) {
-      console.error('Save error:', error);
-
-      const errorMessage = isEdit
-        ? 'スポットの更新に失敗しました'
-        : 'スポットの作成に失敗しました';
-
-      toast({
-        title: 'エラー',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // submitForm関数はuseFormSubmitフックで提供される
 
   const handleDelete = async () => {
     if (!spot?._id) return;
 
     try {
-      setLoading(true);
+      setDeleteLoading(true);
       await deleteCampingSpot(spot._id);
 
       // スポット削除成功後にキャッシュをクリア
@@ -482,8 +201,37 @@ export default function ShachuHakuForm({
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setDeleteLoading(false);
     }
+  };
+
+  // 「戻る」ボタンのハンドラー
+  const handleClose = () => {
+    // 編集モードの場合はそのまま閉じる
+    if (isEdit) {
+      onClose();
+      return;
+    }
+
+    // 新規作成モードの場合、入力内容があるかチェック
+    const hasInput = checkHasFormInput();
+
+    if (hasInput) {
+      // 入力がある場合は確認ダイアログを表示
+      setShowCloseConfirmDialog(true);
+    } else {
+      // 入力がない場合はそのまま閉じる（下書きも削除）
+      clearStorage();
+      onClose();
+    }
+  };
+
+  // 閉じることを確認
+  const confirmClose = () => {
+    // 下書きを削除して閉じる
+    clearStorage();
+    setShowCloseConfirmDialog(false);
+    onClose();
   };
 
   return (
@@ -590,7 +338,7 @@ export default function ShachuHakuForm({
             <Button
               type='button'
               variant='outline'
-              onClick={onClose}
+              onClick={handleClose}
               className='cursor-pointer'
             >
               <ArrowLeft className='w-4 h-4 mr-2' />
@@ -601,7 +349,7 @@ export default function ShachuHakuForm({
                 type='button'
                 variant='destructive'
                 onClick={() => setShowDeleteConfirm(true)}
-                disabled={loading}
+                disabled={deleteLoading || loading}
                 className='cursor-pointer'
               >
                 <Trash2 className='w-4 h-4 mr-2' />
@@ -624,7 +372,7 @@ export default function ShachuHakuForm({
       {showDeleteConfirm && (
         <DeleteConfirmDialog
           spot={spot}
-          loading={loading}
+          loading={deleteLoading}
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
         />
@@ -641,6 +389,13 @@ export default function ShachuHakuForm({
           submitForm(data);
         }}
         isEdit={isEdit}
+      />
+
+      {/* 閉じる確認ダイアログ */}
+      <CloseConfirmDialog
+        open={showCloseConfirmDialog}
+        onOpenChange={setShowCloseConfirmDialog}
+        onConfirm={confirmClose}
       />
     </div>
   );

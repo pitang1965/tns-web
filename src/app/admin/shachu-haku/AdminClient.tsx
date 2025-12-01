@@ -27,6 +27,7 @@ import { useAdminSpotForm } from '@/hooks/useAdminSpotForm';
 import { useAdminListData } from '@/hooks/useAdminListData';
 import { downloadCampingSpotsCSV } from '@/lib/csv/campingSpots';
 import { useUrlSync } from '@/hooks/useUrlSync';
+import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
@@ -226,6 +227,9 @@ export default function AdminClient() {
   });
 
   const handleNavigateToEdit = (spotId: string) => {
+    // Clear LocalStorage auto-save data before navigating to edit mode
+    localStorage.removeItem(AUTO_SAVE_KEY);
+
     // Save the current filtered spot IDs for navigation
     if (activeTab === 'map') {
       // Map view: use visible spots in current bounds

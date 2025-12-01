@@ -18,6 +18,7 @@ import {
   filterSpotsClientSide,
   hasActiveClientFilters,
 } from '@/lib/clientSideFilterSpots';
+import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 import { getActiveFilterDescriptions } from '@/lib/filterDescriptions';
 import {
   getTypeColor,
@@ -158,6 +159,9 @@ export function AdminSpotsList({
                   <Link
                     href={`/admin/shachu-haku/${spot._id}`}
                     onClick={() => {
+                      // Clear LocalStorage auto-save data before navigating to edit mode
+                      localStorage.removeItem(AUTO_SAVE_KEY);
+
                       // Save all filtered spot IDs to sessionStorage for navigation
                       // Use allSpotIds if available (all filtered spots), otherwise fall back to current page
                       const spotIds = allSpotIds && allSpotIds.length > 0

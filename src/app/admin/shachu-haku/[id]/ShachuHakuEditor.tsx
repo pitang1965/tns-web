@@ -12,6 +12,7 @@ import { getCampingSpotById } from '../../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { LoadingState } from '@/components/common/LoadingState';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
+import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 
 // Dynamically import the form component to avoid SSR issues
 const ShachuHakuForm = dynamic(
@@ -66,6 +67,9 @@ export default function ShachuHakuEditor() {
 
   useEffect(() => {
     if (!id || isLoading || !isAdmin) return;
+
+    // Clear LocalStorage auto-save data when entering edit mode
+    localStorage.removeItem(AUTO_SAVE_KEY);
 
     const loadSpot = async () => {
       try {
