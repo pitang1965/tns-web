@@ -5,6 +5,11 @@ type AdLinkProps = {
 };
 
 export function AdLink({ className = '' }: AdLinkProps) {
+  // 環境変数で表示/非表示を制御
+  if (process.env.NEXT_PUBLIC_SHOW_AD_LINK !== 'true') {
+    return null;
+  }
+
   return (
     <a
       href='https://amzn.to/48d3oj8'
