@@ -177,7 +177,7 @@ export function NearbySpotsSelector({
   return (
     <div className='space-y-3'>
       <div className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-        📍 最も近い施設をコピー
+        📍 最も近い施設の座標をコピー
       </div>
       <div className='space-y-2'>
         {closestFacilities.map((facility) => (
