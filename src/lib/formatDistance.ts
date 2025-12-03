@@ -8,10 +8,11 @@
  * formatDistance(1000) // "1km"
  * formatDistance(4500) // "4.5km"
  * formatDistance(4520) // "4.52km"
+ * formatDistance(118.74) // "119m"
  */
 export function formatDistance(meters: number): string {
   if (meters < 1000) {
-    return `${meters}m`;
+    return `${Math.round(meters)}m`;
   }
 
   const km = meters / 1000;

@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Map, Route, Copy } from 'lucide-react';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
 import { ShachuHakuFormData } from './validationSchemas';
+import { NearbySpotsSelector } from './NearbySpotsSelector';
 
 type NearbyFacilityFieldsProps = {
   register: UseFormRegister<ShachuHakuFormData>;
@@ -124,6 +125,16 @@ export function NearbyFacilityFields({
             )}
           </Label>
         </div>
+
+        {/* 近隣スポットから施設をコピー */}
+        <div className='mt-4'>
+          <NearbySpotsSelector
+            lat={watch('lat') || ''}
+            lng={watch('lng') || ''}
+            setValue={setValue}
+          />
+        </div>
+
         <div className='space-y-6 mt-4'>
           {/* トイレ情報 */}
           <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
