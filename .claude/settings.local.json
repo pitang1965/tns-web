@@ -13,7 +13,8 @@
       "mcp__mongodb-readonly__aggregate",
       "Bash(cat:*)",
       "mcp__context7__get-library-docs",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,
