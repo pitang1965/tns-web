@@ -15,7 +15,7 @@ import {
   getRatingColor,
   getPricingColor,
 } from '@/lib/spotColorUtils';
-import { formatDistance } from '@/lib/formatDistance';
+import { formatFacilityDistance } from '@/lib/formatDistance';
 
 type SpotPopupProps = {
   spot: CampingSpotWithId;
@@ -89,28 +89,28 @@ export function SpotPopup({
           </div>
           {/* 距離・標高情報を1行に（折り返し可能） */}
           <div className='flex flex-wrap gap-x-3 gap-y-0.5'>
-            {spot.distanceToToilet && (
+            {spot.distanceToToilet != null && (
               <span>
                 <strong className='text-gray-900 dark:text-gray-100'>
                   トイレ:
                 </strong>{' '}
-                {formatDistance(spot.distanceToToilet)}
+                {formatFacilityDistance(spot.distanceToToilet)}
               </span>
             )}
-            {spot.distanceToBath && (
+            {spot.distanceToBath != null && (
               <span>
                 <strong className='text-gray-900 dark:text-gray-100'>
                   入浴施設:
                 </strong>{' '}
-                {formatDistance(spot.distanceToBath)}
+                {formatFacilityDistance(spot.distanceToBath)}
               </span>
             )}
-            {spot.distanceToConvenience && (
+            {spot.distanceToConvenience != null && (
               <span>
                 <strong className='text-gray-900 dark:text-gray-100'>
                   コンビニ:
                 </strong>{' '}
-                {formatDistance(spot.distanceToConvenience)}
+                {formatFacilityDistance(spot.distanceToConvenience)}
               </span>
             )}
             {spot.elevation && (

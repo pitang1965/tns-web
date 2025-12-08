@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { formatDistance } from '@/lib/formatDistance';
+import { formatFacilityDistance } from '@/lib/formatDistance';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
   ArrowLeft,
@@ -443,30 +443,30 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               {spot.distanceToToilet != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
-                    トイレまで
+                    トイレ
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatDistance(spot.distanceToToilet)}
+                    {formatFacilityDistance(spot.distanceToToilet)}
                   </span>
                 </div>
               )}
               {spot.distanceToBath != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
-                    入浴施設まで
+                    入浴施設
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatDistance(spot.distanceToBath)}
+                    {formatFacilityDistance(spot.distanceToBath)}
                   </span>
                 </div>
               )}
               {spot.distanceToConvenience != null && (
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-700 dark:text-gray-300'>
-                    コンビニまで
+                    コンビニ
                   </span>
                   <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatDistance(spot.distanceToConvenience)}
+                    {formatFacilityDistance(spot.distanceToConvenience)}
                   </span>
                 </div>
               )}

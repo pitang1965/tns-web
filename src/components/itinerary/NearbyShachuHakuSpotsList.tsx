@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MapPin, ExternalLink, Banknote, Umbrella, Plug } from 'lucide-react';
+import { formatFacilityDistance } from '@/lib/formatDistance';
 
 type NearbyShachuHakuSpotsListProps = {
   spots: CampingSpotWithDistance[];
@@ -118,18 +119,17 @@ export function NearbyShachuHakuSpotsList({
                   <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground'>
                     {spot.distanceToToilet !== undefined && (
                       <span>
-                        トイレまで {formatDistance(spot.distanceToToilet)}
+                        トイレ: {formatFacilityDistance(spot.distanceToToilet)}
                       </span>
                     )}
                     {spot.distanceToBath !== undefined && (
                       <span>
-                        入浴施設まで {formatDistance(spot.distanceToBath)}
+                        入浴施設: {formatFacilityDistance(spot.distanceToBath)}
                       </span>
                     )}
                     {spot.distanceToConvenience !== undefined && (
                       <span>
-                        コンビニまで{' '}
-                        {formatDistance(spot.distanceToConvenience)}
+                        コンビニ: {formatFacilityDistance(spot.distanceToConvenience)}
                       </span>
                     )}
                   </div>

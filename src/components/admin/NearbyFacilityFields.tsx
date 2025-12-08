@@ -141,6 +141,23 @@ export function NearbyFacilityFields({
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
               <Label className='text-md font-medium'>トイレ</Label>
               <div className='flex flex-col sm:flex-row gap-2'>
+                <Button
+                  type='button'
+                  variant='secondary'
+                  size='sm'
+                  onClick={() => {
+                    setValue('distanceToToilet', '0');
+                    setValue('nearbyToiletLat', '');
+                    setValue('nearbyToiletLng', '');
+                    toast({
+                      title: '設定完了',
+                      description: 'トイレを「敷地内にあるが場所不明」に設定しました',
+                    });
+                  }}
+                  className='cursor-pointer'
+                >
+                  敷地内にあるが場所不明
+                </Button>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
                     setValue('nearbyToiletLat', lat.toString());
@@ -345,6 +362,23 @@ export function NearbyFacilityFields({
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
               <Label className='text-md font-medium'>入浴施設</Label>
               <div className='flex flex-col sm:flex-row gap-2'>
+                <Button
+                  type='button'
+                  variant='secondary'
+                  size='sm'
+                  onClick={() => {
+                    setValue('distanceToBath', '0');
+                    setValue('nearbyBathLat', '');
+                    setValue('nearbyBathLng', '');
+                    toast({
+                      title: '設定完了',
+                      description: '入浴施設を「敷地内にあるが場所不明」に設定しました',
+                    });
+                  }}
+                  className='cursor-pointer'
+                >
+                  敷地内にあるが場所不明
+                </Button>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
                     setValue('nearbyBathLat', lat.toString());
