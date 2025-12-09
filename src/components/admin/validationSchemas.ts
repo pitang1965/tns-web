@@ -103,6 +103,86 @@ export const ShachuHakuFormCreateSchema = z.object({
   restrictions: z.string(),
   amenities: z.string(),
   notes: z.string().optional(),
+}).superRefine((data, ctx) => {
+  // 座標の重複チェック用のヘルパー関数
+  const areCoordinatesEqual = (
+    lat1?: string,
+    lng1?: string,
+    lat2?: string,
+    lng2?: string
+  ): boolean => {
+    // 両方の座標が入力されている場合のみチェック
+    if (!lat1 || !lng1 || !lat2 || !lng2 || lat1 === '' || lng1 === '' || lat2 === '' || lng2 === '') {
+      return false;
+    }
+
+    const num1Lat = Number(lat1);
+    const num1Lng = Number(lng1);
+    const num2Lat = Number(lat2);
+    const num2Lng = Number(lng2);
+
+    // 数値変換に失敗した場合はfalse
+    if (isNaN(num1Lat) || isNaN(num1Lng) || isNaN(num2Lat) || isNaN(num2Lng)) {
+      return false;
+    }
+
+    // 緯度と経度が両方一致する場合はtrue
+    return num1Lat === num2Lat && num1Lng === num2Lng;
+  };
+
+  // 車中泊場所とトイレの座標重複チェック
+  if (areCoordinatesEqual(data.lat, data.lng, data.nearbyToiletLat, data.nearbyToiletLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '車中泊場所とトイレの座標が同じです。異なる座標を入力してください',
+      path: ['nearbyToiletLat'],
+    });
+  }
+
+  // 車中泊場所と入浴施設の座標重複チェック
+  if (areCoordinatesEqual(data.lat, data.lng, data.nearbyBathLat, data.nearbyBathLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '車中泊場所と入浴施設の座標が同じです。異なる座標を入力してください',
+      path: ['nearbyBathLat'],
+    });
+  }
+
+  // 車中泊場所とコンビニの座標重複チェック
+  if (areCoordinatesEqual(data.lat, data.lng, data.nearbyConvenienceLat, data.nearbyConvenienceLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '車中泊場所とコンビニの座標が同じです。異なる座標を入力してください',
+      path: ['nearbyConvenienceLat'],
+    });
+  }
+
+  // トイレと入浴施設の座標重複チェック
+  if (areCoordinatesEqual(data.nearbyToiletLat, data.nearbyToiletLng, data.nearbyBathLat, data.nearbyBathLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'トイレと入浴施設の座標が同じです。異なる座標を入力してください',
+      path: ['nearbyBathLat'],
+    });
+  }
+
+  // トイレとコンビニの座標重複チェック
+  if (areCoordinatesEqual(data.nearbyToiletLat, data.nearbyToiletLng, data.nearbyConvenienceLat, data.nearbyConvenienceLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'トイレとコンビニの座標が同じです。異なる座標を入力してください',
+      path: ['nearbyConvenienceLat'],
+    });
+  }
+
+  // 入浴施設とコンビニの座標重複チェック
+  if (areCoordinatesEqual(data.nearbyBathLat, data.nearbyBathLng, data.nearbyConvenienceLat, data.nearbyConvenienceLng)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '入浴施設とコンビニの座標が同じです。異なる座標を入力してください',
+      path: ['nearbyConvenienceLat'],
+    });
+  }
 });
 
 // 編集用も作成用と同じスキーマ（標高は必須）
