@@ -147,7 +147,11 @@ export function useAutoSetSpotType(
       });
     }
     // 6. 駐車場（最後、他のルールが優先）
-    else if (nameValue.includes('駐車場')) {
+    else if (
+      nameValue.includes('駐車場') ||
+      nameValue.includes('タイムズ') ||
+      nameValue.includes('パーキング')
+    ) {
       if (lastAutoSetTypeRef.current === 'parking_lot') return;
 
       setValue('type', 'parking_lot', {
@@ -160,7 +164,7 @@ export function useAutoSetSpotType(
       toast({
         title: '種別を自動設定しました',
         description:
-          '「駐車場」を検出したため、種別を「駐車場」に設定しました。変更が必要な場合は種別フィールドで選択し直してください。',
+          '駐車場関連のキーワードを検出したため、種別を「駐車場」に設定しました。変更が必要な場合は種別フィールドで選択し直してください。',
         duration: 5000,
       });
     }
