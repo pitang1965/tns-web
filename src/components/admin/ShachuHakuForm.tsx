@@ -36,8 +36,7 @@ import {
 } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
-import { RatingFields } from './RatingFields';
-import { FeatureFields } from './FeatureFields';
+import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
@@ -271,18 +270,12 @@ export default function ShachuHakuForm({
               errors={errors}
             />
 
-            <RatingFields
-              register={register}
-              errors={errors}
-              watch={watch}
-              spot={spot}
-            />
-
-            <FeatureFields
+            <ShachuHakuDetailFields
               register={register}
               watch={watch}
               setValue={setValue}
               errors={errors}
+              spot={spot}
             />
 
             <NearbyFacilityFields

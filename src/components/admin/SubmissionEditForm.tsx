@@ -16,8 +16,7 @@ import { approveSubmissionWithoutCreating } from '../../app/actions/campingSpotS
 import { ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
-import { RatingFields } from './RatingFields';
-import { FeatureFields } from './FeatureFields';
+import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
 
@@ -314,9 +313,7 @@ export default function SubmissionEditForm({
               errors={errors}
             />
 
-            <RatingFields register={register} errors={errors} watch={watch} />
-
-            <FeatureFields
+            <ShachuHakuDetailFields
               register={register}
               watch={watch}
               setValue={setValue}
