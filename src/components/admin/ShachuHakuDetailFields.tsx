@@ -244,7 +244,7 @@ export function ShachuHakuDetailFields({
           <Input
             id='restrictions'
             {...register('restrictions')}
-            placeholder='制限事項をカンマ区切りで入力'
+            placeholder='全高や利用時間等の制限事項を入力'
           />
           {errors.restrictions && (
             <p className='text-sm text-red-500'>{errors.restrictions.message}</p>
@@ -256,7 +256,7 @@ export function ShachuHakuDetailFields({
           <Input
             id='amenities'
             {...register('amenities')}
-            placeholder='その他設備をカンマ区切りで入力'
+            placeholder='その他の設備を入力'
           />
           {errors.amenities && (
             <p className='text-sm text-red-500'>{errors.amenities.message}</p>
