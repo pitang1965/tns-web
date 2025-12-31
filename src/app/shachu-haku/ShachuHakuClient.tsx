@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -352,8 +352,10 @@ export default function ShachuHakuClient() {
   };
 
   const handleTabChange = (tab: 'map' | 'list') => {
-    setActiveTab(tab);
-    // URL update is handled by useEffect
+    startTransition(() => {
+      setActiveTab(tab);
+      // URL update is handled by useEffect
+    });
   };
 
   // Use location navigation hook

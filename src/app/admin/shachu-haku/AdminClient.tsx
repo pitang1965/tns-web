@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -437,7 +437,7 @@ export default function AdminClient() {
         <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
-            onClick={() => setActiveTab('map')}
+            onClick={() => startTransition(() => setActiveTab('map'))}
             className='rounded-b-none cursor-pointer'
           >
             <MapPin className='w-4 h-4 mr-2' />
@@ -445,7 +445,7 @@ export default function AdminClient() {
           </Button>
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
-            onClick={() => setActiveTab('list')}
+            onClick={() => startTransition(() => setActiveTab('list'))}
             className='rounded-b-none cursor-pointer'
           >
             一覧表示
