@@ -96,8 +96,8 @@ importers:
         specifier: 6.21.0
         version: 6.21.0
       mongoose:
-        specifier: 8.19.2
-        version: 8.19.2
+        specifier: 8.21.0
+        version: 8.21.0
       next:
         specifier: 15.5.9
         version: 15.5.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -3793,8 +3793,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@8.19.2:
-    resolution: {integrity: sha512-ww2T4dBV+suCbOfG5YPwj9pLCfUVyj8FEA1D3Ux1HHqutpLxGyOYEPU06iPRBW4cKr3PJfOSYsIpHWPTkz5zig==}
+  mongoose@8.21.0:
+    resolution: {integrity: sha512-dW2U01gN8EVQT5KAO5AkzjbqWc8A/CsEq15jOzq/M9ISpy8jw3iq7W9ZP135h9zykFOMt3AMxq4+anvt2YNJgw==}
     engines: {node: '>=16.20.1'}
 
   mpath@0.9.0:
@@ -8761,7 +8761,7 @@ snapshots:
       bson: 6.10.4
       mongodb-connection-string-url: 3.0.2
 
-  mongoose@8.19.2:
+  mongoose@8.21.0:
     dependencies:
       bson: 6.10.4
       kareem: 2.6.3
