@@ -309,9 +309,24 @@ const withPWA = withPWAInit({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-    eslint: {
+  eslint: {
     // ESLint のエラーを無視してビルドを続行
     ignoreDuringBuilds: true
+  },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'tabi-no-shiori.vercel.app',
+          },
+        ],
+        destination: 'https://tabi.over40web.club/:path*',
+        permanent: true,
+      },
+    ];
   },
 };
 
