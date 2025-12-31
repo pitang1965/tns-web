@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next';
-import { connectToDatabase } from '@/lib/mongodb';
-import { Itinerary } from '@/data/models/Itinerary';
-import { CampingSpot } from '@/data/models/CampingSpot';
+import CampingSpot from '@/lib/models/CampingSpot';
+import { ensureDbConnection } from '@/lib/database';
 
 const BASE_URL = 'https://tabi.over40web.club';
 
@@ -35,21 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    await connectToDatabase();
-
-    // 旅程ページの動的URL
-    const itineraries = await Itinerary.find({}, { _id: 1, updatedAt: 1 })
-      .sort({ updatedAt: -1 })
-      .lean();
-
-    const itineraryPages: MetadataRoute.Sitemap = itineraries.map((itinerary) => ({
-      url: `${BASE_URL}/itineraries/${itinerary._id}`,
-      lastModified: new Date(itinerary.updatedAt || Date.now()),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    }));
-
     // 車中泊スポットページの動的URL
+    await ensureDbConnection();
+
     const campingSpots = await CampingSpot.find({}, { _id: 1, updatedAt: 1 })
       .sort({ updatedAt: -1 })
       .lean();
@@ -61,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    return [...staticPages, ...itineraryPages, ...campingSpotPages];
+    return [...staticPages, ...campingSpotPages];
   } catch (error) {
     console.error('Error generating sitemap:', error);
     // エラー時は静的ページのみ返す
