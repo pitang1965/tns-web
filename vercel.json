@@ -1,4 +1,17 @@
 {
   "buildCommand": "pnpm build",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://tabi.over40web.club/:path*",
+      "permanent": true,
+      "has": [
+        {
+          "type": "host",
+          "value": "tabi-no-shiori.vercel.app"
+        }
+      ]
+    }
+  ]
 }

@@ -5,3 +5,6 @@ Allow: /
 # その他すべてのボットに対するルール
 User-agent: *
 Allow: /
+
+# サイトマップの場所
+Sitemap: https://tabi.over40web.club/sitemap.xml
