@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -132,8 +132,12 @@ export default function ShachuHakuSubmissionForm({
   });
 
   // 名称から種別を自動設定する機能
+  // INP問題を回避するため、名称の値を遅延させる
+  const nameValue = form.watch('name');
+  const deferredNameValue = useDeferredValue(nameValue);
+
   useAutoSetSpotType(
-    form.watch('name'),
+    deferredNameValue,
     form.watch('type'),
     form.setValue,
     toast
