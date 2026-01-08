@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { formatFacilityDistance } from '@/lib/formatDistance';
+import { formatDate } from '@/lib/date';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
   ArrowLeft,
@@ -244,6 +245,11 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               {spot.name}
             </h1>
             <p className='text-gray-600 dark:text-gray-400'>{spot.address}</p>
+            {spot.updatedAt && (
+              <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
+                {formatDate(spot.updatedAt.toString())}更新
+              </p>
+            )}
           </div>
           <div className='flex flex-wrap gap-2'>
             <Button

@@ -37,6 +37,8 @@ export type CampingSpotWithDistance = {
   amenities?: string[];
   notes?: string;
   distance: number; // in meters
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 /**

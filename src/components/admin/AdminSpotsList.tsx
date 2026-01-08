@@ -25,6 +25,7 @@ import {
   getRatingColor,
   getPricingColor,
 } from '@/lib/spotColorUtils';
+import { formatDate } from '@/lib/date';
 
 type AdminSpotsListProps = {
   spots: CampingSpotWithId[];
@@ -113,6 +114,11 @@ export function AdminSpotsList({
                   <p className='text-gray-600 dark:text-gray-300'>
                     {spot.address}
                   </p>
+                  {spot.updatedAt && (
+                    <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
+                      {formatDate(spot.updatedAt.toString())}更新
+                    </p>
+                  )}
                   <div className='flex gap-2 mt-2 flex-wrap'>
                     <Badge className={`${getTypeColor(spot.type)} text-white`}>
                       {CampingSpotTypeLabels[spot.type]}

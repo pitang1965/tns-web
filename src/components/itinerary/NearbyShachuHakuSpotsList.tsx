@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MapPin, ExternalLink, Banknote, Umbrella, Plug } from 'lucide-react';
 import { formatFacilityDistance } from '@/lib/formatDistance';
+import { formatDate } from '@/lib/date';
 
 type NearbyShachuHakuSpotsListProps = {
   spots: CampingSpotWithDistance[];
@@ -73,6 +74,11 @@ export function NearbyShachuHakuSpotsList({
                       {spot.address && (
                         <p className='text-xs text-muted-foreground truncate mt-1'>
                           {spot.address}
+                        </p>
+                      )}
+                      {spot.updatedAt && (
+                        <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
+                          {formatDate(spot.updatedAt.toString())}更新
                         </p>
                       )}
                     </div>
