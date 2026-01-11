@@ -32,7 +32,7 @@ type FacilityData = {
   distance?: number;
 }
 
-export function FacilitiesMap({ watch }: FacilitiesMapProps) {
+export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -49,14 +49,14 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     { type: 'bath', label: '入浴施設', icon: '♨️', color: '#f39c12' },
   ];
 
-  // 距離データを取得する関数
+  // 距離データを取得する関数（メモ化された値を使用）
   const getDistance = (type: string): number | undefined => {
     if (type === 'toilet') {
-      return parseFloat(watch('distanceToToilet') || '0') || undefined;
+      return parseFloat(distanceToToilet || '0') || undefined;
     } else if (type === 'convenience') {
-      return parseFloat(watch('distanceToConvenience') || '0') || undefined;
+      return parseFloat(distanceToConvenience || '0') || undefined;
     } else if (type === 'bath') {
-      return parseFloat(watch('distanceToBath') || '0') || undefined;
+      return parseFloat(distanceToBath || '0') || undefined;
     }
     return undefined;
   };
@@ -233,19 +233,36 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   };
 
   // 座標情報を持つ施設を取得
-  // フォームの値を監視
-  const lat = watch('lat');
-  const lng = watch('lng');
-  const name = watch('name');
-  const nearbyToiletLat = watch('nearbyToiletLat');
-  const nearbyToiletLng = watch('nearbyToiletLng');
-  const distanceToToilet = watch('distanceToToilet');
-  const nearbyConvenienceLat = watch('nearbyConvenienceLat');
-  const nearbyConvenienceLng = watch('nearbyConvenienceLng');
-  const distanceToConvenience = watch('distanceToConvenience');
-  const nearbyBathLat = watch('nearbyBathLat');
-  const nearbyBathLng = watch('nearbyBathLng');
-  const distanceToBath = watch('distanceToBath');
+  // フォームの値を1回のwatch呼び出しでまとめて取得
+  const formValues = watch([
+    'lat',
+    'lng',
+    'name',
+    'nearbyToiletLat',
+    'nearbyToiletLng',
+    'distanceToToilet',
+    'nearbyConvenienceLat',
+    'nearbyConvenienceLng',
+    'distanceToConvenience',
+    'nearbyBathLat',
+    'nearbyBathLng',
+    'distanceToBath',
+  ]);
+
+  const [
+    lat,
+    lng,
+    name,
+    nearbyToiletLat,
+    nearbyToiletLng,
+    distanceToToilet,
+    nearbyConvenienceLat,
+    nearbyConvenienceLng,
+    distanceToConvenience,
+    nearbyBathLat,
+    nearbyBathLng,
+    distanceToBath,
+  ] = formValues;
 
   const facilities = useMemo((): FacilityData[] => {
     const result: FacilityData[] = [];
@@ -488,38 +505,48 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
 
-    clearMarkers();
+    // debounce: 300ms後にマーカーを更新
+    const timeoutId = setTimeout(() => {
+      clearMarkers();
 
-    if (facilities.length > 0) {
-      // 各施設のマーカーを追加
-      facilities.forEach((facility) => {
-        addMarker(facility, currentZoom);
-      });
-    }
+      if (facilities.length > 0) {
+        // 各施設のマーカーを追加
+        facilities.forEach((facility) => {
+          addMarker(facility, currentZoom);
+        });
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [facilities, mapLoaded, currentZoom]);
 
   // 全ての施設が見えるようにマップを調整（施設変更時のみ、ズーム時は除外）
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
 
-    if (facilities.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      facilities.forEach((facility) => {
-        bounds.extend([facility.lng, facility.lat]);
-      });
-
-      if (facilities.length === 1) {
-        // 施設が1つの場合は中心に配置
-        mapInstance.current.setCenter([facilities[0].lng, facilities[0].lat]);
-        mapInstance.current.setZoom(15);
-      } else {
-        // 複数の施設がある場合は全体が見えるように調整
-        mapInstance.current.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 16,
+    // debounce: 500ms後にマップを調整
+    const timeoutId = setTimeout(() => {
+      if (facilities.length > 0) {
+        const bounds = new mapboxgl.LngLatBounds();
+        facilities.forEach((facility) => {
+          bounds.extend([facility.lng, facility.lat]);
         });
+
+        if (facilities.length === 1) {
+          // 施設が1つの場合は中心に配置
+          mapInstance.current!.setCenter([facilities[0].lng, facilities[0].lat]);
+          mapInstance.current!.setZoom(15);
+        } else {
+          // 複数の施設がある場合は全体が見えるように調整
+          mapInstance.current!.fitBounds(bounds, {
+            padding: 50,
+            maxZoom: 16,
+          });
+        }
       }
-    }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [facilities, mapLoaded]);
 
   // 施設の存在チェック用のヘルパー関数
@@ -570,4 +597,4 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       )}
     </div>
   );
-}
+});

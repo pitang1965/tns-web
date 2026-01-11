@@ -65,16 +65,31 @@ export function useFormAutoSave({
   // フォームの値が変更されたときに自動保存（新規作成モードのみ）
   useEffect(() => {
     if (!isEdit) {
+      let timeoutId: NodeJS.Timeout | null = null;
+
       const subscription = watch((formData) => {
-        try {
-          // フォームデータをLocalStorageに保存
-          localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(formData));
-        } catch (error) {
-          console.error('Failed to save form data to localStorage:', error);
+        // 既存のタイマーをクリア
+        if (timeoutId) {
+          clearTimeout(timeoutId);
         }
+
+        // 500ms後に保存（debounce）
+        timeoutId = setTimeout(() => {
+          try {
+            // フォームデータをLocalStorageに保存
+            localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(formData));
+          } catch (error) {
+            console.error('Failed to save form data to localStorage:', error);
+          }
+        }, 500);
       });
 
-      return () => subscription.unsubscribe();
+      return () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        subscription.unsubscribe();
+      };
     }
   }, [watch, isEdit]);
 
