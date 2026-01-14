@@ -233,36 +233,19 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
   };
 
   // 座標情報を持つ施設を取得
-  // フォームの値を1回のwatch呼び出しでまとめて取得
-  const formValues = watch([
-    'lat',
-    'lng',
-    'name',
-    'nearbyToiletLat',
-    'nearbyToiletLng',
-    'distanceToToilet',
-    'nearbyConvenienceLat',
-    'nearbyConvenienceLng',
-    'distanceToConvenience',
-    'nearbyBathLat',
-    'nearbyBathLng',
-    'distanceToBath',
-  ]);
-
-  const [
-    lat,
-    lng,
-    name,
-    nearbyToiletLat,
-    nearbyToiletLng,
-    distanceToToilet,
-    nearbyConvenienceLat,
-    nearbyConvenienceLng,
-    distanceToConvenience,
-    nearbyBathLat,
-    nearbyBathLng,
-    distanceToBath,
-  ] = formValues;
+  // フォームの値を監視（個別のwatch呼び出しで即座の更新を実現）
+  const lat = watch('lat');
+  const lng = watch('lng');
+  const name = watch('name');
+  const nearbyToiletLat = watch('nearbyToiletLat');
+  const nearbyToiletLng = watch('nearbyToiletLng');
+  const distanceToToilet = watch('distanceToToilet');
+  const nearbyConvenienceLat = watch('nearbyConvenienceLat');
+  const nearbyConvenienceLng = watch('nearbyConvenienceLng');
+  const distanceToConvenience = watch('distanceToConvenience');
+  const nearbyBathLat = watch('nearbyBathLat');
+  const nearbyBathLng = watch('nearbyBathLng');
+  const distanceToBath = watch('distanceToBath');
 
   const facilities = useMemo((): FacilityData[] => {
     const result: FacilityData[] = [];
@@ -505,7 +488,7 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
 
-    // debounce: 300ms後にマーカーを更新
+    // debounce: 50ms後にマーカーを更新（ほぼ即座に更新）
     const timeoutId = setTimeout(() => {
       clearMarkers();
 
@@ -515,7 +498,7 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
           addMarker(facility, currentZoom);
         });
       }
-    }, 300);
+    }, 50);
 
     return () => clearTimeout(timeoutId);
   }, [facilities, mapLoaded, currentZoom]);
@@ -524,7 +507,7 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
   useEffect(() => {
     if (!mapInstance.current || !mapLoaded) return;
 
-    // debounce: 500ms後にマップを調整
+    // debounce: 50ms後にマップを調整（ほぼ即座に更新）
     const timeoutId = setTimeout(() => {
       if (facilities.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
@@ -544,7 +527,7 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
           });
         }
       }
-    }, 500);
+    }, 50);
 
     return () => clearTimeout(timeoutId);
   }, [facilities, mapLoaded]);
