@@ -173,6 +173,7 @@ export function BasicInfoFields({
                 step='any'
                 placeholder='35.6762'
                 className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                onWheel={(e) => e.currentTarget.blur()}
                 {...register('lat')}
               />
               <InputGroupAddon align='inline-end' className='border-l-0'>
@@ -194,6 +195,7 @@ export function BasicInfoFields({
                 step='any'
                 placeholder='139.6503'
                 className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                onWheel={(e) => e.currentTarget.blur()}
                 {...register('lng')}
               />
               <InputGroupAddon align='inline-end' className='border-l-0'>

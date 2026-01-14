@@ -58,6 +58,7 @@ export function PricingFields({ register, watch, setValue, errors }: PricingFiel
                 type='number'
                 min='0'
                 className='pl-8 border-l-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                onWheel={(e) => e.currentTarget.blur()}
                 {...register('pricePerNight')}
                 placeholder='0'
               />

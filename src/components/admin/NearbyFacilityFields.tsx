@@ -214,6 +214,7 @@ export function NearbyFacilityFields({
                   type='number'
                   min='0'
                   placeholder='距離(m)または空欄'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToToilet')}
                 />
                 {errors.distanceToToilet && (
@@ -229,6 +230,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='緯度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyToiletLat')}
                 />
                 {errors.nearbyToiletLat && (
@@ -244,6 +246,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='経度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyToiletLng')}
                 />
                 {errors.nearbyToiletLng && (
@@ -315,6 +318,7 @@ export function NearbyFacilityFields({
                   id='distanceToConvenience'
                   type='number'
                   min='0'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToConvenience')}
                   placeholder='距離(m)または空欄'
                 />
@@ -331,6 +335,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='緯度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyConvenienceLat')}
                 />
                 {errors.nearbyConvenienceLat && (
@@ -346,6 +351,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='経度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyConvenienceLng')}
                 />
                 {errors.nearbyConvenienceLng && (
@@ -434,6 +440,7 @@ export function NearbyFacilityFields({
                   id='distanceToBath'
                   type='number'
                   min='0'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToBath')}
                   placeholder='距離(m)または空欄'
                 />
@@ -450,6 +457,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='緯度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyBathLat')}
                 />
                 {errors.nearbyBathLat && (
@@ -465,6 +473,7 @@ export function NearbyFacilityFields({
                   type='number'
                   step='any'
                   placeholder='経度（任意）'
+                  onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyBathLng')}
                 />
                 {errors.nearbyBathLng && (

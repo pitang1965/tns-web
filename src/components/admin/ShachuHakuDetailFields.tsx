@@ -177,6 +177,7 @@ export function ShachuHakuDetailFields({
                 type='number'
                 min='1'
                 placeholder='台数または空欄'
+                onWheel={(e) => e.currentTarget.blur()}
                 {...register('capacity')}
               />
               {errors.capacity && (
@@ -190,6 +191,7 @@ export function ShachuHakuDetailFields({
                 type='number'
                 min='1'
                 placeholder='台数または空欄'
+                onWheel={(e) => e.currentTarget.blur()}
                 {...register('capacityLarge')}
               />
               {errors.capacityLarge && (
@@ -231,6 +233,7 @@ export function ShachuHakuDetailFields({
             type='number'
             min='-10'
             max='3776'
+            onWheel={(e) => e.currentTarget.blur()}
             {...register('elevation')}
             placeholder='標高（メートル）'
           />

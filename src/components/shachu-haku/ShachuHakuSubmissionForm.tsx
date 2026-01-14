@@ -461,6 +461,7 @@ export default function ShachuHakuSubmissionForm({
                               step='any'
                               placeholder='35.6762'
                               className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                              onWheel={(e) => e.currentTarget.blur()}
                               {...field}
                             />
                             <InputGroupAddon
@@ -493,6 +494,7 @@ export default function ShachuHakuSubmissionForm({
                               step='any'
                               placeholder='139.6503'
                               className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                              onWheel={(e) => e.currentTarget.blur()}
                               {...field}
                             />
                             <InputGroupAddon
@@ -632,7 +634,7 @@ export default function ShachuHakuSubmissionForm({
                     <FormItem>
                       <FormLabel>1泊料金（円）</FormLabel>
                       <FormControl>
-                        <Input type='number' placeholder='1000' {...field} />
+                        <Input type='number' placeholder='1000' onWheel={(e) => e.currentTarget.blur()} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
