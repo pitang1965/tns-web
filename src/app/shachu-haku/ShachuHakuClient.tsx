@@ -514,7 +514,7 @@ export default function ShachuHakuClient() {
                         `表示範囲内: ${visibleSpots.length}件`
                       )}
                     </div>
-                    <AdLink />
+                    <AdLink href="https://amzn.to/4oy6Dbc" label="ポータブル電源セール" shortLabel="ポタ電セール" />
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
                     <div className='text-sm text-muted-foreground space-y-1 mt-2'>

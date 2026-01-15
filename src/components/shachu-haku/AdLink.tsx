@@ -1,10 +1,13 @@
 import { ExternalLink, Zap } from 'lucide-react';
 
 type AdLinkProps = {
+  href: string;
+  label: string;
+  shortLabel: string;
   className?: string;
 };
 
-export function AdLink({ className = '' }: AdLinkProps) {
+export function AdLink({ href, label, shortLabel, className = '' }: AdLinkProps) {
   // 環境変数で表示/非表示を制御
   if (process.env.NEXT_PUBLIC_SHOW_AD_LINK !== 'true') {
     return null;
@@ -12,7 +15,7 @@ export function AdLink({ className = '' }: AdLinkProps) {
 
   return (
     <a
-      href='https://amzn.to/4oy6Dbc'
+      href={href}
       target='_blank'
       rel='noopener noreferrer'
       className={`
@@ -29,8 +32,8 @@ export function AdLink({ className = '' }: AdLinkProps) {
       `}
     >
       <Zap className='w-3.5 h-3.5 animate-bounce-subtle' />
-      <span className='hidden sm:inline'>ポータブル電源セール</span>
-      <span className='sm:hidden'>ポタ電セール</span>
+      <span className='hidden sm:inline'>{label}</span>
+      <span className='sm:hidden'>{shortLabel}</span>
       <ExternalLink className='w-3 h-3 group-hover:translate-x-0.5 transition-transform' />
 
       {/* キラキラエフェクト */}

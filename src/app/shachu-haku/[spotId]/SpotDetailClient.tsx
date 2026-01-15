@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
+import { AdLink } from '@/components/shachu-haku/AdLink';
 
 import {
   CampingSpotWithId,
@@ -700,6 +701,15 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               </CardContent>
             </Card>
           )}
+
+          {/* 広告リンク */}
+          <div className='flex justify-center'>
+            <AdLink
+              href='https://amzn.to/45c0kmK'
+              label='電気毛布セール'
+              shortLabel='電気毛布'
+            />
+          </div>
         </div>
       </div>
     </div>
