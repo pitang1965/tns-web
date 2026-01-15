@@ -29,7 +29,7 @@ export function AdLink({ className = '' }: AdLinkProps) {
       `}
     >
       <Zap className='w-3.5 h-3.5 animate-bounce-subtle' />
-      <span className='hidden sm:inline'>ポータブル電源 セール</span>
+      <span className='hidden sm:inline'>ポータブル電源セール</span>
       <span className='sm:hidden'>ポタ電セール</span>
       <ExternalLink className='w-3 h-3 group-hover:translate-x-0.5 transition-transform' />
 
