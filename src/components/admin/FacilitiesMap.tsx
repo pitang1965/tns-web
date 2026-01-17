@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MapPin } from 'lucide-react';
 import { formatDistance } from '@/lib/formatDistance';
@@ -32,7 +32,7 @@ type FacilityData = {
   distance?: number;
 }
 
-export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: FacilitiesMapProps) {
+export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -580,4 +580,4 @@ export const FacilitiesMap = React.memo(function FacilitiesMap({ watch }: Facili
       )}
     </div>
   );
-});
+}
