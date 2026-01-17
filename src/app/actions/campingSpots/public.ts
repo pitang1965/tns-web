@@ -102,12 +102,13 @@ export async function getPublicCampingSpotsByBounds(
     // Split search term by whitespace to support multiple keywords
     const keywords = options.searchTerm.trim().split(/\s+/);
 
-    // Each keyword must match at least one of: name, prefecture, or address
+    // Each keyword must match at least one of: name, prefecture, address, or notes
     query.$and = keywords.map(keyword => ({
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { prefecture: { $regex: keyword, $options: 'i' } },
-        { address: { $regex: keyword, $options: 'i' } }
+        { address: { $regex: keyword, $options: 'i' } },
+        { notes: { $regex: keyword, $options: 'i' } }
       ]
     }));
   }
@@ -144,12 +145,13 @@ export async function getPublicCampingSpotsWithPagination(
     // Split search term by whitespace to support multiple keywords
     const keywords = options.searchTerm.trim().split(/\s+/);
 
-    // Each keyword must match at least one of: name, prefecture, or address
+    // Each keyword must match at least one of: name, prefecture, address, or notes
     query.$and = keywords.map(keyword => ({
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { prefecture: { $regex: keyword, $options: 'i' } },
-        { address: { $regex: keyword, $options: 'i' } }
+        { address: { $regex: keyword, $options: 'i' } },
+        { notes: { $regex: keyword, $options: 'i' } }
       ]
     }));
   }
