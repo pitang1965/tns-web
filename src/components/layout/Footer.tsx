@@ -21,16 +21,9 @@ export function Footer() {
         </Link>
       </div>
 
-      <div className='hidden md:block'>
-        <a
-          className='text-foreground'
-          href='https://over40web.club'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Powered by Over 40 Web Club
-        </a>
-      </div>
+      <p className='text-xs text-muted-foreground text-center max-w-md'>
+        掲載情報は変更されている可能性があります。お出かけ前に現地の看板や公式サイトで最新情報をご確認ください。
+      </p>
     </footer>
   );
 }
