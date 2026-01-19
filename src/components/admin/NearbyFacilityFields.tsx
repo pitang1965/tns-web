@@ -149,12 +149,12 @@ export function NearbyFacilityFields({
                   onClick={() => {
                     const name = watch('name');
                     const address = watch('address');
-                    const searchQuery = `${name} ${address}`;
+                    const searchQuery = `${name}（${address}）に施設内又は最寄りのトイレを教えていただけますか？`;
                     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                     window.open(url, '_blank');
                   }}
                   className='p-1 h-auto cursor-pointer'
-                  title='名称と住所で Google AI モード検索'
+                  title='最寄りのトイレをGoogle AI モード検索'
                 >
                   <Search className='w-4 h-4' />
                 </Button>
