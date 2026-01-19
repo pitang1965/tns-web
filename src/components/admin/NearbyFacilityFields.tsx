@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Map, Route, Copy } from 'lucide-react';
+import { Map, Route, Copy, Search } from 'lucide-react';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
 import { ShachuHakuFormData } from './validationSchemas';
 import { NearbySpotsSelector } from './NearbySpotsSelector';
@@ -139,7 +139,26 @@ export function NearbyFacilityFields({
           {/* トイレ情報 */}
           <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <Label className='text-md font-medium'>トイレ</Label>
+              <div className='flex items-center gap-2'>
+                <Label className='text-md font-medium'>トイレ</Label>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  disabled={!watch('name') || !watch('address')}
+                  onClick={() => {
+                    const name = watch('name');
+                    const address = watch('address');
+                    const searchQuery = `${name} ${address}`;
+                    const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                    window.open(url, '_blank');
+                  }}
+                  className='p-1 h-auto cursor-pointer'
+                  title='名称と住所で Google AI モード検索'
+                >
+                  <Search className='w-4 h-4' />
+                </Button>
+              </div>
               <div className='flex flex-col sm:flex-row gap-2'>
                 <Button
                   type='button'
@@ -261,7 +280,26 @@ export function NearbyFacilityFields({
           {/* コンビニ情報 */}
           <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <Label className='text-md font-medium'>コンビニ</Label>
+              <div className='flex items-center gap-2'>
+                <Label className='text-md font-medium'>コンビニ</Label>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  disabled={!watch('name') || !watch('address')}
+                  onClick={() => {
+                    const name = watch('name');
+                    const address = watch('address');
+                    const searchQuery = `${name} ${address}の最寄りの24時間営業のコンビニは？`;
+                    const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                    window.open(url, '_blank');
+                  }}
+                  className='p-1 h-auto cursor-pointer'
+                  title='最寄りの24時間営業コンビニを Google AI モード検索'
+                >
+                  <Search className='w-4 h-4' />
+                </Button>
+              </div>
               <div className='flex flex-col sm:flex-row gap-2'>
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
@@ -366,7 +404,26 @@ export function NearbyFacilityFields({
           {/* 入浴施設情報 */}
           <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <Label className='text-md font-medium'>入浴施設</Label>
+              <div className='flex items-center gap-2'>
+                <Label className='text-md font-medium'>入浴施設</Label>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  disabled={!watch('name') || !watch('address')}
+                  onClick={() => {
+                    const name = watch('name');
+                    const address = watch('address');
+                    const searchQuery = `${name} ${address}の最寄りの入浴施設は？`;
+                    const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                    window.open(url, '_blank');
+                  }}
+                  className='p-1 h-auto cursor-pointer'
+                  title='最寄りの入浴施設を Google AI モード検索'
+                >
+                  <Search className='w-4 h-4' />
+                </Button>
+              </div>
               <div className='flex flex-col sm:flex-row gap-2'>
                 <Button
                   type='button'

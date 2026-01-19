@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -237,9 +238,63 @@ export default function ShachuHakuForm({
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-4xl max-h-[90vh] flex flex-col'>
         <CardHeader className='shrink-0'>
-          <CardTitle>
-            {isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}
-          </CardTitle>
+          <div className='flex items-center justify-between'>
+            <CardTitle>
+              {isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}
+            </CardTitle>
+            <div className='flex items-center gap-2'>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={!watch('name')}
+                onClick={() => {
+                  const name = watch('name');
+                  const url = `http://search.ipos-land.jp/p/parklist.aspx?q=${encodeURIComponent(name)}`;
+                  window.open(url, '_blank');
+                }}
+                className='flex items-center gap-1 cursor-pointer'
+                title='iPosNetで名称を検索'
+              >
+                <Search className='w-4 h-4' />
+                iPosNetで検索
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={!watch('name')}
+                onClick={() => {
+                  const name = watch('name');
+                  const url = `https://www.kurumatabi.com/park/search.php?q=${encodeURIComponent(name)}`;
+                  window.open(url, '_blank');
+                }}
+                className='flex items-center gap-1 cursor-pointer'
+                title='くるま旅で名称を検索'
+              >
+                <Search className='w-4 h-4' />
+                くるま旅で検索
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={!watch('name') || !watch('address')}
+                onClick={() => {
+                  const name = watch('name');
+                  const address = watch('address');
+                  const searchQuery = `${name} ${address}`;
+                  const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                  window.open(url, '_blank');
+                }}
+                className='flex items-center gap-1 cursor-pointer'
+                title='名称と住所で Google AI モード検索'
+              >
+                <Search className='w-4 h-4' />
+                AIモードで検索
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent ref={cardRef} className='overflow-auto flex-1'>
           <form
