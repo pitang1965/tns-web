@@ -1,9 +1,15 @@
 {
   "mcpServers": {
+    "Sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
     "mongodb-readonly": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@mongodb-js/mongodb-mcp-server"
       ],

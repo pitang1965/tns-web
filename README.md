@@ -502,17 +502,24 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "Sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
     "mongodb-readonly": {
-      "command": "npx",
-      "args": ["-y", "@mongodb-js/mongodb-mcp-server", "--readOnly"],
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@mongodb-js/mongodb-mcp-server"],
       "env": {
-        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI_READONLY}",
+        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI}",
         "MDB_MCP_READ_ONLY": "true"
       }
     }
   }
 }
 ```
+
+**注意**: 上記は Windows 環境用の設定です。
 
 ## セキュリティ注意事項
 
@@ -530,17 +537,32 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "Sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
     "mongodb-readonly": {
-      "command": "npx",
-      "args": ["-y", "@mongodb-js/mongodb-mcp-server", "--readOnly"],
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@mongodb-js/mongodb-mcp-server"],
       "env": {
-        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI_READONLY}",
+        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI}",
         "MDB_MCP_READ_ONLY": "true"
+      }
+    },
+    "context7-project": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}",
+        "X-Project-Context": "travel-itinerary-nextjs"
       }
     }
   }
 }
 ```
+
+**注意**: Windows 環境では `cmd /c npx` の形式でコマンドを実行する必要があります。macOS/Linux では `"command": "npx"` と `"args": ["-y", "@mongodb-js/mongodb-mcp-server"]` の形式で設定してください。
 
 ### .env.mcp（.gitignore に追加）
 
@@ -550,6 +572,58 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:your_password@cluster0.xxxxx.
 ```
 
 ## MCP サーバー連携
+
+### Sentry
+
+Sentry MCP サーバーを使用すると、Claude Code から Sentry のエラー監視データに直接アクセスできます。
+
+#### 機能
+
+- **エラー検索**: 自然言語でエラーを検索
+- **問題詳細の取得**: Issue ID から詳細情報とスタックトレースを取得
+- **Root Cause 分析**: Seer AI によるエラーの根本原因分析
+- **問題の更新**: Issue のステータス変更やアサイン
+
+#### 設定
+
+`.mcp.json` に以下の設定が含まれています：
+
+```json
+{
+  "mcpServers": {
+    "Sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    }
+  }
+}
+```
+
+#### 認証
+
+初回使用時に Sentry アカウントでの認証が必要です：
+
+```bash
+# Claude Code を起動
+claude
+
+# MCP 接続状況を確認
+/mcp
+# → "Authentication successful. Connected to Sentry." と表示されれば OK
+```
+
+#### 使用例
+
+```
+# 本日のエラーを検索
+「本日発生したエラーを表示して」
+
+# 特定の Issue の詳細を取得
+「TABI-NO-SHIORI-56 の詳細を教えて」
+
+# 根本原因の分析
+「この Issue の Root Cause 分析をして」
+```
 
 ### Context7
 
@@ -617,6 +691,7 @@ Context7 から最新ドキュメントを取得可能な技術：
 ## 参考リンク
 
 - [MongoDB MCP Server 公式ドキュメント](https://www.mongodb.com/docs/mcp-server/)
+- [Sentry MCP Server](https://docs.sentry.io/product/sentry-mcp/) - Sentry エラー監視との連携
 - [Claude Code MCP ガイド](https://docs.anthropic.com/ja/docs/claude-code/mcp)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Context7](https://context7.com/) - AI コンテキスト管理サービス
