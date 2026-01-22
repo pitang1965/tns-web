@@ -23,6 +23,7 @@ export async function ensureDbConnection() {
         serverSelectionTimeoutMS: 10000, // 10 seconds
         maxPoolSize: 10, // Maintain up to 10 socket connections
         minPoolSize: 2, // Maintain a minimum of 2 socket connections
+        autoIndex: process.env.NODE_ENV !== 'production', // 本番環境ではインデックス自動作成を無効化（N+1クエリ防止）
       });
 
       console.log('MongoDB connection established successfully');
