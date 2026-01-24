@@ -127,22 +127,22 @@ export const DIAGNOSIS_QUESTIONS: QuestionDefinition[] = [
   },
   {
     id: 'environmentPreference',
-    question: '周囲の環境はどれが好みですか？',
+    question: '周囲の環境は？',
     options: [
       {
         value: 'crowded',
         label: '人が多い方が安心',
-        description: '賑やかな場所が好き',
+        description: '他の車中泊者がいると安心',
       },
       {
         value: 'quiet',
-        label: '静かな場所がいい',
-        description: '落ち着いて過ごしたい',
+        label: '適度に人がいればよい',
+        description: '人はいるけど静かな場所',
       },
       {
         value: 'isolated',
-        label: '誰もいない場所',
-        description: '自然の中で孤独を楽しむ',
+        label: '誰もいない場所がいい',
+        description: '静かに過ごしたい',
       },
     ],
   },
@@ -206,6 +206,27 @@ export const DIAGNOSIS_QUESTIONS: QuestionDefinition[] = [
         value: 'comfort_first',
         label: '快適さ優先',
         description: '多少の出費は気にしない',
+      },
+    ],
+  },
+  {
+    id: 'nightSafety',
+    question: '夜間の安心感について最も近いものは？',
+    options: [
+      {
+        value: 'managed',
+        label: '管理されている場所がいい',
+        description: 'スタッフや警備がいると安心',
+      },
+      {
+        value: 'quiet_preferred',
+        label: '多少不安でも静かな方がいい',
+        description: '静けさを優先したい',
+      },
+      {
+        value: 'not_concerned',
+        label: '気にしない',
+        description: '特にこだわりなし',
       },
     ],
   },

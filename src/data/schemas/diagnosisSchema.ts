@@ -36,6 +36,7 @@ export const DiagnosisAnswerSchema = z.object({
   mealStyle: z.enum(['local_gourmet', 'convenience', 'self_cooking']),
   bathPreference: z.enum(['onsen', 'shower', 'next_day']),
   budgetPreference: z.enum(['free', 'around_1000', 'comfort_first']),
+  nightSafety: z.enum(['managed', 'quiet_preferred', 'not_concerned']),
 });
 
 export type DiagnosisAnswer = z.infer<typeof DiagnosisAnswerSchema>;

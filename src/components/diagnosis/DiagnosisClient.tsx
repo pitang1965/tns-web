@@ -14,6 +14,7 @@ export default function DiagnosisClient() {
     progress,
     currentQuestion,
     currentAnswer,
+    answers,
     result,
     isIntro,
     isComplete,
@@ -62,7 +63,7 @@ export default function DiagnosisClient() {
   if (isComplete && result) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <DiagnosisResultView result={result} onReset={reset} />
+        <DiagnosisResultView result={result} answers={answers} onReset={reset} />
       </div>
     );
   }

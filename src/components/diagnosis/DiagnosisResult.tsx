@@ -1,23 +1,30 @@
 'use client';
 
 import Link from 'next/link';
-import { DiagnosisResult as DiagnosisResultType } from '@/data/schemas/diagnosisSchema';
+import { useState } from 'react';
+import {
+  DiagnosisResult as DiagnosisResultType,
+  PartialDiagnosisAnswer,
+} from '@/data/schemas/diagnosisSchema';
+import { DIAGNOSIS_QUESTIONS } from '@/lib/diagnosisQuestions';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShareButtons } from './ShareButtons';
-import { Search, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type DiagnosisResultProps = {
   result: DiagnosisResultType;
+  answers: PartialDiagnosisAnswer;
   onReset: () => void;
 };
 
 const RANK_ICONS = ['', '1', '2', '3'];
 
-export function DiagnosisResultView({ result, onReset }: DiagnosisResultProps) {
+export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResultProps) {
   const { persona, recommendations } = result;
+  const [copied, setCopied] = useState(false);
 
   // 除外されていないおすすめスポットをフィルタリング
   const visibleRecommendations = recommendations.filter((r) => !r.excluded);
@@ -25,6 +32,45 @@ export function DiagnosisResultView({ result, onReset }: DiagnosisResultProps) {
   // 検索ページへのリンク（上位のスポットタイプでフィルタリング）
   const topTypes = visibleRecommendations.slice(0, 3).map((r) => r.type);
   const searchUrl = `/shachu-haku?type=${topTypes[0] || ''}`;
+
+  // デバッグ用: 回答と結果をクリップボードにコピー
+  const handleCopyDebugInfo = async () => {
+    const lines: string[] = [];
+
+    lines.push('=== 車中泊スポット診断 デバッグ情報 ===');
+    lines.push('');
+    lines.push('【回答内容】');
+
+    DIAGNOSIS_QUESTIONS.forEach((q, index) => {
+      const answerValue = answers[q.id];
+      const selectedOption = q.options.find((opt) => opt.value === answerValue);
+      lines.push(`Q${index + 1}. ${q.question}`);
+      lines.push(`   → ${selectedOption?.label || '未回答'} (${answerValue || '-'})`);
+    });
+
+    lines.push('');
+    lines.push('【診断結果】');
+    lines.push(`ペルソナ: ${persona.emoji} ${persona.name}`);
+    lines.push(`説明: ${persona.description}`);
+    lines.push('');
+    lines.push('【おすすめスポット（スコア順）】');
+
+    recommendations.forEach((r, index) => {
+      const status = r.excluded ? '(除外)' : '';
+      lines.push(`${index + 1}. ${r.label} ${status}`);
+      lines.push(`   バッジ: ${r.badges.join(', ')}`);
+    });
+
+    if (result.excludedSpots.length > 0) {
+      lines.push('');
+      lines.push(`【除外されたスポット】: ${result.excludedSpots.join(', ')}`);
+    }
+
+    const text = lines.join('\n');
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-6">
@@ -99,10 +145,19 @@ export function DiagnosisResultView({ result, onReset }: DiagnosisResultProps) {
 
         <ShareButtons persona={persona} />
 
-        <div className="flex justify-center">
+        <div className="flex items-center justify-center gap-2">
           <Button variant="ghost" onClick={onReset} className="gap-2">
             <RotateCcw className="h-4 w-4" />
             もう一度診断する
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopyDebugInfo}
+            className="gap-1 text-xs text-muted-foreground"
+          >
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            {copied ? 'コピー済み' : '回答と結果をコピー'}
           </Button>
         </div>
       </div>

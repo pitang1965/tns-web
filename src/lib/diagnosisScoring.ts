@@ -5,7 +5,7 @@ import {
   PersonaType,
   SpotRecommendation,
 } from '@/data/schemas/diagnosisSchema';
-import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
+import { CampingSpotTypeLabels, CampingSpotType } from '@/data/schemas/campingSpot';
 
 // ペルソナ定義
 export const PERSONAS: Record<PersonaType, PersonaInfo> = {
@@ -132,6 +132,23 @@ const PERSONA_SCORING: PersonaScoringMatrix = {
     around_1000: { onsen: 10, comfort: 5 },
     comfort_first: { comfort: 20, onsen: 15, outdoor: 5 },
   },
+  nightSafety: {
+    managed: { machiyoru: 20, comfort: 15, easy: 15 },
+    quiet_preferred: { quiet: 20, outdoor: 15 },
+    not_concerned: {},
+  },
+};
+
+// 診断用のスポットタイプラベル（CampingSpotTypeLabelsとは別に管理）
+const DIAGNOSIS_SPOT_LABELS: Record<string, string> = {
+  roadside_station: '道の駅・◯◯の駅',
+  sa_pa: 'SA/PA',
+  rv_park: 'RVパーク',
+  auto_campground: 'オートキャンプ場',
+  onsen_facility: '日帰り温泉施設',
+  convenience_store: 'コンビニ',
+  parking_lot: '都市型立体駐車場',
+  other: 'その他（河川敷・簡易駐車スペース等）',
 };
 
 // スポットタイプ別のバッジ
@@ -142,7 +159,7 @@ const SPOT_BADGES: Record<string, string[]> = {
   auto_campground: ['自然豊か', '広い', '設備充実'],
   onsen_facility: ['温泉', '入浴施設', 'リラックス'],
   convenience_store: ['24時間', '買い物便利', '市街地'],
-  parking_lot: ['屋根あり', '24時間', '市街地'],
+  parking_lot: ['屋根あり', '24時間', '飲食店近い'],
   other: ['穴場', '静か', '自然豊か'],
 };
 
@@ -205,15 +222,45 @@ function getExcludedSpotTypes(answers: DiagnosisAnswer): string[] {
 // おすすめスポットを取得
 export function getRecommendedSpots(
   persona: PersonaInfo,
-  excludedTypes: string[]
+  excludedTypes: string[],
+  answers: DiagnosisAnswer
 ): SpotRecommendation[] {
   // 全スポットタイプを取得
   const allSpotTypes = Object.keys(CampingSpotTypeLabels);
 
   // ペルソナのおすすめ順でスコアを付ける
+  // ベーススコア: ペルソナ内なら100-90-80、ペルソナ外でも30（回答ボーナスで浮上可能）
   const spotScores = allSpotTypes.map((type) => {
     const personaIndex = persona.spotTypes.indexOf(type);
-    const score = personaIndex >= 0 ? 100 - personaIndex * 10 : 0;
+    let score = personaIndex >= 0 ? 100 - personaIndex * 10 : 30;
+
+    // 立体駐車場への条件付きボーナス
+    if (type === 'parking_lot') {
+      // nightSafety が managed なら加点
+      if (answers.nightSafety === 'managed') {
+        score += 20;
+      }
+
+      // 管理重視 + 静かさ → 立体駐車場を優遇
+      if (
+        answers.nightSafety === 'managed' &&
+        (answers.environmentPreference === 'quiet' ||
+          answers.environmentPreference === 'crowded')
+      ) {
+        score += 25;
+      }
+
+      // 夜中トイレ頻度が高い場合も加点
+      if (answers.toiletFrequency === 'often') {
+        score += 15;
+      }
+
+      // 居酒屋派は立体駐車場と相性が良い（飲んで車に戻るスタイル）
+      if (answers.drinkingPreference === 'izakaya') {
+        score += 35;
+      }
+    }
+
     return { type, score };
   });
 
@@ -223,7 +270,7 @@ export function getRecommendedSpots(
     .filter((item) => item.score > 0)
     .map((item, index) => ({
       type: item.type,
-      label: CampingSpotTypeLabels[item.type as keyof typeof CampingSpotTypeLabels],
+      label: DIAGNOSIS_SPOT_LABELS[item.type] || CampingSpotTypeLabels[item.type as CampingSpotType],
       rank: index + 1,
       badges: SPOT_BADGES[item.type] || [],
       excluded: excludedTypes.includes(item.type),
@@ -245,7 +292,7 @@ export function calculateDiagnosisResult(answers: DiagnosisAnswer): DiagnosisRes
   const excludedSpots = getExcludedSpotTypes(answers);
 
   // おすすめスポットを取得
-  const recommendations = getRecommendedSpots(persona, excludedSpots);
+  const recommendations = getRecommendedSpots(persona, excludedSpots, answers);
 
   return {
     persona,
