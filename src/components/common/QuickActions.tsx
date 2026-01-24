@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Search, MapPin, Zap, BookHeart } from 'lucide-react';
+import { Plus, Search, MapPin, Zap, BookHeart, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +13,14 @@ export default function QuickActions() {
       href: '/itineraries/new',
       icon: Plus,
       color: 'bg-blue-500 hover:bg-blue-600',
+      textColor: 'text-white',
+    },
+    {
+      title: 'スポット診断',
+      description: 'あなたにぴったりの車中泊スタイルを診断',
+      href: '/shachu-haku/shindan',
+      icon: Sparkles,
+      color: 'bg-pink-500 hover:bg-pink-600',
       textColor: 'text-white',
     },
     {

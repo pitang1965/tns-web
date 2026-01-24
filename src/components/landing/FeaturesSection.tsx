@@ -1,7 +1,7 @@
 'use client';
 
 import { H2, Text } from '@/components/common/Typography';
-import { Map, Share2, Navigation, FileText, MapPin, Car } from 'lucide-react';
+import { Map, Share2, Navigation, FileText, MapPin, Car, Sparkles } from 'lucide-react';
 
 const features = [
   {
@@ -17,6 +17,13 @@ const features = [
     description:
       'トイレ・入浴施設、コンビニまでの距離、安全性・静けさの情報を提供。あなたのおすすめスポットも募集中！',
     link: '/shachu-haku',
+  },
+  {
+    icon: Sparkles,
+    title: 'スポット診断',
+    description:
+      '10問の質問に答えて、あなたにぴったりの車中泊スタイルとおすすめスポットを診断します。',
+    link: '/shachu-haku/shindan',
   },
   {
     icon: Map,
