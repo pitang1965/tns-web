@@ -502,6 +502,14 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "auth0": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@auth0/auth0-mcp-server", "run"],
+      "env": {
+        "DEBUG": "auth0-mcp"
+      }
+    },
     "Sentry": {
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
@@ -537,6 +545,14 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "auth0": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@auth0/auth0-mcp-server", "run"],
+      "env": {
+        "DEBUG": "auth0-mcp"
+      }
+    },
     "Sentry": {
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
@@ -625,6 +641,74 @@ claude
 「この Issue の Root Cause 分析をして」
 ```
 
+### Auth0
+
+Auth0 MCP サーバーを使用すると、Claude Code から Auth0 テナントの管理操作を直接実行できます。
+
+#### 機能
+
+- **アプリケーション管理**: アプリケーションの作成、一覧取得、設定変更
+- **アクション管理**: Auth0 Actions の作成、デプロイ、管理
+- **ログ確認**: 認証ログ、エラーログの参照
+- **テナント設定**: 各種設定の確認・変更
+
+#### 設定
+
+`.mcp.json` に以下の設定が含まれています：
+
+```json
+{
+  "mcpServers": {
+    "auth0": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@auth0/auth0-mcp-server", "run"],
+      "env": {
+        "DEBUG": "auth0-mcp"
+      }
+    }
+  }
+}
+```
+
+**注意**: 上記は Windows 環境用の設定です。macOS/Linux では `"command": "npx"` と `"args": ["-y", "@auth0/auth0-mcp-server", "run"]` の形式で設定してください。
+
+#### 認証
+
+初回使用時に Auth0 アカウントでの OAuth 2.0 デバイス認証が必要です：
+
+1. Claude Code を起動
+2. Auth0 関連の操作を実行すると、ブラウザが自動的に開く
+3. Auth0 アカウントにログインし、必要な権限を許可
+4. 認証情報はシステムのキーチェーンに安全に保存される
+
+```bash
+# MCP 接続状況を確認
+/mcp
+# → "auth0: Connected" と表示されれば OK
+```
+
+#### 使用例
+
+```
+# アプリケーション一覧を取得
+「Auth0 のアプリケーション一覧を表示して」
+
+# 新しいアプリケーションを作成
+「新しい SPA アプリケーションを作成して」
+
+# 最近のログを確認
+「Auth0 の最近の認証ログを表示して」
+
+# アクションの作成とデプロイ
+「ログイン後にユーザーロールを追加する Auth0 Action を作成してデプロイして」
+```
+
+#### 参考リンク
+
+- [Auth0 MCP Server - Getting Started](https://auth0.com/docs/get-started/auth0-mcp-server/getting-started-with-auth0-mcp-server)
+- [GitHub - auth0/auth0-mcp-server](https://github.com/auth0/auth0-mcp-server)
+
 ### Context7
 
 Context7 は AI アシスタント向けのコンテキスト管理サービスです。Claude Code との統合により、プロジェクトの履歴管理や高度なコンテキスト検索機能を提供します。
@@ -692,6 +776,7 @@ Context7 から最新ドキュメントを取得可能な技術：
 
 - [MongoDB MCP Server 公式ドキュメント](https://www.mongodb.com/docs/mcp-server/)
 - [Sentry MCP Server](https://docs.sentry.io/product/sentry-mcp/) - Sentry エラー監視との連携
+- [Auth0 MCP Server](https://auth0.com/docs/get-started/auth0-mcp-server/getting-started-with-auth0-mcp-server) - Auth0 テナント管理との連携
 - [Claude Code MCP ガイド](https://docs.anthropic.com/ja/docs/claude-code/mcp)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Context7](https://context7.com/) - AI コンテキスト管理サービス

@@ -1,5 +1,19 @@
 {
   "mcpServers": {
+    "auth0": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@auth0/auth0-mcp-server",
+        "run"
+      ],
+      "env": {
+        "DEBUG": "auth0-mcp"
+      }
+    },
     "Sentry": {
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
