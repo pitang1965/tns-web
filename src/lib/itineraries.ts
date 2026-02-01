@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import clientPromise from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb';
 import {
   ServerItineraryDocument,
   ServerItineraryInsertDocument,
@@ -19,10 +19,9 @@ async function getAuthenticatedUser() {
 }
 
 // データベース接続を取得する関数
-// データベース名は MONGODB_URI の接続文字列から自動的に取得されます
+// getDb()は明示的にデータベース名を指定するため、接続URIの解析に依存しない
 async function getDatabase() {
-  const client = await clientPromise;
-  return client.db(); // データベース名を指定しない場合、接続URIから自動取得
+  return getDb();
 }
 
 export async function createItinerary(
@@ -103,8 +102,7 @@ export async function getPublicItineraries(): Promise<
 export async function getItineraryById(
   id: string
 ): Promise<ClientItineraryDocument | null> {
-  const client = await clientPromise;
-  const db = client.db(); // 接続URIから自動取得
+  const db = await getDb();
 
   try {
     // 有効なObjectIdかチェック
@@ -140,8 +138,7 @@ export async function getItineraryWithDay(
   id: string,
   dayIndex: number
 ): Promise<{ metadata: any; dayPlan: any } | null> {
-  const client = await clientPromise;
-  const db = client.db(); // 接続URIから自動取得
+  const db = await getDb();
 
   try {
     // 有効なObjectIdかチェック

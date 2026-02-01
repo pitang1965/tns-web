@@ -2,7 +2,7 @@
 
 import { auth0 } from '@/lib/auth0';
 import { ObjectId } from 'mongodb';
-import clientPromise from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb';
 
 export async function deleteItinerary(id: string) {
   const session = await auth0.getSession();
@@ -11,8 +11,7 @@ export async function deleteItinerary(id: string) {
   }
 
   try {
-    const client = await clientPromise;
-    const db = client.db(); // 接続URIから自動取得
+    const db = await getDb();
 
     const result = await db.collection('itineraries').deleteOne({
       _id: new ObjectId(id),

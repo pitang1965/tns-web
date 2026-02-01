@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 // ObjectIdの検証関数
@@ -27,8 +27,7 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid day index' }, { status: 400 });
     }
 
-    const client = await clientPromise;
-    const db = client.db(); // 接続URIから自動取得
+    const db = await getDb();
 
     // まず基本的な情報を取得して日数をチェック
     const itinerary = await db

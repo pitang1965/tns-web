@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ensureDbConnection } from '@/lib/database';
-import clientPromise from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb';
 import CampingSpot from '@/lib/models/CampingSpot';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 
@@ -10,9 +10,8 @@ export async function GET() {
   try {
     await ensureDbConnection();
 
-    // Get MongoDB client for itineraries collection
-    const client = await clientPromise;
-    const db = client.db(); // 接続URIから自動取得
+    // Get MongoDB database for itineraries collection
+    const db = await getDb();
 
     const [campingSpotCount, itineraryCount, submissionCount] = await Promise.all([
       CampingSpot.countDocuments({}), // Count all spots, not just verified

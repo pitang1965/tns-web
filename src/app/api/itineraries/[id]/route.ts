@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { getDb } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import {
   ServerItineraryDocument,
@@ -26,8 +26,7 @@ export async function GET(
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db(); // 接続URIから自動取得
+    const db = await getDb();
     const itinerary = await db
       .collection('itineraries')
       .findOne({ _id: new ObjectId(id as string) });
