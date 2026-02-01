@@ -41,7 +41,6 @@ export function useMapMarkers({
     markerElement.style.width = '36px';
     markerElement.style.height = '36px';
     markerElement.style.borderRadius = '50%';
-    markerElement.style.backgroundColor = '#3b82f6';
     markerElement.style.color = 'white';
     markerElement.style.fontWeight = 'bold';
     markerElement.style.display = 'flex';
@@ -49,7 +48,20 @@ export function useMapMarkers({
     markerElement.style.alignItems = 'center';
     markerElement.style.border = '2px solid white';
     markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-    markerElement.innerText = activity.order.toString();
+
+    // 現在地の場合は緑色で特別なアイコン
+    if (activity.isCurrentLocation) {
+      markerElement.style.backgroundColor = '#22c55e'; // 緑色
+      markerElement.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      `;
+    } else {
+      markerElement.style.backgroundColor = '#3b82f6'; // 青色
+      markerElement.innerText = activity.order.toString();
+    }
 
     return markerElement;
   }, []);
@@ -73,11 +85,12 @@ export function useMapMarkers({
     ) => {
       markerElement.addEventListener('mouseenter', () => {
         marker.getElement().style.zIndex = '10';
+        const popupContent = activity.isCurrentLocation
+          ? `<div style="font-weight: bold; color: black; padding: 5px;">現在地</div>`
+          : `<div style="font-weight: bold; color: black; padding: 5px;">${activity.order}. ${activity.title}</div>`;
         popup
           .setLngLat([activity.longitude, activity.latitude])
-          .setHTML(
-            `<div style="font-weight: bold; color: black; padding: 5px;">${activity.order}. ${activity.title}</div>`
-          )
+          .setHTML(popupContent)
           .addTo(mapInstance!);
       });
 

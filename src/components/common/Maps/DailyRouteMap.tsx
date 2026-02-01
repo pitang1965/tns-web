@@ -13,6 +13,8 @@ export type ActivityLocation = {
   title: string;
   latitude: number;
   longitude: number;
+  type?: string; // 場所タイプ（HOME等）
+  isCurrentLocation?: boolean; // 現在地フラグ
 };
 
 type DailyRouteMapProps = {

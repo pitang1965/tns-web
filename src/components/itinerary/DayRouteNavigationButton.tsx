@@ -1,19 +1,31 @@
+'use client';
+
 import React from 'react';
 import { Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
 import { activitySchema } from '@/data/schemas/activitySchema';
+import { calculateDistance } from '@/hooks/useCurrentLocation';
 
 type Activity = z.infer<typeof activitySchema>;
 
+type Location = {
+  latitude: number;
+  longitude: number;
+};
+
 type DayRouteNavigationButtonProps = {
   activities: Activity[];
+  currentLocation: Location;
   className?: string;
 };
 
+// 自宅と現在地が近いと判断する距離（メートル）
+const HOME_PROXIMITY_THRESHOLD = 50;
+
 export const DayRouteNavigationButton: React.FC<
   DayRouteNavigationButtonProps
-> = ({ activities, className = '' }) => {
+> = ({ activities, currentLocation, className = '' }) => {
   // 住所を返す関数（addressは既に文字列）
   const formatAddress = (address: Activity['place']['address']) => {
     return address || null;
@@ -31,8 +43,8 @@ export const DayRouteNavigationButton: React.FC<
       !isNaN(activity.place.location.longitude)
   );
 
-  // 2つ以上のアクティビティがない場合は非表示
-  if (activitiesWithLocation.length < 2) {
+  // アクティビティが1つ以上ない場合は非表示
+  if (activitiesWithLocation.length < 1) {
     return null;
   }
 
@@ -45,17 +57,51 @@ export const DayRouteNavigationButton: React.FC<
 
   // 全体ルート検索を開く
   const openFullRoute = () => {
-    const waypoints = activitiesWithLocation.map((activity) => {
-      const { latitude, longitude } = activity.place.location!;
+    // ルートに含めるアクティビティを決定
+    let routeActivities = [...activitiesWithLocation];
 
-      // 住所がある場合はエンコードして使用
-      const addressString = formatAddress(activity.place.address);
-      if (addressString) {
-        return encodeURIComponent(addressString);
+    // 最初のアクティビティが自宅タイプで、現在地から50m以内ならスキップ
+    if (routeActivities.length > 0) {
+      const firstActivity = routeActivities[0];
+      const firstLat = firstActivity.place.location?.latitude;
+      const firstLng = firstActivity.place.location?.longitude;
+      if (
+        firstActivity.place.type === 'HOME' &&
+        typeof firstLat === 'number' &&
+        typeof firstLng === 'number'
+      ) {
+        const distance = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          firstLat,
+          firstLng
+        );
+        if (distance <= HOME_PROXIMITY_THRESHOLD) {
+          routeActivities = routeActivities.slice(1);
+        }
       }
-      // 座標のみの場合
-      return `${latitude},${longitude}`;
-    });
+    }
+
+    // ルートに含めるアクティビティがない場合は何もしない
+    if (routeActivities.length === 0) {
+      return;
+    }
+
+    // 現在地を出発点として追加
+    const waypoints = [
+      `${currentLocation.latitude},${currentLocation.longitude}`,
+      ...routeActivities.map((activity) => {
+        const { latitude, longitude } = activity.place.location!;
+
+        // 住所がある場合はエンコードして使用
+        const addressString = formatAddress(activity.place.address);
+        if (addressString) {
+          return encodeURIComponent(addressString);
+        }
+        // 座標のみの場合
+        return `${latitude},${longitude}`;
+      }),
+    ];
 
     // Google Maps の directions URL を構築
     let url = `https://www.google.com/maps/dir/${waypoints.join('/')}`;

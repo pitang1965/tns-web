@@ -18,6 +18,7 @@ type PlaceProps = PlacePropsBase & {
   allActivities?: ActivityType[];
   currentActivityIndex?: number;
   url?: string | null;
+  isOwner?: boolean; // 所有者かどうか（自宅の座標・住所表示制御用）
 };
 
 export const PlaceView: React.FC<PlaceProps> = ({
@@ -28,9 +29,16 @@ export const PlaceView: React.FC<PlaceProps> = ({
   allActivities,
   currentActivityIndex,
   url,
+  isOwner = false,
 }) => {
-  const lat = location?.latitude;
-  const lng = location?.longitude;
+  // 自宅タイプかつ非所有者の場合は座標・住所を非表示にする
+  const isHomeType = type === 'HOME';
+  const shouldHideLocationInfo = isHomeType && !isOwner;
+
+  const lat = shouldHideLocationInfo ? undefined : location?.latitude;
+  const lng = shouldHideLocationInfo ? undefined : location?.longitude;
+  const displayAddress = shouldHideLocationInfo ? null : address;
+  const displayLocation = shouldHideLocationInfo ? null : location;
 
   return (
   <div className='mt-1'>
@@ -72,9 +80,14 @@ export const PlaceView: React.FC<PlaceProps> = ({
           currentActivityIndex={currentActivityIndex}
         />
       </div>
+      {isHomeType && isOwner && (
+        <span className='text-xs text-muted-foreground'>
+          旅程を公開しても、自宅の座標や住所は公開されません
+        </span>
+      )}
     </div>
-    {address && <Text>{address}</Text>}
-    {location && <LocationView location={location} />}
+    {displayAddress && <Text>{displayAddress}</Text>}
+    {displayLocation && <LocationView location={displayLocation} />}
   </div>
   );
 };

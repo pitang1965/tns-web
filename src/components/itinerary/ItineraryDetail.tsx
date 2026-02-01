@@ -73,7 +73,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   }, [metadata, access.hasAccess, currentDayIndex, pathname, addUrl]);
 
   const renderDayPlan = (dayPlan: DayPlan, index: number) => {
-    return <DayPlanView key={index} day={dayPlan} dayIndex={index} />;
+    return <DayPlanView key={index} day={dayPlan} dayIndex={index} isOwner={access.isOwner} />;
   };
 
   if (loading) {

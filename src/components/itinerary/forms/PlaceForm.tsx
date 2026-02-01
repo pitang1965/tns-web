@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { PLACE_TYPES } from '@/constants/placeTypes';
+import { PLACE_TYPES, PlaceType } from '@/constants/placeTypes';
 import { CoordinateInput } from '@/components/itinerary/forms/CoordinateInput';
 
 type PlaceFormProps = {
@@ -27,6 +27,9 @@ export function PlaceForm({
 }: PlaceFormProps) {
   const { register, setValue, watch } = useFormContext<ClientItineraryInput>();
 
+  const selectedType = watch(`${basePath}.place.type` as Path<ClientItineraryInput>) as PlaceType | undefined;
+  const isHomeType = selectedType === 'HOME';
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -38,7 +41,14 @@ export function PlaceForm({
       </div>
 
       <div className="space-y-2">
-        <Label>場所のタイプ</Label>
+        <div className="flex items-center gap-2">
+          <Label>場所のタイプ</Label>
+          {isHomeType && (
+            <span className="text-xs text-muted-foreground">
+              旅程を公開しても、自宅の座標や住所は公開されません
+            </span>
+          )}
+        </div>
         <Select
           value={String(
             watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || ''

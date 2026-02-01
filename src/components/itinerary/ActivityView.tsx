@@ -12,6 +12,7 @@ type ActivityProps = {
   total?: number; // その日の活動の総数 - オプショナル
   // 複数経由地ルート検索用のプロパティ
   allActivities?: ActivityType[];
+  isOwner?: boolean; // 所有者かどうか（自宅の座標・住所表示制御用）
 };
 
 export const ActivityView: React.FC<ActivityProps> = ({
@@ -19,6 +20,7 @@ export const ActivityView: React.FC<ActivityProps> = ({
   index,
   total,
   allActivities,
+  isOwner = false,
 }) => {
   // indexとtotalが両方提供された場合のみ、番号表示を追加
   const titlePrefix =
@@ -52,6 +54,7 @@ export const ActivityView: React.FC<ActivityProps> = ({
         allActivities={allActivities}
         currentActivityIndex={index}
         url={activity.url}
+        isOwner={isOwner}
       />
       {activity.description && <Text>{activity.description}</Text>}
     </li>
