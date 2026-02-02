@@ -11,11 +11,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Info,
-  Search,
   BookHeart,
   CircleUser,
   MapPin,
-  Plus,
   Users,
   Mail,
 } from 'lucide-react';
@@ -80,16 +78,6 @@ export function BurgerMenu() {
           >
             <Info className='mr-1' />
             情報
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <Link
-            href='/search'
-            className='flex items-center'
-            onClick={(e) => handleItemClick(e, '/search')}
-          >
-            <Search className='mr-1' />
-            検索
           </Link>
         </DropdownMenuItem>
         {isAdmin ? (

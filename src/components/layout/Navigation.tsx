@@ -6,7 +6,6 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
 import {
   Info,
-  Search,
   BookHeart,
   CircleUser,
   MapPin,
@@ -59,10 +58,6 @@ export function Navigation() {
       <NavLink href='/'>
         <Info className='mr-1' />
         情報
-      </NavLink>
-      <NavLink href='/search'>
-        <Search className='mr-1' />
-        検索
       </NavLink>
       {userIsAdmin ? (
         <DropdownMenu>

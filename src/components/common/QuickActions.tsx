@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Search, MapPin, Zap, BookHeart, Sparkles } from 'lucide-react';
+import { Plus, MapPin, Zap, BookHeart, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -24,14 +24,6 @@ export default function QuickActions() {
       textColor: 'text-white',
     },
     {
-      title: '旅程を探す',
-      description: '他のユーザーの公開旅程を探索',
-      href: '/search',
-      icon: Search,
-      color: 'bg-emerald-500 hover:bg-emerald-600',
-      textColor: 'text-white',
-    },
-    {
       title: '車中泊スポット',
       description: '全国の車中泊スポットを探す',
       href: '/shachu-haku',
@@ -40,8 +32,8 @@ export default function QuickActions() {
       textColor: 'text-white',
     },
     {
-      title: 'あなたの旅程',
-      description: 'あなたの旅程一覧を見る',
+      title: '旅程一覧',
+      description: 'みんなの旅程を探索・自分の旅程を管理',
       href: '/itineraries',
       icon: BookHeart,
       color: 'bg-orange-500 hover:bg-orange-600',
