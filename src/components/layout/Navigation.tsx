@@ -7,7 +7,6 @@ import { ReactNode } from 'react';
 import {
   Info,
   BookHeart,
-  CircleUser,
   MapPin,
   Mail,
   ChevronDown,
@@ -125,12 +124,6 @@ export function Navigation() {
         <Mail className='mr-1' />
         お問い合わせ
       </NavLink>
-      {user && (
-        <NavLink href='/account'>
-          <CircleUser className='mr-1' />
-          アカウント
-        </NavLink>
-      )}
     </div>
   );
 }
