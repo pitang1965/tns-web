@@ -4,13 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { ReactNode } from 'react';
-import {
-  Info,
-  BookHeart,
-  MapPin,
-  Mail,
-  ChevronDown,
-} from 'lucide-react';
+import { Info, BookHeart, MapPin, ChevronDown } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import {
   DropdownMenu,
@@ -120,10 +114,6 @@ export function Navigation() {
           車中泊スポット
         </NavLink>
       )}
-      <NavLink href='/contact'>
-        <Mail className='mr-1' />
-        お問い合わせ
-      </NavLink>
     </div>
   );
 }

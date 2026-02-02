@@ -8,7 +8,7 @@ export function Footer() {
         <TabBar />
       </div>
 
-      {/* プライバシーポリシーと利用規約のリンク */}
+      {/* フッターリンク */}
       <div className='flex flex-wrap gap-4 mb-2 text-sm text-muted-foreground'>
         <Link
           href='/privacy'
@@ -18,6 +18,12 @@ export function Footer() {
         </Link>
         <Link href='/terms' className='hover:text-foreground transition-colors'>
           利用規約
+        </Link>
+        <Link
+          href='/contact'
+          className='hover:text-foreground transition-colors'
+        >
+          お問い合わせ
         </Link>
       </div>
 
