@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ActivityView } from './ActivityView';
 import { H3, LargeText, Text } from '@/components/common/Typography';
@@ -43,7 +43,15 @@ const HOME_PROXIMITY_THRESHOLD = 50;
 export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const [showFullMap, setShowFullMap] = useState(false);
   const [showLocationAlert, setShowLocationAlert] = useState(false);
-  const { currentLocation, permissionGranted, loading, requestLocation } = useCurrentLocation();
+  const [showLocationError, setShowLocationError] = useState(false);
+  const { currentLocation, permissionGranted, loading, error, requestLocation } = useCurrentLocation();
+
+  // エラーが発生したらエラーダイアログを表示
+  useEffect(() => {
+    if (error) {
+      setShowLocationError(true);
+    }
+  }, [error]);
 
   // 日付表示の生成
   const dayDisplay = day.date
@@ -129,10 +137,15 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
     return [currentLocationActivity, ...routeActivities];
   }, [currentLocation, activitiesWithLocation]);
 
-  // 現在地が許可されていて、アクティビティが1つ以上ある場合にマップを表示
-  const shouldShowMap = permissionGranted && currentLocation && activitiesWithLocation.length >= 1;
+  // アクティビティが1つ以上ある場合にマップを表示（位置情報不要）
+  const shouldShowMap = activitiesWithLocation.length >= 1;
 
-  // 位置情報許可ボタンを表示するかどうか
+  // マップに渡すアクティビティ（現在地がある場合は追加、ない場合はアクティビティのみ）
+  const mapActivities = currentLocation
+    ? routeActivitiesWithCurrentLocation
+    : activitiesWithLocation;
+
+  // 位置情報許可ボタンを表示するかどうか（マップが表示されていて位置情報がない場合）
   const shouldShowLocationPermissionButton = !permissionGranted && activitiesWithLocation.length >= 1;
 
   // メモが存在するかチェック
@@ -191,7 +204,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
       {shouldShowMap && (
         <div className='mb-4'>
           <DailyRouteMap
-            activities={routeActivitiesWithCurrentLocation}
+            activities={mapActivities}
             compact={true}
             onExpandClick={() => setShowFullMap(true)}
           />
@@ -232,7 +245,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
           </DialogHeader>
           <div className='h-[70vh] w-full'>
             <DailyRouteMap
-              activities={routeActivitiesWithCurrentLocation}
+              activities={mapActivities}
               compact={false}
               initialZoom={13}
             />
@@ -246,13 +259,33 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>位置情報の許可</AlertDialogTitle>
             <AlertDialogDescription>
-              位置情報が許可されていないと現在位置からのルート検索やルートマップ表示はできません。
+              位置情報を許可すると、現在位置からのルート検索が利用できます。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>キャンセル</AlertDialogCancel>
             <AlertDialogAction onClick={handleRequestLocation}>
               位置情報を許可する
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 位置情報エラーのAlertDialog */}
+      <AlertDialog open={showLocationError} onOpenChange={setShowLocationError}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>位置情報を取得できませんでした</AlertDialogTitle>
+            <AlertDialogDescription className='space-y-2'>
+              <span className='block'>{error}</span>
+              <span className='block text-sm'>
+                位置情報がブロックされている場合は、ブラウザのアドレスバー左側のアイコンから設定を変更してください。
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowLocationError(false)}>
+              閉じる
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
