@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation';
 import { getCampingSpotById } from '../../actions/campingSpots/admin';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
+import {
+  CampingSpotJsonLd,
+  BreadcrumbJsonLd,
+} from '@/components/seo/JsonLd';
 
 type PageProps = {
   params: Promise<{ spotId: string }>;
@@ -119,7 +123,40 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
       notFound();
     }
 
-    return <SpotDetailClient spot={spot} />;
+    const typeLabel =
+      CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels] ||
+      spot.type;
+
+    return (
+      <>
+        <CampingSpotJsonLd
+          name={spot.name}
+          description={`${spot.prefecture}の${typeLabel}「${spot.name}」。${spot.address}`}
+          address={spot.address}
+          prefecture={spot.prefecture}
+          latitude={spot.coordinates[1]}
+          longitude={spot.coordinates[0]}
+          spotType={typeLabel}
+          isFree={spot.pricing.isFree}
+          pricePerNight={spot.pricing.pricePerNight}
+          url={`https://tabi.over40web.club/shachu-haku/${spotId}`}
+        />
+        <BreadcrumbJsonLd
+          items={[
+            { name: 'ホーム', url: 'https://tabi.over40web.club' },
+            {
+              name: '車中泊マップ',
+              url: 'https://tabi.over40web.club/shachu-haku',
+            },
+            {
+              name: spot.name,
+              url: `https://tabi.over40web.club/shachu-haku/${spotId}`,
+            },
+          ]}
+        />
+        <SpotDetailClient spot={spot} />
+      </>
+    );
   } catch (error) {
     // Enhanced error logging for debugging Facebook WebView issues
     console.error('SpotDetailPage: Error loading spot:', {

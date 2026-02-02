@@ -13,6 +13,7 @@ import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
+import { WebsiteJsonLd } from '@/components/seo/JsonLd';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,7 +29,8 @@ export const metadata: Metadata = {
   title: '車旅のしおり',
   description:
     '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
-  keywords: '車旅,車中泊,車中泊スポット,旅程作成,旅行計画,道の駅,RVパーク',
+  keywords:
+    '車中泊マップ,車中泊スポット,車中泊,車旅,道の駅,RVパーク,オートキャンプ場,SA,PA,旅程作成,旅行計画,車中泊地図',
   manifest: '/manifest.json',
   icons: {
     apple: [
@@ -75,6 +77,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ja' suppressHydrationWarning>
+      <head>
+        <WebsiteJsonLd />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>

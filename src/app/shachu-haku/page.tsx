@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ShachuHakuClient from './ShachuHakuClient';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
+import { CampingMapJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -62,7 +63,7 @@ export async function generateMetadata({
     title,
     description,
     keywords:
-      '車中泊,車中泊スポット,スポット検索,道の駅,SA,PA,RVパーク,オートキャンプ場,車旅',
+      '車中泊マップ,車中泊スポット,車中泊地図,車中泊,スポット検索,道の駅,SA,PA,RVパーク,オートキャンプ場,車旅',
     openGraph: {
       title,
       description,
@@ -88,5 +89,16 @@ export async function generateMetadata({
 }
 
 export default function ShachuHakuPage() {
-  return <ShachuHakuClient />;
+  return (
+    <>
+      <CampingMapJsonLd />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'ホーム', url: 'https://tabi.over40web.club' },
+          { name: '車中泊マップ', url: 'https://tabi.over40web.club/shachu-haku' },
+        ]}
+      />
+      <ShachuHakuClient />
+    </>
+  );
 }
