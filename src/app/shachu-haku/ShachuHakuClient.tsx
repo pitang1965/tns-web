@@ -16,7 +16,7 @@ import { useSpotFiltering } from '@/hooks/useSpotFiltering';
 import { useOrientation } from '@/hooks/useOrientation';
 import { useUrlSync } from '@/hooks/useUrlSync';
 
-import { MapPin, Info, Plus, Share2 } from 'lucide-react';
+import { MapPin, Info, Plus, Share2, Sparkles } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
@@ -436,6 +436,15 @@ export default function ShachuHakuClient() {
             </div>
           </div>
           <div className='flex flex-col sm:flex-row gap-2'>
+            <Link href='/shachu-haku/shindan'>
+              <Button
+                variant='outline'
+                className='w-full sm:w-auto cursor-pointer whitespace-nowrap border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950'
+              >
+                <Sparkles className='w-4 h-4' />
+                スポット診断
+              </Button>
+            </Link>
             <Button
               onClick={handleShare}
               variant='outline'

@@ -15,7 +15,7 @@ import {
   CircleUser,
   MapPin,
   Users,
-  Mail,
+  Sparkles,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
@@ -158,6 +158,16 @@ export function BurgerMenu() {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Link
+            href='/shachu-haku/shindan'
+            className='flex items-center'
+            onClick={(e) => handleItemClick(e, '/shachu-haku/shindan')}
+          >
+            <Sparkles className='mr-1' />
+            スポット診断
+          </Link>
+        </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <Link
@@ -170,16 +180,6 @@ export function BurgerMenu() {
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <Link
-            href='/contact'
-            className='flex items-center'
-            onClick={(e) => handleItemClick(e, '/contact')}
-          >
-            <Mail className='mr-1' />
-            お問い合わせ
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href='/account'
