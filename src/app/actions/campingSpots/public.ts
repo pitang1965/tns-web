@@ -4,6 +4,7 @@ import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotFilter } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
+import { parseSearchTermToFuzzyPatterns } from '@/lib/utils/searchNormalize';
 
 // Public function for general users (no authentication required)
 export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
@@ -99,18 +100,21 @@ export async function getPublicCampingSpotsByBounds(
   };
 
   if (options?.searchTerm) {
-    // Split search term by whitespace to support multiple keywords
-    const keywords = options.searchTerm.trim().split(/\s+/);
+    // Parse search term into fuzzy regex patterns (handles Japanese character variants)
+    const fuzzyPatterns = parseSearchTermToFuzzyPatterns(options.searchTerm);
 
-    // Each keyword must match at least one of: name, prefecture, address, or notes
-    query.$and = keywords.map(keyword => ({
-      $or: [
-        { name: { $regex: keyword, $options: 'i' } },
-        { prefecture: { $regex: keyword, $options: 'i' } },
-        { address: { $regex: keyword, $options: 'i' } },
-        { notes: { $regex: keyword, $options: 'i' } }
-      ]
-    }));
+    // Only add $and condition if there are actual patterns
+    if (fuzzyPatterns.length > 0) {
+      // Each keyword must match at least one of: name, prefecture, address, or notes
+      query.$and = fuzzyPatterns.map(pattern => ({
+        $or: [
+          { name: { $regex: pattern, $options: 'i' } },
+          { prefecture: { $regex: pattern, $options: 'i' } },
+          { address: { $regex: pattern, $options: 'i' } },
+          { notes: { $regex: pattern, $options: 'i' } }
+        ]
+      }));
+    }
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -142,18 +146,21 @@ export async function getPublicCampingSpotsWithPagination(
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    // Split search term by whitespace to support multiple keywords
-    const keywords = options.searchTerm.trim().split(/\s+/);
+    // Parse search term into fuzzy regex patterns (handles Japanese character variants)
+    const fuzzyPatterns = parseSearchTermToFuzzyPatterns(options.searchTerm);
 
-    // Each keyword must match at least one of: name, prefecture, address, or notes
-    query.$and = keywords.map(keyword => ({
-      $or: [
-        { name: { $regex: keyword, $options: 'i' } },
-        { prefecture: { $regex: keyword, $options: 'i' } },
-        { address: { $regex: keyword, $options: 'i' } },
-        { notes: { $regex: keyword, $options: 'i' } }
-      ]
-    }));
+    // Only add $and condition if there are actual patterns
+    if (fuzzyPatterns.length > 0) {
+      // Each keyword must match at least one of: name, prefecture, address, or notes
+      query.$and = fuzzyPatterns.map(pattern => ({
+        $or: [
+          { name: { $regex: pattern, $options: 'i' } },
+          { prefecture: { $regex: pattern, $options: 'i' } },
+          { address: { $regex: pattern, $options: 'i' } },
+          { notes: { $regex: pattern, $options: 'i' } }
+        ]
+      }));
+    }
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
