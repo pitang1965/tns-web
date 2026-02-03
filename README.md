@@ -121,12 +121,15 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - **重要**: データベース名を必ず含めてください（`/データベース名?`の形式）
   - 開発環境の例: `mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/itinerary_db_dev?retryWrites=true&w=majority`
   - 本番環境の例: `mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/itinerary_db?retryWrites=true&w=majority`
-  - データベースのホスト、ポート、認証情報、データベース名などを含む。
+- `APP_MONGODB_URI`（開発環境のみ）:
+  - **開発環境専用**。Claude Code の MCP サーバー（mongodb-readonly）が `MONGODB_URI` を上書きする場合の回避策。
+  - 設定されている場合、`MONGODB_URI` より優先して使用されます。
+  - 本番環境（Vercel 等）では設定不要です。
 
 **環境別のデータベース設定:**
 
-- **開発環境** (`.env.local`): `itinerary_db_dev` を使用
-- **本番環境** (Vercel 等の環境変数): `itinerary_db` を使用
+- **開発環境** (`.env.local`): `itinerary_db_dev` を使用。MCP サーバーとの競合を避けるため `APP_MONGODB_URI` も設定を推奨。
+- **本番環境** (Vercel 等の環境変数): `itinerary_db` を使用。`MONGODB_URI` のみで OK。
 - 詳細は `ENVIRONMENT_SETUP.md` を参照してください。
 
 ### モニタリング・分析
@@ -484,8 +487,13 @@ node_modules/
 #### Next.js アプリ用
 
 ```bash
-# .env.local
-MONGODB_URI=mongodb+srv://app_user:password@cluster0.xxxxx.mongodb.net/itinerary_db
+# .env.local（開発環境）
+# APP_MONGODB_URI: MCP サーバーとの競合回避のため設定（開発環境のみ）
+APP_MONGODB_URI=mongodb+srv://app_user:password@cluster0.xxxxx.mongodb.net/itinerary_db_dev
+MONGODB_URI=mongodb+srv://app_user:password@cluster0.xxxxx.mongodb.net/itinerary_db_dev
+
+# 本番環境（Vercel等）では MONGODB_URI のみ設定すれば OK
+# MONGODB_URI=mongodb+srv://app_user:password@cluster0.xxxxx.mongodb.net/itinerary_db
 ```
 
 #### Claude MCP 用

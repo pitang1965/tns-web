@@ -13,8 +13,8 @@ import mongoose from 'mongoose';
 export async function ensureDbConnection() {
   try {
     if (mongoose.connection.readyState === 0) {
-      // データベース名は MONGODB_URI から自動取得
-      const uri = process.env.MONGODB_URI!;
+      // APP_MONGODB_URI を優先して使用（MCPサーバーとの競合を避けるため）
+      const uri = process.env.APP_MONGODB_URI || process.env.MONGODB_URI!;
 
       // Enhanced connection options for stability in various environments
       await mongoose.connect(uri, {
