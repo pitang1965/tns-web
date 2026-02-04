@@ -45,10 +45,7 @@ export function AdSense() {
                   });
                 }
               } catch (err) {
-                // Silently ignore AdSense errors in development
-                if (process.env.NODE_ENV !== 'production') {
-                  console.debug('AdSense:', err.message);
-                }
+                // Silently ignore AdSense errors
               }
             `}
           </Script>
