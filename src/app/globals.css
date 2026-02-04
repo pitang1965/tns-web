@@ -231,4 +231,21 @@
     transform: scale(0.98);
     transition: transform 75ms;
   }
+
+  /* AdSense広告の高さ制限 */
+  .adsbygoogle {
+    max-height: 100px !important;
+  }
+
+  .adsbygoogle iframe {
+    max-height: 100px !important;
+  }
+
+  /* モバイルではさらに小さく */
+  @media (max-width: 767px) {
+    .adsbygoogle,
+    .adsbygoogle iframe {
+      max-height: 90px !important;
+    }
+  }
 }

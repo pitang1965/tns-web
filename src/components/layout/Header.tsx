@@ -106,7 +106,7 @@ export function Header() {
           <div className='md:hidden'>
             <BurgerMenu />
           </div>
-          <Link href='/' className='text-xl ml-auto'>
+          <Link href='/' className='text-lg md:text-xl ml-auto whitespace-nowrap'>
             車旅のしおり
           </Link>
           <Suspense fallback={null}>

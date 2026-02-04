@@ -117,9 +117,11 @@ export default function RootLayout({
                 <EnvironmentWrapper>
                   <div className='flex flex-col min-h-screen bg-background text-foreground'>
                     <Header />
+                    {/* 固定ヘッダー用のスペーサー */}
+                    <div className='h-12' />
                     <AdSense />
                     <main className='flex-1 relative'>
-                      <div className='pt-12 pb-16'>{children}</div>
+                      <div className='pb-16'>{children}</div>
                       <Toaster />
                     </main>
                     <Footer />
