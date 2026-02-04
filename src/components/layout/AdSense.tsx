@@ -24,12 +24,12 @@ export function AdSense() {
   return (
     <div className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}>
       <div className='container mx-auto px-2 py-0.5'>
-        <div className='w-full max-w-screen-lg mx-auto'>
+        <div className='w-full max-w-5xl mx-auto max-h-[90px] md:max-h-[100px] overflow-hidden'>
           <ins
             className='adsbygoogle'
-            style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
+            style={{ display: 'block', maxHeight: '90px' }}
             data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
-            data-ad-format='auto'
+            data-ad-format='horizontal'
             data-full-width-responsive='true'
           />
           <Script id='adsense-push-header' strategy='lazyOnload'>
