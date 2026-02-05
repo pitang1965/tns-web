@@ -18,10 +18,12 @@ export function AdSense() {
   const isMobileLandscape =
     isLandscape && typeof window !== 'undefined' && window.innerWidth < 768;
 
+  const isDev = process.env.NODE_ENV === 'development';
+
   if (
     isAdminPage ||
     isPremium ||
-    !process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ||
+    (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && !isDev) ||
     isMobileLandscape
   ) {
     return null;
@@ -30,33 +32,44 @@ export function AdSense() {
   return (
     <div
       className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
-      style={{ maxHeight: '100px', overflow: 'hidden' }}
+      style={{ height: '90px', overflow: 'hidden' }}
     >
       <div className='container mx-auto px-2 py-0.5'>
-        <div className='w-full max-w-screen-lg mx-auto'>
-          <ins
-            className='adsbygoogle'
-            style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
-            data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
-            data-ad-format='auto'
-            data-full-width-responsive='true'
-          />
-          <Script id='adsense-push-header' strategy='lazyOnload'>
-            {`
-              try {
-                if (typeof window !== 'undefined' && window.adsbygoogle) {
-                  const ads = document.querySelectorAll('.adsbygoogle');
-                  ads.forEach((ad) => {
-                    if (!ad.getAttribute('data-adsbygoogle-status')) {
-                      (adsbygoogle = window.adsbygoogle || []).push({});
+        <div className='w-full max-w-screen-lg mx-auto flex justify-center'>
+          {isDev ? (
+            <div
+              className='bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400'
+              style={{ width: '728px', height: '80px', maxWidth: '100%' }}
+            >
+              広告プレースホルダー (728x90)
+            </div>
+          ) : (
+            <>
+              <ins
+                className='adsbygoogle'
+                style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
+                data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+                data-ad-format='auto'
+                data-full-width-responsive='true'
+              />
+              <Script id='adsense-push-header' strategy='lazyOnload'>
+                {`
+                  try {
+                    if (typeof window !== 'undefined' && window.adsbygoogle) {
+                      const ads = document.querySelectorAll('.adsbygoogle');
+                      ads.forEach((ad) => {
+                        if (!ad.getAttribute('data-adsbygoogle-status')) {
+                          (adsbygoogle = window.adsbygoogle || []).push({});
+                        }
+                      });
                     }
-                  });
-                }
-              } catch (err) {
-                // Silently ignore AdSense errors
-              }
-            `}
-          </Script>
+                  } catch (err) {
+                    // Silently ignore AdSense errors
+                  }
+                `}
+              </Script>
+            </>
+          )}
         </div>
       </div>
     </div>
