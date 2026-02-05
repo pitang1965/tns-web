@@ -46,10 +46,11 @@ export function AdSense() {
             <>
               <ins
                 className='adsbygoogle'
-                style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
+                style={{ display: 'block' }}
                 data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+                data-ad-slot='5507909013'
                 data-ad-format='auto'
-                data-full-width-responsive='false'
+                data-full-width-responsive='true'
               />
               <Script id='adsense-push-header' strategy='lazyOnload'>
                 {`
