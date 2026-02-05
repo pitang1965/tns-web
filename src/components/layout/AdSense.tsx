@@ -49,7 +49,7 @@ export function AdSense() {
                 style={{ display: 'block', minHeight: '50px', maxHeight: '80px' }}
                 data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
                 data-ad-format='auto'
-                data-full-width-responsive='true'
+                data-full-width-responsive='false'
               />
               <Script id='adsense-push-header' strategy='lazyOnload'>
                 {`
