@@ -232,14 +232,4 @@
     transition: transform 75ms;
   }
 
-  /* AdSense広告のサイズ制限 */
-  .adsbygoogle {
-    max-width: 100% !important;
-    overflow: hidden !important;
-  }
-
-  .adsbygoogle iframe,
-  .adsbygoogle ins {
-    max-width: 100% !important;
-  }
 }

@@ -33,8 +33,7 @@ export function AdSense() {
     <div
       className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
     >
-      <div className='container mx-auto px-2 py-0.5'>
-        <div className='w-full max-w-5xl mx-auto'>
+      <div className='w-full'>
           {isDev ? (
             <div
               className='bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400'
@@ -70,7 +69,6 @@ export function AdSense() {
               </Script>
             </>
           )}
-        </div>
       </div>
     </div>
   );
