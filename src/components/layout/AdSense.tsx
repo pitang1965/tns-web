@@ -32,10 +32,9 @@ export function AdSense() {
   return (
     <div
       className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
-      style={{ maxHeight: '100px', overflow: 'hidden' }}
     >
       <div className='container mx-auto px-2 py-0.5'>
-        <div className='w-full max-w-5xl mx-auto flex justify-center'>
+        <div className='w-full max-w-5xl mx-auto'>
           {isDev ? (
             <div
               className='bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400'
