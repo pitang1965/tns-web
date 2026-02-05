@@ -78,6 +78,7 @@ export function AdSense() {
               }}
               data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
               data-ad-slot={isMobile ? '9582885398' : '8653673455'}
+              data-full-width-responsive='false'
             />
           </div>
           <Script id='adsense-push-header' strategy='lazyOnload'>
