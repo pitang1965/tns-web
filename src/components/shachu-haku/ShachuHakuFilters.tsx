@@ -10,17 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group';
+import { Input } from '@/components/ui/input';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { MapPin, Search, Navigation, Filter, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { MapPin, Search, Navigation, Filter, ChevronDown, ChevronUp, RotateCcw, X } from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -180,18 +176,26 @@ export default function ShachuHakuFilters({
                 </span>
               </div>
               <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-                <InputGroup className='flex-1'>
-                  <InputGroupAddon>
-                    <Search className='h-4 w-4' />
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    placeholder='キーワードで検索...'
+                <div className='relative flex-1'>
+                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    placeholder='キーワードで絞り込み...'
                     value={searchTerm}
                     onChange={(e) => onSearchTermChange(e.target.value)}
+                    className={`pl-9 h-9 ${searchTerm ? 'pr-8' : ''}`}
                   />
-                </InputGroup>
+                  {searchTerm && (
+                    <button
+                      type='button'
+                      onClick={() => onSearchTermChange('')}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
+                    >
+                      <X className='h-3 w-3 text-white' />
+                    </button>
+                  )}
+                </div>
                 <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                  <SelectTrigger className='h-9 w-full sm:w-[180px] cursor-pointer'>
+                  <SelectTrigger className={`h-9 w-full sm:w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
                     <SelectValue placeholder='全種別' />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,7 +233,7 @@ export default function ShachuHakuFilters({
         </Collapsible>
 
         {/* Desktop Layout (2xl and above) */}
-        <div className='hidden 2xl:flex gap-4 items-center'>
+        <div className='hidden 2xl:flex 2xl:flex-col gap-3'>
           {/* Location Jump */}
           <div className='flex items-center gap-2'>
             <MapPin className='w-4 h-4 text-gray-500 dark:text-gray-400' />
@@ -275,28 +279,33 @@ export default function ShachuHakuFilters({
             </Select>
           </div>
 
-          {/* Vertical Divider */}
-          <div className='h-8 w-px bg-gray-200 dark:bg-gray-700' />
-
           {/* Search and Type Filter */}
-          <div className='flex items-center gap-2 flex-1'>
+          <div className='flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700'>
             <Filter className='w-4 h-4 text-gray-500 dark:text-gray-400' />
             <span className='text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap'>
               絞り込み:
             </span>
             <div className='flex gap-2 flex-1'>
-              <InputGroup className='flex-1 max-w-xs'>
-                <InputGroupAddon>
-                  <Search className='h-4 w-4' />
-                </InputGroupAddon>
-                <InputGroupInput
-                  placeholder='キーワードで検索...'
+              <div className='relative flex-1 max-w-xs'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Input
+                  placeholder='キーワードで絞り込み...'
                   value={searchTerm}
                   onChange={(e) => onSearchTermChange(e.target.value)}
+                  className={`pl-9 h-9 ${searchTerm ? 'pr-8' : ''}`}
                 />
-              </InputGroup>
+                {searchTerm && (
+                  <button
+                    type='button'
+                    onClick={() => onSearchTermChange('')}
+                    className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
+                  >
+                    <X className='h-3 w-3 text-white' />
+                  </button>
+                )}
+              </div>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                <SelectTrigger className='h-9 w-[180px] cursor-pointer'>
+                <SelectTrigger className={`h-9 w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
                   <SelectValue placeholder='全種別' />
                 </SelectTrigger>
                 <SelectContent>

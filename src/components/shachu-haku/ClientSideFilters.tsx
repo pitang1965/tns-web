@@ -59,7 +59,7 @@ export default function ClientSideFilters({
         >
           <MoreVertical className='h-4 w-4' />
           {activeFiltersCount > 0 && (
-            <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center text-xs'>
+            <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs'>
               {activeFiltersCount}
             </span>
           )}
