@@ -25,6 +25,7 @@ type ActivityFormProps = {
   total?: number;
   remove: (dayIndex: number, activityIndex: number) => void;
   moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
+  insertActivity?: (dayIndex: number, atIndex: number) => void;
   moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
   moveToNextDay?: (dayIndex: number, activityIndex: number) => void;
   isFirst?: boolean;
@@ -41,6 +42,7 @@ export function ActivityForm({
   total,
   remove,
   moveActivity,
+  insertActivity,
   moveToPreviousDay,
   moveToNextDay,
   isFirst = false,
@@ -74,6 +76,7 @@ export function ActivityForm({
           activityIndex={activityIndex}
           remove={remove}
           moveActivity={moveActivity}
+          insertActivity={insertActivity}
           moveToPreviousDay={moveToPreviousDay}
           moveToNextDay={moveToNextDay}
           isFirst={isFirst}

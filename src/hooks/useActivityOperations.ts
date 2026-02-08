@@ -42,6 +42,34 @@ export function useActivityOperations({
     );
   };
 
+  // アクティビティの挿入（指定位置に追加）
+  const insertActivity = (dayIndex: number, atIndex: number) => {
+    const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
+    const newActivities = [...currentActivities];
+    newActivities.splice(atIndex, 0, {
+      id: crypto.randomUUID(),
+      title: '',
+      place: {
+        type: 'ATTRACTION' as const,
+        name: '',
+        address: null,
+        location: {
+          latitude: undefined,
+          longitude: undefined,
+        },
+      },
+      description: '',
+      startTime: '',
+      endTime: '',
+      cost: 0,
+      url: null,
+    });
+    setValue(`dayPlans.${dayIndex}.activities`, newActivities, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   // アクティビティの削除
   const removeActivity = (dayIndex: number, activityIndex: number) => {
     const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
@@ -124,6 +152,7 @@ export function useActivityOperations({
 
   return {
     addActivity,
+    insertActivity,
     removeActivity,
     moveToPreviousDay,
     moveToNextDay,

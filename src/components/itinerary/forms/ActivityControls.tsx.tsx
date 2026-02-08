@@ -18,6 +18,7 @@ type ActivityControlsProps = {
   activityIndex: number;
   remove: (dayIndex: number, activityIndex: number) => void;
   moveActivity?: (dayIndex: number, fromIndex: number, toIndex: number) => void;
+  insertActivity?: (dayIndex: number, atIndex: number) => void;
   moveToPreviousDay?: (dayIndex: number, activityIndex: number) => void;
   moveToNextDay?: (dayIndex: number, activityIndex: number) => void;
   isFirst?: boolean;
@@ -36,6 +37,7 @@ export function ActivityControls({
   activityIndex,
   remove,
   moveActivity,
+  insertActivity,
   moveToPreviousDay,
   moveToNextDay,
   isFirst = false,
@@ -133,6 +135,16 @@ export function ActivityControls({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
+            {insertActivity && (
+              <DropdownMenuItem onClick={() => insertActivity(dayIndex, activityIndex)} className='cursor-pointer'>
+                上にアクティビティを追加
+              </DropdownMenuItem>
+            )}
+            {insertActivity && (
+              <DropdownMenuItem onClick={() => insertActivity(dayIndex, activityIndex + 1)} className='cursor-pointer'>
+                下にアクティビティを追加
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={handleShiftSubsequentActivities} className='cursor-pointer'>
               以降のアクティビティの時間をずらす
             </DropdownMenuItem>

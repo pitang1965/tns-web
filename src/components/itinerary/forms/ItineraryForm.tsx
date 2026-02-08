@@ -78,7 +78,7 @@ export function ItineraryForm({
   );
 
   // アクティビティ操作フック
-  const { addActivity, removeActivity, moveToPreviousDay, moveToNextDay } =
+  const { addActivity, insertActivity, removeActivity, moveToPreviousDay, moveToNextDay } =
     useActivityOperations({
       watch,
       setValue,
@@ -120,6 +120,7 @@ export function ItineraryForm({
         dayIndex={index}
         daysCount={numberOfDays}
         addActivity={addActivity}
+        insertActivity={insertActivity}
         removeActivity={removeActivity}
         moveToPreviousDay={moveToPreviousDay}
         moveToNextDay={moveToNextDay}
