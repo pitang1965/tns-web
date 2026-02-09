@@ -132,9 +132,9 @@ export function useMapBoundsLoader({
         }
       }
     } catch (error) {
-      // Ignore abort errors
+      // Ignore abort errors - don't touch loading state for aborted requests
+      // because a newer request is already in progress
       if (error instanceof Error && error.name === 'AbortError') {
-        setLoading(false);
         return;
       }
 
@@ -147,9 +147,12 @@ export function useMapBoundsLoader({
         console.error('Error loading spots:', error);
       }
     } finally {
-      // Always turn off loading in finally block, regardless of abort status
-      // This ensures the loading state is cleared even if the request was aborted
-      setLoading(false);
+      // Only turn off loading if this request wasn't aborted.
+      // Aborted requests should not clear loading state because
+      // a newer request is already in progress with its own loading state.
+      if (!currentController.signal.aborted) {
+        setLoading(false);
+      }
     }
   };
 

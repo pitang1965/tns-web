@@ -23,6 +23,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
+import { useDeferredSearch } from '@/hooks/useDeferredSearch';
 
 type ShachuHakuFiltersProps = {
   searchTerm: string;
@@ -50,6 +51,16 @@ export default function ShachuHakuFilters({
   onResetAll,
 }: ShachuHakuFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const {
+    inputValue,
+    setInputValue,
+    inputRef,
+    submit: handleSearchSubmit,
+    clear: handleSearchClear,
+    handleKeyDown: handleSearchKeyDown,
+    isDirty: isSearchDirty,
+  } = useDeferredSearch(searchTerm, onSearchTermChange);
 
   // Count active filters
   const countActiveFilters = () => {
@@ -176,23 +187,35 @@ export default function ShachuHakuFilters({
                 </span>
               </div>
               <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-                <div className='relative flex-1'>
-                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-                  <Input
-                    placeholder='キーワードで絞り込み...'
-                    value={searchTerm}
-                    onChange={(e) => onSearchTermChange(e.target.value)}
-                    className={`pl-9 h-9 ${searchTerm ? 'pr-8' : ''}`}
-                  />
-                  {searchTerm && (
-                    <button
-                      type='button'
-                      onClick={() => onSearchTermChange('')}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
-                    >
-                      <X className='h-3 w-3 text-white' />
-                    </button>
-                  )}
+                <div className='flex gap-1 flex-1'>
+                  <div className='relative flex-1'>
+                    <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                    <Input
+                      ref={inputRef}
+                      placeholder='キーワードで絞り込み...'
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                      className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
+                    />
+                    {inputValue && (
+                      <button
+                        type='button'
+                        onClick={handleSearchClear}
+                        className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
+                      >
+                        <X className='h-3 w-3 text-white' />
+                      </button>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleSearchSubmit}
+                    size='sm'
+                    className='h-9 px-3 cursor-pointer'
+                    disabled={!isSearchDirty}
+                  >
+                    <Search className='w-4 h-4' />
+                  </Button>
                 </div>
                 <Select value={typeFilter} onValueChange={onTypeFilterChange}>
                   <SelectTrigger className={`h-9 w-full sm:w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
@@ -286,23 +309,34 @@ export default function ShachuHakuFilters({
               絞り込み:
             </span>
             <div className='flex gap-2 flex-1'>
-              <div className='relative flex-1 max-w-xs'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-                <Input
-                  placeholder='キーワードで絞り込み...'
-                  value={searchTerm}
-                  onChange={(e) => onSearchTermChange(e.target.value)}
-                  className={`pl-9 h-9 ${searchTerm ? 'pr-8' : ''}`}
-                />
-                {searchTerm && (
-                  <button
-                    type='button'
-                    onClick={() => onSearchTermChange('')}
-                    className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
-                  >
-                    <X className='h-3 w-3 text-white' />
-                  </button>
-                )}
+              <div className='flex gap-1 flex-1 max-w-sm'>
+                <div className='relative flex-1'>
+                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    placeholder='キーワードで絞り込み...'
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
+                  />
+                  {inputValue && (
+                    <button
+                      type='button'
+                      onClick={handleSearchClear}
+                      className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
+                    >
+                      <X className='h-3 w-3 text-white' />
+                    </button>
+                  )}
+                </div>
+                <Button
+                  onClick={handleSearchSubmit}
+                  size='sm'
+                  className='h-9 px-3 cursor-pointer'
+                  disabled={inputValue.trim() === searchTerm}
+                >
+                  <Search className='w-4 h-4' />
+                </Button>
               </div>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
                 <SelectTrigger className={`h-9 w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
