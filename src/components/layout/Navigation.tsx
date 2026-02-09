@@ -53,7 +53,7 @@ export function Navigation() {
         情報
       </NavLink>
       {userIsAdmin ? (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
             <BookHeart className='mr-1' />
             旅程
@@ -84,7 +84,7 @@ export function Navigation() {
         </NavLink>
       )}
       {userIsAdmin ? (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
             <MapPin className='mr-1' />
             車中泊スポット
