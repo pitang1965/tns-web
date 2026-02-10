@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/common/ThemeProvider';
@@ -11,7 +10,7 @@ import { AdSense } from '@/components/layout/AdSense';
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
+
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
 import { WebsiteJsonLd } from '@/components/seo/JsonLd';
 
@@ -113,8 +112,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <TooltipProvider>
-                <EnvironmentWrapper>
+              <EnvironmentWrapper>
                   <div className='flex flex-col min-h-screen bg-background text-foreground'>
                     <Header />
                     {/* 固定ヘッダー用のスペーサー */}
@@ -127,7 +125,6 @@ export default function RootLayout({
                     <Footer />
                   </div>
                 </EnvironmentWrapper>
-              </TooltipProvider>
             </ThemeProvider>
           </Auth0Provider>
         </ErrorBoundary>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { SmallText } from '@/components/common/Typography';
 import AboutSection from '@/components/landing/AboutSection';
@@ -8,17 +8,13 @@ import FeaturesSection from '@/components/landing/FeaturesSection';
 import StatsSection from '@/components/landing/StatsSection';
 import SNSSection from '@/components/landing/SNSSection';
 import CTASection from '@/components/landing/CTASection';
-import { LoadingState } from '@/components/common/LoadingState';
+import HeroPreview from '@/components/landing/HeroPreview';
 
 const HeroMapSection = dynamic(
   () => import('@/components/landing/HeroMapSection'),
   {
     ssr: false,
-    loading: () => (
-      <div className='h-[70vh] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center'>
-        <LoadingState variant='inline' />
-      </div>
-    ),
+    loading: () => <HeroPreview />,
   }
 );
 
@@ -27,11 +23,32 @@ type PublicHomeProps = {
 }
 
 export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
+  const [shouldLoadMap, setShouldLoadMap] = useState(false);
+
+  useEffect(() => {
+    // ブラウザがアイドルになってからマップを読み込む
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(
+        () => setShouldLoadMap(true),
+        { timeout: 4000 } // 最大4秒待つ
+      );
+      return () => cancelIdleCallback(id);
+    } else {
+      // requestIdleCallback非対応ブラウザ用フォールバック
+      const timer = setTimeout(() => setShouldLoadMap(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <div className='flex flex-col bg-background text-foreground'>
       {/* Hero Map Section */}
-      <Suspense fallback={<div className='h-[70vh] bg-gray-100' />}>
-        <HeroMapSection initialSpots={initialSpots} />
+      <Suspense fallback={<HeroPreview />}>
+        {shouldLoadMap ? (
+          <HeroMapSection initialSpots={initialSpots} />
+        ) : (
+          <HeroPreview />
+        )}
       </Suspense>
 
       {/* About Section */}

@@ -19,7 +19,12 @@
       "mcp__mongodb-readonly__connect",
       "mcp__mongodb-readonly__collection-schema",
       "mcp__mongodb-readonly__find",
-      "mcp__mongodb-readonly__count"
+      "mcp__mongodb-readonly__count",
+      "WebFetch(domain:pagespeed.web.dev)",
+      "WebFetch(domain:www.googleapis.com)",
+      "Bash(ANALYZE=true npm run build:*)",
+      "Bash(dir:*)",
+      "Bash(git status:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
