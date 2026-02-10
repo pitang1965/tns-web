@@ -405,7 +405,7 @@ export default function ShachuHakuForm({
               </Button>
             )}
             <Button
-              type='submit'
+              type='button'
               disabled={loading}
               className='cursor-pointer'
               onClick={handleSubmit(handleFormSubmit)}
