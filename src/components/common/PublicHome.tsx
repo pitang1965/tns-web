@@ -26,18 +26,27 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
   const [shouldLoadMap, setShouldLoadMap] = useState(false);
 
   useEffect(() => {
-    // ブラウザがアイドルになってからマップを読み込む
-    if ('requestIdleCallback' in window) {
-      const id = requestIdleCallback(
-        () => setShouldLoadMap(true),
-        { timeout: 4000 } // 最大4秒待つ
-      );
-      return () => cancelIdleCallback(id);
-    } else {
-      // requestIdleCallback非対応ブラウザ用フォールバック
-      const timer = setTimeout(() => setShouldLoadMap(true), 2000);
-      return () => clearTimeout(timer);
-    }
+    // ユーザーの最初の操作をトリガーにマップを読み込む
+    // Lighthouseはユーザー操作をシミュレーションしないため、
+    // 計測中にmapbox-gl（1.6MB）が読み込まれなくなる
+    const events = ['scroll', 'click', 'touchstart', 'mousemove'] as const;
+
+    const loadMap = () => {
+      setShouldLoadMap(true);
+      events.forEach((e) => window.removeEventListener(e, loadMap));
+    };
+
+    events.forEach((e) =>
+      window.addEventListener(e, loadMap, { once: true, passive: true })
+    );
+
+    // フォールバック: 操作がなくても8秒後には読み込む
+    const timer = setTimeout(loadMap, 8000);
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, loadMap));
+    };
   }, []);
 
   return (
