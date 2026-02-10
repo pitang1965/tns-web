@@ -1,7 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { useState, useEffect, type ComponentType } from 'react';
 import { SmallText } from '@/components/common/Typography';
 import AboutSection from '@/components/landing/AboutSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
@@ -10,20 +9,13 @@ import SNSSection from '@/components/landing/SNSSection';
 import CTASection from '@/components/landing/CTASection';
 import HeroPreview from '@/components/landing/HeroPreview';
 
-const HeroMapSection = dynamic(
-  () => import('@/components/landing/HeroMapSection'),
-  {
-    ssr: false,
-    loading: () => <HeroPreview />,
-  }
-);
-
 type PublicHomeProps = {
   initialSpots?: any[];
 }
 
 export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
-  const [shouldLoadMap, setShouldLoadMap] = useState(false);
+  const [MapComponent, setMapComponent] =
+    useState<ComponentType<{ initialSpots?: any[] }> | null>(null);
 
   useEffect(() => {
     // ユーザーの最初の操作をトリガーにマップを読み込む
@@ -32,19 +24,17 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
     const events = ['scroll', 'click', 'touchstart', 'mousemove'] as const;
 
     const loadMap = () => {
-      setShouldLoadMap(true);
       events.forEach((e) => window.removeEventListener(e, loadMap));
+      import('@/components/landing/HeroMapSection').then((mod) => {
+        setMapComponent(() => mod.default);
+      });
     };
 
     events.forEach((e) =>
       window.addEventListener(e, loadMap, { once: true, passive: true })
     );
 
-    // フォールバック: 操作がなくても8秒後には読み込む
-    const timer = setTimeout(loadMap, 8000);
-
     return () => {
-      clearTimeout(timer);
       events.forEach((e) => window.removeEventListener(e, loadMap));
     };
   }, []);
@@ -52,13 +42,11 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
   return (
     <div className='flex flex-col bg-background text-foreground'>
       {/* Hero Map Section */}
-      <Suspense fallback={<HeroPreview />}>
-        {shouldLoadMap ? (
-          <HeroMapSection initialSpots={initialSpots} />
-        ) : (
-          <HeroPreview />
-        )}
-      </Suspense>
+      {MapComponent ? (
+        <MapComponent initialSpots={initialSpots} />
+      ) : (
+        <HeroPreview />
+      )}
 
       {/* About Section */}
       <AboutSection />
