@@ -8,7 +8,7 @@ import { Info, BookHeart, MapPin } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 const activeClassNames = 'text-blue-500 dark:text-blue-400';
-const inactiveClassNames = 'text-gray-600 dark:text-gray-400';
+const inactiveClassNames = 'text-gray-700 dark:text-gray-400';
 
 type TabLinkProps = {
   href: string;
