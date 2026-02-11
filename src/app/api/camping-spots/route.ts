@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import CampingSpot, { ICampingSpot } from '@/lib/models/CampingSpot';
 import { ensureDbConnection } from '@/lib/database';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(geoJSON);
   } catch (error) {
-    console.error('Error fetching camping spots:', error);
+    logger.error(error instanceof Error ? error : new Error('Error fetching camping spots'));
     return NextResponse.json(
       { error: 'Failed to fetch camping spots' },
       { status: 500 }

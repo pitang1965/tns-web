@@ -4,6 +4,7 @@ import { createItinerary, getItineraries } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { auth0 } from '@/lib/auth0';
 import { canCreateItinerary } from '@/lib/userUtils';
+import { logger } from '@/lib/logger';
 
 export async function createItineraryAction(data: ClientItineraryInput) {
   try {
@@ -54,7 +55,7 @@ export async function createItineraryAction(data: ClientItineraryInput) {
 
     return { success: true, id: createdItinerary.id };
   } catch (error) {
-    console.error('Error: creating itinerary:', error);
+    logger.error(error instanceof Error ? error : new Error('Error creating itinerary'));
     return { success: false, error: 'Failed to create itinerary' };
   }
 }

@@ -3,6 +3,7 @@ import { ensureDbConnection } from '@/lib/database';
 import { getDb } from '@/lib/mongodb';
 import CampingSpot from '@/lib/models/CampingSpot';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,7 @@ export async function GET() {
       submissions: submissionCount,
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    logger.error(error instanceof Error ? error : new Error('Error fetching stats'));
     return NextResponse.json(
       { error: 'Failed to fetch statistics' },
       { status: 500 }

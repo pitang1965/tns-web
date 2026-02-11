@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import CampingSpot from '@/lib/models/CampingSpot';
 import { ensureDbConnection } from '@/lib/database';
+import { logger } from '@/lib/logger';
 
 const BASE_URL = 'https://tabi.over40web.club';
 
@@ -80,7 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticPages, ...campingSpotPages];
   } catch (error) {
-    console.error('Error generating sitemap:', error);
+    logger.error(error instanceof Error ? error : new Error('Error generating sitemap'));
     // エラー時は静的ページのみ返す
     return staticPages;
   }

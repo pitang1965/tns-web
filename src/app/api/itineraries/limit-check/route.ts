@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 import { getItineraries } from '@/lib/itineraries';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error checking itinerary limit:', error);
+    logger.error(error instanceof Error ? error : new Error('Error checking itinerary limit'));
     return NextResponse.json(
       { error: '制限チェックに失敗しました' },
       { status: 500 }

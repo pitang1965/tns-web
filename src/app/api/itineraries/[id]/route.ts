@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { logger } from '@/lib/logger';
 import {
   ServerItineraryDocument,
   toClientItinerary,
@@ -46,9 +47,10 @@ export async function GET(
 
     return NextResponse.json(clientItinerary);
   } catch (error) {
-    console.error('Error fetching itinerary: ', error);
-    console.error('Request params:', params);
-    console.error('Request URL:', request.url);
+    logger.error(
+      error instanceof Error ? error : new Error('Error fetching itinerary'),
+      { url: request.url }
+    );
     return NextResponse.json(
       { error: 'Error fetching itinerary' },
       { status: 500 }

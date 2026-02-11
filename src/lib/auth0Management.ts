@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 type Auth0ManagementToken = {
   access_token: string;
   token_type: string;
@@ -45,7 +47,9 @@ export class Auth0ManagementClient {
       const data: Auth0ManagementToken = await response.json();
       return data.access_token;
     } catch (error) {
-      console.error('Error getting Auth0 management token:', error);
+      logger.error(
+        error instanceof Error ? error : new Error('Error getting Auth0 management token'),
+      );
       throw error;
     }
   }
@@ -95,7 +99,9 @@ export class Auth0ManagementClient {
         newUsersThisMonth: newThisMonth,
       };
     } catch (error) {
-      console.error('Error getting user stats:', error);
+      logger.error(
+        error instanceof Error ? error : new Error('Error getting user stats'),
+      );
       throw error;
     }
   }
@@ -115,16 +121,18 @@ export class Auth0ManagementClient {
       );
 
       if (!response.ok) {
-        console.warn(
-          `Failed to get user count since ${since}: ${response.status}`
-        );
+        logger.warn(`Failed to get user count since ${since.toISOString()}`, {
+          status: response.status,
+        });
         return 0;
       }
 
       const data = await response.json();
       return data.total || 0;
     } catch (error) {
-      console.error(`Error getting user count since ${since}:`, error);
+      logger.error(
+        error instanceof Error ? error : new Error(`Error getting user count since ${since.toISOString()}`),
+      );
       return 0;
     }
   }

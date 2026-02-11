@@ -3,6 +3,7 @@
 import { updateItinerary } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { auth0 } from '@/lib/auth0';
+import { logger } from '@/lib/logger';
 
 export async function updateItineraryAction(
   id: string,
@@ -60,7 +61,7 @@ export async function updateItineraryAction(
 
     return { success: true, id: updatedItinerary.id };
   } catch (error) {
-    console.error('Error updating itinerary:', error);
+    logger.error(error instanceof Error ? error : new Error('Error updating itinerary'), { id });
     return {
       success: false,
       error:

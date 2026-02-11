@@ -3,6 +3,7 @@
 import { auth0 } from '@/lib/auth0';
 import { ObjectId } from 'mongodb';
 import { getDb } from '@/lib/mongodb';
+import { logger } from '@/lib/logger';
 
 export async function deleteItinerary(id: string) {
   const session = await auth0.getSession();
@@ -24,7 +25,7 @@ export async function deleteItinerary(id: string) {
 
     return { success: true, message: 'Itinerary deleted successfully' };
   } catch (error) {
-    console.error('Error deleting itinerary:', error);
+    logger.error(error instanceof Error ? error : new Error('Error deleting itinerary'), { id });
     return { success: false, message: 'Error deleting itinerary' };
   }
 }

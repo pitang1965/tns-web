@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDb } from '@/lib/mongodb';
+import { logger } from '@/lib/logger';
 import {
   ServerItineraryDocument,
   ServerItineraryInsertDocument,
@@ -72,7 +73,7 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    console.error('Error in getItineraries:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in getItineraries'));
     return [];
   }
 }
@@ -91,7 +92,7 @@ export async function getPublicItineraries(): Promise<
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    console.error('Error in getPublicItineraries:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in getPublicItineraries'));
     // Facebook Webview やネットワークエラーに対するフォールバック
     // 空配列を返してページは正常に表示させる
     return [];
@@ -129,7 +130,7 @@ export async function getItineraryById(
     // toClientItinerary関数を使用して変換
     return toClientItinerary(itinerary);
   } catch (error) {
-    console.error('Error in getItineraryById:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in getItineraryById'), { id });
     return null;
   }
 }
@@ -207,7 +208,7 @@ export async function getItineraryWithDay(
 
     return { metadata, dayPlan };
   } catch (error) {
-    console.error('Error in getItineraryWithDay:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in getItineraryWithDay'), { id, dayIndex });
     return null;
   }
 }
@@ -287,7 +288,7 @@ export async function updateItinerary(
 
     return toClientItinerary(updatedWithStringId);
   } catch (error) {
-    console.error('Error in updateItinerary:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in updateItinerary'), { id });
     throw error;
   }
 }
@@ -305,7 +306,7 @@ export async function getAllItineraries(): Promise<ClientItineraryDocument[]> {
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    console.error('Error in getAllItineraries:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in getAllItineraries'));
     return [];
   }
 }

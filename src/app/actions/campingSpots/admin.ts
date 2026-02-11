@@ -8,6 +8,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './auth';
+import { logger } from '@/lib/logger';
 import { convertFormDataToCampingSpot } from './helpers';
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
@@ -264,14 +265,10 @@ export async function getCampingSpotById(id: string) {
     // Return properly serialized data
     return JSON.parse(JSON.stringify(spot));
   } catch (error) {
-    // Log detailed error information for debugging
-    console.error('Error in getCampingSpotById:', {
-      id,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      userAgent:
-        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
-    });
+    logger.error(
+      error instanceof Error ? error : new Error('Error in getCampingSpotById'),
+      { id }
+    );
 
     // Always throw a proper Error object, never undefined
     if (error instanceof Error) {

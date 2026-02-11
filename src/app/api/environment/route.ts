@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error in /api/environment:', error);
+    logger.error(error instanceof Error ? error : new Error('Error in /api/environment'));
     // エラー時は unknown を返す
     return NextResponse.json({ environment: 'unknown' }, { status: 200 });
   }

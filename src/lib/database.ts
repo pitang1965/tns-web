@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { logger } from '@/lib/logger';
 
 /**
  * Ensures that a MongoDB connection is established
@@ -46,12 +47,10 @@ export async function ensureDbConnection() {
       });
     }
   } catch (error) {
-    console.error('Failed to establish MongoDB connection:', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      readyState: mongoose.connection.readyState,
-      userAgent:
-        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
-    });
+    logger.error(
+      error instanceof Error ? error : new Error('Failed to establish MongoDB connection'),
+      { readyState: mongoose.connection.readyState }
+    );
     throw new Error(
       `Database connection failed: ${
         error instanceof Error ? error.message : 'Unknown error'

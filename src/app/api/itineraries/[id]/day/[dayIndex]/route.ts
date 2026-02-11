@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { logger } from '@/lib/logger';
 
 // ObjectIdの検証関数
 function isValidObjectId(id: string): boolean {
@@ -178,7 +179,7 @@ export async function GET(
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching day data: ', error);
+    logger.error(error instanceof Error ? error : new Error('Error fetching day data'));
     return NextResponse.json(
       { error: 'Error fetching day data' },
       { status: 500 }

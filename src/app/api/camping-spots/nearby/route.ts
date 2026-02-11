@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import CampingSpot, { ICampingSpot } from '@/lib/models/CampingSpot';
 import { ensureDbConnection } from '@/lib/database';
 import { calculateDistance } from '@/lib/utils/distance';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -128,7 +129,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(nearbySpots);
   } catch (error) {
-    console.error('Error fetching nearby spots:', error);
+    logger.error(error instanceof Error ? error : new Error('Error fetching nearby spots'));
     return NextResponse.json(
       { error: '近隣スポットの取得に失敗しました' },
       { status: 500 }
