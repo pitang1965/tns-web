@@ -66,6 +66,7 @@ export function FixedActionButtons({
           <TooltipTrigger
             onClick={(e) => onBack(e)}
             disabled={disabled}
+            aria-label="戻る"
             className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer active:scale-95 transition-transform'
           >
             <ArrowLeft className='h-5 w-5' />
@@ -85,6 +86,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onShare}
                 disabled={isShareDisabled}
+                aria-label="旅程を共有"
                 className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-transform ${isShareDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}`}
               >
                 <Share2 className='h-5 w-5' />
@@ -104,6 +106,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onEdit}
                 disabled={disabled}
+                aria-label="編集"
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-secondary hover:bg-secondary/80 cursor-pointer active:scale-95 transition-transform'
               >
                 <Pencil className='h-5 w-5' />
@@ -118,6 +121,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onDelete}
                 disabled={disabled}
+                aria-label="削除"
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer active:scale-95 transition-transform'
               >
                 <Trash2 className='h-5 w-5' />
@@ -132,6 +136,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onAdd}
                 disabled={disabled}
+                aria-label="追加"
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer active:scale-95 transition-transform'
               >
                 <Plus className='h-5 w-5' />
@@ -152,6 +157,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={onDelete}
                 disabled={disabled}
+                aria-label="削除"
                 className='inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-destructive hover:bg-destructive/90 text-destructive-foreground cursor-pointer active:scale-95 transition-transform'
               >
                 <Trash2 className='h-5 w-5' />
@@ -166,6 +172,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onSave(e)}
                 disabled={disabled}
+                aria-label={disabled ? '保存中' : '保存'}
                 className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110 cursor-pointer'}`}
               >
                 {disabled ? (
@@ -190,6 +197,7 @@ export function FixedActionButtons({
               <TooltipTrigger
                 onClick={(e) => onCreate(e)}
                 disabled={disabled}
+                aria-label={disabled ? '作成中' : '作成'}
                 className={`inline-flex items-center justify-center rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90 hover:scale-110 cursor-pointer'}`}
               >
                 {disabled ? (

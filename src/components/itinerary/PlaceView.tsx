@@ -49,6 +49,7 @@ export const PlaceView: React.FC<PlaceProps> = ({
           href={url}
           target='_blank'
           rel='noopener noreferrer'
+          aria-label={name || 'リンクを開く'}
           className='font-medium text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1'
         >
           {name}
@@ -63,6 +64,7 @@ export const PlaceView: React.FC<PlaceProps> = ({
             strokeLinecap='round'
             strokeLinejoin='round'
             className='inline-block'
+            aria-hidden='true'
           >
             <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' />
             <polyline points='15 3 21 3 21 9' />
