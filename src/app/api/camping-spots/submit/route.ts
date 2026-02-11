@@ -3,6 +3,7 @@ import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
 import mailerSend from '@/lib/mailersend';
+import { logger } from '@/lib/logger';
 import { calculateDistance } from '@/lib/utils/distance';
 
 
@@ -105,22 +106,26 @@ export async function POST(request: NextRequest) {
     await newSubmission.save();
 
     // Send email notification to admin
-    if (process.env.MAILERSEND_API_TOKEN && process.env.ADMIN_EMAIL) {
-      try {
-        await mailerSend.sendCampingSpotSubmission({
-          name: validatedData.name,
-          prefecture: validatedData.prefecture,
-          address: validatedData.address,
-          type: validatedData.type,
-          submitterName: validatedData.submitterName,
-          submitterEmail: validatedData.submitterEmail,
-          adminEmail: process.env.ADMIN_EMAIL,
-          submissionId: newSubmission._id.toString(),
-        });
-      } catch (emailError) {
-        console.error('Failed to send notification email:', emailError);
-        // Continue with the response even if email fails
+    if (process.env.ADMIN_EMAIL) {
+      const result = await mailerSend.sendCampingSpotSubmission({
+        name: validatedData.name,
+        prefecture: validatedData.prefecture,
+        address: validatedData.address,
+        type: validatedData.type,
+        submitterName: validatedData.submitterName,
+        submitterEmail: validatedData.submitterEmail,
+        adminEmail: process.env.ADMIN_EMAIL,
+        submissionId: newSubmission._id.toString(),
+      });
+
+      if (!result.success) {
+        logger.error(
+          new Error(`[車中泊スポット投稿] 管理者通知メール送信失敗: ${result.error}`),
+          { submissionId: newSubmission._id.toString(), isConfigError: result.isConfigError }
+        );
       }
+    } else {
+      logger.warn('[車中泊スポット投稿] ADMIN_EMAILが未設定のため通知メールをスキップしました');
     }
 
     return NextResponse.json(
@@ -131,8 +136,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Submission error:', error);
-
     if (error instanceof Error) {
       // Validation error
       if (error.name === 'ZodError') {
@@ -156,6 +159,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    logger.error(
+      error instanceof Error ? error : new Error('Submission error'),
+    );
     return NextResponse.json(
       {
         error: '投稿処理でエラーが発生しました',

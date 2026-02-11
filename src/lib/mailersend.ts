@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 type EmailData = {
   to: string;
   subject: string;
@@ -13,6 +15,7 @@ type MailerSendResponse = {
   success: boolean;
   message?: string;
   error?: string;
+  isConfigError?: boolean;
 };
 
 export class MailerSendClient {
@@ -33,6 +36,14 @@ export class MailerSendClient {
   }
 
   async sendEmail(emailData: EmailData): Promise<MailerSendResponse> {
+    if (!this.apiToken) {
+      return {
+        success: false,
+        error: 'メール送信サービスのAPIキーが設定されていません',
+        isConfigError: true,
+      };
+    }
+
     try {
       const payload = {
         from: emailData.from || this.defaultFrom,
@@ -58,9 +69,49 @@ export class MailerSendClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        const status = response.status;
+
+        if (status === 401 || status === 403) {
+          logger.error(
+            new Error(`[MailerSend] 認証エラー (HTTP ${status}): APIキーが無効です`),
+            { status, to: emailData.to }
+          );
+          return {
+            success: false,
+            error: 'メール送信サービスの認証に失敗しました。APIキーを確認してください。',
+            isConfigError: true,
+          };
+        }
+
+        if (status === 422) {
+          logger.error(
+            new Error(`[MailerSend] バリデーションエラー (HTTP ${status})`),
+            { status, to: emailData.to, detail: errorData.message }
+          );
+          return {
+            success: false,
+            error: `メール送信のパラメータが不正です: ${errorData.message || '送信元アドレスやドメインの設定を確認してください'}`,
+            isConfigError: true,
+          };
+        }
+
+        if (status === 429) {
+          logger.warn(`[MailerSend] レート制限 (HTTP ${status})`, {
+            to: emailData.to,
+          });
+          return {
+            success: false,
+            error: 'メール送信のレート制限に達しました。しばらく時間をおいて再度お試しください。',
+          };
+        }
+
+        logger.error(
+          new Error(`[MailerSend] メール送信失敗 (HTTP ${status})`),
+          { status, to: emailData.to, detail: errorData.message }
+        );
         return {
           success: false,
-          error: errorData.message || `HTTP Error: ${response.status}`,
+          error: `メール送信に失敗しました (HTTP ${status})`,
         };
       }
 
@@ -69,10 +120,15 @@ export class MailerSendClient {
         message: 'Email sent successfully',
       };
     } catch (error) {
+      logger.error(
+        error instanceof Error
+          ? error
+          : new Error('[MailerSend] ネットワークエラー'),
+        { to: emailData.to }
+      );
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'メール送信サービスへの接続に失敗しました',
       };
     }
   }

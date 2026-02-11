@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mailerSend from '@/lib/mailersend';
+import { logger } from '@/lib/logger';
 import { auth0Management } from '@/lib/auth0Management';
 
 export async function POST(request: NextRequest) {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail) {
-      console.error('ADMIN_EMAIL environment variable not set');
+      logger.error(new Error('ADMIN_EMAIL environment variable not set'));
       return NextResponse.json(
         { error: 'Admin email not configured' },
         { status: 500 }
@@ -28,31 +29,34 @@ export async function POST(request: NextRequest) {
     try {
       userStats = await auth0Management.getUserStats();
     } catch (error) {
-      console.warn('Failed to get user stats:', error);
+      logger.warn('Failed to get user stats', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       userStats = null;
     }
 
     // メール送信を試行（失敗してもWebhookは成功扱い）
-    try {
-      const result = await mailerSend.sendUserRegistrationNotification({
-        userId,
-        userEmail: email,
-        userName: name || 'Unknown',
-        createdAt,
-        adminEmail,
-        userStats,
-      });
+    const result = await mailerSend.sendUserRegistrationNotification({
+      userId,
+      userEmail: email,
+      userName: name || 'Unknown',
+      createdAt,
+      adminEmail,
+      userStats,
+    });
 
-      if (!result.success) {
-        console.error('Failed to send user registration notification:', result.error);
-      }
-    } catch (error) {
-      console.error('Error sending user registration notification:', error);
+    if (!result.success) {
+      logger.error(
+        new Error(`[ユーザー登録通知] メール送信失敗: ${result.error}`),
+        { userId, isConfigError: result.isConfigError }
+      );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in user registration webhook:', error);
+    logger.error(
+      error instanceof Error ? error : new Error('Error in user registration webhook'),
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

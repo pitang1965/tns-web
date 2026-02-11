@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contactFormSchema } from '@/data/schemas/contactSchema';
 import mailerSend from '@/lib/mailersend';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,18 +9,10 @@ export async function POST(request: NextRequest) {
 
     const validatedData = contactFormSchema.parse(body);
 
-    if (!process.env.MAILERSEND_API_TOKEN) {
-      console.error('MAILERSEND_API_TOKEN is not configured');
-      return NextResponse.json(
-        { error: 'メール送信サービスの設定に問題があります' },
-        { status: 500 }
-      );
-    }
-
     if (!process.env.ADMIN_EMAIL) {
-      console.error('ADMIN_EMAIL is not configured');
+      logger.error(new Error('ADMIN_EMAIL is not configured'));
       return NextResponse.json(
-        { error: '管理者メールアドレスが設定されていません' },
+        { error: 'メール送信サービスの設定に問題があります。管理者にお問い合わせください。' },
         { status: 500 }
       );
     }
@@ -33,9 +26,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.success) {
-      console.error('Failed to send email:', result.error);
+      const userMessage = result.isConfigError
+        ? 'メール送信サービスの設定に問題があります。管理者にお問い合わせください。'
+        : 'メール送信に失敗しました。しばらく時間をおいて再度お試しください。';
       return NextResponse.json(
-        { error: result.error || 'メール送信に失敗しました' },
+        { error: userMessage },
         { status: 500 }
       );
     }
@@ -46,8 +41,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Contact form error:', error);
-
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
         { error: '入力内容に不備があります' },
@@ -55,6 +48,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    logger.error(
+      error instanceof Error ? error : new Error('Contact form error'),
+    );
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
       { status: 500 }
