@@ -12,16 +12,16 @@ export function Footer() {
       <div className='flex flex-wrap gap-4 mb-2 text-sm text-muted-foreground'>
         <Link
           href='/privacy'
-          className='hover:text-foreground transition-colors'
+          className='underline underline-offset-4 hover:text-foreground transition-colors'
         >
           プライバシーポリシー
         </Link>
-        <Link href='/terms' className='hover:text-foreground transition-colors'>
+        <Link href='/terms' className='underline underline-offset-4 hover:text-foreground transition-colors'>
           利用規約
         </Link>
         <Link
           href='/contact'
-          className='hover:text-foreground transition-colors'
+          className='underline underline-offset-4 hover:text-foreground transition-colors'
         >
           お問い合わせ
         </Link>

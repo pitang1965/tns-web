@@ -54,7 +54,7 @@ export function Navigation() {
       </NavLink>
       {userIsAdmin ? (
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
+          <DropdownMenuTrigger aria-label='旅程メニュー' className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
             <BookHeart className='mr-1' />
             旅程
             <ChevronDown className='ml-1 h-3 w-3' />
@@ -85,7 +85,7 @@ export function Navigation() {
       )}
       {userIsAdmin ? (
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
+          <DropdownMenuTrigger aria-label='車中泊スポットメニュー' className='flex items-center hover:underline hover:decoration-1 hover:underline-offset-4 hover:decoration-current outline-none cursor-pointer'>
             <MapPin className='mr-1' />
             車中泊スポット
             <ChevronDown className='ml-1 h-3 w-3' />

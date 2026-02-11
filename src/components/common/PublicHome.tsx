@@ -65,18 +65,18 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
 
       {/* Footer Legal */}
       <div className='py-8 px-6 bg-gray-50 dark:bg-gray-800'>
-        <SmallText className='text-center text-gray-500 dark:text-gray-400'>
+        <SmallText className='text-center text-gray-600 dark:text-gray-400'>
           続行することにより、本アプリの
           <a
             href='/terms'
-            className='text-blue-600 dark:text-blue-400 hover:underline mx-1'
+            className='text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1'
           >
             利用規約
           </a>
           及び
           <a
             href='/privacy'
-            className='text-blue-600 dark:text-blue-400 hover:underline mx-1'
+            className='text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1'
           >
             プライバシーに関する声明
           </a>

@@ -35,7 +35,7 @@ export default function SNSSection() {
               <h3 className='text-xl font-semibold mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors'>
                 アライアズキ🫘車中泊
               </h3>
-              <p className='text-sm text-gray-500 dark:text-gray-400 mb-2'>
+              <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>
                 @araiazuki930
               </p>
               <div className='flex items-center gap-1 text-blue-600 dark:text-blue-400 text-sm font-medium'>
