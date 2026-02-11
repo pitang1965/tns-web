@@ -296,7 +296,7 @@ export default function ShachuHakuSubmissionForm({
           >
             {/* 基本情報 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>基本情報</h3>
+              <h2 className='text-lg font-semibold'>基本情報</h2>
 
               <FormField
                 control={form.control}
@@ -439,7 +439,7 @@ export default function ShachuHakuSubmissionForm({
 
             {/* 位置情報 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>位置情報</h3>
+              <h2 className='text-lg font-semibold'>位置情報</h2>
 
               <div className='space-y-2'>
                 <FormLabel>座標</FormLabel>
@@ -578,7 +578,7 @@ export default function ShachuHakuSubmissionForm({
 
             {/* 施設情報 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>施設情報</h3>
+              <h2 className='text-lg font-semibold'>施設情報</h2>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <FormField
@@ -621,7 +621,7 @@ export default function ShachuHakuSubmissionForm({
 
             {/* 料金情報 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>料金情報</h3>
+              <h2 className='text-lg font-semibold'>料金情報</h2>
               <p className='text-sm text-gray-600 dark:text-gray-400'>
                 無料の場合は空欄のままにしてください
               </p>
@@ -678,7 +678,7 @@ export default function ShachuHakuSubmissionForm({
 
             {/* 投稿者情報 */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>投稿者情報（任意）</h3>
+              <h2 className='text-lg font-semibold'>投稿者情報（任意）</h2>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <FormField

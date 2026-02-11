@@ -32,7 +32,7 @@ export function ShachuHakuSpotItem({
     >
       <div className='flex justify-between items-start'>
         <div className='flex-1'>
-          <h3 className='font-semibold text-lg'>{spot.name}</h3>
+          <h2 className='font-semibold text-lg'>{spot.name}</h2>
           <p className='text-gray-600 dark:text-gray-300'>{spot.address}</p>
           {spot.updatedAt && (
             <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
