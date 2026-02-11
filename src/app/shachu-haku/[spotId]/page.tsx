@@ -76,6 +76,9 @@ export const generateMetadata = async ({
       twitter: {
         card: 'summary',
       },
+      alternates: {
+        canonical: `/shachu-haku/${spotId}`,
+      },
     };
   } catch (error) {
     console.error('Error generating metadata:', error);

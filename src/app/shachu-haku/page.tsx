@@ -85,6 +85,9 @@ export async function generateMetadata({
       title,
       description,
     },
+    alternates: {
+      canonical: '/shachu-haku',
+    },
   };
 }
 

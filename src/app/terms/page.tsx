@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: '利用規約 | 車旅のしおり',
   description: '車旅のしおりの利用規約',
+  alternates: {
+    canonical: '/terms',
+  },
 };
 
 export default function TermsPage() {

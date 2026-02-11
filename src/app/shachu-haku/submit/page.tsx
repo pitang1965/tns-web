@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
   },
+  alternates: {
+    canonical: '/shachu-haku/submit',
+  },
 };
 
 export default function CampingSpotSubmitPage() {

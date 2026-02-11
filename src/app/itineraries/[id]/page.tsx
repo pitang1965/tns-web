@@ -81,6 +81,9 @@ export const generateMetadata = async ({
     twitter: {
       card: 'summary_large_image',
     },
+    alternates: {
+      canonical: `/itineraries/${id}`,
+    },
   };
 };
 

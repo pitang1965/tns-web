@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     description:
       '車中泊はどこでできる？10の質問に答えて、あなたにぴったりの車中泊スポットを見つけよう。',
   },
+  alternates: {
+    canonical: '/shachu-haku/shindan',
+  },
 };
 
 // FAQ構造化データ - 質問形式の検索に強い

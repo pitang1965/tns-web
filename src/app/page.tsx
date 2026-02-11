@@ -1,10 +1,15 @@
+import type { Metadata } from 'next';
 import { auth0 } from '@/lib/auth0';
 import PublicHome from '@/components/common/PublicHome';
 import LoggedInHome from '@/components/common/LoggedInHome';
 import CampingSpot, { ICampingSpot } from '@/lib/models/CampingSpot';
 import { ensureDbConnection } from '@/lib/database';
 
-// metadataはsrc\app\layout.tsxのものを使用する
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+  },
+};
 
 async function getFeaturedSpots() {
   try {

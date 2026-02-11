@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
+  alternates: {
+    canonical: '/itineraries',
+  },
 };
 
 export default async function Itineraries() {

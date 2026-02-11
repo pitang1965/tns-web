@@ -6,6 +6,9 @@ import { ArrowLeft, MapPin, MousePointer2, Filter, Search, Share2, Tent } from '
 export const metadata: Metadata = {
   title: 'ヘルプ | 車旅のしおり',
   description: '車旅のしおりの使い方',
+  alternates: {
+    canonical: '/help',
+  },
 };
 
 export default function HelpPage() {
