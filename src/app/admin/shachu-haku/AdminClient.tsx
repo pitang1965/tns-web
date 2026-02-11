@@ -388,6 +388,7 @@ export default function AdminClient() {
             <Button
               onClick={() => setShowImportDialog(true)}
               variant='outline'
+              disabled={loading}
               className='hidden md:flex cursor-pointer'
             >
               <Upload className='w-4 h-4 mr-2' />
@@ -396,6 +397,7 @@ export default function AdminClient() {
             <Button
               onClick={exportToCSV}
               variant='outline'
+              disabled={loading}
               className='hidden md:flex cursor-pointer'
             >
               <Download className='w-4 h-4 mr-2' />
@@ -403,6 +405,7 @@ export default function AdminClient() {
             </Button>
             <Button
               onClick={() => openForm()}
+              disabled={loading}
               className='hidden md:flex cursor-pointer'
             >
               <Plus className='w-4 h-4 mr-2' />
@@ -412,6 +415,7 @@ export default function AdminClient() {
         </div>
         <Button
           onClick={() => openForm()}
+          disabled={loading}
           className='md:hidden w-full cursor-pointer'
         >
           <Plus className='w-4 h-4 mr-2' />
