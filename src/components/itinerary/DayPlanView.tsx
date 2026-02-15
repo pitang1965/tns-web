@@ -186,16 +186,21 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
 
           {/* 位置情報許可ボタン */}
           {shouldShowLocationPermissionButton && (
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setShowLocationAlert(true)}
-              disabled={loading}
-              className='flex items-center gap-1 cursor-pointer'
-            >
-              <MapPin className='h-4 w-4' />
-              <span>{loading ? '取得中...' : '位置情報を許可'}</span>
-            </Button>
+            <div className='flex flex-col items-start gap-1'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setShowLocationAlert(true)}
+                disabled={loading}
+                className='flex items-center gap-1 cursor-pointer'
+              >
+                <MapPin className='h-4 w-4' />
+                <span>{loading ? '取得中...' : '位置情報を許可'}</span>
+              </Button>
+              <p className='text-xs text-muted-foreground'>
+                現在位置からのルート検索が利用できます
+              </p>
+            </div>
           )}
         </div>
       </div>
