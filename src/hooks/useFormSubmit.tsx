@@ -34,8 +34,10 @@ export function useFormSubmit({
 }: UseFormSubmitProps): {
   submitForm: (data: ShachuHakuFormData) => Promise<void>;
   loading: boolean;
+  showReloadDialog: boolean;
 } {
   const [loading, setLoading] = useState(false);
+  const [showReloadDialog, setShowReloadDialog] = useState(false);
 
   /**
    * フォーム送信処理
@@ -198,10 +200,14 @@ export function useFormSubmit({
       console.error('Save error:', error);
 
       // エラーの種類を判定して適切なメッセージを表示
-      const { errorTitle, errorMessage, errorDetails } = getErrorDetails(
-        error,
-        isEdit
-      );
+      const { errorTitle, errorMessage, errorDetails, isVersionSkew } =
+        getErrorDetails(error, isEdit);
+
+      if (isVersionSkew) {
+        // バージョンスキューエラーはダイアログで表示
+        setShowReloadDialog(true);
+        return;
+      }
 
       toast({
         title: errorTitle,
@@ -221,5 +227,5 @@ export function useFormSubmit({
     }
   };
 
-  return { submitForm, loading };
+  return { submitForm, loading, showReloadDialog };
 }

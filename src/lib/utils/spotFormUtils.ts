@@ -106,16 +106,25 @@ export function getErrorDetails(
   errorTitle: string;
   errorMessage: string;
   errorDetails: string;
+  isVersionSkew: boolean;
 } {
   let errorTitle = 'エラー';
   let errorMessage = '';
   let errorDetails = '';
+  let isVersionSkew = false;
 
   if (error instanceof Error) {
     const errorText = error.message.toLowerCase();
 
+    // Server Actionバージョンスキューエラー（デプロイ後の不整合）
+    if (errorText.includes('not found on the server')) {
+      errorTitle = 'ページの更新が必要です';
+      errorMessage = 'アプリが更新されました。ページを再読み込みしてください。';
+      errorDetails = '入力したデータは自動的に保存されています。';
+      isVersionSkew = true;
+    }
     // MongoDBタイムアウトエラー
-    if (
+    else if (
       errorText.includes('timeout') ||
       errorText.includes('timed out') ||
       errorText.includes('server selection')
@@ -161,5 +170,5 @@ export function getErrorDetails(
     errorDetails = '入力したデータは自動的に保存されています。';
   }
 
-  return { errorTitle, errorMessage, errorDetails };
+  return { errorTitle, errorMessage, errorDetails, isVersionSkew };
 }

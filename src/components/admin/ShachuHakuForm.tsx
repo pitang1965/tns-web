@@ -43,7 +43,16 @@ import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { MissingFieldsConfirmDialog } from './MissingFieldsConfirmDialog';
 import { CloseConfirmDialog } from './CloseConfirmDialog';
-import { DEFAULT_FORM_VALUES, AUTO_SAVE_KEY } from '@/constants/formDefaults';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import { DEFAULT_FORM_VALUES } from '@/constants/formDefaults';
 import { convertSpotToFormValues } from '@/lib/utils/spotFormUtils';
 
 type NavigationData = {
@@ -125,7 +134,7 @@ export default function ShachuHakuForm({
   });
 
   // フォーム送信フック
-  const { submitForm, loading } = useFormSubmit({
+  const { submitForm, loading, showReloadDialog } = useFormSubmit({
     isEdit,
     spot,
     toast,
@@ -445,6 +454,23 @@ export default function ShachuHakuForm({
         onOpenChange={setShowCloseConfirmDialog}
         onConfirm={confirmClose}
       />
+
+      {/* バージョンスキューエラー（デプロイ後の不整合）ダイアログ */}
+      <AlertDialog open={showReloadDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ページの更新が必要です</AlertDialogTitle>
+            <AlertDialogDescription>
+              アプリが更新されました。入力データは自動保存されています。ページを再読み込みしてください。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => window.location.reload()}>
+              再読み込み
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
