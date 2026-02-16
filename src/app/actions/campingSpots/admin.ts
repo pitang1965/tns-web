@@ -10,6 +10,7 @@ import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './auth';
 import { logger } from '@/lib/logger';
 import { convertFormDataToCampingSpot } from './helpers';
+import { escapeRegex } from '@/lib/utils/searchNormalize';
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
@@ -106,7 +107,7 @@ export async function getCampingSpotsByBounds(
   };
 
   if (options?.searchTerm) {
-    query.name = { $regex: options.searchTerm, $options: 'i' };
+    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -120,7 +121,7 @@ export async function getCampingSpotsByBounds(
   // Get total count without bounds filter for "全○○件中" display
   const totalQuery: Record<string, unknown> = {};
   if (options?.searchTerm) {
-    totalQuery.name = { $regex: options.searchTerm, $options: 'i' };
+    totalQuery.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
   }
   if (options?.prefecture && options.prefecture !== 'all') {
     totalQuery.prefecture = options.prefecture;
@@ -157,7 +158,7 @@ export async function getCampingSpotsWithPagination(
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    query.name = { $regex: options.searchTerm, $options: 'i' };
+    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -212,7 +213,7 @@ export async function getCampingSpotIdsOnly(options?: {
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    query.name = { $regex: options.searchTerm, $options: 'i' };
+    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {

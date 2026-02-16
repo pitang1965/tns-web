@@ -93,7 +93,7 @@ export function keywordToFuzzyRegex(keyword: string): string {
 }
 
 /**
- * 正規表現のメタ文字をエスケープ
+ * 正規表現のメタ文字をエスケープ（1文字用）
  */
 function escapeRegexChar(char: string): string {
   // 正規表現で特別な意味を持つ文字をエスケープ
@@ -102,6 +102,13 @@ function escapeRegexChar(char: string): string {
     return '\\' + char;
   }
   return char;
+}
+
+/**
+ * 正規表現のメタ文字をエスケープ（文字列用）
+ */
+export function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
