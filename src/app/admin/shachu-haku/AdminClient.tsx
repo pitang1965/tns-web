@@ -17,7 +17,7 @@ import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { CSVImportResult, getCampingSpotsForExport } from '../../actions/campingSpots/csv';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
-import { celebrateSubmission } from '@/lib/confetti';
+import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 import { useLocationNavigation } from '@/hooks/useLocationNavigation';
@@ -253,9 +253,10 @@ export default function AdminClient() {
     });
 
   const handleFormSuccess = async (createdId?: string) => {
-    // 新規作成時は紙吹雪でお祝い
+    // 新規作成時は紙吹雪と祝福音でお祝い
     if (isNewSpot) {
       celebrateSubmission();
+      playCelebrationSound();
     }
 
     // 新規作成時は編集ページにリダイレクト
