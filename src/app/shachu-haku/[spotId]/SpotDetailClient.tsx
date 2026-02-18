@@ -18,6 +18,7 @@ import {
   Map,
   ExternalLink,
   Plus,
+  Search,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -261,6 +262,20 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
             >
               <Navigation className='w-4 h-4 mr-2' />
               ルート検索
+            </Button>
+            <Button
+              onClick={() => {
+                const searchQuery = [spot.name, spot.address].filter(Boolean).join(' ');
+                const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                window.open(url, '_blank');
+              }}
+              variant='outline'
+              size='sm'
+              className='cursor-pointer'
+              title='名称と住所で Google AI モード検索'
+            >
+              <Search className='w-4 h-4 mr-2' />
+              AI検索
             </Button>
             <Button onClick={showOnMap} variant='outline' size='sm' className='cursor-pointer'>
               <Map className='w-4 h-4 mr-2' />
