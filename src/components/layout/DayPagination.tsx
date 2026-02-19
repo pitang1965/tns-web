@@ -258,14 +258,6 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     return items;
   };
 
-  // デバッグ用のログ
-  useEffect(() => {
-    console.log('DayPagination render:', {
-      dayPlans,
-      currentPage,
-      actualTotalDays,
-    });
-  }, [dayPlans, currentPage, actualTotalDays]);
 
   return (
     <>
