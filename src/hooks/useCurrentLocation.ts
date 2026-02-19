@@ -11,6 +11,7 @@ type UseCurrentLocationResult = {
   error: string | null;
   permissionGranted: boolean;
   requestLocation: () => void;
+  clearError: () => void;
 };
 
 /**
@@ -44,6 +45,10 @@ export function useCurrentLocation(): UseCurrentLocationResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [permissionGranted, setPermissionGranted] = useState(false);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -105,5 +110,6 @@ export function useCurrentLocation(): UseCurrentLocationResult {
     error,
     permissionGranted,
     requestLocation,
+    clearError,
   };
 }

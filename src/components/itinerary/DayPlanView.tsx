@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ActivityView } from './ActivityView';
 import { H3, LargeText, Text } from '@/components/common/Typography';
@@ -43,15 +43,7 @@ const HOME_PROXIMITY_THRESHOLD = 50;
 export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const [showFullMap, setShowFullMap] = useState(false);
   const [showLocationAlert, setShowLocationAlert] = useState(false);
-  const [showLocationError, setShowLocationError] = useState(false);
-  const { currentLocation, permissionGranted, loading, error, requestLocation } = useCurrentLocation();
-
-  // エラーが発生したらエラーダイアログを表示
-  useEffect(() => {
-    if (error) {
-      setShowLocationError(true);
-    }
-  }, [error]);
+  const { currentLocation, permissionGranted, loading, error, requestLocation, clearError } = useCurrentLocation();
 
   // 日付表示の生成
   const dayDisplay = day.date
@@ -277,7 +269,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
       </AlertDialog>
 
       {/* 位置情報エラーのAlertDialog */}
-      <AlertDialog open={showLocationError} onOpenChange={setShowLocationError}>
+      <AlertDialog open={!!error} onOpenChange={(open) => { if (!open) clearError(); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>位置情報を取得できませんでした</AlertDialogTitle>
@@ -289,7 +281,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowLocationError(false)}>
+            <AlertDialogAction onClick={clearError}>
               閉じる
             </AlertDialogAction>
           </AlertDialogFooter>
