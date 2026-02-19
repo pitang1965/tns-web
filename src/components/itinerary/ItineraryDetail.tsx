@@ -158,7 +158,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
               totalDays={metadata.totalDays}
               currentDayPlan={currentDayPlan}
               renderDayPlan={renderDayPlan}
-              initialSelectedDay={dayParamHook.selectedDay + 1}
+              currentPage={dayParamHook.selectedDay + 1}
               onDayChange={dayParamHook.handleDayChange}
             />
           ) : (

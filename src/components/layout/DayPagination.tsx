@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -18,7 +17,7 @@ type DayPaginationProps = {
   currentDayPlan?: DayPlan | null;
   renderDayPlan: (dayPlan: DayPlan, index: number) => React.ReactNode;
   onDayChange?: (day: number) => void;
-  initialSelectedDay?: number;
+  currentPage: number;
 }
 export const DayPagination: React.FC<DayPaginationProps> = ({
   dayPlans,
@@ -26,74 +25,15 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
   currentDayPlan,
   renderDayPlan,
   onDayChange,
-  initialSelectedDay = 1,
+  currentPage,
 }) => {
-  // 直前のページ操作を追跡するref
-  const isUserNavigation = useRef(false);
-
   // 実際の日数を計算（dayPlansの長さまたはtotalDaysから）
   const actualTotalDays = dayPlans?.length || totalDays || 1;
 
-  // 初期選択日が有効な範囲内になるように調整
-  const validInitialDay = Math.min(
-    Math.max(initialSelectedDay, 1),
-    actualTotalDays
-  );
-
-  const [currentPage, setCurrentPage] = useState(validInitialDay);
-
-  // デバッグ用
-  const prevInitialSelectedDayRef = useRef(initialSelectedDay);
-
-  // initialSelectedDayが変更されたときにcurrentPageを更新
-  // ただし、ユーザーがページを変更した場合は反映しない
-  useEffect(() => {
-    // ユーザーによるナビゲーションの場合は処理をスキップ
-    if (isUserNavigation.current) {
-      isUserNavigation.current = false;
-      return;
-    }
-
-    // 前回のinitialSelectedDayと現在の値が異なる場合のみ処理（親コンポーネントからの変更）
-    if (initialSelectedDay !== prevInitialSelectedDayRef.current) {
-      prevInitialSelectedDayRef.current = initialSelectedDay;
-
-      if (initialSelectedDay) {
-        const validDay = Math.min(
-          Math.max(initialSelectedDay, 1),
-          actualTotalDays
-        );
-        setCurrentPage(validDay);
-      }
-    }
-  }, [initialSelectedDay, actualTotalDays]);
-
-  // コンポーネントがマウントされた時に初期ページを親に通知
-  useEffect(() => {
-    if (onDayChange && initialSelectedDay !== currentPage) {
-      onDayChange(currentPage);
-    }
-  }, []);
-
   // ページを変更する関数
   const goToPage = (page: number) => {
-    console.log('ページに移動:', page, '合計ページ数:', actualTotalDays);
-
-    // ユーザーのナビゲーションであることをマーク
-    isUserNavigation.current = true;
-
-    // 妥当性チェック（範囲を確認）
-    if (page < 1 || page > actualTotalDays) {
-      console.error('無効なページ番号:', page);
-      return;
-    }
-
-    setCurrentPage(page);
-
-    // 親コンポーネントに現在のページを通知
-    if (onDayChange) {
-      onDayChange(page);
-    }
+    if (page < 1 || page > actualTotalDays) return;
+    onDayChange?.(page);
   };
 
   // 前のページに移動
@@ -122,7 +62,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
           <PaginationItem key={page}>
             <PaginationLink
               onClick={(e) => {
-                e.preventDefault(); // デフォルトのリンク動作を防止
+                e.preventDefault();
                 goToPage(page);
               }}
               isActive={page === currentPage}
@@ -188,7 +128,6 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       );
       for (let i = actualTotalDays - 3; i < actualTotalDays; i++) {
         if (i > 1) {
-          // 最初のページと重複しないように
           items.push(
             <PaginationItem key={i}>
               <PaginationLink
@@ -214,7 +153,6 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
       );
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
         if (i > 1 && i < actualTotalDays) {
-          // 最初と最後のページと重複しないように
           items.push(
             <PaginationItem key={i}>
               <PaginationLink
@@ -244,7 +182,6 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
           <PaginationLink
             onClick={(e) => {
               e.preventDefault();
-              console.log('最終日クリック:', actualTotalDays);
               goToPage(actualTotalDays);
             }}
             isActive={actualTotalDays === currentPage}

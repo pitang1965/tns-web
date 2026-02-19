@@ -129,9 +129,11 @@ export function ItineraryForm({
   };
 
   // day パラメータが有効範囲外の場合の処理
-  if (dayParamHook.isDayOutOfRange) {
-    dayParamHook.redirectToFirstDay();
-  }
+  useEffect(() => {
+    if (dayParamHook.isDayOutOfRange) {
+      dayParamHook.redirectToFirstDay();
+    }
+  }, [dayParamHook.isDayOutOfRange]);
 
   return (
     <>
@@ -165,7 +167,7 @@ export function ItineraryForm({
                 <DayPagination
                   dayPlans={watch('dayPlans')}
                   onDayChange={dayParamHook.handleDayChange}
-                  initialSelectedDay={dayParamHook.selectedDay + 1}
+                  currentPage={dayParamHook.selectedDay + 1}
                   renderDayPlan={(dayPlan, index) => (
                     <>
                       {/* 各ページの上部に現在の日数表示を追加 */}
