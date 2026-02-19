@@ -1,121 +1,60 @@
-'use client';
-
-import { use, useState, useEffect } from 'react';
-import { useSearchParams, usePathname } from 'next/navigation';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { ItineraryToc } from '@/components/layout/ItineraryToc';
-import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
-import { updateItineraryAction } from '@/actions/updateItinerary';
-import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
-import { useGetItinerary } from '@/hooks/useGetItinerary';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { auth0 } from '@/lib/auth0';
+import { getItineraryById } from '@/lib/itineraries';
+import { EditItineraryClient } from '@/components/itinerary/forms/EditItineraryClient';
 import { LoadingState } from '@/components/common/LoadingState';
-import { useRecentUrls } from '@/hooks/useRecentUrls';
-import { clearItineraryCache } from '@/lib/cacheUtils';
 
-type EditItineraryPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default withPageAuthRequired(function EditItineraryPage({
+export const generateMetadata = async ({
   params,
-}: EditItineraryPageProps) {
-  const { id } = use(params);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const { addUrl } = useRecentUrls();
-  const { itinerary, loading, error } = useGetItinerary(id);
-
-  // ページタイトルを動的に設定
-  useEffect(() => {
-    if (itinerary?.title) {
-      const dayParam = searchParams.get('day');
-      const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
-      document.title = `${itinerary.title}${dayDisplay} | 車旅のしおり`;
-    }
-  }, [itinerary?.title, searchParams]);
-
-  // 閲覧履歴に追加
-  useEffect(() => {
-    if (itinerary?.title) {
-      const dayParam = searchParams.get('day');
-      const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
-      const title = `${itinerary.title}${dayDisplay}`;
-      addUrl(pathname, title);
-    }
-  }, [itinerary?.title, searchParams, pathname, addUrl]);
-
-  const handleSubmit = async (data: ClientItineraryInput) => {
-    console.log('Submitting form data for update:', data);
-    setIsSubmitting(true);
-
-    try {
-      const result = await updateItineraryAction(id, data);
-      console.log('Update action result:', result);
-      setIsSubmitting(false);
-      if (!result) {
-        return {
-          success: false,
-          error: 'サーバーからの応答がありませんでした。',
-        };
-      }
-      // 旅程更新成功後にキャッシュをクリア
-      if (result.success) {
-        await clearItineraryCache();
-      }
-      return result;
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setIsSubmitting(false);
-      return {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : '予期しないエラーが発生しました',
-      };
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className='container mx-auto p-4'>
-        <LoadingState variant='inline' />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='container mx-auto p-4'>エラーが発生しました: {error}</div>
-    );
-  }
+  searchParams,
+}: PageProps): Promise<Metadata> => {
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
+  const itinerary = await getItineraryById(id);
 
   if (!itinerary) {
-    return (
-      <div className='container mx-auto p-4'>旅程が見つかりませんでした。</div>
-    );
+    return {
+      title: '旅程が見つかりません | 車旅のしおり',
+    };
   }
 
+  const dayParam = resolvedSearchParams.day
+    ? parseInt(resolvedSearchParams.day as string)
+    : null;
+  const totalDays = itinerary.dayPlans?.length || 1;
+  const dayDisplay = dayParam && totalDays > 1 ? ` ${dayParam}日目` : '';
+
+  return {
+    title: `${itinerary.title}${dayDisplay} 編集 | 車旅のしおり`,
+  };
+};
+
+export default async function EditItineraryPage({ params }: PageProps) {
+  const { id } = await params;
+  const session = await auth0.getSession();
+
+  if (!session) {
+    redirect(`/auth/login?returnTo=/itineraries/${id}/edit`);
+  }
+
+  const itineraryPromise = getItineraryById(id);
+
   return (
-    <main className='min-w-[320px]'>
-      <div className='flex flex-col lg:flex-row gap-6'>
-        <div className='hidden lg:block w-1/4 max-w-[250px]'>
-          <ItineraryToc initialItinerary={itinerary} />
+    <Suspense
+      fallback={
+        <div className='container mx-auto p-4'>
+          <LoadingState variant='inline' />
         </div>
-        <div className='flex-1 min-w-0 sm:min-w-[320px]'>
-          <ItineraryForm
-            initialData={itinerary}
-            onSubmit={handleSubmit}
-            title='旅程編集'
-            description='旅程の詳細を編集してください。* の付いた項目は入力必須です。'
-            submitLabel='更新'
-            isSubmitting={isSubmitting}
-          />
-        </div>
-      </div>
-    </main>
+      }
+    >
+      <EditItineraryClient itineraryPromise={itineraryPromise} id={id} />
+    </Suspense>
   );
-});
+}
