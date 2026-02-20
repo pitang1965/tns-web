@@ -73,7 +73,6 @@ export function ItineraryForm({
 
   // useDayParamフックを使用して日付パラメータを管理
   const dayParamHook = useDayParam(
-    itineraryId || 'new',
     (watch('numberOfDays') || 1) - 1
   );
 
@@ -92,18 +91,6 @@ export function ItineraryForm({
       itineraryId,
       formModified,
     });
-
-  // 日数の変更に応じて選択中の日を調整する
-  useEffect(() => {
-    const numberOfDays = watch('numberOfDays') || 0;
-    const maxDayIndex = numberOfDays - 1;
-
-    if (dayParamHook.selectedDay > maxDayIndex && maxDayIndex >= 0) {
-      if (maxDayIndex !== dayParamHook.selectedDay) {
-        dayParamHook.handleDayChange(maxDayIndex);
-      }
-    }
-  }, [watch('numberOfDays')]);
 
   useEffect(() => {
     // 1日目表示時は基本情報を展開、それ以外では折りたたむ
@@ -128,12 +115,6 @@ export function ItineraryForm({
     );
   };
 
-  // day パラメータが有効範囲外の場合の処理
-  useEffect(() => {
-    if (dayParamHook.isDayOutOfRange) {
-      dayParamHook.redirectToFirstDay();
-    }
-  }, [dayParamHook.isDayOutOfRange]);
 
   return (
     <>

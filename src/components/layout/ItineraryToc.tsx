@@ -5,10 +5,7 @@ import { useAtom } from 'jotai';
 import { H3, Text, SmallText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  ItineraryMetadata,
-  itineraryMetadataAtom,
-} from '@/data/store/itineraryAtoms';
+import { ItineraryMetadata, itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
 import {
   Collapsible,
   CollapsibleContent,
@@ -35,16 +32,11 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [metadata, setMetadata] = useAtom(itineraryMetadataAtom);
-  const [topOffset, setTopOffset] = useState(192); // デフォルト値
-  const [headerHeight, setHeaderHeight] = useState(64); // ヘッダー高さ
+  // 編集ページではフォーム変更をリアルタイム反映するためatom優先、閲覧ページはprops使用
+  const [atomItinerary] = useAtom(itineraryMetadataAtom);
+  const displayData = atomItinerary.title ? atomItinerary : initialItinerary;
 
-  // コンポーネントがマウントされたときに初期データをロード
-  useEffect(() => {
-    if (initialItinerary && Object.keys(initialItinerary).length > 0) {
-      setMetadata(initialItinerary as ItineraryMetadata);
-    }
-  }, [initialItinerary, setMetadata]);
+  const [topOffset, setTopOffset] = useState(192); // デフォルト値
 
   // 動的にヘッダー＋広告の高さを計算し、スクロールに応じて調整
   useEffect(() => {
@@ -54,7 +46,6 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
 
       if (header) {
         const hHeight = header.offsetHeight;
-        setHeaderHeight(hHeight);
 
         if (adContainer) {
           const adHeight = adContainer.offsetHeight;
@@ -109,8 +100,7 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   };
 
   // 表示用のデータを取得
-  const summaries =
-    initialItinerary?.dayPlanSummaries || metadata.dayPlanSummaries || [];
+  const summaries = displayData?.dayPlanSummaries || [];
 
   return (
     <div className='w-80 shrink-0'>

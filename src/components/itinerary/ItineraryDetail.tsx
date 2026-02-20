@@ -36,7 +36,6 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
   // 日付パラメータの管理
   const dayParamHook = useDayParam(
-    id,
     (metadataOnly?.dayPlans?.length || 1) - 1
   );
 
@@ -119,10 +118,6 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     );
   }
 
-  // day パラメータが有効範囲外の場合の処理
-  if (dayParamHook.isDayOutOfRange) {
-    dayParamHook.redirectToFirstDay();
-  }
 
   return (
     <main className='container mx-auto p-4'>

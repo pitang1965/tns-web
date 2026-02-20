@@ -217,10 +217,6 @@ export default function ShachuHakuClient() {
     enableDuplicateCheck: true,
   });
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, typeFilter, clientFilters]);
 
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {
@@ -466,14 +462,14 @@ export default function ShachuHakuClient() {
       <div className='w-full'>
         <ShachuHakuFilters
           searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
+          onSearchTermChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
           typeFilter={typeFilter}
-          onTypeFilterChange={setTypeFilter}
+          onTypeFilterChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}
           onPrefectureJump={handlePrefectureJump}
           onRegionJump={handleRegionJump}
           onCurrentLocation={handleCurrentLocation}
           clientFilters={clientFilters}
-          onClientFiltersChange={setClientFilters}
+          onClientFiltersChange={(v) => { setClientFilters(v); setCurrentPage(1); }}
           onResetAll={handleResetAllFromHook}
         />
 

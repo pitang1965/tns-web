@@ -8,11 +8,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
  * URL上は1ベース（day=1, day=2...）
  * 内部処理は0ベース（0, 1, 2...）
  *
- * @param itineraryId 旅程ID
  * @param maxDays 最大日数（範囲外の値を検証するため、0ベース）
  * @returns 現在の日付と日付変更関数のオブジェクト
  */
-export function useDayParam(itineraryId: string, maxDays: number = 0) {
+export function useDayParam(maxDays: number = 0) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -35,11 +34,19 @@ export function useDayParam(itineraryId: string, maxDays: number = 0) {
     }
   }, [dayParam]);
 
+  // 選択日が範囲外の場合、最終日に自動クランプ
+  useEffect(() => {
+    if (selectedDay > maxDays && maxDays >= 0) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('day', String(maxDays + 1)); // URL は1ベース
+      router.push(url.toString());
+    }
+  }, [selectedDay, maxDays, router]);
+
   // 日付切り替え時にURLを更新する関数
   const handleDayChange = (day: number) => {
     // DayPaginationからの入力は既に1ベース（例: 14日目 = 14）
     // URLも1ベース表記なので、そのまま使用
-    console.log('handleDayChange が呼び出されました。入力値:', day);
     const url = new URL(window.location.href);
     url.searchParams.set('day', day.toString());
 
@@ -47,20 +54,8 @@ export function useDayParam(itineraryId: string, maxDays: number = 0) {
     router.push(url.toString());
   };
 
-  // 選択された日が範囲外かをチェック（内部は0ベース）
-  const isDayOutOfRange = selectedDay > maxDays;
-
-  // 無効な日付の場合、1日目にリダイレクトする関数（URLは1ベース）
-  const redirectToFirstDay = () => {
-    if (maxDays >= 0) {
-      router.push(`/itineraries/${itineraryId}?day=1`);
-    }
-  };
-
   return {
     selectedDay, // 0ベース
-    handleDayChange, // 0ベースの値を受け取る
-    isDayOutOfRange,
-    redirectToFirstDay,
+    handleDayChange, // 1ベースの値を受け取る
   };
 }

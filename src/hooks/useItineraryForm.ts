@@ -45,10 +45,19 @@ export function useItineraryForm({
 
   const isCreating = submitLabel === '作成';
 
-  // フォーム初期化
+  // フォーム初期化（startDateのISO形式をYYYY-MM-DDに正規化）
+  const defaultValues = initialData
+    ? {
+        ...initialData,
+        startDate: initialData.startDate?.includes('T')
+          ? initialData.startDate.split('T')[0]
+          : initialData.startDate,
+      }
+    : DEFAULT_ITINERARY;
+
   const methods = useForm<ClientItineraryInput>({
     resolver: zodResolver(clientItinerarySchema),
-    defaultValues: initialData || DEFAULT_ITINERARY,
+    defaultValues,
     mode: 'onSubmit',
   });
 

@@ -1,18 +1,12 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { useEnvironment } from '@/hooks/useEnvironment';
+import { useIsClient } from '@/hooks/useIsClient';
 
 function EnvironmentClass({ children }: { children: React.ReactNode }) {
   const environment = useEnvironment();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    if (environment === 'development') {
-      console.log('Development mode detected - applying dev-mode class');
-    }
-  }, [environment]);
+  const isClient = useIsClient();
 
   if (!isClient) {
     return <>{children}</>;
