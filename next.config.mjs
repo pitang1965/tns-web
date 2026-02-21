@@ -308,6 +308,11 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
+  },
   reactStrictMode: true,
   eslint: {
     // ESLint のエラーを無視してビルドを続行
