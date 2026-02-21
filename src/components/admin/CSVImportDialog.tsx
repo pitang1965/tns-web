@@ -34,7 +34,13 @@ export default function CSVImportDialog({
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile && selectedFile.type === 'text/csv') {
+    const isCSV = selectedFile && (
+      selectedFile.type === 'text/csv' ||
+      selectedFile.type === 'application/vnd.ms-excel' ||
+      selectedFile.type === 'application/csv' ||
+      selectedFile.name.endsWith('.csv')
+    );
+    if (isCSV) {
       setFile(selectedFile);
       setResult(null);
     } else {
@@ -68,9 +74,10 @@ export default function CSVImportDialog({
       }
     } catch (error) {
       console.error('Import error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       toast({
-        title: 'エラー',
-        description: 'インポート処理でエラーが発生しました',
+        title: 'インポートエラー',
+        description: errorMessage || 'インポート処理でエラーが発生しました',
         variant: 'destructive',
       });
     } finally {
