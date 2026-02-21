@@ -1,4 +1,5 @@
 import { CampingSpot, CampingSpotType } from '@/data/schemas/campingSpot';
+export { isValidCoordinate } from '@/lib/coordinates';
 
 // Type別のデフォルト治安レベル
 const getDefaultSecurityLevel = (type: CampingSpotType): number => {

@@ -3,22 +3,18 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams, usePathname } from 'next/navigation';
-import { formatFacilityDistance } from '@/lib/formatDistance';
 import { formatDate } from '@/lib/date';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
   ArrowLeft,
   Share2,
-  MapPin,
-  Car,
-  Zap,
-  Shield,
-  Volume2,
   Navigation,
   Map,
-  ExternalLink,
+  MapPin,
   Plus,
   Search,
+  Shield,
+  Volume2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -26,6 +22,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { AdLink } from '@/components/shachu-haku/AdLink';
+import { SpotBasicInfoCard } from '@/components/shachu-haku/SpotBasicInfoCard';
+import { SpotFacilitiesCard } from '@/components/shachu-haku/SpotFacilitiesCard';
+import { SpotSecurityCard } from '@/components/shachu-haku/SpotSecurityCard';
+import { SpotNightNoiseCard } from '@/components/shachu-haku/SpotNightNoiseCard';
+import { SpotAmenitiesCard } from '@/components/shachu-haku/SpotAmenitiesCard';
+import { SpotRestrictionsCard } from '@/components/shachu-haku/SpotRestrictionsCard';
 
 import {
   CampingSpotWithId,
@@ -37,8 +39,6 @@ import {
 } from '@/lib/campingSpotUtils';
 import {
   isFacebookBrowser,
-  isInAppBrowser,
-  safeWindowOpen,
   safeSocialShare,
   safeClipboardWrite,
 } from '@/lib/browserDetection';
@@ -47,6 +47,10 @@ import {
   getRatingColor,
   getPricingColor,
 } from '@/lib/spotColorUtils';
+import {
+  openCurrentLocationRoute,
+  showSpotOnMap,
+} from '@/lib/mapNavigation';
 
 // Dynamically import the map components to avoid SSR issues
 const FacilityMap = dynamic(
@@ -77,117 +81,10 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
     }
   }, [spot, pathname, addUrl]);
 
-  // 座標の有効性をチェック
-  const isValidCoordinate = (
-    coords: [number, number] | undefined | null
-  ): coords is [number, number] => {
-    return (
-      coords != null &&
-      Array.isArray(coords) &&
-      coords.length === 2 &&
-      typeof coords[0] === 'number' &&
-      typeof coords[1] === 'number' &&
-      !isNaN(coords[0]) &&
-      !isNaN(coords[1]) &&
-      isFinite(coords[0]) &&
-      isFinite(coords[1]) &&
-      coords[0] >= -180 &&
-      coords[0] <= 180 &&
-      coords[1] >= -90 &&
-      coords[1] <= 90
-    );
-  };
-
-  const openCurrentLocationRoute = () => {
-    if (!isValidCoordinate(spot.coordinates)) {
-      toast({
-        title: 'エラー',
-        description:
-          '座標情報が正しく設定されていないため、ルート検索を実行できません。',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const [longitude, latitude] = spot.coordinates;
-
-    try {
-      if (
-        typeof navigator !== 'undefined' &&
-        /iPhone|iPad|iPod/i.test(navigator.userAgent)
-      ) {
-        // iOS: Google Maps app を優先
-        const mapUrl = `comgooglemaps://?daddr=${latitude},${longitude}&directionsmode=driving`;
-
-        // In-App Browserでは直接的なlocation.href変更を避ける
-        if (isInAppBrowser()) {
-          safeWindowOpen(mapUrl, '_self');
-
-          // フォールバック: Google Maps Web（遅延なし）
-          setTimeout(() => {
-            const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-            safeWindowOpen(webUrl, '_blank');
-          }, 500);
-        } else {
-          window.location.href = mapUrl;
-
-          // フォールバック: Google Maps Web
-          setTimeout(() => {
-            window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-          }, 2000);
-        }
-      } else if (
-        typeof navigator !== 'undefined' &&
-        /Android/i.test(navigator.userAgent)
-      ) {
-        // Android: Google Maps Navigation
-        const mapUrl = `google.navigation:q=${latitude},${longitude}&mode=d`;
-
-        if (isInAppBrowser()) {
-          safeWindowOpen(mapUrl, '_self');
-        } else {
-          window.location.href = mapUrl;
-        }
-      } else {
-        // Desktop or other: Open in new tab
-        const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-        safeWindowOpen(url, '_blank');
-      }
-    } catch (error) {
-      console.error('Error opening route:', error);
-
-      // 最終フォールバック: Google Maps Web
-      const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode=driving`;
-      safeWindowOpen(fallbackUrl, '_blank');
-
-      toast({
-        title: '注意',
-        description: 'ルート検索を外部ブラウザで開きます',
-      });
-    }
-  };
-
-  const showOnMap = () => {
-    if (!isValidCoordinate(spot.coordinates)) {
-      toast({
-        title: 'エラー',
-        description:
-          '座標情報が正しく設定されていないため、地図を表示できません。',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const [longitude, latitude] = spot.coordinates;
-    const url = `https://www.google.com/maps/place/${latitude},${longitude}`;
-    safeWindowOpen(url, '_blank');
-  };
-
   const handleShare = async () => {
     const url = window.location.href;
     const title = `${spot.name} - 車中泊スポット`;
 
-    // In-App Browserの警告表示（Facebook等）
     if (isFacebookBrowser()) {
       toast({
         title: 'ブラウザ環境について',
@@ -197,24 +94,16 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
       });
     }
 
-    // 安全なソーシャル共有を試行
     const shareSuccess = await safeSocialShare({ title, url });
+    if (shareSuccess) return;
 
-    if (shareSuccess) {
-      // 共有成功
-      return;
-    }
-
-    // Web Share API非対応またはエラーの場合はクリップボードにコピー
     const clipboardSuccess = await safeClipboardWrite(url);
-
     if (clipboardSuccess) {
       toast({
         title: '共有リンクをコピーしました',
         description: 'URLがクリップボードにコピーされました',
       });
     } else {
-      // 最終フォールバック: 手動コピー用のアラート
       toast({
         title: '共有リンク',
         description: `以下のURLを手動でコピーしてください: ${url}`,
@@ -230,7 +119,6 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
     <div className='container mx-auto p-6 space-y-6'>
       {/* ヘッダー */}
       <div className='space-y-4'>
-        {/* 戻るボタン */}
         <div>
           <Link href={isFromList ? '/shachu-haku?tab=list' : '/shachu-haku'}>
             <Button variant='outline' size='sm'>
@@ -240,7 +128,6 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
           </Link>
         </div>
 
-        {/* タイトルとボタン */}
         <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4'>
           <div>
             <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
@@ -255,7 +142,7 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
           </div>
           <div className='flex flex-wrap gap-2'>
             <Button
-              onClick={openCurrentLocationRoute}
+              onClick={() => openCurrentLocationRoute(spot.coordinates, toast)}
               variant='outline'
               size='sm'
               className='cursor-pointer'
@@ -265,7 +152,9 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
             </Button>
             <Button
               onClick={() => {
-                const searchQuery = [spot.name, spot.address].filter(Boolean).join(' ');
+                const searchQuery = [spot.name, spot.address]
+                  .filter(Boolean)
+                  .join(' ');
                 const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                 window.open(url, '_blank');
               }}
@@ -277,11 +166,21 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               <Search className='w-4 h-4 mr-2' />
               AI検索
             </Button>
-            <Button onClick={showOnMap} variant='outline' size='sm' className='cursor-pointer'>
+            <Button
+              onClick={() => showSpotOnMap(spot.coordinates, toast)}
+              variant='outline'
+              size='sm'
+              className='cursor-pointer'
+            >
               <Map className='w-4 h-4 mr-2' />
               地図で表示
             </Button>
-            <Button onClick={handleShare} variant='outline' size='sm' className='cursor-pointer'>
+            <Button
+              onClick={handleShare}
+              variant='outline'
+              size='sm'
+              className='cursor-pointer'
+            >
               <Share2 className='w-4 h-4 mr-2' />
               共有
             </Button>
@@ -322,7 +221,6 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* メイン情報 */}
         <div className='lg:col-span-2 space-y-6'>
-          {/* 施設地図 */}
           <Card>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
@@ -335,7 +233,6 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
             </CardContent>
           </Card>
 
-          {/* 詳細情報 */}
           {spot.notes && (
             <Card>
               <CardHeader>
@@ -381,343 +278,12 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
 
         {/* サイドバー */}
         <div className='space-y-6'>
-          {/* 基本情報 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>基本情報</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='grid grid-cols-2 gap-4 text-sm'>
-                <div>
-                  <div className='font-semibold text-gray-900 dark:text-gray-100'>
-                    都道府県
-                  </div>
-                  <div className='text-gray-700 dark:text-gray-300'>
-                    {spot.prefecture}
-                  </div>
-                </div>
-                <div>
-                  <div className='font-semibold text-gray-900 dark:text-gray-100'>
-                    種別
-                  </div>
-                  <div className='text-gray-700 dark:text-gray-300'>
-                    {CampingSpotTypeLabels[spot.type]}
-                  </div>
-                </div>
-                <div>
-                  <div className='font-semibold text-gray-900 dark:text-gray-100'>
-                    料金
-                  </div>
-                  <div className='text-gray-700 dark:text-gray-300'>
-                    {spot.pricing.isFree
-                      ? '無料'
-                      : spot.pricing.pricePerNight
-                      ? `¥${spot.pricing.pricePerNight}/泊`
-                      : '有料：？円/泊'}
-                  </div>
-                </div>
-                {spot.capacity && (
-                  <div>
-                    <div className='font-semibold text-gray-900 dark:text-gray-100'>
-                      収容台数
-                    </div>
-                    <div className='text-gray-700 dark:text-gray-300'>
-                      {spot.capacity}台
-                    </div>
-                  </div>
-                )}
-                {spot.elevation && (
-                  <div>
-                    <div className='font-semibold text-gray-900 dark:text-gray-100'>
-                      標高
-                    </div>
-                    <div className='text-gray-700 dark:text-gray-300'>
-                      {spot.elevation}m
-                    </div>
-                  </div>
-                )}
-              </div>
-              {spot.url && (
-                <div className='pt-2 border-t border-gray-200 dark:border-gray-700'>
-                  <div className='font-semibold text-gray-900 dark:text-gray-100 mb-1'>
-                    参考URL
-                  </div>
-                  <a
-                    href={spot.url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm break-all'
-                  >
-                    <ExternalLink className='w-3 h-3 flex-shrink-0' />
-                    公式サイト・詳細情報
-                  </a>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* 周辺施設 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>周辺施設</CardTitle>
-            </CardHeader>
-            <CardContent className='space-y-3'>
-              {spot.distanceToToilet != null && (
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    トイレ
-                  </span>
-                  <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatFacilityDistance(spot.distanceToToilet)}
-                  </span>
-                </div>
-              )}
-              {spot.distanceToBath != null && (
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    入浴施設
-                  </span>
-                  <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatFacilityDistance(spot.distanceToBath)}
-                  </span>
-                </div>
-              )}
-              {spot.distanceToConvenience != null && (
-                <div className='flex justify-between items-center'>
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    コンビニ
-                  </span>
-                  <span className='font-semibold text-gray-900 dark:text-gray-100'>
-                    {formatFacilityDistance(spot.distanceToConvenience)}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* セキュリティ情報 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <Shield className='w-5 h-5' />
-                セキュリティ情報
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-3'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    総合治安レベル
-                  </span>
-                  <Badge
-                    className={`${getRatingColor(securityLevel)} text-white`}
-                  >
-                    {securityLevel}/5
-                  </Badge>
-                </div>
-
-                {spot.security && (
-                  <div className='space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700'>
-                    <div className='text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2'>
-                      セキュリティ設備
-                    </div>
-                    <div className='grid grid-cols-1 gap-2 text-sm'>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.security.hasGate
-                              ? 'bg-green-500'
-                              : 'bg-gray-400'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          ゲート・門扉:{' '}
-                          {spot.security.hasGate ? 'あり' : 'なし'}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.security.hasLighting
-                              ? 'bg-green-500'
-                              : 'bg-gray-400'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          照明設備:{' '}
-                          {spot.security.hasLighting ? '十分' : '暗め'}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.security.hasStaff
-                              ? 'bg-green-500'
-                              : 'bg-gray-400'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          スタッフ常駐:{' '}
-                          {spot.security.hasStaff ? 'あり' : 'なし'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 夜間環境情報 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <Volume2 className='w-5 h-5' />
-                夜間環境情報
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='space-y-3'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    静けさレベル
-                  </span>
-                  <Badge
-                    className={`${getRatingColor(quietnessLevel)} text-white`}
-                  >
-                    {quietnessLevel}/5
-                  </Badge>
-                </div>
-
-                {spot.nightNoise && (
-                  <div className='space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700'>
-                    <div className='text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2'>
-                      騒音環境
-                    </div>
-                    <div className='grid grid-cols-1 gap-2 text-sm'>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.nightNoise.hasNoiseIssues
-                              ? 'bg-red-500'
-                              : 'bg-green-500'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          騒音問題:{' '}
-                          {spot.nightNoise.hasNoiseIssues ? 'あり' : 'なし'}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.nightNoise.nearBusyRoad
-                              ? 'bg-orange-500'
-                              : 'bg-green-500'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          交通量の多い道路:{' '}
-                          {spot.nightNoise.nearBusyRoad ? '近い' : '離れている'}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            spot.nightNoise.isQuietArea
-                              ? 'bg-green-500'
-                              : 'bg-gray-400'
-                          }`}
-                        ></div>
-                        <span className='text-gray-700 dark:text-gray-300'>
-                          静かなエリア:{' '}
-                          {spot.nightNoise.isQuietArea ? 'はい' : 'いいえ'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 設備 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>設備</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='grid grid-cols-2 gap-3 text-sm'>
-                <div className='flex items-center gap-2'>
-                  <Car
-                    className={`w-4 h-4 ${
-                      spot.hasRoof ? 'text-green-600' : 'text-gray-400'
-                    }`}
-                  />
-                  <span
-                    className={
-                      spot.hasRoof
-                        ? 'text-green-700 dark:text-green-400'
-                        : 'text-gray-500 dark:text-gray-400'
-                    }
-                  >
-                    屋根{spot.hasRoof ? 'あり' : 'なし'}
-                  </span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Zap
-                    className={`w-4 h-4 ${
-                      spot.hasPowerOutlet ? 'text-green-600' : 'text-gray-400'
-                    }`}
-                  />
-                  <span
-                    className={
-                      spot.hasPowerOutlet
-                        ? 'text-green-700 dark:text-green-400'
-                        : 'text-gray-500 dark:text-gray-400'
-                    }
-                  >
-                    電源{spot.hasPowerOutlet ? 'あり' : 'なし'}
-                  </span>
-                </div>
-              </div>
-
-              {spot.amenities && spot.amenities.length > 0 && (
-                <div className='mt-3'>
-                  <div className='font-semibold text-gray-900 dark:text-gray-100 mb-2'>
-                    その他設備
-                  </div>
-                  <div className='text-sm text-gray-700 dark:text-gray-300'>
-                    {spot.amenities.join('、')}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* 制限事項 */}
-          {spot.restrictions && spot.restrictions.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>制限事項</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-1'>
-                  {spot.restrictions.map((restriction, index) => (
-                    <div
-                      key={index}
-                      className='text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2'
-                    >
-                      <span className='text-red-500 mt-1'>•</span>
-                      <span>{restriction}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* 広告リンク */}
+          <SpotBasicInfoCard spot={spot} />
+          <SpotFacilitiesCard spot={spot} />
+          <SpotSecurityCard spot={spot} />
+          <SpotNightNoiseCard spot={spot} />
+          <SpotAmenitiesCard spot={spot} />
+          <SpotRestrictionsCard spot={spot} />
           <div className='flex justify-center'>
             <AdLink
               href='https://amzn.to/45c0kmK'
