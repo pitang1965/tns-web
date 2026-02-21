@@ -182,6 +182,9 @@ export default function CSVImportDialog({
           {/* Results */}
           {result && (
             <div className='space-y-4'>
+              <div className='text-sm text-gray-500 text-right'>
+                {result.totalRows}件中 {result.processedCount}件処理
+              </div>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Card className='bg-green-50 border-green-200'>
                   <CardContent className='p-4 flex items-center gap-3'>
@@ -247,18 +250,15 @@ export default function CSVImportDialog({
                             className='border border-red-200 rounded-lg p-3 bg-red-50'
                           >
                             <div className='flex items-start gap-2'>
-                              <Badge variant='destructive' className='text-xs'>
+                              <Badge variant='destructive' className='text-xs shrink-0'>
                                 行 {error.row}
                               </Badge>
-                              <div className='flex-1'>
-                                <p className='text-sm text-red-800 font-medium'>
-                                  {error.error}
+                              <div className='flex-1 min-w-0'>
+                                <p className='text-sm text-red-800 font-medium truncate'>
+                                  {error.name}
                                 </p>
-                                <p className='text-xs text-red-600 mt-1'>
-                                  データ:{' '}
-                                  {typeof error.data === 'string'
-                                    ? error.data
-                                    : JSON.stringify(error.data)}
+                                <p className='text-xs text-red-600 mt-1 wrap-break-word'>
+                                  {error.error}
                                 </p>
                               </div>
                             </div>

@@ -15,13 +15,15 @@ import { parseCSV } from '@/lib/csv/utils';
 
 export type CSVImportError = {
   row: number;
+  name: string;
   error: string;
-  data: unknown;
 }
 
 export type CSVImportResult = {
   success: number;
   errors: CSVImportError[];
+  totalRows: number;
+  processedCount: number;
 }
 
 export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImportResult> {
@@ -30,22 +32,37 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
 
   const rows = parseCSV(csvData.trim());
   if (rows.length === 0) {
-    return { success: 0, errors: [] };
+    return { success: 0, errors: [], totalRows: 0, processedCount: 0 };
   }
 
   const headers = rows[0];
+  const dataRows = rows.slice(1);
+  const totalRows = dataRows.length;
+
+  console.log(`[CSV Import] Starting: ${totalRows} rows`);
 
   const results: CSVImportResult = {
     success: 0,
     errors: [],
+    totalRows,
+    processedCount: 0,
   };
 
   // Check if headers are in Japanese or English
   const isJapaneseHeaders = headers.includes('名称');
+  const nameIndex = isJapaneseHeaders ? headers.indexOf('名称') : headers.indexOf('name');
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = 0; i < dataRows.length; i++) {
+    const rowNum = i + 2; // 1-indexed, header is row 1
+    results.processedCount = i + 1;
+    const spotName = dataRows[i][nameIndex] || `行 ${rowNum}`;
+
+    if ((i + 1) % 20 === 0 || i === 0) {
+      console.log(`[CSV Import] Row ${i + 1}/${totalRows}: ${spotName}`);
+    }
+
     try {
-      const values = rows[i];
+      const values = dataRows[i];
       const rowData: any = {};
 
       headers.forEach((header, index) => {
@@ -111,9 +128,9 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
           duplicateSpot.coordinates[0]
         );
         results.errors.push({
-          row: i + 1,
-          error: `Duplicate spot found: ${duplicateSpot.name} (${Math.round(distance)}m away)`,
-          data: rowData,
+          row: rowNum,
+          name: spotName,
+          error: `重複スポット: ${duplicateSpot.name} (${Math.round(distance)}m先に存在)`,
         });
         continue;
       }
@@ -124,13 +141,17 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
 
       results.success++;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`[CSV Import] Error at row ${rowNum} "${spotName}": ${errorMessage}`);
       results.errors.push({
-        row: i + 1,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        data: rows[i].join(','),
+        row: rowNum,
+        name: spotName,
+        error: errorMessage,
       });
     }
   }
+
+  console.log(`[CSV Import] Done: ${results.success} success, ${results.errors.length} errors out of ${totalRows}`);
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
