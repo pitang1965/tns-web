@@ -13,7 +13,7 @@ import { logger } from '@/lib/logger';
  */
 export async function ensureDbConnection() {
   try {
-    if (mongoose.connection.readyState === 0) {
+    if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
       // APP_MONGODB_URI を優先して使用（MCPサーバーとの競合を避けるため）
       const uri = process.env.APP_MONGODB_URI || process.env.MONGODB_URI!;
 
@@ -22,8 +22,8 @@ export async function ensureDbConnection() {
         connectTimeoutMS: 10000, // 10 seconds
         socketTimeoutMS: 45000, // 45 seconds
         serverSelectionTimeoutMS: 10000, // 10 seconds
-        maxPoolSize: 10, // Maintain up to 10 socket connections
-        minPoolSize: 2, // Maintain a minimum of 2 socket connections
+        maxPoolSize: 5,
+        minPoolSize: 0,
         autoIndex: process.env.NODE_ENV !== 'production', // 本番環境ではインデックス自動作成を無効化（N+1クエリ防止）
       });
 

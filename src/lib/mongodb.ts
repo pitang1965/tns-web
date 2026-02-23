@@ -20,7 +20,12 @@ function getMongoUri(): string {
 }
 
 const uri = getMongoUri();
-const options = {};
+const options = {
+  maxPoolSize: 5,
+  minPoolSize: 0,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+};
 
 // データベース名を環境変数から取得、またはURIから抽出
 function getDatabaseName(): string {
