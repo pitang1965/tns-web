@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
-import { useMapBoundsLoader } from '@/hooks/useMapBoundsLoader';
+import { useMapBoundsLoader, MAX_LNG_SPAN, MAX_LAT_SPAN } from '@/hooks/useMapBoundsLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -76,6 +76,7 @@ export default function ShachuHakuClient() {
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
     null
   );
+  const [isBoundsTooWide, setIsBoundsTooWide] = useState(false);
 
   // Use orientation hook
   const { isLandscape } = useOrientation();
@@ -129,6 +130,7 @@ export default function ShachuHakuClient() {
       prefectureFilter: 'all',
       typeFilter,
     },
+    onBoundsTooWide: setIsBoundsTooWide,
   });
 
   // Load spots for list view with pagination - NO dependencies
@@ -180,7 +182,12 @@ export default function ShachuHakuClient() {
   const handleBoundsChangeWrapper = useCallback(
     (bounds: { north: number; south: number; east: number; west: number }) => {
       mapBoundsRef.current = bounds;
-      setSavedBounds(bounds); // Save bounds for list view
+      // Only save bounds for list view if within valid range
+      const lngSpan = bounds.east - bounds.west;
+      const latSpan = bounds.north - bounds.south;
+      if (lngSpan <= MAX_LNG_SPAN && latSpan <= MAX_LAT_SPAN) {
+        setSavedBounds(bounds);
+      }
       handleBoundsChange(bounds); // Call hook's handler
     },
     [handleBoundsChange]
@@ -514,6 +521,10 @@ export default function ShachuHakuClient() {
                       {loading ? (
                         <span className='flex items-center gap-2'>
                           読み込み中... <Spinner className='size-4' />
+                        </span>
+                      ) : isBoundsTooWide ? (
+                        <span className='text-amber-600 dark:text-amber-400 text-sm font-medium'>
+                          地図を拡大してください
                         </span>
                       ) : (
                         `表示範囲内: ${visibleSpots.length}件`

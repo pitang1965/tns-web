@@ -6,6 +6,10 @@ import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
 import { parseSearchTermToFuzzyPatterns } from '@/lib/utils/searchNormalize';
 
+// Maximum display range for public users (scraping prevention)
+const MAX_LNG_SPAN = 6;
+const MAX_LAT_SPAN = 4;
+
 // Public function for general users (no authentication required)
 export async function getPublicCampingSpots(filter?: CampingSpotFilter) {
   await ensureDbConnection();
@@ -87,6 +91,11 @@ export async function getPublicCampingSpotsByBounds(
   }
 ) {
   await ensureDbConnection();
+
+  // Reject requests with too-wide bounds (scraping prevention)
+  if (bounds.east - bounds.west > MAX_LNG_SPAN || bounds.north - bounds.south > MAX_LAT_SPAN) {
+    return [];
+  }
 
   const query: Record<string, unknown> = {
     coordinates: {
@@ -171,16 +180,20 @@ export async function getPublicCampingSpotsWithPagination(
     query.type = options.type;
   }
 
-  // Add bounds filter if provided
+  // Add bounds filter if provided (skip if too wide)
   if (options?.bounds) {
-    query.coordinates = {
-      $geoWithin: {
-        $box: [
-          [options.bounds.west, options.bounds.south],
-          [options.bounds.east, options.bounds.north],
-        ],
-      },
-    };
+    const lngSpan = options.bounds.east - options.bounds.west;
+    const latSpan = options.bounds.north - options.bounds.south;
+    if (lngSpan <= MAX_LNG_SPAN && latSpan <= MAX_LAT_SPAN) {
+      query.coordinates = {
+        $geoWithin: {
+          $box: [
+            [options.bounds.west, options.bounds.south],
+            [options.bounds.east, options.bounds.north],
+          ],
+        },
+      };
+    }
   }
 
   const skip = (page - 1) * limit;

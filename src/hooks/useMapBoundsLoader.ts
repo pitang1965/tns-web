@@ -1,6 +1,11 @@
 import { useRef, useCallback } from 'react';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
+// Maximum display range for public users (scraping prevention)
+// Admin uses this hook without onBoundsTooWide, so the limit is not applied
+export const MAX_LNG_SPAN = 6;
+export const MAX_LAT_SPAN = 4;
+
 type Bounds = {
   north: number;
   south: number;
@@ -33,6 +38,7 @@ type UseMapBoundsLoaderOptions = {
     typeFilter: string;
   };
   onLoadSuccess?: (data: CampingSpotWithId[], bounds: Bounds, filters: Filters) => Promise<void>;
+  onBoundsTooWide?: (tooWide: boolean) => void;
 };
 
 /**
@@ -50,12 +56,14 @@ export function useMapBoundsLoader({
   toast,
   filters,
   onLoadSuccess,
+  onBoundsTooWide,
 }: UseMapBoundsLoaderOptions) {
   const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastLoadedBoundsRef = useRef<Bounds | null>(null);
   const initialLoadDoneRef = useRef(false);
   const filtersRef = useRef(filters);
+  const wasBoundsTooWideRef = useRef(false);
 
   // Update filters ref when filters change
   filtersRef.current = filters;
@@ -168,10 +176,29 @@ export function useMapBoundsLoader({
       const isInitialLoad = !initialLoadDoneRef.current;
 
       const executeLoad = () => {
+        // Check if bounds span exceeds the public limit (only when onBoundsTooWide is provided)
+        if (onBoundsTooWide) {
+          const lngSpan = bounds.east - bounds.west;
+          const latSpan = bounds.north - bounds.south;
+          if (lngSpan > MAX_LNG_SPAN || latSpan > MAX_LAT_SPAN) {
+            setSpots([]);
+            if (setTotalCount) setTotalCount(0);
+            setLoading(false);
+            onBoundsTooWide(true);
+            wasBoundsTooWideRef.current = true;
+            initialLoadDoneRef.current = true;
+            return;
+          }
+          onBoundsTooWide(false);
+        }
+
         // Skip loading if zooming in (new bounds are completely within old bounds)
         // because we already have all the data for the visible area
-        // But not on initial load
-        if (!isInitialLoad && isZoomIn(lastLoadedBoundsRef.current, bounds)) {
+        // But not on initial load, and not if we were previously in too-wide state
+        // (spots were cleared, so we must reload)
+        const wasWide = wasBoundsTooWideRef.current;
+        wasBoundsTooWideRef.current = false;
+        if (!wasWide && !isInitialLoad && isZoomIn(lastLoadedBoundsRef.current, bounds)) {
           return; // Skip loading for zoom in
         }
 
