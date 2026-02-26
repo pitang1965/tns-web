@@ -25,7 +25,7 @@ importers:
         version: 4.1.3(react-hook-form@7.66.0(react@19.2.0))
       '@mapbox/mapbox-gl-language':
         specifier: ^1.0.1
-        version: 1.0.1(mapbox-gl@3.18.1)
+        version: 1.0.1(mapbox-gl@3.19.0)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -91,7 +91,7 @@ importers:
         version: 0.562.0(react@19.2.0)
       mapbox-gl:
         specifier: ^3.15.0
-        version: 3.18.1
+        version: 3.19.0
       mongodb:
         specifier: 7.0.0
         version: 7.0.0
@@ -140,7 +140,7 @@ importers:
         version: 1.9.0
       '@types/mapbox-gl':
         specifier: ^3.4.1
-        version: 3.4.1
+        version: 3.5.0
       '@types/node':
         specifier: ^24.9.1
         version: 24.9.1
@@ -1044,10 +1044,6 @@ packages:
 
   '@mapbox/vector-tile@2.0.4':
     resolution: {integrity: sha512-AkOLcbgGTdXScosBWwmmD7cDlvOjkg/DetGva26pIRiZPdeJYjYKarIlb4uxVzi6bwHO6EWH82eZ5Nuv4T5DUg==}
-
-  '@mapbox/whoots-js@3.1.0':
-    resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
-    engines: {node: '>=6.0.0'}
 
   '@mongodb-js/saslprep@1.3.2':
     resolution: {integrity: sha512-QgA5AySqB27cGTXBFmnpifAi7HxoGUeezwo6p9dI03MuDB6Pp33zgclqVb6oVK3j6I9Vesg0+oojW2XxB59SGg==}
@@ -2300,11 +2296,13 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/mapbox-gl@3.4.1':
-    resolution: {integrity: sha512-NsGKKtgW93B+UaLPti6B7NwlxYlES5DpV5Gzj9F75rK5ALKsqSk15CiEHbOnTr09RGbr6ZYiCdI+59NNNcAImg==}
+  '@types/mapbox-gl@3.5.0':
+    resolution: {integrity: sha512-3wVAUTC6q1UKatLP9YxFBnGJWi3neJUF9OKeyRdUf/BsYjZAP35xmZkL4zogVJbO3vdExuSVYCAkzUXjpjdhOg==}
+    deprecated: This is a stub types definition. mapbox-gl provides its own type definitions, so you do not need this installed.
 
-  '@types/mapbox__point-geometry@0.1.4':
-    resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
+  '@types/mapbox__point-geometry@1.0.87':
+    resolution: {integrity: sha512-32whuSWD/aDBHpRrZmEMlRjxR0L3sSYUaRnVmw0XwyVMvuU5LsRqrFwYud7gXjqmUE0MSoJB91+IJMqCyYyxag==}
+    deprecated: This is a stub types definition. @mapbox/point-geometry provides its own type definitions, so you do not need this installed.
 
   '@types/mysql@2.15.27':
     resolution: {integrity: sha512-YfWiV16IY0OeBfBCk8+hXKmdTKrKlwKN1MNKAPBu5JYxLwBEZl7QzeEpGnlZb3VMGJrrGmB84gXiH+ofs/TezA==}
@@ -2594,6 +2592,11 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  acorn@8.16.0:
+    resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -2616,6 +2619,9 @@ packages:
 
   ajv@8.17.1:
     resolution: {integrity: sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==}
+
+  ajv@8.18.0:
+    resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -3759,8 +3765,8 @@ packages:
   make-error@1.3.6:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
 
-  mapbox-gl@3.18.1:
-    resolution: {integrity: sha512-Izc8dee2zkmb6Pn9hXFbVioPRLXJz1OFUcrvri69MhFACPU4bhLyVmhEsD9AyW1qOAP0Yvhzm60v63xdMIHPPw==}
+  mapbox-gl@3.19.0:
+    resolution: {integrity: sha512-SFObIgdxN0b6hZNsRxSUmQWdVW9q9GM2gw4McgFbycyhekew7BZIh8V57pEERDWlI9x/5SxxraTit5Cf0hm9OA==}
 
   martinez-polygon-clipping@0.8.1:
     resolution: {integrity: sha512-9PLLMzMPI6ihHox4Ns6LpVBLpRc7sbhULybZ/wyaY8sY3ECNe2+hxm1hA2/9bEEpRrdpjoeduBuZLg2aq1cSIQ==}
@@ -4728,6 +4734,10 @@ packages:
 
   webpack-sources@3.3.3:
     resolution: {integrity: sha512-yd1RBzSGanHkitROoPFd6qsrxt+oFhg/129YzheDGqeustzX0vTZJZsSsQjVQC4yzBQ56K55XU8gaNCtIzOnTg==}
+    engines: {node: '>=10.13.0'}
+
+  webpack-sources@3.3.4:
+    resolution: {integrity: sha512-7tP1PdV4vF+lYPnkMR0jMY5/la2ub5Fc/8VQrrU+lXkiM6C4TjVfGw7iKfyhnTQOsD+6Q/iKw0eFciziRgD58Q==}
     engines: {node: '>=10.13.0'}
 
   webpack-virtual-modules@0.5.0:
@@ -5896,9 +5906,9 @@ snapshots:
 
   '@mapbox/jsonlint-lines-primitives@2.0.2': {}
 
-  '@mapbox/mapbox-gl-language@1.0.1(mapbox-gl@3.18.1)':
+  '@mapbox/mapbox-gl-language@1.0.1(mapbox-gl@3.19.0)':
     dependencies:
-      mapbox-gl: 3.18.1
+      mapbox-gl: 3.19.0
 
   '@mapbox/mapbox-gl-supported@3.0.0': {}
 
@@ -5913,8 +5923,6 @@ snapshots:
       '@mapbox/point-geometry': 1.1.0
       '@types/geojson': 7946.0.16
       pbf: 4.0.1
-
-  '@mapbox/whoots-js@3.1.0': {}
 
   '@mongodb-js/saslprep@1.3.2':
     dependencies:
@@ -7196,11 +7204,13 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/mapbox-gl@3.4.1':
+  '@types/mapbox-gl@3.5.0':
     dependencies:
-      '@types/geojson': 7946.0.16
+      mapbox-gl: 3.19.0
 
-  '@types/mapbox__point-geometry@0.1.4': {}
+  '@types/mapbox__point-geometry@1.0.87':
+    dependencies:
+      '@mapbox/point-geometry': 1.1.0
 
   '@types/mysql@2.15.27':
     dependencies:
@@ -7494,9 +7504,9 @@ snapshots:
     dependencies:
       acorn: 8.15.0
 
-  acorn-import-phases@1.0.4(acorn@8.15.0):
+  acorn-import-phases@1.0.4(acorn@8.16.0):
     dependencies:
-      acorn: 8.15.0
+      acorn: 8.16.0
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -7508,19 +7518,21 @@ snapshots:
 
   acorn@8.15.0: {}
 
+  acorn@8.16.0: {}
+
   agent-base@6.0.2:
     dependencies:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
-  ajv-formats@2.1.1(ajv@8.17.1):
+  ajv-formats@2.1.1(ajv@8.18.0):
     optionalDependencies:
-      ajv: 8.17.1
+      ajv: 8.18.0
 
-  ajv-keywords@5.1.0(ajv@8.17.1):
+  ajv-keywords@5.1.0(ajv@8.18.0):
     dependencies:
-      ajv: 8.17.1
+      ajv: 8.18.0
       fast-deep-equal: 3.1.3
 
   ajv@6.12.6:
@@ -7531,6 +7543,13 @@ snapshots:
       uri-js: 4.4.1
 
   ajv@8.17.1:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      fast-uri: 3.1.0
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+
+  ajv@8.18.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-uri: 3.1.0
@@ -8788,7 +8807,7 @@ snapshots:
 
   make-error@1.3.6: {}
 
-  mapbox-gl@3.18.1:
+  mapbox-gl@3.19.0:
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
       '@mapbox/mapbox-gl-supported': 3.0.0
@@ -8796,10 +8815,9 @@ snapshots:
       '@mapbox/tiny-sdf': 2.0.7
       '@mapbox/unitbezier': 0.0.1
       '@mapbox/vector-tile': 2.0.4
-      '@mapbox/whoots-js': 3.1.0
       '@types/geojson': 7946.0.16
       '@types/geojson-vt': 3.2.5
-      '@types/mapbox__point-geometry': 0.1.4
+      '@types/mapbox__point-geometry': 1.0.87
       '@types/pbf': 3.0.5
       '@types/supercluster': 7.1.3
       cheap-ruler: 4.0.0
@@ -9327,9 +9345,9 @@ snapshots:
   schema-utils@4.3.3:
     dependencies:
       '@types/json-schema': 7.0.15
-      ajv: 8.17.1
-      ajv-formats: 2.1.1(ajv@8.17.1)
-      ajv-keywords: 5.1.0(ajv@8.17.1)
+      ajv: 8.18.0
+      ajv-formats: 2.1.1(ajv@8.18.0)
+      ajv-keywords: 5.1.0(ajv@8.18.0)
 
   semver@6.3.1: {}
 
@@ -9621,7 +9639,7 @@ snapshots:
   terser@5.46.0:
     dependencies:
       '@jridgewell/source-map': 0.3.11
-      acorn: 8.15.0
+      acorn: 8.16.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -9841,6 +9859,8 @@ snapshots:
 
   webpack-sources@3.3.3: {}
 
+  webpack-sources@3.3.4: {}
+
   webpack-virtual-modules@0.5.0: {}
 
   webpack@5.102.1:
@@ -9851,8 +9871,8 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@webassemblyjs/wasm-edit': 1.14.1
       '@webassemblyjs/wasm-parser': 1.14.1
-      acorn: 8.15.0
-      acorn-import-phases: 1.0.4(acorn@8.15.0)
+      acorn: 8.16.0
+      acorn-import-phases: 1.0.4(acorn@8.16.0)
       browserslist: 4.26.3
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.19.0
@@ -9869,7 +9889,7 @@ snapshots:
       tapable: 2.3.0
       terser-webpack-plugin: 5.3.16(webpack@5.102.1)
       watchpack: 2.5.1
-      webpack-sources: 3.3.3
+      webpack-sources: 3.3.4
     transitivePeerDependencies:
       - '@swc/core'
       - esbuild
