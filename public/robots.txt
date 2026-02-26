@@ -8,12 +8,18 @@ Allow: /
 
 # インデックス不要なページをブロック
 Disallow: /admin/
+Disallow: /auth/
 Disallow: /debug
 Disallow: /debug-ua
 Disallow: /account
 Disallow: /api/
 Disallow: /itineraries/new
 Disallow: /itineraries/*/edit
+
+# 静的ファイル・アセットをブロック
+Disallow: /_next/static/
+Disallow: /manifest.json
+Disallow: /favicon.ico
 
 # サイトマップの場所
 Sitemap: https://tabi.over40web.club/sitemap.xml
