@@ -44,7 +44,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import dynamic from 'next/dynamic';
 import { CoordinatesFromClipboardButton } from '@/components/itinerary/CoordinatesFromClipboardButton';
-import { celebrateSubmission } from '@/lib/confetti';
+import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
 
 // Dynamically import map component to avoid SSR issues
 const SimpleLocationPicker = dynamic(
@@ -147,6 +147,13 @@ export default function ShachuHakuSubmissionForm({
     try {
       setLoading(true);
 
+      // ブラウザのAutoplayポリシー対策: fetch前（ユーザージェスチャー有効中）にAudioContextを初期化
+      let audioCtx: AudioContext | undefined;
+      try {
+        audioCtx = new AudioContext();
+        await audioCtx.resume();
+      } catch { /* Web Audio API非対応環境では無視 */ }
+
       // Convert form data to submission format
       const pricePerNight = data.pricePerNight
         ? Number(data.pricePerNight)
@@ -195,11 +202,13 @@ export default function ShachuHakuSubmissionForm({
 
       // 投稿成功！くす玉のような紙吹雪でお祝い
       celebrateSubmission();
+      playCelebrationSound(audioCtx);
 
       toast({
         title: '🎉 投稿ありがとうございます！',
         description:
           '車中泊スポット情報を投稿いただきました。管理者の確認後に公開されます。コミュニティへのご貢献に感謝します！',
+        duration: 10000,
       });
 
       form.reset();

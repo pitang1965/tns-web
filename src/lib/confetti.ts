@@ -4,9 +4,9 @@ import confetti from 'canvas-confetti';
  * Web Audio APIで祝福のチャイム音を鳴らす
  * ド→ミ→ソ→高いドの和音を順に鳴らし、最後に同時和音で締める
  */
-export function playCelebrationSound() {
+export function playCelebrationSound(existingCtx?: AudioContext) {
   try {
-    const ctx = new AudioContext();
+    const ctx = existingCtx ?? new AudioContext();
     const now = ctx.currentTime;
 
     // ド→ミ→ソ→高ドのアルペジオ + 最後に和音
