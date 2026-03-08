@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const mongoUri = process.env.MONGODB_URI || '';
+    // APP_MONGODB_URIを優先（MCPサーバーによるMONGODB_URI上書きの影響を受けないため）
+    const mongoUri = process.env.APP_MONGODB_URI || process.env.MONGODB_URI || '';
 
     // データベース名を抽出して環境を判定
     let environment: 'development' | 'production' | 'unknown' = 'unknown';
@@ -18,7 +19,7 @@ export async function GET() {
 
     return NextResponse.json({ environment }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'no-store',
       },
     });
   } catch (error) {
