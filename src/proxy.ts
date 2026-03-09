@@ -11,7 +11,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Custom logic for admin routes
-  if (request.nextUrl.pathname.startsWith('/admin/camping-spots')) {
+  if (request.nextUrl.pathname.startsWith('/admin')) {
     const session = await auth0.getSession(request);
 
     if (!session) {
