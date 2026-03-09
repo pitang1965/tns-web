@@ -314,10 +314,6 @@ const nextConfig = {
     },
   },
   reactStrictMode: true,
-  eslint: {
-    // ESLint のエラーを無視してビルドを続行
-    ignoreDuringBuilds: true
-  },
   async redirects() {
     return [
       {

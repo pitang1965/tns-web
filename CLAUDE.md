@@ -234,14 +234,7 @@ After running `npx shadcn@latest add [component-name]`, ALWAYS perform these che
    rm -rf "./@"
    ```
 
-3. **Fix Import Paths:**
-   - This project uses `@/lib/utils` for the cn() utility function
-   - shadcn/ui CLI often generates files with `@/utils` imports, which is INCORRECT
-   - Check and fix in newly created/updated files:
-     - ❌ Wrong: `import { cn } from "@/utils"`
-     - ✅ Correct: `import { cn } from "@/lib/utils"`
-
-4. **Verify with TypeScript:**
+3. **Verify with TypeScript:**
    ```bash
    npx tsc --noEmit
    ```
