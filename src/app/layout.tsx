@@ -23,9 +23,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://tabi.over40web.club'),
-  title: '車旅のしおり',
+  title: '車旅の旅程管理 | 車旅のしおり',
   description:
-    '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
+    '車旅の旅程を簡単に作成・管理。全国の車中泊スポット（道の駅・RVパーク）も地図で検索できます。',
   keywords:
     '車中泊マップ,車中泊スポット,車中泊,車旅,道の駅,RVパーク,オートキャンプ場,SA,PA,旅程作成,旅行計画,車中泊地図',
   manifest: '/manifest.json',
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: '車旅のしおり',
+    title: '車旅の旅程管理 | 車旅のしおり',
     description:
-      '旅行の計画から実行まで、あなたの旅をサポートします。効率的な旅程管理ツールで、思い出に残る旅行を。',
+      '車旅の旅程を簡単に作成・管理。全国の車中泊スポット（道の駅・RVパーク）も地図で検索できます。',
     images: [
       {
         url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像

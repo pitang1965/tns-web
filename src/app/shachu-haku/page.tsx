@@ -41,7 +41,7 @@ export async function generateMetadata({
   const title =
     titleParts.length > 0
       ? `${titleParts.join('・')}の車中泊スポット | 車旅のしおり`
-      : '車中泊スポット検索 | 車旅のしおり';
+      : '全国車中泊マップ | 車旅のしおり';
 
   const description =
     descriptionParts.length > 0
