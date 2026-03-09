@@ -266,7 +266,7 @@ export default function ShachuHakuForm({
                 title='iPosNetで名称を検索'
               >
                 <Search className='w-4 h-4' />
-                iPosNetで検索
+                iPosNet
               </Button>
               <Button
                 type='button'
@@ -282,7 +282,7 @@ export default function ShachuHakuForm({
                 title='くるま旅で名称を検索'
               >
                 <Search className='w-4 h-4' />
-                くるま旅で検索
+                くるま旅
               </Button>
               <Button
                 type='button'
@@ -300,7 +300,24 @@ export default function ShachuHakuForm({
                 title='名称と住所で Google AI モード検索'
               >
                 <Search className='w-4 h-4' />
-                AIモードで検索
+                AI(基本)
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={!watch('name')}
+                onClick={() => {
+                  const name = watch('name');
+                  const searchQuery = `${name} 車中泊 周辺観光スポット`;
+                  const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
+                  window.open(url, '_blank');
+                }}
+                className='flex items-center gap-1 cursor-pointer'
+                title='周辺観光スポットをGoogle AI モード検索（notes記入用）'
+              >
+                <Search className='w-4 h-4' />
+                AI(観光)
               </Button>
             </div>
           </div>
