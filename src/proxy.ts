@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth0 } from './lib/auth0';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const authRes = await auth0.middleware(request);
 
   // Ensure your own middleware does not handle the `/auth` routes, auto-mounted and handled by the SDK
