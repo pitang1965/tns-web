@@ -63,18 +63,40 @@ export function useCurrentLocation(): UseCurrentLocationResult {
     // 精度が10km超の場合（IPベース測位の典型値）は信頼できないとして無視する
     const MAX_ACCURACY_METERS = 10000;
 
+    // 日本の地理的範囲（沖縄〜北海道）
+    const JAPAN_BOUNDS = {
+      latMin: 24.0,
+      latMax: 46.0,
+      lngMin: 122.0,
+      lngMax: 154.0,
+    };
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        if (position.coords.accuracy > MAX_ACCURACY_METERS) {
+        const { latitude, longitude, accuracy } = position.coords;
+
+        if (accuracy > MAX_ACCURACY_METERS) {
           setError('位置情報の精度が低すぎるため使用できませんでした（有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください）');
           setPermissionGranted(false);
           setLoading(false);
           return;
         }
-        setCurrentLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
+
+        // 日本国外の座標はIPジオロケーションの誤りとして無視する
+        const isInJapan =
+          latitude >= JAPAN_BOUNDS.latMin &&
+          latitude <= JAPAN_BOUNDS.latMax &&
+          longitude >= JAPAN_BOUNDS.lngMin &&
+          longitude <= JAPAN_BOUNDS.lngMax;
+
+        if (!isInJapan) {
+          setError('位置情報が日本国外を示しています。有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください');
+          setPermissionGranted(false);
+          setLoading(false);
+          return;
+        }
+
+        setCurrentLocation({ latitude, longitude });
         setPermissionGranted(true);
         setLoading(false);
       },
