@@ -59,8 +59,18 @@ export function useCurrentLocation(): UseCurrentLocationResult {
     setLoading(true);
     setError(null);
 
+    // IPジオロケーションのフォールバック時に国をまたいだ誤差が生じることがあるため、
+    // 精度が10km超の場合（IPベース測位の典型値）は信頼できないとして無視する
+    const MAX_ACCURACY_METERS = 10000;
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        if (position.coords.accuracy > MAX_ACCURACY_METERS) {
+          setError('位置情報の精度が低すぎるため使用できませんでした（有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください）');
+          setPermissionGranted(false);
+          setLoading(false);
+          return;
+        }
         setCurrentLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
