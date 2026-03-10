@@ -67,7 +67,7 @@ export function useCurrentLocation(): UseCurrentLocationResult {
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
 
-        if (accuracy > MAX_ACCURACY_METERS) {
+        if (accuracy >= MAX_ACCURACY_METERS) {
           setError('位置情報の精度が低すぎるため使用できませんでした（有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください）');
           setPermissionGranted(false);
           setLoading(false);
