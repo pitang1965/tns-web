@@ -63,16 +63,17 @@ export function useAutoSetPrefecture(
     // 既に処理済みの住所の場合はスキップ（無限ループ防止）
     if (lastProcessedAddressRef.current === addressValue) return;
 
-    // 郵便番号パターン（〒123-4567 または 123-4567 または 1234567）
-    const postalCodePattern = /^〒?\s*(\d{3}-?\d{4})\s*/;
-    const postalCodeMatch = addressValue.match(postalCodePattern);
-
     let cleanedAddress = addressValue;
     let hasPostalCode = false;
 
-    // 郵便番号があれば削除
-    if (postalCodeMatch) {
-      cleanedAddress = addressValue.replace(postalCodePattern, '').trim();
+    // 国名プレフィックスを削除（例: "日本、", "日本, "）
+    const countryPrefixPattern = /^日本[、,，\s]+/;
+    cleanedAddress = cleanedAddress.replace(countryPrefixPattern, '').trim();
+
+    // 郵便番号パターン（〒123-4567 または 123-4567）を削除（位置問わず）
+    const postalCodePattern = /〒?\s*\d{3}-?\d{4}\s*/;
+    if (postalCodePattern.test(cleanedAddress)) {
+      cleanedAddress = cleanedAddress.replace(postalCodePattern, '').trim();
       hasPostalCode = true;
     }
 
