@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  * ローカルの入力状態と確定済みの検索語を分離管理し、
  * Enterキーやボタンクリックまたはクリア操作時のみAPI呼び出しを行う。
  */
-export function useDeferredSearch(committedValue: string, onCommit: (value: string) => void) {
+export function useExplicitSearch(committedValue: string, onCommit: (value: string) => void) {
   const [inputValue, setInputValue] = useState(committedValue);
   const inputRef = useRef<HTMLInputElement>(null);
 

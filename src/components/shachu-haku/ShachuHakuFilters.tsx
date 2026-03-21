@@ -23,7 +23,7 @@ import {
 } from '@/data/schemas/campingSpot';
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
-import { useDeferredSearch } from '@/hooks/useDeferredSearch';
+import { useExplicitSearch } from '@/hooks/useExplicitSearch';
 
 type ShachuHakuFiltersProps = {
   searchTerm: string;
@@ -60,7 +60,7 @@ export default function ShachuHakuFilters({
     clear: handleSearchClear,
     handleKeyDown: handleSearchKeyDown,
     isDirty: isSearchDirty,
-  } = useDeferredSearch(searchTerm, onSearchTermChange);
+  } = useExplicitSearch(searchTerm, onSearchTermChange);
 
   // Count active filters
   const countActiveFilters = () => {
