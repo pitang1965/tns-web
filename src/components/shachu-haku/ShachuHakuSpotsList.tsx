@@ -56,7 +56,7 @@ export function ShachuHakuSpotsList({
         <CardHeader>
           <CardTitle className='flex items-center justify-between gap-2'>
             <span>車中泊スポット一覧</span>
-            <AdLink href="https://amzn.to/4oy6Dbc" label="ポータブル電源セール" shortLabel="ポタ電セール" />
+            <AdLink href="https://amzn.to/47PWalM" label="車中泊用品セール" shortLabel="本日のセール" />
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -82,7 +82,7 @@ export function ShachuHakuSpotsList({
                   total
                 )}件を表示`}
           </span>
-          <AdLink href="https://amzn.to/4oy6Dbc" label="ポータブル電源セール" shortLabel="ポタ電セール" />
+          <AdLink href="https://amzn.to/47PWalM" label="車中泊用品セール" shortLabel="本日のセール" />
         </CardTitle>
         {activeFilterDescriptions.length > 0 && (
           <div className='text-sm text-muted-foreground space-y-1 mt-2'>
