@@ -253,11 +253,9 @@ export default function AdminClient() {
     });
 
   const handleFormSuccess = async (createdId?: string) => {
-    // 新規作成時は紙吹雪と祝福音でお祝い
-    if (isNewSpot) {
-      celebrateSubmission();
-      playCelebrationSound();
-    }
+    // 作成・更新時は紙吹雪と祝福音でお祝い
+    celebrateSubmission();
+    playCelebrationSound();
 
     // 新規作成時は編集ページにリダイレクト
     if (isNewSpot && createdId) {
@@ -279,7 +277,7 @@ export default function AdminClient() {
     }
     closeForm();
     toast({
-      title: isNewSpot ? '🎉 作成完了' : '成功',
+      title: isNewSpot ? '🎉 作成完了' : '🎉 更新完了',
       description: isNewSpot
         ? '車中泊スポットを作成しました'
         : '車中泊スポットを更新しました',
