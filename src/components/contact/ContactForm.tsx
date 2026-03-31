@@ -90,6 +90,7 @@ export function ContactForm() {
         <Input
           id='name'
           type='text'
+          autoComplete='name'
           placeholder={user?.name || '山田太郎'}
           {...register('name')}
           className={errors.name ? 'border-red-500' : ''}
@@ -111,6 +112,7 @@ export function ContactForm() {
         <Input
           id='email'
           type='email'
+          autoComplete='email'
           placeholder={user?.email || 'example@example.com'}
           {...register('email')}
           className={errors.email ? 'border-red-500' : ''}
