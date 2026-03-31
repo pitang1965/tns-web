@@ -697,7 +697,7 @@ export default function ShachuHakuSubmissionForm({
                     <FormItem>
                       <FormLabel>お名前</FormLabel>
                       <FormControl>
-                        <Input placeholder='匿名希望' {...field} autoComplete='name' />
+                        <Input placeholder='匿名希望' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -715,7 +715,6 @@ export default function ShachuHakuSubmissionForm({
                           type='email'
                           placeholder='example@email.com'
                           {...field}
-                          autoComplete='email'
                         />
                       </FormControl>
                       <FormMessage />
