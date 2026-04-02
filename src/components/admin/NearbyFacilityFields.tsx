@@ -414,7 +414,7 @@ export function NearbyFacilityFields({
                   onClick={() => {
                     const name = watch('name');
                     const address = watch('address');
-                    const searchQuery = `${name} ${address}の最寄りの入浴施設は？`;
+                    const searchQuery = `${name} ${address}の最寄りの日帰り入浴施設は？`;
                     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                     window.open(url, '_blank');
                   }}
