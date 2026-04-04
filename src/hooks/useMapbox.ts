@@ -12,6 +12,7 @@ type UseMapboxProps = {
 export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
+  const hasInitialized = useRef(false);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // すべてのアクティビティを表示範囲に収めるための境界ボックスを計算
@@ -81,7 +82,7 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
   // マップの初期化
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
-    if (!mapContainer.current || mapInstance.current) return;
+    if (hasInitialized.current || !mapContainer.current || mapInstance.current) return;
 
     if (activities.length === 0) return;
 
@@ -109,6 +110,8 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
       console.warn('Invalid coordinates detected, skipping map initialization');
       return;
     }
+
+    hasInitialized.current = true;
 
     try {
       mapInstance.current = new mapboxgl.Map({
@@ -161,7 +164,10 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
       console.error('Failed to initialize map:', error);
     }
 
-    // クリーンアップ関数
+  }, [activities, initialZoom, calculateBounds]); // activitiesが揃った時点で初期化を実行
+
+  // アンマウント時のみクリーンアップ
+  useEffect(() => {
     return () => {
       if (mapInstance.current) {
         try {
@@ -184,7 +190,7 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
         setMapLoaded(false);
       }
     };
-  }, []); // 空の依存配列で初期化時のみ実行
+  }, []);
 
   return {
     mapContainer,
