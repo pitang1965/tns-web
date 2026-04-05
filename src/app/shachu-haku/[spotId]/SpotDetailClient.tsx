@@ -11,7 +11,6 @@ import {
   Navigation,
   Map,
   MapPin,
-  Plus,
   Search,
   Shield,
   Volume2,
@@ -47,10 +46,7 @@ import {
   getRatingColor,
   getPricingColor,
 } from '@/lib/spotColorUtils';
-import {
-  openCurrentLocationRoute,
-  showSpotOnMap,
-} from '@/lib/mapNavigation';
+import { openCurrentLocationRoute, showSpotOnMap } from '@/lib/mapNavigation';
 
 // Dynamically import the map components to avoid SSR issues
 const FacilityMap = dynamic(
@@ -60,7 +56,7 @@ const FacilityMap = dynamic(
     loading: () => (
       <div className='h-[400px] bg-gray-100 animate-pulse rounded-lg' />
     ),
-  }
+  },
 );
 
 type SpotDetailClientProps = {
@@ -196,14 +192,14 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
         <Badge
           className={`${getPricingColor(
             spot.pricing.isFree,
-            spot.pricing.pricePerNight
+            spot.pricing.pricePerNight,
           )} text-white`}
         >
           {spot.pricing.isFree
             ? '無料'
             : spot.pricing.pricePerNight
-            ? `¥${spot.pricing.pricePerNight}`
-            : '有料：？円'}
+              ? `¥${spot.pricing.pricePerNight}`
+              : '有料：？円'}
         </Badge>
         <Badge className={`${getRatingColor(securityLevel)} text-white`}>
           <Shield className='w-3 h-3 mr-1' />
@@ -245,35 +241,6 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
               </CardContent>
             </Card>
           )}
-
-          {/* スポット投稿促進 */}
-          <Card className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'>
-            <CardContent className='pt-6'>
-              <div className='text-center space-y-3'>
-                <div className='flex justify-center'>
-                  <div className='p-3 bg-blue-100 dark:bg-blue-800/50 rounded-full'>
-                    <Plus className='w-6 h-6 text-blue-600 dark:text-blue-400' />
-                  </div>
-                </div>
-                <div>
-                  <h2 className='text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2'>
-                    あなたの車中泊スポットを教えてください
-                  </h2>
-                  <p className='text-sm text-blue-700 dark:text-blue-300 mb-4'>
-                    車旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
-                    <br />
-                    みんなで情報を共有して、より快適な車中泊を楽しみましょう。
-                  </p>
-                </div>
-                <Link href='/shachu-haku/submit'>
-                  <Button className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'>
-                    <Plus className='w-4 h-4 mr-2' />
-                    スポット情報を投稿する
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* サイドバー */}

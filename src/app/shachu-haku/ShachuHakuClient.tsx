@@ -1,12 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  startTransition,
+} from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { calculateBoundsFromZoomAndCenter } from '@/lib/maps';
 import { useToast } from '@/components/ui/use-toast';
-import { useMapBoundsLoader, MAX_LNG_SPAN, MAX_LAT_SPAN } from '@/hooks/useMapBoundsLoader';
+import {
+  useMapBoundsLoader,
+  MAX_LNG_SPAN,
+  MAX_LAT_SPAN,
+} from '@/hooks/useMapBoundsLoader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -36,7 +47,7 @@ const ShachuHakuMap = dynamic(
     loading: () => (
       <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg' />
     ),
-  }
+  },
 );
 
 export default function ShachuHakuClient() {
@@ -74,7 +85,7 @@ export default function ShachuHakuClient() {
   const [spots, setSpots] = useState<CampingSpotWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
-    null
+    null,
   );
   const [isBoundsTooWide, setIsBoundsTooWide] = useState(false);
 
@@ -142,7 +153,7 @@ export default function ShachuHakuClient() {
           prefecture?: string;
           type?: string;
           bounds?: { north: number; south: number; east: number; west: number };
-        }
+        },
       ) => Promise<void>)
     | null
   >(null);
@@ -153,14 +164,14 @@ export default function ShachuHakuClient() {
       prefecture?: string;
       type?: string;
       bounds?: { north: number; south: number; east: number; west: number };
-    }
+    },
   ) => {
     try {
       setLoading(true);
       const result = await getPublicCampingSpotsWithPagination(
         page,
         pageSize,
-        filters
+        filters,
       );
       setSpots(result.spots);
       setTotalPages(result.totalPages);
@@ -190,7 +201,7 @@ export default function ShachuHakuClient() {
       }
       handleBoundsChange(bounds); // Call hook's handler
     },
-    [handleBoundsChange]
+    [handleBoundsChange],
   );
 
   // Sync URL with filters and map state
@@ -199,12 +210,26 @@ export default function ShachuHakuClient() {
       tab: activeTab === 'list' ? 'list' : null,
       q: searchTerm || null,
       type: typeFilter !== 'all' ? typeFilter : null,
-      pricing: clientFilters.pricingFilter !== 'all' ? clientFilters.pricingFilter : null,
-      min_security: clientFilters.minSecurityLevel > 0 ? clientFilters.minSecurityLevel : null,
-      min_quietness: clientFilters.minQuietnessLevel > 0 ? clientFilters.minQuietnessLevel : null,
-      max_toilet_dist: clientFilters.maxToiletDistance !== null ? clientFilters.maxToiletDistance : null,
-      min_elevation: clientFilters.minElevation !== null ? clientFilters.minElevation : null,
-      max_elevation: clientFilters.maxElevation !== null ? clientFilters.maxElevation : null,
+      pricing:
+        clientFilters.pricingFilter !== 'all'
+          ? clientFilters.pricingFilter
+          : null,
+      min_security:
+        clientFilters.minSecurityLevel > 0
+          ? clientFilters.minSecurityLevel
+          : null,
+      min_quietness:
+        clientFilters.minQuietnessLevel > 0
+          ? clientFilters.minQuietnessLevel
+          : null,
+      max_toilet_dist:
+        clientFilters.maxToiletDistance !== null
+          ? clientFilters.maxToiletDistance
+          : null,
+      min_elevation:
+        clientFilters.minElevation !== null ? clientFilters.minElevation : null,
+      max_elevation:
+        clientFilters.maxElevation !== null ? clientFilters.maxElevation : null,
       lat: savedBounds
         ? ((savedBounds.north + savedBounds.south) / 2).toFixed(7)
         : mapCenter[1].toFixed(6),
@@ -215,7 +240,10 @@ export default function ShachuHakuClient() {
         ? (savedBounds.east - savedBounds.west).toFixed(7)
         : null,
       aspect_ratio: savedBounds
-        ? ((savedBounds.east - savedBounds.west) / (savedBounds.north - savedBounds.south)).toFixed(2)
+        ? (
+            (savedBounds.east - savedBounds.west) /
+            (savedBounds.north - savedBounds.south)
+          ).toFixed(2)
         : null,
       zoom: !savedBounds ? mapZoom.toFixed(2) : null,
     },
@@ -223,7 +251,6 @@ export default function ShachuHakuClient() {
     debounceMs: 500,
     enableDuplicateCheck: true,
   });
-
 
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {
@@ -456,12 +483,6 @@ export default function ShachuHakuClient() {
               <Share2 className='w-4 h-4' />
               車中泊情報を共有
             </Button>
-            <Link href='/shachu-haku/submit'>
-              <Button className='bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto cursor-pointer whitespace-nowrap'>
-                <Plus className='w-4 h-4' />
-                スポット投稿
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -469,14 +490,23 @@ export default function ShachuHakuClient() {
       <div className='w-full'>
         <ShachuHakuFilters
           searchTerm={searchTerm}
-          onSearchTermChange={(v) => { setSearchTerm(v); setCurrentPage(1); }}
+          onSearchTermChange={(v) => {
+            setSearchTerm(v);
+            setCurrentPage(1);
+          }}
           typeFilter={typeFilter}
-          onTypeFilterChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}
+          onTypeFilterChange={(v) => {
+            setTypeFilter(v);
+            setCurrentPage(1);
+          }}
           onPrefectureJump={handlePrefectureJump}
           onRegionJump={handleRegionJump}
           onCurrentLocation={handleCurrentLocation}
           clientFilters={clientFilters}
-          onClientFiltersChange={(v) => { setClientFilters(v); setCurrentPage(1); }}
+          onClientFiltersChange={(v) => {
+            setClientFilters(v);
+            setCurrentPage(1);
+          }}
           onResetAll={handleResetAllFromHook}
         />
 
@@ -530,7 +560,11 @@ export default function ShachuHakuClient() {
                         `表示範囲内: ${visibleSpots.length}件`
                       )}
                     </div>
-                    <AdLink href="https://amzn.to/47PWalM" label="車中泊用品セール" shortLabel="本日のセール" />
+                    <AdLink
+                      href='https://amzn.to/47PWalM'
+                      label='車中泊用品セール'
+                      shortLabel='本日のセール'
+                    />
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
                     <div className='text-sm text-muted-foreground space-y-1 mt-2'>
@@ -544,7 +578,11 @@ export default function ShachuHakuClient() {
             </CardHeader>
             <CardContent className='px-3! pt-2! pb-3! sm:px-6! sm:pt-3! sm:pb-6!'>
               {/* ランドスケープ時は地図とポップアップを横並びに */}
-              <div className={isLandscape ? 'flex gap-2 sm:gap-4 items-stretch' : ''}>
+              <div
+                className={
+                  isLandscape ? 'flex gap-2 sm:gap-4 items-stretch' : ''
+                }
+              >
                 <div className={isLandscape ? 'flex-1 min-w-0' : ''}>
                   <ShachuHakuMap
                     spots={filteredSpots}
@@ -631,6 +669,33 @@ export default function ShachuHakuClient() {
           </div>
         )}
       </div>
+
+      {/* スポット投稿促進・アクションセクション */}
+      <Card className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'>
+        <CardContent className='pt-6 pb-6'>
+          <div className='text-center space-y-3'>
+            <div className='flex justify-center'>
+              <div className='p-3 bg-blue-100 dark:bg-blue-800/50 rounded-full'>
+                <Plus className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+              </div>
+            </div>
+            <div>
+              <h2 className='text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2'>
+                あなたの車中泊スポットを教えてください
+              </h2>
+              <p className='text-sm text-blue-700 dark:text-blue-300 mb-4'>
+                車旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
+              </p>
+            </div>
+            <Link href='/shachu-haku/submit'>
+              <Button className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'>
+                <Plus className='w-4 h-4' />
+                スポット投稿
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
