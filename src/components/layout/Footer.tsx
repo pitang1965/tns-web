@@ -3,7 +3,7 @@ import { TabBar } from '@/components/layout/TabBar';
 
 export function Footer() {
   return (
-    <footer className='flex flex-col items-center justify-center bg-background text-foreground p-2'>
+    <footer className='flex flex-col items-center justify-center bg-background text-foreground p-2 pb-20 md:pb-2'>
       <div className='md:hidden'>
         <TabBar />
       </div>
