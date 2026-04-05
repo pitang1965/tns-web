@@ -1,6 +1,11 @@
 import { ContactForm } from '@/components/contact/ContactForm';
 
-export default function ContactPage() {
+type Props = {
+  searchParams: Promise<{ subject?: string; message?: string }>;
+};
+
+export default async function ContactPage({ searchParams }: Props) {
+  const { subject, message } = await searchParams;
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='max-w-2xl mx-auto'>
@@ -24,7 +29,7 @@ export default function ContactPage() {
         </div>
 
         <div className='bg-card rounded-lg border p-6 shadow-sm'>
-          <ContactForm />
+          <ContactForm defaultSubject={subject} defaultMessage={message} />
         </div>
 
         <div className='mt-8 text-sm text-muted-foreground'>

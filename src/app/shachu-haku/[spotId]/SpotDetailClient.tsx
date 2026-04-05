@@ -14,6 +14,7 @@ import {
   Search,
   Shield,
   Volume2,
+  PenLine,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -110,6 +111,44 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
 
   const securityLevel = calculateSecurityLevel(spot);
   const quietnessLevel = calculateQuietnessLevel(spot);
+
+  const correctionContactUrl = (() => {
+    const pricing = spot.pricing.isFree
+      ? '無料'
+      : spot.pricing.pricePerNight
+        ? `¥${spot.pricing.pricePerNight}/泊`
+        : '有料（金額不明）';
+    const amenitiesStr =
+      spot.amenities.length > 0 ? spot.amenities.join('、') : 'なし';
+    const restrictionsStr =
+      spot.restrictions.length > 0
+        ? spot.restrictions.map((r) => `•${r}`).join('\n')
+        : 'なし';
+    const spotUrl = `https://tabi.over40web.club/shachu-haku/${spot._id}`;
+
+    const subject = `[スポット情報修正] ${spot.name}`;
+    const message = `スポット名：${spot.name}
+URL: ${spotUrl}
+
+情報の更新（修正・追加）を依頼します。
+
+--- 修正候補 ---
+スポット名：${spot.name} →
+料金：${pricing} →
+ゲート・門扉：${spot.security.hasGate ? 'あり' : 'なし'} →
+照明設備：${spot.security.hasLighting ? '十分' : '暗め'} →
+スタッフ常駐：${spot.security.hasStaff ? 'あり' : 'なし'} →
+騒音問題：${spot.nightNoise.hasNoiseIssues ? 'あり' : 'なし'} →
+交通量の多い道路：${spot.nightNoise.nearBusyRoad ? '近い' : '離れている'} →
+静かなエリア：${spot.nightNoise.isQuietArea ? 'はい' : 'いいえ'} →
+その他設備：${amenitiesStr} →
+制限事項：
+${restrictionsStr} →
+詳細・備考：
+${spot.notes ?? 'なし'} → `;
+
+    return `/contact?subject=${encodeURIComponent(subject)}&message=${encodeURIComponent(message)}`;
+  })();
 
   return (
     <div className='container mx-auto p-6 space-y-6'>
@@ -260,6 +299,38 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
           </div>
         </div>
       </div>
+
+      {/* 情報修正依頼カード */}
+      <Card className='bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'>
+        <CardContent className='pt-6 pb-6'>
+          <div className='text-center space-y-3'>
+            <div className='flex justify-center'>
+              <div className='p-3 bg-amber-100 dark:bg-amber-800/50 rounded-full'>
+                <PenLine className='w-6 h-6 text-amber-600 dark:text-amber-400' />
+              </div>
+            </div>
+            <div>
+              <h2 className='text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2'>
+                情報の更新・修正をお知らせください
+              </h2>
+              <p className='text-sm text-amber-700 dark:text-amber-300 mb-4'>
+                掲載情報に誤りや変更がある場合は、お問い合わせフォームからご連絡ください。
+                <br />
+                スポット名・料金・設備状況などの修正前の情報が自動入力されます。
+              </p>
+            </div>
+            <Link href={correctionContactUrl}>
+              <Button
+                variant='outline'
+                className='cursor-pointer border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50'
+              >
+                <PenLine className='w-4 h-4 mr-2' />
+                情報の修正を依頼する
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

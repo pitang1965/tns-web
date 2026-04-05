@@ -14,7 +14,15 @@ import {
   type ContactFormData,
 } from '@/data/schemas/contactSchema';
 
-export function ContactForm() {
+type ContactFormProps = {
+  defaultSubject?: string;
+  defaultMessage?: string;
+};
+
+export function ContactForm({
+  defaultSubject,
+  defaultMessage,
+}: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUser();
 
@@ -39,6 +47,16 @@ export function ContactForm() {
       }
     }
   }, [user, setValue]);
+
+  // クエリパラメータからの初期値を設定
+  useEffect(() => {
+    if (defaultSubject) {
+      setValue('subject', defaultSubject);
+    }
+    if (defaultMessage) {
+      setValue('message', defaultMessage);
+    }
+  }, [defaultSubject, defaultMessage, setValue]);
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
@@ -82,7 +100,7 @@ export function ContactForm() {
         <Label htmlFor='name'>
           お名前 *
           {user && (
-            <span className="text-sm text-muted-foreground ml-2">
+            <span className='text-sm text-muted-foreground ml-2'>
               (ログイン情報から自動入力)
             </span>
           )}
@@ -103,7 +121,7 @@ export function ContactForm() {
         <Label htmlFor='email'>
           メールアドレス *
           {user && (
-            <span className="text-sm text-muted-foreground ml-2">
+            <span className='text-sm text-muted-foreground ml-2'>
               (ログイン情報から自動入力)
             </span>
           )}
@@ -148,7 +166,11 @@ export function ContactForm() {
         )}
       </div>
 
-      <Button type='submit' disabled={isSubmitting} className='w-full cursor-pointer'>
+      <Button
+        type='submit'
+        disabled={isSubmitting}
+        className='w-full cursor-pointer'
+      >
         {isSubmitting ? '送信中...' : 'お問い合わせを送信'}
       </Button>
     </form>
