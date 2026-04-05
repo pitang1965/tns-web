@@ -194,7 +194,7 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
 
   return {
     mapContainer,
-    mapInstance: mapInstance.current,
+    mapInstance,
     mapLoaded,
     updateMapBounds,
     fitAllMarkers,

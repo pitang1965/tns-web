@@ -38,7 +38,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
 
   // マーカー管理
   useMapMarkers({
-    mapInstance,
+    mapInstance: mapInstance.current,
     mapLoaded,
     activities,
     updateMapBounds,
@@ -46,7 +46,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
 
   // ルートライン管理
   useRouteLayer({
-    mapInstance,
+    mapInstance: mapInstance.current,
     mapLoaded,
     activities,
   });
