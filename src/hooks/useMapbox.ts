@@ -102,8 +102,6 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
       return;
     }
 
-    hasInitialized.current = true;
-
     try {
       mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
       mapInstance.current = new mapboxgl.Map({
@@ -112,6 +110,7 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
         center: [centerLng, centerLat] as [number, number],
         zoom: initialZoom,
       });
+      hasInitialized.current = true;
 
       // エラーハンドリングを追加
       mapInstance.current.on('error', (e) => {
