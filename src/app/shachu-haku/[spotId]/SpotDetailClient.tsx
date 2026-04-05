@@ -292,9 +292,9 @@ ${spot.notes ?? 'なし'} → `;
           <SpotRestrictionsCard spot={spot} />
           <div className='flex justify-center'>
             <AdLink
-              href='https://amzn.to/45c0kmK'
-              label='電気毛布セール'
-              shortLabel='電気毛布'
+              href='https://amzn.to/48vDnfQ'
+              label='ポータブル電源セール'
+              shortLabel='ポタ電セール'
             />
           </div>
         </div>

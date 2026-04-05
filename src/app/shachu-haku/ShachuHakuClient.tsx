@@ -561,9 +561,9 @@ export default function ShachuHakuClient() {
                       )}
                     </div>
                     <AdLink
-                      href='https://amzn.to/47PWalM'
-                      label='車中泊用品セール'
-                      shortLabel='本日のセール'
+                      href='https://amzn.to/48vDnfQ'
+                      label='ポータブル電源セール'
+                      shortLabel='ポタ電セール'
                     />
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
