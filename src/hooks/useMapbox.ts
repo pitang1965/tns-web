@@ -69,22 +69,6 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
     }
   }, [activities, calculateBounds, initialZoom]);
 
-  // 全てのマーカーを表示する範囲に調整する関数
-  const fitAllMarkers = useCallback(() => {
-    if (mapInstance.current && activities.length > 0) {
-      try {
-        const bounds = calculateBounds();
-        if (bounds) {
-          mapInstance.current.fitBounds(bounds as mapboxgl.LngLatBoundsLike, {
-            padding: 50,
-          });
-        }
-      } catch (error) {
-        console.error('Error fitting markers:', error);
-      }
-    }
-  }, [activities, calculateBounds]);
-
   // マップの初期化
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
@@ -204,7 +188,6 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
     mapInstance,
     mapLoaded,
     updateMapBounds,
-    fitAllMarkers,
     calculateBounds,
   };
 }

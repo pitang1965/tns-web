@@ -31,7 +31,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
   onExpandClick,
 }) => {
   // カスタムフックを使用してマップ機能を分離
-  const { mapContainer, mapInstance, mapLoaded, updateMapBounds, fitAllMarkers } = useMapbox({
+  const { mapContainer, mapInstance, mapLoaded, updateMapBounds } = useMapbox({
     activities,
     initialZoom,
   });
@@ -69,7 +69,7 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
       <div className='absolute bottom-2 right-2 z-10 flex flex-col gap-2'>
         {activities.length > 1 && (
           <Button
-            onClick={fitAllMarkers}
+            onClick={updateMapBounds}
             size='sm'
             variant='outline'
             className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
