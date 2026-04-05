@@ -15,16 +15,24 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
 
   // すべてのアクティビティを表示範囲に収めるための境界ボックスを計算
   const calculateBounds = useCallback(() => {
-    if (activities.length === 0) return null;
+    const validActivities = activities.filter(
+      (a) =>
+        isFinite(a.longitude) &&
+        isFinite(a.latitude) &&
+        !isNaN(a.longitude) &&
+        !isNaN(a.latitude),
+    );
+
+    if (validActivities.length === 0) return null;
 
     // 初期値として最初のアクティビティの位置を設定
-    let minLng = activities[0].longitude;
-    let maxLng = activities[0].longitude;
-    let minLat = activities[0].latitude;
-    let maxLat = activities[0].latitude;
+    let minLng = validActivities[0].longitude;
+    let maxLng = validActivities[0].longitude;
+    let minLat = validActivities[0].latitude;
+    let maxLat = validActivities[0].latitude;
 
     // すべてのアクティビティをループして境界を更新
-    activities.forEach((activity) => {
+    validActivities.forEach((activity) => {
       minLng = Math.min(minLng, activity.longitude);
       maxLng = Math.max(maxLng, activity.longitude);
       minLat = Math.min(minLat, activity.latitude);
@@ -80,7 +88,8 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
   // マップの初期化
   useEffect(() => {
     // マップコンテナが存在し、まだマップが初期化されていない場合のみ初期化
-    if (hasInitialized.current || !mapContainer.current || mapInstance.current) return;
+    if (hasInitialized.current || !mapContainer.current || mapInstance.current)
+      return;
 
     if (activities.length === 0) return;
 
@@ -162,7 +171,6 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
     } catch (error) {
       console.error('Failed to initialize map:', error);
     }
-
   }, [activities, initialZoom, calculateBounds]); // activitiesが揃った時点で初期化を実行
 
   // アンマウント時のみクリーンアップ
