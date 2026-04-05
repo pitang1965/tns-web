@@ -156,7 +156,7 @@ export function ContactForm({
         <Label htmlFor='message'>メッセージ *</Label>
         <Textarea
           id='message'
-          rows={6}
+          rows={12}
           placeholder='お問い合わせの内容をご記入ください'
           {...register('message')}
           className={errors.message ? 'border-red-500' : ''}
