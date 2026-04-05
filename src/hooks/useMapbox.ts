@@ -2,8 +2,6 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { ActivityLocation } from '@/components/common/Maps/DailyRouteMap';
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
-
 type UseMapboxProps = {
   activities: ActivityLocation[];
   initialZoom?: number;
@@ -114,6 +112,7 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
     hasInitialized.current = true;
 
     try {
+      mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v11',
