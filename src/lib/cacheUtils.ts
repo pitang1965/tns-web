@@ -15,9 +15,9 @@ export async function clearShachuHakuCache(): Promise<void> {
             (name) =>
               name.includes('shachu-haku-list') ||
               name.includes('shachu-haku-detail') ||
-              name.includes('shachu-haku-api')
+              name.includes('shachu-haku-api'),
           )
-          .map((name) => caches.delete(name))
+          .map((name) => caches.delete(name)),
       );
       console.log('車中泊スポットキャッシュをクリアしました');
     } catch (error) {
@@ -27,9 +27,10 @@ export async function clearShachuHakuCache(): Promise<void> {
 }
 
 /**
- * 旅程関連のキャッシュをクリア
+ * 旅程関連のキャッシュをクリア（Service Worker + IndexedDB）
  */
 export async function clearItineraryCache(): Promise<void> {
+  // Service Worker キャッシュをクリア
   if (typeof window !== 'undefined' && 'caches' in window) {
     try {
       const cacheNames = await caches.keys();
@@ -39,13 +40,20 @@ export async function clearItineraryCache(): Promise<void> {
             (name) =>
               name.includes('itinerary-list') ||
               name.includes('itinerary-detail') ||
-              name.includes('itinerary-api')
+              name.includes('itinerary-api'),
           )
-          .map((name) => caches.delete(name))
+          .map((name) => caches.delete(name)),
       );
-      console.log('旅程キャッシュをクリアしました');
     } catch (error) {
-      console.error('キャッシュクリアエラー:', error);
+      console.error('Service Workerキャッシュクリアエラー:', error);
     }
+  }
+
+  // IndexedDB キャッシュをクリア
+  try {
+    const { clearAllCachedItineraries } = await import('@/lib/itineraryCache');
+    await clearAllCachedItineraries();
+  } catch (error) {
+    console.error('IndexedDBキャッシュクリアエラー:', error);
   }
 }

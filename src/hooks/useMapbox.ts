@@ -159,6 +159,9 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
   // アンマウント時のみクリーンアップ
   useEffect(() => {
     return () => {
+      // hasInitialized をリセットして再マウント時に再初期化できるようにする
+      // React Strict Mode のダブルマウントでも正しく動作する
+      hasInitialized.current = false;
       if (mapInstance.current) {
         try {
           // ルートラインのレイヤーとソースを削除

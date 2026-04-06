@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Button } from '@/components/ui/button';
@@ -19,60 +19,92 @@ import { useGetItineraryDay } from '@/hooks/useGetItineraryDay';
 import { useItineraryAccess } from '@/hooks/useItineraryAccess';
 import { useItineraryActions } from '@/hooks/useItineraryActions';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
-import { DayPlan } from '@/data/schemas/itinerarySchema';
+import {
+  ClientItineraryDocument,
+  DayPlan,
+} from '@/data/schemas/itinerarySchema';
 
 type ItineraryDetailProps = {
   id: string;
 };
 
+function toMetadata(itinerary: ClientItineraryDocument) {
+  return {
+    id: itinerary.id!,
+    title: itinerary.title,
+    description: itinerary.description,
+    isPublic: itinerary.isPublic,
+    owner: itinerary.owner,
+    sharedWith: itinerary.sharedWith,
+    totalDays: itinerary.dayPlans.length,
+    createdAt: itinerary.createdAt,
+    updatedAt: itinerary.updatedAt,
+    dayPlanSummaries: itinerary.dayPlans.map((dp) => ({
+      date: dp.date,
+      notes: dp.notes,
+    })),
+  };
+}
+
 const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
-  const { user } = useUser();
+  const { user, isLoading: userIsLoading } = useUser();
   const pathname = usePathname();
   const { addUrl } = useRecentUrls();
 
-  // 最初は基本メタデータだけを取得（日程の総数を知るため）
-  const { itinerary: metadataOnly, loading: metadataLoading } =
-    useGetItinerary(id);
+  // IndexedDB キャッシュ付きフック：即時表示のためのメタデータ取得
+  // loading はキャッシュヒット時に即座に false になる
+  const { itinerary, loading: metadataLoading } = useGetItinerary(id);
 
   // 日付パラメータの管理
-  const dayParamHook = useDayParam(
-    (metadataOnly?.dayPlans?.length || 1) - 1
-  );
-
+  const dayParamHook = useDayParam((itinerary?.dayPlans?.length || 1) - 1);
   const currentDayIndex = dayParamHook.selectedDay;
 
-  // 選択された日のデータのみを取得
+  // 選択された日のデータを day エンドポイントから取得（マップ表示に必要な正確なデータ）
+  // dayLoading はローディングスピナーに使わない（バックグラウンドで更新）
   const {
-    metadata,
-    dayPlan: currentDayPlan,
-    loading: dayLoading,
+    metadata: freshMetadata,
+    dayPlan: freshDayPlan,
     error: dayError,
   } = useGetItineraryDay(id, currentDayIndex);
 
-  // アクセス制御
-  const access = useItineraryAccess({ user, metadata });
+  // キャッシュから導出したメタデータを fallback として使用
+  const cachedMetadata = useMemo(
+    () => (itinerary ? toMetadata(itinerary) : undefined),
+    [itinerary],
+  );
 
-  // アクション
-  const actions = useItineraryActions({ id });
+  // day エンドポイントのデータを優先、なければキャッシュを使用
+  const metadata = freshMetadata ?? cachedMetadata;
+  const currentDayPlan = freshDayPlan ?? itinerary?.dayPlans[currentDayIndex];
 
-  // 読み込み状態を合成
-  const loading = metadataLoading || dayLoading;
+  // ローディング：メタデータとAuth0ユーザーの両方が解決するまで待つ
+  // Auth0は通常100〜300msで解決するため、体感速度への影響は最小限
+  const loading = metadataLoading || userIsLoading;
   const error = dayError;
 
-  // 閲覧履歴に追加
+  const access = useItineraryAccess({ user, metadata });
+  const actions = useItineraryActions({ id });
+
   useEffect(() => {
     if (metadata && access.hasAccess) {
       const title = metadata.title || '旅程を表示';
-      const dayDisplay = metadata.totalDays > 1 && currentDayIndex !== null
-        ? ` ${currentDayIndex + 1}日目`
-        : '';
-      const fullTitle = `${title}${dayDisplay}`;
-      addUrl(pathname, fullTitle);
+      const dayDisplay =
+        metadata.totalDays > 1 && currentDayIndex !== null
+          ? ` ${currentDayIndex + 1}日目`
+          : '';
+      addUrl(pathname, `${title}${dayDisplay}`);
     }
   }, [metadata, access.hasAccess, currentDayIndex, pathname, addUrl]);
 
   const renderDayPlan = (dayPlan: DayPlan, index: number) => {
-    return <DayPlanView key={index} day={dayPlan} dayIndex={index} isOwner={access.isOwner} />;
+    return (
+      <DayPlanView
+        key={index}
+        day={dayPlan}
+        dayIndex={index}
+        isOwner={access.isOwner}
+      />
+    );
   };
 
   if (loading) {
@@ -90,11 +122,17 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
             {error}
           </div>
           <div className='flex gap-3'>
-            <Button variant='outline' onClick={actions.handleBack} className='cursor-pointer'>
+            <Button
+              variant='outline'
+              onClick={actions.handleBack}
+              className='cursor-pointer'
+            >
               旅程一覧に戻る
             </Button>
             {access.isOwner && (
-              <Button onClick={actions.handleEdit} className='cursor-pointer'>旅程を編集</Button>
+              <Button onClick={actions.handleEdit} className='cursor-pointer'>
+                旅程を編集
+              </Button>
             )}
           </div>
         </div>
@@ -106,7 +144,6 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     return <LargeText>旅程が見つかりません。</LargeText>;
   }
 
-  // アクセス制御チェック
   if (!access.hasAccess) {
     return (
       <ItineraryAccessGate
@@ -118,17 +155,15 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
     );
   }
 
-
   return (
     <main className='container mx-auto p-4'>
-      {/* FixedActionButtonsのための余白を確保 */}
       <div className='pt-8 md:pt-12'></div>
       <div className='flex flex-col md:flex-row gap-6'>
         <div className='hidden md:block'>
           <ItineraryToc initialItinerary={metadata} />
         </div>
         <div className='flex-1'>
-          <ItineraryHeader itinerary={metadata} />
+          <ItineraryHeader itinerary={itinerary ?? metadata} />
 
           {!user && access.isPublic && (
             <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
