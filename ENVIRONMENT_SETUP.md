@@ -26,7 +26,7 @@ MongoDB Atlas Cluster0
 
 ```bash
 MONGODB_URI='mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/itinerary_db_dev?retryWrites=true&w=majority&appName=Cluster0'
-AUTH0_BASE_URL='http://localhost:3000'
+APP_BASE_URL='http://localhost:3000'
 # その他の開発環境用設定...
 ```
 
@@ -36,7 +36,7 @@ AUTH0_BASE_URL='http://localhost:3000'
 
 ```bash
 MONGODB_URI='mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/itinerary_db?retryWrites=true&w=majority&appName=Cluster0'
-AUTH0_BASE_URL='https://tabi.over40web.club'
+APP_BASE_URL='https://tabi.over40web.club'
 # その他の本番環境用設定...
 ```
 
