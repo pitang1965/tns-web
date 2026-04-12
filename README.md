@@ -510,6 +510,10 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
     "auth0": {
       "type": "stdio",
       "command": "cmd",
@@ -553,6 +557,10 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:password@cluster0.xxxxx.mongo
 ```json
 {
   "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
     "auth0": {
       "type": "stdio",
       "command": "cmd",
@@ -596,6 +604,39 @@ MONGODB_URI_READONLY=mongodb+srv://claude_readonly:your_password@cluster0.xxxxx.
 ```
 
 ## MCP サーバー連携
+
+### Next.js DevTools
+
+Next.js DevTools MCP サーバーを使用すると、Claude Code から Next.js アプリケーションの内部情報（ルート一覧、設定、ビルド情報など）に直接アクセスできます。
+
+#### 機能
+
+- **ルート一覧の取得**: App Router / Pages Router のルート構造を確認
+- **エラー検出**: ビルドエラー・ランタイムエラー・型エラーをリアルタイムで取得
+- **ページメタデータ**: ルート・コンポーネント・レンダリング情報を参照
+- **Server Actionsの検査**: Server ActionのIDからソースファイルと関数名を特定
+- **開発ログの取得**: ブラウザコンソールとサーバーログへのアクセス
+
+#### 設定
+
+`.mcp.json` に以下の設定が含まれています：
+
+```json
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    }
+  }
+}
+```
+
+**注意**: `type` を省略した場合は `stdio` として扱われます。
+
+#### 参考リンク
+
+- [Next.js MCP Getting Started](https://nextjs.org/docs/app/guides/mcp#getting-started)
 
 ### Sentry
 
