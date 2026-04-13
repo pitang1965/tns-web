@@ -1,6 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  startTransition,
+} from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -14,7 +20,10 @@ import { Spinner } from '@/components/ui/spinner';
 import Link from 'next/link';
 import { getCampingSpotsByBounds } from '../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-import { CSVImportResult, getCampingSpotsForExport } from '../../actions/campingSpots/csv';
+import {
+  CSVImportResult,
+  getCampingSpotsForExport,
+} from '../../actions/campingSpots/csv';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
 import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
@@ -37,23 +46,22 @@ const ShachuHakuMap = dynamic(
     loading: () => (
       <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg' />
     ),
-  }
+  },
 );
 
 const CSVImportDialog = dynamic(
   () => import('@/components/admin/CSVImportDialog'),
   {
     ssr: false,
-  }
+  },
 );
 
 const ShachuHakuForm = dynamic(
   () => import('@/components/admin/ShachuHakuForm'),
   {
     ssr: false,
-  }
+  },
 );
-
 
 export default function AdminClient() {
   const { user, isLoading } = useUser();
@@ -179,7 +187,7 @@ export default function AdminClient() {
 
       handleBoundsChange(bounds); // Call hook's handler
     },
-    [handleBoundsChange, initialLoadDoneRef, lastLoadedBoundsRef]
+    [handleBoundsChange, initialLoadDoneRef, lastLoadedBoundsRef],
   );
 
   // Reload map data when switching to map tab or when filters change
@@ -233,7 +241,7 @@ export default function AdminClient() {
     // Save the current filtered spot IDs for navigation
     if (activeTab === 'map') {
       // Map view: use visible spots in current bounds
-      const spotIds = visibleSpots.map(s => s._id);
+      const spotIds = visibleSpots.map((s) => s._id);
       sessionStorage.setItem('admin-spot-ids', JSON.stringify(spotIds));
     } else if (activeTab === 'list') {
       // List view: use ALL filtered spot IDs (not just current page)
@@ -457,32 +465,18 @@ export default function AdminClient() {
 
         {/* Map Tab Content - Always render but hide with visibility */}
         <div
-          className='space-y-4'
           style={{
             visibility: activeTab === 'map' ? 'visible' : 'hidden',
             height: activeTab === 'map' ? 'auto' : '0',
             overflow: 'hidden',
           }}
         >
-          <Card>
-            <CardHeader>
-              {/* カスタムポップアップ - マップ表示時に選択されたスポット情報を表示 */}
-              {activeTab === 'map' && selectedSpot ? (
-                <SpotPopup
-                  spot={selectedSpot}
-                  onClose={clearSelection}
-                  actionButton={
-                    <Button
-                      onClick={() => handleNavigateToEdit(selectedSpot._id)}
-                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
-                      size='sm'
-                    >
-                      編集
-                    </Button>
-                  }
-                />
-              ) : (
-                <>
+          {/* lg以上: 地図と詳細パネルを横並び / lg未満: 縦積み */}
+          <div className='flex flex-col lg:flex-row lg:items-stretch gap-4'>
+            {/* 地図 */}
+            <div className='flex-1 min-w-0'>
+              <Card>
+                <CardHeader className='pb-2'>
                   <CardTitle className='flex items-center gap-2'>
                     <MapPin className='w-5 h-5' />
                     {loading ? (
@@ -494,48 +488,69 @@ export default function AdminClient() {
                     )}
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
-                    <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                    <div className='text-sm text-muted-foreground space-y-1 mt-1'>
                       {activeFilterDescriptions.map((desc, index) => (
                         <div key={index}>{desc}</div>
                       ))}
                     </div>
                   )}
-                </>
-              )}
-            </CardHeader>
-            <CardContent>
-              <ShachuHakuMap
-                key='shachu-haku-admin-map'
-                spots={filteredSpots}
-                onSpotSelect={handleSpotSelect}
-                onBoundsChange={handleBoundsChangeWrapper}
-                initialCenter={mapCenter}
-                initialZoom={mapZoom}
-                initialBounds={savedBounds || undefined}
-                onCreateSpot={(coordinates) => {
-                  openForm({
-                    coordinates,
-                    name: '',
-                    prefecture: '',
-                    type: 'other',
-                    distanceToToilet: 0,
-                    quietnessLevel: 3,
-                    securityLevel: 3,
-                    overallRating: 3,
-                    hasRoof: false,
-                    hasPowerOutlet: false,
-                    hasGate: false,
-                    pricing: { isFree: true },
-                    capacity: 1,
-                    restrictions: [],
-                    amenities: [],
-                    notes: '',
-                    isVerified: false,
-                  } as any);
-                }}
-              />
-            </CardContent>
-          </Card>
+                </CardHeader>
+                <CardContent>
+                  <ShachuHakuMap
+                    key='shachu-haku-admin-map'
+                    spots={filteredSpots}
+                    onSpotSelect={handleSpotSelect}
+                    onBoundsChange={handleBoundsChangeWrapper}
+                    initialCenter={mapCenter}
+                    initialZoom={mapZoom}
+                    initialBounds={savedBounds || undefined}
+                    activatedSpotId={selectedSpot?._id ?? null}
+                    onCreateSpot={(coordinates) => {
+                      openForm({
+                        coordinates,
+                        name: '',
+                        prefecture: '',
+                        type: 'other',
+                        distanceToToilet: 0,
+                        quietnessLevel: 3,
+                        securityLevel: 3,
+                        overallRating: 3,
+                        hasRoof: false,
+                        hasPowerOutlet: false,
+                        hasGate: false,
+                        pricing: { isFree: true },
+                        capacity: 1,
+                        restrictions: [],
+                        amenities: [],
+                        notes: '',
+                        isVerified: false,
+                      } as any);
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* スポット詳細パネル: lg以上は右側固定幅、lg未満は下に表示 */}
+            {activeTab === 'map' && selectedSpot && (
+              <div className='lg:w-80 lg:shrink-0 lg:flex lg:flex-col'>
+                <SpotPopup
+                  spot={selectedSpot}
+                  onClose={clearSelection}
+                  className='lg:flex-1'
+                  actionButton={
+                    <Button
+                      onClick={() => handleNavigateToEdit(selectedSpot._id)}
+                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
+                      size='sm'
+                    >
+                      編集
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* List Tab Content */}

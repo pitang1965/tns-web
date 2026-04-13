@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { formatDistance } from '@/lib/formatDistance';
 
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { calculateSecurityLevel } from '@/lib/campingSpotUtils';
@@ -34,7 +35,9 @@ type ShachuHakuMapProps = {
     east: number;
     west: number;
   };
-}
+  /** 親コンポーネントで選択中のスポットID。nullになると施設マーカーをクリア */
+  activatedSpotId?: string | null;
+};
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -46,15 +49,98 @@ export default function ShachuHakuMap({
   initialCenter = [139.6917, 35.6895],
   initialZoom = 9,
   initialBounds,
+  activatedSpotId,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const facilityMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
   const currentZoomRef = useRef<number>(9);
   const [markerUpdateTrigger, setMarkerUpdateTrigger] = useState(0);
   const isUserInteractionRef = useRef(false);
+
+  const clearFacilityMarkers = useCallback(() => {
+    facilityMarkersRef.current.forEach((marker) => marker.remove());
+    facilityMarkersRef.current = [];
+  }, []);
+
+  const isValidCoords = (coords: unknown): coords is [number, number] =>
+    Array.isArray(coords) &&
+    coords.length === 2 &&
+    typeof coords[0] === 'number' &&
+    typeof coords[1] === 'number' &&
+    !isNaN(coords[0]) &&
+    !isNaN(coords[1]);
+
+  const FACILITY_CONFIGS = [
+    {
+      key: 'nearbyToiletCoordinates' as const,
+      distKey: 'distanceToToilet' as const,
+      emoji: '🚻',
+      label: 'トイレ',
+      color: '#8b5cf6',
+    },
+    {
+      key: 'nearbyConvenienceCoordinates' as const,
+      distKey: 'distanceToConvenience' as const,
+      emoji: '🏪',
+      label: 'コンビニ',
+      color: '#10b981',
+    },
+    {
+      key: 'nearbyBathCoordinates' as const,
+      distKey: 'distanceToBath' as const,
+      emoji: '♨️',
+      label: '入浴施設',
+      color: '#f59e0b',
+    },
+  ] as const;
+
+  const showFacilityMarkers = useCallback(
+    (spot: CampingSpotWithId) => {
+      if (!map.current) return;
+      clearFacilityMarkers();
+
+      FACILITY_CONFIGS.forEach(({ key, distKey, emoji, color }) => {
+        const coords = spot[key];
+        if (!isValidCoords(coords)) return;
+
+        const el = document.createElement('div');
+        el.className = 'admin-facility-marker';
+        el.style.cssText = `
+        width: 28px;
+        height: 28px;
+        background-color: ${color};
+        border: 3px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: default;
+        pointer-events: none;
+        animation: facilityFadeIn 0.15s ease-out;
+      `;
+        el.textContent = emoji;
+
+        const distance = spot[distKey];
+        el.title =
+          distance !== undefined
+            ? `${emoji} ${formatDistance(distance)}`
+            : emoji;
+
+        const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat(coords as [number, number])
+          .addTo(map.current!);
+
+        facilityMarkersRef.current.push(marker);
+      });
+    },
+    [clearFacilityMarkers],
+  );
 
   // Hide/show markers during map movement
   const hideMarkers = useCallback(() => {
@@ -130,6 +216,13 @@ export default function ShachuHakuMap({
           background-color: #f3f4f6 !important;
           color: #111827 !important;
         }
+        .admin-facility-marker {
+          transition: transform 0.2s ease;
+        }
+        @keyframes facilityFadeIn {
+          from { opacity: 0; transform: scale(0.7); }
+          to   { opacity: 1; transform: scale(1); }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -142,15 +235,17 @@ export default function ShachuHakuMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: initialBounds ? [
-        (initialBounds.west + initialBounds.east) / 2,
-        (initialBounds.south + initialBounds.north) / 2
-      ] : initialCenter,
+      center: initialBounds
+        ? [
+            (initialBounds.west + initialBounds.east) / 2,
+            (initialBounds.south + initialBounds.north) / 2,
+          ]
+        : initialCenter,
       zoom: initialBounds ? 5 : initialZoom, // Temporary zoom, will be replaced by fitBounds
       minZoom: 3.5, //  北海道全域程度まで表示可能、それ以上はズームアウト不可
       maxBounds: [
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
-        [154.0, 46.0]  // 北東端（東端、北端）北海道より北
+        [154.0, 46.0], // 北東端（東端、北端）北海道より北
       ],
     });
 
@@ -187,7 +282,7 @@ export default function ShachuHakuMap({
           {
             padding: 0, // No padding for consistent display across devices
             duration: 0, // No animation on initial load
-          }
+          },
         );
       }
 
@@ -215,12 +310,14 @@ export default function ShachuHakuMap({
       isUserInteractionRef.current = true;
       setIsMapMoving(true);
       hideMarkers();
+      clearFacilityMarkers();
     });
 
     map.current.on('zoomstart', () => {
       isUserInteractionRef.current = true;
       setIsMapMoving(true);
       hideMarkers();
+      clearFacilityMarkers();
     });
 
     map.current.on('moveend', () => {
@@ -378,15 +475,40 @@ export default function ShachuHakuMap({
         .setLngLat(spot.coordinates)
         .addTo(map.current!);
 
-      // Click event - call callback to show custom popup
+      // Click event - show facility markers + call callback
       markerElement.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent map click event from firing
+        e.stopPropagation(); // Prevent map click from firing (which clears facility markers)
+        showFacilityMarkers(spot);
         onSpotSelect(spot);
       });
 
       markersRef.current.push(marker);
     });
-  }, [spots, mapLoaded, onSpotSelect, isMapMoving, markerUpdateTrigger]);
+  }, [
+    spots,
+    mapLoaded,
+    onSpotSelect,
+    isMapMoving,
+    markerUpdateTrigger,
+    showFacilityMarkers,
+    clearFacilityMarkers,
+  ]);
+
+  // Clear facility markers when parent deselects the spot (e.g. ✕ button in SpotPopup)
+  useEffect(() => {
+    if (!activatedSpotId) {
+      clearFacilityMarkers();
+    }
+  }, [activatedSpotId, clearFacilityMarkers]);
+
+  // Clear facility markers when clicking map background
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    map.current.on('click', clearFacilityMarkers);
+    return () => {
+      map.current?.off('click', clearFacilityMarkers);
+    };
+  }, [mapLoaded, clearFacilityMarkers]);
 
   // Initial load only: Trigger bounds change to load spots
   useEffect(() => {
@@ -430,11 +552,16 @@ export default function ShachuHakuMap({
     // If initialBounds is provided, check if it's different from last applied
     if (initialBounds) {
       // Check if this is a new bounds value (different from last applied)
-      const isSameBounds = lastAppliedBoundsRef.current &&
-        Math.abs(lastAppliedBoundsRef.current.north - initialBounds.north) < 0.0001 &&
-        Math.abs(lastAppliedBoundsRef.current.south - initialBounds.south) < 0.0001 &&
-        Math.abs(lastAppliedBoundsRef.current.east - initialBounds.east) < 0.0001 &&
-        Math.abs(lastAppliedBoundsRef.current.west - initialBounds.west) < 0.0001;
+      const isSameBounds =
+        lastAppliedBoundsRef.current &&
+        Math.abs(lastAppliedBoundsRef.current.north - initialBounds.north) <
+          0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.south - initialBounds.south) <
+          0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.east - initialBounds.east) <
+          0.0001 &&
+        Math.abs(lastAppliedBoundsRef.current.west - initialBounds.west) <
+          0.0001;
 
       // Only apply if bounds have changed (e.g., prefecture jump)
       if (!isSameBounds) {
@@ -460,7 +587,7 @@ export default function ShachuHakuMap({
             {
               padding: 0, // No padding for consistent display across devices
               duration: 1000, // Smooth animation
-            }
+            },
           );
         }
       }
@@ -505,6 +632,7 @@ export default function ShachuHakuMap({
       <div className='w-full aspect-16/10 max-h-[300px] sm:max-h-[600px]'>
         <div ref={mapContainer} className='w-full h-full rounded-lg' />
       </div>
+
       <div className='absolute bottom-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600'>
         <div className='text-xs text-gray-600 dark:text-gray-400'>
           スポット数: {spots.length}
