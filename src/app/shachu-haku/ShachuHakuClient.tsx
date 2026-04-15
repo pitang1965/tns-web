@@ -595,6 +595,7 @@ export default function ShachuHakuClient() {
                     onZoomChange={setMapZoom}
                     onCenterChange={setMapCenter}
                     isLandscape={isLandscape}
+                    activatedSpotId={selectedSpot?._id ?? null}
                   />
                 </div>
                 {/* ランドスケープ時はポップアップを右側に表示 */}

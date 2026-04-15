@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { formatDistance } from '@/lib/formatDistance';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -43,6 +44,8 @@ type ShachuHakuMapProps = {
   onZoomChange?: (zoom: number) => void;
   onCenterChange?: (center: [number, number]) => void;
   isLandscape?: boolean;
+  /** 親コンポーネントで選択中のスポットID。nullになると施設マーカーをクリア */
+  activatedSpotId?: string | null;
 };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -59,15 +62,98 @@ export default function ShachuHakuMap({
   onZoomChange,
   onCenterChange,
   isLandscape = false,
+  activatedSpotId,
 }: ShachuHakuMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const facilityMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const [isMapMoving, setIsMapMoving] = useState(false);
   const currentZoomRef = useRef<number>(9); // Use ref instead of state to avoid re-renders
   const [markerUpdateTrigger, setMarkerUpdateTrigger] = useState(0); // Trigger marker updates
   const isUserInteractionRef = useRef(false); // Track if user is interacting
+
+  const clearFacilityMarkers = useCallback(() => {
+    facilityMarkersRef.current.forEach((marker) => marker.remove());
+    facilityMarkersRef.current = [];
+  }, []);
+
+  const isValidCoords = (coords: unknown): coords is [number, number] =>
+    Array.isArray(coords) &&
+    coords.length === 2 &&
+    typeof coords[0] === 'number' &&
+    typeof coords[1] === 'number' &&
+    !isNaN(coords[0]) &&
+    !isNaN(coords[1]);
+
+  const FACILITY_CONFIGS = [
+    {
+      key: 'nearbyToiletCoordinates' as const,
+      distKey: 'distanceToToilet' as const,
+      emoji: '🚻',
+      label: 'トイレ',
+      color: '#8b5cf6',
+    },
+    {
+      key: 'nearbyConvenienceCoordinates' as const,
+      distKey: 'distanceToConvenience' as const,
+      emoji: '🏪',
+      label: 'コンビニ',
+      color: '#10b981',
+    },
+    {
+      key: 'nearbyBathCoordinates' as const,
+      distKey: 'distanceToBath' as const,
+      emoji: '♨️',
+      label: '入浴施設',
+      color: '#f59e0b',
+    },
+  ] as const;
+
+  const showFacilityMarkers = useCallback(
+    (spot: CampingSpotWithId) => {
+      if (!map.current) return;
+      clearFacilityMarkers();
+
+      FACILITY_CONFIGS.forEach(({ key, distKey, emoji, color }) => {
+        const coords = spot[key];
+        if (!isValidCoords(coords)) return;
+
+        const el = document.createElement('div');
+        el.className = 'facility-marker';
+        el.style.cssText = `
+        width: 28px;
+        height: 28px;
+        background-color: ${color};
+        border: 3px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: default;
+        pointer-events: none;
+        animation: facilityFadeIn 0.15s ease-out;
+      `;
+        el.textContent = emoji;
+
+        const distance = spot[distKey];
+        el.title =
+          distance !== undefined
+            ? `${emoji} ${formatDistance(distance)}`
+            : emoji;
+
+        const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat(coords as [number, number])
+          .addTo(map.current!);
+
+        facilityMarkersRef.current.push(marker);
+      });
+    },
+    [clearFacilityMarkers],
+  );
 
   // Hide/show markers during map movement
   const hideMarkers = useCallback(() => {
@@ -151,6 +237,13 @@ export default function ShachuHakuMap({
           background-color: #f3f4f6 !important;
           color: #111827 !important;
         }
+        .facility-marker {
+          transition: transform 0.2s ease;
+        }
+        @keyframes facilityFadeIn {
+          from { opacity: 0; transform: scale(0.7); }
+          to   { opacity: 1; transform: scale(1); }
+        }
         /* Mapbox UI elements z-index adjustments */
         .mapboxgl-ctrl-bottom-left,
         .mapboxgl-ctrl-bottom-right {
@@ -222,7 +315,7 @@ export default function ShachuHakuMap({
           {
             padding: 0, // No padding for consistent display across devices
             duration: 0, // No animation on initial load
-          }
+          },
         );
       }
 
@@ -252,12 +345,14 @@ export default function ShachuHakuMap({
       isUserInteractionRef.current = true; // User is interacting
       setIsMapMoving(true);
       hideMarkers();
+      clearFacilityMarkers();
     });
 
     map.current.on('zoomstart', () => {
       isUserInteractionRef.current = true; // User is interacting
       setIsMapMoving(true);
       hideMarkers();
+      clearFacilityMarkers();
     });
 
     map.current.on('moveend', () => {
@@ -334,7 +429,7 @@ export default function ShachuHakuMap({
       const existingPopups = document.querySelectorAll('.mapboxgl-popup');
       existingPopups.forEach((popup) => {
         const closeButton = popup.querySelector(
-          '.mapboxgl-popup-close-button'
+          '.mapboxgl-popup-close-button',
         ) as HTMLElement;
         if (closeButton) {
           closeButton.click();
@@ -437,7 +532,8 @@ export default function ShachuHakuMap({
         e.stopPropagation(); // Prevent map click event from firing
 
         if (readonly) {
-          // For readonly mode (public view), call callback to show custom popup
+          // For readonly mode (public view), show facility markers + call callback
+          showFacilityMarkers(spot);
           onSpotSelect(spot);
         } else {
           // For admin mode, show Mapbox popup
@@ -445,7 +541,7 @@ export default function ShachuHakuMap({
           const existingPopups = document.querySelectorAll('.mapboxgl-popup');
           existingPopups.forEach((popup) => {
             const closeButton = popup.querySelector(
-              '.mapboxgl-popup-close-button'
+              '.mapboxgl-popup-close-button',
             ) as HTMLElement;
             if (closeButton) {
               closeButton.click();
@@ -456,6 +552,7 @@ export default function ShachuHakuMap({
           marker.togglePopup();
 
           // Also call the spot selection handler
+          showFacilityMarkers(spot);
           onSpotSelect(spot);
         }
       });
@@ -469,7 +566,25 @@ export default function ShachuHakuMap({
     readonly,
     isMapMoving,
     markerUpdateTrigger,
+    showFacilityMarkers,
+    clearFacilityMarkers,
   ]);
+
+  // Clear facility markers when parent deselects the spot (e.g. ✕ button in SpotPopup)
+  useEffect(() => {
+    if (!activatedSpotId) {
+      clearFacilityMarkers();
+    }
+  }, [activatedSpotId, clearFacilityMarkers]);
+
+  // Clear facility markers when clicking map background
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    map.current.on('click', clearFacilityMarkers);
+    return () => {
+      map.current?.off('click', clearFacilityMarkers);
+    };
+  }, [mapLoaded, clearFacilityMarkers]);
 
   // Initial load only: Trigger bounds change to load spots
   useEffect(() => {
@@ -546,7 +661,7 @@ export default function ShachuHakuMap({
             {
               padding: 0, // No padding for consistent display across devices
               duration: 1000, // Smooth animation
-            }
+            },
           );
         }
       }
@@ -579,7 +694,7 @@ export default function ShachuHakuMap({
 
   const createPopupHTML = (
     spot: CampingSpotWithId,
-    isReadonly: boolean
+    isReadonly: boolean,
   ): string => {
     return `
       <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
@@ -592,18 +707,18 @@ export default function ShachuHakuMap({
           }</div>
           <div class="flex justify-between items-center">
             <span><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(
-              spot
+              spot,
             )}/5 🔒</span>
             <span><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(
-              spot
+              spot,
             )}/5 🔇</span>
           </div>
           <div><strong class="text-gray-900">料金:</strong> ${
             spot.pricing.isFree
               ? '無料'
               : spot.pricing.pricePerNight
-              ? `¥${spot.pricing.pricePerNight}/泊`
-              : '有料：？円/泊'
+                ? `¥${spot.pricing.pricePerNight}/泊`
+                : '有料：？円/泊'
           }</div>
           <div class="mt-3 pt-2 border-t border-gray-200">
             <button
