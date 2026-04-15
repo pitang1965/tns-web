@@ -268,6 +268,19 @@ ${spot.notes ?? 'なし'} → `;
             </CardContent>
           </Card>
 
+          <div className='flex gap-3 flex-wrap'>
+            <AdLink
+              href='https://amzn.to/48vDnfQ'
+              label='ポータブル電源セール'
+              shortLabel='ポタ電セール'
+            />
+            <AdLink
+              href='https://amzn.to/4tTWIzU'
+              label='走行充電器'
+              shortLabel='走行充電器'
+            />
+          </div>
+
           {spot.notes && (
             <Card>
               <CardHeader>
@@ -290,13 +303,6 @@ ${spot.notes ?? 'なし'} → `;
           <SpotNightNoiseCard spot={spot} />
           <SpotAmenitiesCard spot={spot} />
           <SpotRestrictionsCard spot={spot} />
-          <div className='flex justify-center'>
-            <AdLink
-              href='https://amzn.to/48vDnfQ'
-              label='ポータブル電源セール'
-              shortLabel='ポタ電セール'
-            />
-          </div>
         </div>
       </div>
 
