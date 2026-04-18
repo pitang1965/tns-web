@@ -18,7 +18,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,6 +42,7 @@ import { FacilitiesMap } from './FacilitiesMap';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { MissingFieldsConfirmDialog } from './MissingFieldsConfirmDialog';
 import { CloseConfirmDialog } from './CloseConfirmDialog';
+import { SpotSearchButtons } from './SpotSearchButtons';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -98,7 +98,7 @@ export default function ShachuHakuForm({
   const { saveScrollPosition } = useScrollRestoration(
     cardRef,
     'admin-spot-scroll',
-    [spot?.name, spot?.prefecture]
+    [spot?.name, spot?.prefecture],
   );
 
   // Save scroll position and navigate
@@ -109,7 +109,6 @@ export default function ShachuHakuForm({
     }
   };
 
-
   const {
     register,
     handleSubmit,
@@ -119,7 +118,7 @@ export default function ShachuHakuForm({
     formState: { errors },
   } = useForm<ShachuHakuFormData>({
     resolver: zodResolver(
-      isEdit ? ShachuHakuFormEditSchema : ShachuHakuFormCreateSchema
+      isEdit ? ShachuHakuFormEditSchema : ShachuHakuFormCreateSchema,
     ),
     defaultValues: DEFAULT_FORM_VALUES,
   });
@@ -251,75 +250,10 @@ export default function ShachuHakuForm({
             <CardTitle>
               {isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}
             </CardTitle>
-            <div className='flex items-center gap-2'>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                disabled={!watch('name')}
-                onClick={() => {
-                  const name = watch('name');
-                  const url = `http://search.ipos-land.jp/p/parklist.aspx?q=${encodeURIComponent(name)}`;
-                  window.open(url, '_blank');
-                }}
-                className='flex items-center gap-1 cursor-pointer'
-                title='iPosNetで名称を検索'
-              >
-                <Search className='w-4 h-4' />
-                iPosNet
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                disabled={!watch('name')}
-                onClick={() => {
-                  const name = watch('name');
-                  const url = `https://www.kurumatabi.com/park/search.php?q=${encodeURIComponent(name)}`;
-                  window.open(url, '_blank');
-                }}
-                className='flex items-center gap-1 cursor-pointer'
-                title='くるま旅で名称を検索'
-              >
-                <Search className='w-4 h-4' />
-                くるま旅
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                disabled={!watch('name') || !watch('address')}
-                onClick={() => {
-                  const name = watch('name');
-                  const address = watch('address');
-                  const searchQuery = `${name} ${address}`;
-                  const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
-                  window.open(url, '_blank');
-                }}
-                className='flex items-center gap-1 cursor-pointer'
-                title='名称と住所で Google AI モード検索'
-              >
-                <Search className='w-4 h-4' />
-                AI(基本)
-              </Button>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                disabled={!watch('name')}
-                onClick={() => {
-                  const name = watch('name');
-                  const searchQuery = `${name} 車中泊 周辺観光スポット`;
-                  const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
-                  window.open(url, '_blank');
-                }}
-                className='flex items-center gap-1 cursor-pointer'
-                title='周辺観光スポットをGoogle AI モード検索（notes記入用）'
-              >
-                <Search className='w-4 h-4' />
-                AI(観光)
-              </Button>
-            </div>
+            <SpotSearchButtons
+              name={watch('name') ?? ''}
+              address={watch('address') ?? ''}
+            />
           </div>
         </CardHeader>
         <CardContent ref={cardRef} className='overflow-auto flex-1'>

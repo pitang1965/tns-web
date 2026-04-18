@@ -19,6 +19,7 @@ import { PricingFields } from './PricingFields';
 import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
+import { SpotSearchButtons } from './SpotSearchButtons';
 
 type SubmissionEditFormProps = {
   submission: CampingSpotSubmissionWithId;
@@ -282,9 +283,15 @@ export default function SubmissionEditForm({
       <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
         <CardHeader className='flex flex-row items-center justify-between'>
           <CardTitle>投稿の編集と承認</CardTitle>
-          <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
-            <X className='w-4 h-4' />
-          </Button>
+          <div className='flex items-center gap-2'>
+            <SpotSearchButtons
+              name={watch('name') ?? ''}
+              address={watch('address') ?? ''}
+            />
+            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
+              <X className='w-4 h-4' />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className='mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg'>
