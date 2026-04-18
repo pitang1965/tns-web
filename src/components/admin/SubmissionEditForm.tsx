@@ -281,14 +281,16 @@ export default function SubmissionEditForm({
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
-        <CardHeader className='flex flex-row items-center justify-between'>
-          <CardTitle>投稿の編集と承認</CardTitle>
-          <div className='flex items-center gap-2'>
-            <SpotSearchButtons
-              name={watch('name') ?? ''}
-              address={watch('address') ?? ''}
-            />
-            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
+        <CardHeader>
+          <div className='flex items-start justify-between gap-2'>
+            <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+              <CardTitle>投稿の編集と承認</CardTitle>
+              <SpotSearchButtons
+                name={watch('name') ?? ''}
+                address={watch('address') ?? ''}
+              />
+            </div>
+            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer shrink-0'>
               <X className='w-4 h-4' />
             </Button>
           </div>

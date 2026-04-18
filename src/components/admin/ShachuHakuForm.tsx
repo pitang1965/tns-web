@@ -246,7 +246,7 @@ export default function ShachuHakuForm({
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-4xl max-h-[90vh] flex flex-col'>
         <CardHeader className='shrink-0'>
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
             <CardTitle>
               {isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}
             </CardTitle>

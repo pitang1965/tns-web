@@ -10,7 +10,7 @@ type SpotSearchButtonsProps = {
 
 export function SpotSearchButtons({ name, address }: SpotSearchButtonsProps) {
   return (
-    <div className='flex items-center gap-2'>
+    <div className='grid grid-cols-2 gap-2 sm:flex sm:flex-row sm:items-center'>
       <Button
         type='button'
         variant='outline'
