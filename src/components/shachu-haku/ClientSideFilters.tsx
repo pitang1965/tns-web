@@ -17,6 +17,7 @@ export type ClientSideFilterValues = {
   minSecurityLevel: number;
   minQuietnessLevel: number;
   maxToiletDistance: number | null;
+  maxConvenienceDistance: number | null;
   minElevation: number | null;
   maxElevation: number | null;
 };
@@ -36,6 +37,7 @@ export default function ClientSideFilters({
       minSecurityLevel: 0,
       minQuietnessLevel: 0,
       maxToiletDistance: null,
+      maxConvenienceDistance: null,
       minElevation: null,
       maxElevation: null,
     });
@@ -46,6 +48,7 @@ export default function ClientSideFilters({
     filters.minSecurityLevel > 0,
     filters.minQuietnessLevel > 0,
     filters.maxToiletDistance !== null,
+    filters.maxConvenienceDistance !== null,
     filters.minElevation !== null,
     filters.maxElevation !== null,
   ].filter(Boolean).length;
@@ -155,9 +158,31 @@ export default function ClientSideFilters({
             }
           >
             <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='50'>50m以内</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value='100'>100m以内</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value='200'>200m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='300'>300m以内</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </div>
+
+        <DropdownMenuSeparator />
+
+        {/* コンビニまでの距離 */}
+        <div className='px-2 py-2'>
+          <p className='text-sm font-medium mb-2'>コンビニまでの距離</p>
+          <DropdownMenuRadioGroup
+            value={filters.maxConvenienceDistance?.toString() || 'all'}
+            onValueChange={(value) =>
+              onFiltersChange({
+                ...filters,
+                maxConvenienceDistance:
+                  value === 'all' ? null : parseInt(value),
+              })
+            }
+          >
+            <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='100'>100m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='200'>200m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value='300'>300m以内</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
@@ -171,8 +196,8 @@ export default function ClientSideFilters({
               filters.minElevation !== null
                 ? `min-${filters.minElevation}`
                 : filters.maxElevation !== null
-                ? `max-${filters.maxElevation}`
-                : 'all'
+                  ? `max-${filters.maxElevation}`
+                  : 'all'
             }
             onValueChange={(value) => {
               if (value === 'all') {
@@ -198,7 +223,7 @@ export default function ClientSideFilters({
           >
             <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value='max-500'>
-              500m以下
+              500m未満
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem value='min-500'>
               500m以上

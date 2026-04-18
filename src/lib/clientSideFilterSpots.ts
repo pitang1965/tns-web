@@ -47,6 +47,16 @@ export function filterSpotsClientSide(
       }
     }
 
+    // コンビニまでの距離フィルター
+    if (filters.maxConvenienceDistance !== null) {
+      if (
+        spot.distanceToConvenience == null ||
+        spot.distanceToConvenience > filters.maxConvenienceDistance
+      ) {
+        return false;
+      }
+    }
+
     // 標高フィルター (最小値)
     if (filters.minElevation !== null) {
       if (!spot.elevation || spot.elevation < filters.minElevation) {
@@ -54,9 +64,9 @@ export function filterSpotsClientSide(
       }
     }
 
-    // 標高フィルター (最大値)
+    // 標高フィルター (最大値、未満で判定)
     if (filters.maxElevation !== null) {
-      if (!spot.elevation || spot.elevation > filters.maxElevation) {
+      if (!spot.elevation || spot.elevation >= filters.maxElevation) {
         return false;
       }
     }
@@ -76,6 +86,7 @@ export function hasActiveClientFilters(
     filters.minSecurityLevel > 0 ||
     filters.minQuietnessLevel > 0 ||
     filters.maxToiletDistance !== null ||
+    filters.maxConvenienceDistance !== null ||
     filters.minElevation !== null ||
     filters.maxElevation !== null
   );

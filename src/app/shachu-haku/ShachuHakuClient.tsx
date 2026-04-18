@@ -226,6 +226,10 @@ export default function ShachuHakuClient() {
         clientFilters.maxToiletDistance !== null
           ? clientFilters.maxToiletDistance
           : null,
+      max_convenience_dist:
+        clientFilters.maxConvenienceDistance !== null
+          ? clientFilters.maxConvenienceDistance
+          : null,
       min_elevation:
         clientFilters.minElevation !== null ? clientFilters.minElevation : null,
       max_elevation:

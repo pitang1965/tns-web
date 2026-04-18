@@ -52,6 +52,66 @@ export default function ShachuHakuFilters({
 }: ShachuHakuFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const quickFilters = [
+    {
+      label: '無料',
+      isActive: clientFilters.pricingFilter === 'free',
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          pricingFilter: clientFilters.pricingFilter === 'free' ? 'all' : 'free',
+        }),
+    },
+    {
+      label: '治安★4以上',
+      isActive: clientFilters.minSecurityLevel >= 4,
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          minSecurityLevel: clientFilters.minSecurityLevel >= 4 ? 0 : 4,
+        }),
+    },
+    {
+      label: '静か★4以上',
+      isActive: clientFilters.minQuietnessLevel >= 4,
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          minQuietnessLevel: clientFilters.minQuietnessLevel >= 4 ? 0 : 4,
+        }),
+    },
+    {
+      label: 'トイレ200m以内',
+      isActive:
+        clientFilters.maxToiletDistance !== null &&
+        clientFilters.maxToiletDistance <= 200,
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          maxToiletDistance:
+            clientFilters.maxToiletDistance !== null &&
+            clientFilters.maxToiletDistance <= 200
+              ? null
+              : 200,
+        }),
+    },
+    {
+      label: 'コンビニ200m以内',
+      isActive:
+        clientFilters.maxConvenienceDistance !== null &&
+        clientFilters.maxConvenienceDistance <= 200,
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          maxConvenienceDistance:
+            clientFilters.maxConvenienceDistance !== null &&
+            clientFilters.maxConvenienceDistance <= 200
+              ? null
+              : 200,
+        }),
+    },
+  ];
+
   const {
     inputValue,
     setInputValue,
@@ -127,6 +187,24 @@ export default function ShachuHakuFilters({
               )}
             </Button>
           </CollapsibleTrigger>
+
+          {/* Quick Filter Chips - always visible on mobile */}
+          <div className='flex flex-wrap gap-1.5 mb-2'>
+            {quickFilters.map((chip) => (
+              <button
+                key={chip.label}
+                type='button'
+                onClick={chip.onToggle}
+                className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
+                  chip.isActive
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-background text-foreground border-input hover:bg-accent'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
 
           {/* Collapsible Content */}
           <CollapsibleContent>
@@ -370,6 +448,24 @@ export default function ShachuHakuFilters({
                 </Button>
               )}
             </div>
+          </div>
+
+          {/* Quick Filter Chips - desktop */}
+          <div className='flex gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700'>
+            {quickFilters.map((chip) => (
+              <button
+                key={chip.label}
+                type='button'
+                onClick={chip.onToggle}
+                className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
+                  chip.isActive
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-background text-foreground border-input hover:bg-accent'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
         </div>
       </CardContent>

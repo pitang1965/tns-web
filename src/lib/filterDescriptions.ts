@@ -52,6 +52,12 @@ export function getActiveFilterDescriptions(
     );
   }
 
+  if (clientFilters.maxConvenienceDistance !== null) {
+    descriptions.push(
+      `コンビニまでの距離：${clientFilters.maxConvenienceDistance}m以内`
+    );
+  }
+
   if (
     clientFilters.minElevation !== null &&
     clientFilters.maxElevation !== null
@@ -62,7 +68,7 @@ export function getActiveFilterDescriptions(
   } else if (clientFilters.minElevation !== null) {
     descriptions.push(`標高：${clientFilters.minElevation}m以上`);
   } else if (clientFilters.maxElevation !== null) {
-    descriptions.push(`標高：${clientFilters.maxElevation}m以下`);
+    descriptions.push(`標高：${clientFilters.maxElevation}m未満`);
   }
 
   return descriptions;

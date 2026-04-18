@@ -63,6 +63,7 @@ export const useShachuHakuFilters = ({
         searchParams.get('min_security') !== null ||
         searchParams.get('min_quietness') !== null ||
         searchParams.get('max_toilet_dist') !== null ||
+        searchParams.get('max_convenience_dist') !== null ||
         searchParams.get('min_elevation') !== null ||
         searchParams.get('max_elevation') !== null;
 
@@ -76,6 +77,9 @@ export const useShachuHakuFilters = ({
           minQuietnessLevel: parseInt(searchParams.get('min_quietness') || '0'),
           maxToiletDistance: searchParams.get('max_toilet_dist')
             ? parseInt(searchParams.get('max_toilet_dist')!)
+            : null,
+          maxConvenienceDistance: searchParams.get('max_convenience_dist')
+            ? parseInt(searchParams.get('max_convenience_dist')!)
             : null,
           minElevation: searchParams.get('min_elevation')
             ? parseInt(searchParams.get('min_elevation')!)
@@ -97,6 +101,7 @@ export const useShachuHakuFilters = ({
         minSecurityLevel: 0,
         minQuietnessLevel: 0,
         maxToiletDistance: null,
+        maxConvenienceDistance: null,
         minElevation: null,
         maxElevation: null,
       };
@@ -264,6 +269,7 @@ export const useShachuHakuFilters = ({
       minSecurityLevel: 0,
       minQuietnessLevel: 0,
       maxToiletDistance: null,
+      maxConvenienceDistance: null,
       minElevation: null,
       maxElevation: null,
     });
