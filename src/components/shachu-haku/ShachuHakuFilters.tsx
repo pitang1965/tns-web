@@ -131,6 +131,7 @@ export default function ShachuHakuFilters({
     if (clientFilters.minSecurityLevel > 0) count++;
     if (clientFilters.minQuietnessLevel > 0) count++;
     if (clientFilters.maxToiletDistance !== null) count++;
+    if (clientFilters.maxConvenienceDistance !== null) count++;
     if (clientFilters.minElevation !== null) count++;
     if (clientFilters.maxElevation !== null) count++;
     return count;
@@ -386,6 +387,11 @@ export default function ShachuHakuFilters({
             <span className='text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap'>
               絞り込み:
             </span>
+            {activeFiltersCount > 0 && (
+              <span className='px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white'>
+                {activeFiltersCount}
+              </span>
+            )}
             <div className='flex gap-2 flex-1'>
               <div className='flex gap-1 flex-1 max-w-sm'>
                 <div className='relative flex-1'>
