@@ -40,7 +40,7 @@ export function filterSpotsClientSide(
     // トイレまでの距離フィルター
     if (filters.maxToiletDistance !== null) {
       if (
-        !spot.distanceToToilet ||
+        spot.distanceToToilet == null ||
         spot.distanceToToilet > filters.maxToiletDistance
       ) {
         return false;
