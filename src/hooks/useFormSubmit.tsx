@@ -129,20 +129,20 @@ export function useFormSubmit({
       formData.append('securityHasGate', data.securityHasGate.toString());
       formData.append(
         'securityHasLighting',
-        data.securityHasLighting.toString()
+        data.securityHasLighting.toString(),
       );
       formData.append('securityHasStaff', data.securityHasStaff.toString());
       formData.append(
         'nightNoiseHasNoiseIssues',
-        data.nightNoiseHasNoiseIssues.toString()
+        data.nightNoiseHasNoiseIssues.toString(),
       );
       formData.append(
         'nightNoiseNearBusyRoad',
-        data.nightNoiseNearBusyRoad.toString()
+        data.nightNoiseNearBusyRoad.toString(),
       );
       formData.append(
         'nightNoiseIsQuietArea',
-        data.nightNoiseIsQuietArea.toString()
+        data.nightNoiseIsQuietArea.toString(),
       );
 
       // 旧評価システム（段階的廃止予定）
@@ -182,7 +182,19 @@ export function useFormSubmit({
         await updateCampingSpot(spot._id, formData);
       } else {
         const result = await createCampingSpot(formData);
-        if (result.success && result.id) {
+        if (!result.success) {
+          if (result.code === 'DUPLICATE') {
+            toast({
+              title: '重複エラー',
+              description: <p className='font-semibold'>{result.error}</p>,
+              variant: 'destructive',
+              duration: 10000,
+            });
+            return;
+          }
+          throw new Error(result.error);
+        }
+        if (result.id) {
           createdId = result.id;
         }
       }

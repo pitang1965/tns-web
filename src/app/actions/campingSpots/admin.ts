@@ -11,6 +11,7 @@ import { checkAdminAuth } from './auth';
 import { logger } from '@/lib/logger';
 import { convertFormDataToCampingSpot } from './helpers';
 import { escapeRegex } from '@/lib/utils/searchNormalize';
+import { calculateDistance } from '@/lib/utils/distance';
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
   await checkAdminAuth();
@@ -90,7 +91,7 @@ export async function getCampingSpotsByBounds(
     searchTerm?: string;
     prefecture?: string;
     type?: string;
-  }
+  },
 ) {
   await checkAdminAuth();
   await ensureDbConnection();
@@ -121,7 +122,10 @@ export async function getCampingSpotsByBounds(
   // Get total count without bounds filter for "全○○件中" display
   const totalQuery: Record<string, unknown> = {};
   if (options?.searchTerm) {
-    totalQuery.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
+    totalQuery.name = {
+      $regex: escapeRegex(options.searchTerm),
+      $options: 'i',
+    };
   }
   if (options?.prefecture && options.prefecture !== 'all') {
     totalQuery.prefecture = options.prefecture;
@@ -150,7 +154,7 @@ export async function getCampingSpotsWithPagination(
     prefecture?: string;
     type?: string;
     bounds?: { north: number; south: number; east: number; west: number };
-  }
+  },
 ) {
   await checkAdminAuth();
   await ensureDbConnection();
@@ -268,7 +272,7 @@ export async function getCampingSpotById(id: string) {
   } catch (error) {
     logger.error(
       error instanceof Error ? error : new Error('Error in getCampingSpotById'),
-      { id }
+      { id },
     );
 
     // Always throw a proper Error object, never undefined
@@ -298,17 +302,80 @@ export async function createCampingSpot(data: FormData) {
   // Validate the data
   const validatedData = CampingSpotSchema.parse(spotData);
 
+  // 同名または同URLのスポットが200m以内にあれば重複とみなす
+  type SpotLean = {
+    name: string;
+    prefecture: string;
+    coordinates: [number, number];
+  };
+
+  const [lng, lat] = validatedData.coordinates;
+  const nameOrUrlConditions: Record<string, unknown>[] = [
+    { name: validatedData.name },
+  ];
+  if (validatedData.url) {
+    nameOrUrlConditions.push({ url: validatedData.url });
+  }
+
+  const candidates = await CampingSpot.find({
+    $or: nameOrUrlConditions,
+  }).lean();
+
+  for (const candidate of candidates) {
+    const spot = candidate as unknown as SpotLean;
+    const distance = calculateDistance(
+      lat,
+      lng,
+      spot.coordinates[1],
+      spot.coordinates[0],
+    );
+    if (distance <= 200) {
+      return {
+        success: false as const,
+        code: 'DUPLICATE' as const,
+        error: `同名またはURLが同じスポットが200m以内に既に登録されています: ${spot.name} (${Math.round(distance)}m先)`,
+      };
+    }
+  }
+
+  // 名前・URL問わず10m以内の既存スポットも重複とみなす
+  const veryNearbySpots = await CampingSpot.find({
+    coordinates: {
+      $near: {
+        $geometry: { type: 'Point', coordinates: [lng, lat] },
+        $maxDistance: 10,
+      },
+    },
+  })
+    .limit(1)
+    .lean();
+
+  if (veryNearbySpots.length > 0) {
+    const spot = veryNearbySpots[0] as unknown as SpotLean;
+    const distance = calculateDistance(
+      lat,
+      lng,
+      spot.coordinates[1],
+      spot.coordinates[0],
+    );
+    return {
+      success: false as const,
+      code: 'DUPLICATE' as const,
+      error: `非常に近い場所に既存のスポットがあります: ${spot.name} (${Math.round(distance)}m先)`,
+    };
+  }
+
   // Remove undefined fields to prevent them from being stored
   const cleanData = Object.fromEntries(
-    Object.entries(validatedData).filter(([key, value]) => value !== undefined)
+    Object.entries(validatedData).filter(([key, value]) => value !== undefined),
   );
 
   // Handle nested pricing object
   if (cleanData.pricing) {
     const cleanPricing = Object.fromEntries(
       Object.entries(cleanData.pricing as any).filter(
-        ([key, value]) => value !== undefined
-      )
+        ([key, value]) => value !== undefined,
+      ),
     );
     cleanData.pricing = cleanPricing as typeof cleanData.pricing;
   }
@@ -448,7 +515,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   if (!updatedSpot) {

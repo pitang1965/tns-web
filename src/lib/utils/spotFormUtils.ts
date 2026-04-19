@@ -29,7 +29,7 @@ export function hasFormInput(formValues: ShachuHakuFormData): boolean {
  * @returns フォーム用のデータ
  */
 export function convertSpotToFormValues(
-  spot: CampingSpotWithId
+  spot: CampingSpotWithId,
 ): ShachuHakuFormData {
   return {
     name: spot.name,
@@ -101,7 +101,7 @@ export function convertSpotToFormValues(
  */
 export function getErrorDetails(
   error: unknown,
-  isEdit: boolean
+  isEdit: boolean,
 ): {
   errorTitle: string;
   errorMessage: string;
