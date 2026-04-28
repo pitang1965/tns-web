@@ -14,7 +14,7 @@ const dayPlanSchema = z.object({
 const baseSchema = z.object({
   title: z.string().min(1, '旅程タイトルを入力してください'),
   description: z.string().default(''),
-  numberOfDays: z.number().min(1, '日数を入力してください'),
+  numberOfDays: z.number({ invalid_type_error: '日数を入力してください' }).min(1, '日数を入力してください'),
   startDate: z.string().optional(),
   dayPlans: z.array(dayPlanSchema),
   owner: userReferenceSchema,
