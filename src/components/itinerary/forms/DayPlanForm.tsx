@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Plus, PlusCircle, Map, Clock, Tent } from 'lucide-react';
+import { Plus, PlusCircle, Map, Clock, Tent, Navigation } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { ActivityOrderList } from './ActivityOrderList';
 import { H3 } from '@/components/common/Typography';
@@ -63,7 +63,7 @@ export function DayPlanForm({
   const moveActivity = (
     dayIndex: number,
     fromIndex: number,
-    toIndex: number
+    toIndex: number,
   ) => {
     const activities = watch(`dayPlans.${dayIndex}.activities`);
     if (!activities) return;
@@ -92,6 +92,57 @@ export function DayPlanForm({
     const activities = watch(`dayPlans.${dayIndex}.activities`) || [];
     setValue(`dayPlans.${dayIndex}.activities`, [...activities, activity], {
       shouldValidate: true,
+    });
+  };
+
+  const previousDayActivities =
+    dayIndex > 0 ? watch(`dayPlans.${dayIndex - 1}.activities`) || [] : [];
+  const previousDayLastActivity =
+    previousDayActivities.length > 0
+      ? previousDayActivities[previousDayActivities.length - 1]
+      : null;
+
+  const showCopyPreviousDayButton =
+    dayIndex > 0 &&
+    watchedActivities.length === 0 &&
+    previousDayLastActivity !== null;
+
+  const handleCopyPreviousDayLastActivity = () => {
+    if (!previousDayLastActivity) return;
+    const newActivity = {
+      id: crypto.randomUUID(),
+      title: previousDayLastActivity.title || '',
+      place: {
+        name: previousDayLastActivity.place?.name || '',
+        type: (previousDayLastActivity.place?.type || 'ATTRACTION') as
+          | 'HOME'
+          | 'ATTRACTION'
+          | 'RESTAURANT'
+          | 'HOTEL'
+          | 'PARKING_PAID_RV_PARK'
+          | 'PARKING_PAID_OTHER'
+          | 'PARKING_FREE_SERVICE_AREA'
+          | 'PARKING_FREE_MICHINOEKI'
+          | 'PARKING_FREE_OTHER'
+          | 'GAS_STATION'
+          | 'CONVENIENCE_SUPERMARKET'
+          | 'BATHING_FACILITY'
+          | 'COIN_LAUNDRY'
+          | 'OTHER',
+        address: previousDayLastActivity.place?.address ?? null,
+        location: previousDayLastActivity.place?.location
+          ? { ...previousDayLastActivity.place.location }
+          : null,
+      },
+      description: null,
+      startTime: null,
+      endTime: null,
+      cost: null,
+      url: previousDayLastActivity.url ?? null,
+    };
+    setValue(`dayPlans.${dayIndex}.activities`, [newActivity], {
+      shouldValidate: true,
+      shouldDirty: true,
     });
   };
 
@@ -248,6 +299,18 @@ export function DayPlanForm({
             />
           </div>
         ))}
+
+        {showCopyPreviousDayButton && (
+          <Button
+            type='button'
+            variant='secondary'
+            onClick={handleCopyPreviousDayLastActivity}
+            className='w-full cursor-pointer'
+          >
+            <Navigation className='h-4 w-4 mr-2' />
+            前日最終地点を追加
+          </Button>
+        )}
 
         <div className='flex gap-2'>
           <Button
