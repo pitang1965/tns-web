@@ -6,6 +6,7 @@ import { ActivityView } from './ActivityView';
 import { H3, LargeText, Text } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Map, MapPin } from 'lucide-react';
 import DailyRouteMap, {
   ActivityLocation,
@@ -43,6 +44,7 @@ const HOME_PROXIMITY_THRESHOLD = 50;
 export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const [showFullMap, setShowFullMap] = useState(false);
   const [showLocationAlert, setShowLocationAlert] = useState(false);
+  const [includeCurrentLocation, setIncludeCurrentLocation] = useState(false);
   const { currentLocation, permissionGranted, loading, error, requestLocation, clearError } = useCurrentLocation();
 
   // 日付表示の生成
@@ -132,10 +134,14 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   // アクティビティが1つ以上ある場合にマップを表示（位置情報不要）
   const shouldShowMap = activitiesWithLocation.length >= 1;
 
-  // マップに渡すアクティビティ（現在地がある場合は追加、ない場合はアクティビティのみ）
-  const mapActivities = currentLocation
-    ? routeActivitiesWithCurrentLocation
-    : activitiesWithLocation;
+  // チェックボックスの表示条件（位置情報取得済みのときのみ）
+  const shouldShowLocationCheckbox = permissionGranted && !!currentLocation && activitiesWithLocation.length >= 1;
+
+  // マップに渡すアクティビティ（チェックボックスで切り替え）
+  const mapActivities =
+    includeCurrentLocation && currentLocation
+      ? routeActivitiesWithCurrentLocation
+      : activitiesWithLocation;
 
   // 位置情報許可ボタンを表示するかどうか（マップが表示されていて位置情報がない場合）
   const shouldShowLocationPermissionButton = !permissionGranted && activitiesWithLocation.length >= 1;
@@ -154,12 +160,23 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
       <div className='flex justify-between items-center mb-4'>
         <H3>{dayDisplay}</H3>
 
-        <div className='flex items-center gap-2'>
-          {/* 位置情報が許可されている場合のみルート検索ボタンを表示 */}
-          {permissionGranted && currentLocation && (
+        <div className='flex items-center gap-2 flex-wrap'>
+          {/* 現在地を含めるチェックボックス（位置情報取得済みのときのみ） */}
+          {shouldShowLocationCheckbox && (
+            <label className='flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer select-none'>
+              <Checkbox
+                checked={includeCurrentLocation}
+                onCheckedChange={(checked) => setIncludeCurrentLocation(checked)}
+              />
+              現在地を含める
+            </label>
+          )}
+
+          {/* 全体ルート検索ボタン（アクティビティがあれば常に表示） */}
+          {activitiesWithLocation.length >= 1 && (
             <DayRouteNavigationButton
               activities={day.activities}
-              currentLocation={currentLocation}
+              currentLocation={includeCurrentLocation && currentLocation ? currentLocation : undefined}
             />
           )}
 

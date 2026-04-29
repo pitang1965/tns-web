@@ -16,7 +16,7 @@ type Location = {
 
 type DayRouteNavigationButtonProps = {
   activities: Activity[];
-  currentLocation: Location;
+  currentLocation?: Location;
   className?: string;
 };
 
@@ -57,27 +57,28 @@ export const DayRouteNavigationButton: React.FC<
 
   // 全体ルート検索を開く
   const openFullRoute = () => {
-    // ルートに含めるアクティビティを決定
     let routeActivities = [...activitiesWithLocation];
 
-    // 最初のアクティビティが自宅タイプで、現在地から50m以内ならスキップ
-    if (routeActivities.length > 0) {
-      const firstActivity = routeActivities[0];
-      const firstLat = firstActivity.place.location?.latitude;
-      const firstLng = firstActivity.place.location?.longitude;
-      if (
-        firstActivity.place.type === 'HOME' &&
-        typeof firstLat === 'number' &&
-        typeof firstLng === 'number'
-      ) {
-        const distance = calculateDistance(
-          currentLocation.latitude,
-          currentLocation.longitude,
-          firstLat,
-          firstLng
-        );
-        if (distance <= HOME_PROXIMITY_THRESHOLD) {
-          routeActivities = routeActivities.slice(1);
+    if (currentLocation) {
+      // 現在地あり: 最初のアクティビティが自宅タイプで50m以内ならスキップ
+      if (routeActivities.length > 0) {
+        const firstActivity = routeActivities[0];
+        const firstLat = firstActivity.place.location?.latitude;
+        const firstLng = firstActivity.place.location?.longitude;
+        if (
+          firstActivity.place.type === 'HOME' &&
+          typeof firstLat === 'number' &&
+          typeof firstLng === 'number'
+        ) {
+          const distance = calculateDistance(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            firstLat,
+            firstLng
+          );
+          if (distance <= HOME_PROXIMITY_THRESHOLD) {
+            routeActivities = routeActivities.slice(1);
+          }
         }
       }
     }
@@ -87,21 +88,19 @@ export const DayRouteNavigationButton: React.FC<
       return;
     }
 
-    // 現在地を出発点として追加
-    const waypoints = [
-      `${currentLocation.latitude},${currentLocation.longitude}`,
-      ...routeActivities.map((activity) => {
-        const { latitude, longitude } = activity.place.location!;
+    const formatActivity = (activity: Activity) => {
+      const { latitude, longitude } = activity.place.location!;
+      const addressString = formatAddress(activity.place.address);
+      return addressString ? encodeURIComponent(addressString) : `${latitude},${longitude}`;
+    };
 
-        // 住所がある場合はエンコードして使用
-        const addressString = formatAddress(activity.place.address);
-        if (addressString) {
-          return encodeURIComponent(addressString);
-        }
-        // 座標のみの場合
-        return `${latitude},${longitude}`;
-      }),
-    ];
+    // 現在地あり: 現在地→アクティビティ群、なし: アクティビティ群のみ
+    const waypoints = currentLocation
+      ? [
+          `${currentLocation.latitude},${currentLocation.longitude}`,
+          ...routeActivities.map(formatActivity),
+        ]
+      : routeActivities.map(formatActivity);
 
     // Google Maps の directions URL を構築
     let url = `https://www.google.com/maps/dir/${waypoints.join('/')}`;
