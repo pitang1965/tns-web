@@ -12,7 +12,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { formatDateWithWeekday } from '@/lib/date';
+import { formatItineraryDuration } from '@/lib/date';
 
 type Props = {
   itinerary: ClientItineraryDocument;
@@ -66,8 +66,7 @@ export const PublicItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>
-          {itinerary.startDate && `${formatDateWithWeekday(itinerary.startDate)} から `}
-          {itinerary.numberOfDays}日間
+          {formatItineraryDuration(itinerary.startDate, itinerary.numberOfDays)}
         </CardDescription>
         <CardDescription className='line-clamp-3'>
           {itinerary.description}

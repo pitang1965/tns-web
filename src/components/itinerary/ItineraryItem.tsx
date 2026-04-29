@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
-import { formatDateWithWeekday } from '@/lib/date';
+import { formatItineraryDuration } from '@/lib/date';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 type Props = {
@@ -50,8 +50,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       </CardHeader>
       <CardContent>
         <CardDescription className='mb-2'>
-          {itinerary.startDate && `${formatDateWithWeekday(itinerary.startDate)} から `}
-          {itinerary.numberOfDays}日間
+          {formatItineraryDuration(itinerary.startDate, itinerary.numberOfDays)}
         </CardDescription>
         <CardDescription className='line-clamp-3'>
           {itinerary.description}

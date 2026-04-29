@@ -23,6 +23,15 @@ export function formatDateWithWeekday(dateString: string): string {
   return `${formattedDate} ${weekday}`;
 }
 
+export function formatItineraryDuration(
+  startDate?: string,
+  numberOfDays?: number,
+): string {
+  const days = `${numberOfDays ?? 0}日間`;
+  if (!startDate) return days;
+  return `${formatDateWithWeekday(startDate)} から ${days}`;
+}
+
 /**
  * 日付のみをISO形式（YYYY-MM-DD）でフォーマットする（曜日なし）
  */
