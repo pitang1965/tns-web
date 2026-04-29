@@ -65,6 +65,7 @@ export function useItineraryForm({
     formState: { errors },
     watch,
     setValue,
+    getValues,
     trigger,
     handleSubmit,
   } = methods;
@@ -89,23 +90,31 @@ export function useItineraryForm({
 
     trigger(['startDate', 'numberOfDays']);
 
+    // 現在のフォーム状態を取得してアクティビティ等を保持する
+    const currentDayPlans = getValues('dayPlans') || [];
+
     const newDayPlans = Array.from({ length: dayCount }, (_, index) => {
-      const existingDayPlan = initialData?.dayPlans?.[index];
+      // フォームの既存データを優先し、なければ initialData にフォールバック
+      const currentDayPlan = currentDayPlans[index];
+      const fallbackDayPlan = initialData?.dayPlans?.[index];
+      const activities = currentDayPlan?.activities ?? fallbackDayPlan?.activities ?? [];
+      const notes = currentDayPlan?.notes ?? fallbackDayPlan?.notes ?? '';
+
       if (startDate) {
         const currentDate = new Date(startDate);
         currentDate.setDate(currentDate.getDate() + index);
         return {
           dayIndex: index,
           date: currentDate.toISOString().split('T')[0],
-          activities: existingDayPlan?.activities || [],
-          notes: existingDayPlan?.notes || '',
+          activities,
+          notes,
         };
       }
       return {
         date: null,
         dayIndex: index,
-        activities: existingDayPlan?.activities || [],
-        notes: existingDayPlan?.notes || '',
+        activities,
+        notes,
       };
     });
 
@@ -116,6 +125,7 @@ export function useItineraryForm({
     setValue,
     initialData,
     trigger,
+    getValues,
   ]);
 
   // フォーム送信処理

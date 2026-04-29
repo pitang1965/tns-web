@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
@@ -59,7 +59,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
     }
   }, [user]);
 
-  const initialData = {
+  const initialData = useMemo(() => ({
     title: '',
     description: '',
     startDate: undefined,
@@ -72,7 +72,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
       name: user?.name || 'Test User',
       email: user?.email || 'test@example.com',
     },
-  };
+  }), [user?.sub, user?.name, user?.email]);
 
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data:', data);
