@@ -29,8 +29,8 @@ export function useFormNavigation({
     const backUrl = isCreating
       ? '/itineraries'
       : itineraryId
-      ? `/itineraries/${itineraryId}`
-      : '/itineraries';
+        ? `/itineraries/${itineraryId}`
+        : '/itineraries';
 
     setBackUrlState(backUrl);
 

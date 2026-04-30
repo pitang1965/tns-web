@@ -49,8 +49,8 @@ export default async function EditItineraryPage({ params }: PageProps) {
   return (
     <Suspense
       fallback={
-        <div className='container mx-auto p-4'>
-          <LoadingState variant='inline' />
+        <div className="container mx-auto p-4">
+          <LoadingState variant="inline" />
         </div>
       }
     >

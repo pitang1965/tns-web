@@ -82,17 +82,19 @@ export function ConfirmationDialog({
             className={cn(
               'cursor-pointer',
               variant === 'destructive' &&
-                'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                'bg-destructive text-destructive-foreground hover:bg-destructive/90',
             )}
           >
             {isProcessing ? (
               <>
-                <Loader2 className='w-4 h-4 mr-1 animate-spin' />
+                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                 {confirmLabel}中...
               </>
             ) : (
               <>
-                {variant === 'destructive' && <Trash2 className='w-4 h-4 mr-1' />}
+                {variant === 'destructive' && (
+                  <Trash2 className="w-4 h-4 mr-1" />
+                )}
                 {confirmLabel}
               </>
             )}

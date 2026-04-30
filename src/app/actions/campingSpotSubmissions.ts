@@ -26,7 +26,7 @@ async function checkAdminAuth() {
 
 // Get all submissions with filters
 export async function getCampingSpotSubmissions(
-  status?: 'pending' | 'approved' | 'rejected'
+  status?: 'pending' | 'approved' | 'rejected',
 ) {
   await checkAdminAuth();
   await ensureDbConnection();
@@ -186,7 +186,7 @@ export async function deleteSubmission(id: string) {
 // Function to approve submission without creating camping spot (for edit workflow)
 export async function approveSubmissionWithoutCreating(
   id: string,
-  reviewNotes?: string
+  reviewNotes?: string,
 ) {
   const user = await checkAdminAuth();
   await ensureDbConnection();

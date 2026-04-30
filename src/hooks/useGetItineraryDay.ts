@@ -24,7 +24,7 @@ type UseGetItineraryDayResult = {
 
 export const useGetItineraryDay = (
   id: string,
-  dayIndex: number // 0ベースのインデックス（useDayParamからの値）
+  dayIndex: number, // 0ベースのインデックス（useDayParamからの値）
 ): UseGetItineraryDayResult => {
   const [metadata, setMetadata] = useState<ItineraryMetadata | undefined>();
   const [dayPlan, setDayPlan] = useState<DayPlan | undefined>();
@@ -39,7 +39,7 @@ export const useGetItineraryDay = (
         setLoading(true);
         // dayIndexはそのまま使用（0ベースのままAPI呼び出し）
         console.log(
-          `Fetching day data for day ${dayIndex} (API index: ${dayIndex})`
+          `Fetching day data for day ${dayIndex} (API index: ${dayIndex})`,
         );
 
         const response = await fetch(`/api/itineraries/${id}/day/${dayIndex}`);
@@ -50,18 +50,16 @@ export const useGetItineraryDay = (
           // 構造化されたエラーメッセージを処理
           if (errorData.error === 'NO_DAY_PLANS') {
             throw new Error(
-              `${errorData.message}\n${errorData.suggestion || ''}`
+              `${errorData.message}\n${errorData.suggestion || ''}`,
             );
           } else if (errorData.error === 'DAY_INDEX_OUT_OF_RANGE') {
-            throw new Error(
-              `${errorData.message}\n${errorData.details || ''}`
-            );
+            throw new Error(`${errorData.message}\n${errorData.details || ''}`);
           }
 
           // 従来のエラーフォーマット
           throw new Error(
             errorData.error ||
-              `旅程データを取得できませんでした。: ${response.status}`
+              `旅程データを取得できませんでした。: ${response.status}`,
           );
         }
 

@@ -21,13 +21,17 @@ export async function createItineraryAction(data: ClientItineraryInput) {
     // 旅程作成制限チェック
     const existingItineraries = await getItineraries();
     if (!canCreateItinerary(session.user, existingItineraries.length)) {
-      throw new Error('旅程作成制限に達しています。プレミアム会員になると無制限に作成できます。');
+      throw new Error(
+        '旅程作成制限に達しています。プレミアム会員になると無制限に作成できます。',
+      );
     }
 
     const now = new Date();
     const newItineraryInput: ClientItineraryInput = {
-     ...data,
-      startDate: data.startDate ? new Date(data.startDate).toISOString() : undefined,
+      ...data,
+      startDate: data.startDate
+        ? new Date(data.startDate).toISOString()
+        : undefined,
       dayPlans: data.dayPlans.map((day) => ({
         ...day,
         activities: day.activities.map((activity) => {
@@ -55,7 +59,9 @@ export async function createItineraryAction(data: ClientItineraryInput) {
 
     return { success: true, id: createdItinerary.id };
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error creating itinerary'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error creating itinerary'),
+    );
     return { success: false, error: 'Failed to create itinerary' };
   }
 }

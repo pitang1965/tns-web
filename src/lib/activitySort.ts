@@ -9,7 +9,7 @@ export function sortActivitiesByTime<T extends Activity>(activities: T[]): T[] {
 
   // 時間が設定されているアクティビティのみを抽出
   const activitiesWithTime = activities.filter(
-    (activity) => activity.startTime || activity.endTime
+    (activity) => activity.startTime || activity.endTime,
   );
 
   if (activitiesWithTime.length < 2) return activities; // 時間設定されたアクティビティが2つ未満なら元のまま

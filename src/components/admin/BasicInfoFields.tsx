@@ -47,9 +47,9 @@ const SimpleLocationPicker = dynamic(
   {
     ssr: false,
     loading: () => (
-      <LoadingState variant='card' message='地図を読み込み中...' />
+      <LoadingState variant="card" message="地図を読み込み中..." />
     ),
-  }
+  },
 );
 
 type BasicInfoFieldsProps = {
@@ -111,24 +111,24 @@ export function BasicInfoFields({
   };
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       {/* Basic Info */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label
-            htmlFor='name'
+            htmlFor="name"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
           >
             名称
           </Label>
-          <Input id='name' {...register('name')} placeholder='名称を入力' />
+          <Input id="name" {...register('name')} placeholder="名称を入力" />
           {errors.name && (
-            <p className='text-sm text-red-500'>{errors.name.message}</p>
+            <p className="text-sm text-red-500">{errors.name.message}</p>
           )}
         </div>
         <div>
           <Label
-            htmlFor='type'
+            htmlFor="type"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
           >
             種別
@@ -139,106 +139,106 @@ export function BasicInfoFields({
             }
             value={typeValue}
           >
-            <SelectTrigger className='cursor-pointer'>
-              <SelectValue placeholder='種別を選択' />
+            <SelectTrigger className="cursor-pointer">
+              <SelectValue placeholder="種別を選択" />
             </SelectTrigger>
             <SelectContent>
               {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key} className='cursor-pointer'>
+                <SelectItem key={key} value={key} className="cursor-pointer">
                   {label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {errors.type && (
-            <p className='text-sm text-red-500'>{errors.type.message}</p>
+            <p className="text-sm text-red-500">{errors.type.message}</p>
           )}
         </div>
       </div>
 
       {/* Coordinates */}
-      <div className='space-y-4'>
+      <div className="space-y-4">
         <Label className="after:content-['*'] after:ml-0.5 after:text-red-500">
           座標
         </Label>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-              <InputGroupAddon className='border-r-0'>
-                <InputGroupText className='text-xs'>緯度</InputGroupText>
+            <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon className="border-r-0">
+                <InputGroupText className="text-xs">緯度</InputGroupText>
               </InputGroupAddon>
               <InputGroupInput
-                id='lat'
-                type='number'
-                step='any'
-                placeholder='35.6762'
-                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                id="lat"
+                type="number"
+                step="any"
+                placeholder="35.6762"
+                className="text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 onWheel={(e) => e.currentTarget.blur()}
                 {...register('lat')}
               />
-              <InputGroupAddon align='inline-end' className='border-l-0'>
+              <InputGroupAddon align="inline-end" className="border-l-0">
                 <InputGroupText>°</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
             {errors.lat && (
-              <p className='text-sm text-red-500'>{errors.lat.message}</p>
+              <p className="text-sm text-red-500">{errors.lat.message}</p>
             )}
           </div>
           <div>
-            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-              <InputGroupAddon className='border-r-0'>
-                <InputGroupText className='text-xs'>経度</InputGroupText>
+            <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon className="border-r-0">
+                <InputGroupText className="text-xs">経度</InputGroupText>
               </InputGroupAddon>
               <InputGroupInput
-                id='lng'
-                type='number'
-                step='any'
-                placeholder='139.6503'
-                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                id="lng"
+                type="number"
+                step="any"
+                placeholder="139.6503"
+                className="text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 onWheel={(e) => e.currentTarget.blur()}
                 {...register('lng')}
               />
-              <InputGroupAddon align='inline-end' className='border-l-0'>
+              <InputGroupAddon align="inline-end" className="border-l-0">
                 <InputGroupText>°</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
             {errors.lng && (
-              <p className='text-sm text-red-500'>{errors.lng.message}</p>
+              <p className="text-sm text-red-500">{errors.lng.message}</p>
             )}
           </div>
         </div>
 
-        <div className='space-y-4'>
-          <div className='space-y-1'>
-            <ButtonGroup className='w-full flex-col sm:flex-row'>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <ButtonGroup className="w-full flex-col sm:flex-row">
               <CoordinatesFromClipboardButton
                 onCoordinatesExtracted={(latitude, longitude) => {
                   setValue('lat', latitude.toString());
                   setValue('lng', longitude.toString());
                 }}
-                className='flex-1'
+                className="flex-1"
               />
               <Button
-                type='button'
-                variant='outline'
-                size='sm'
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setShowMap(!showMap)}
-                className='flex-1 cursor-pointer'
+                className="flex-1 cursor-pointer"
               >
-                <MapPin className='w-4 h-4' />
+                <MapPin className="w-4 h-4" />
                 {showMap ? '選択完了' : '地図で選択'}
               </Button>
             </ButtonGroup>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Google Maps の URL
               や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
             </p>
           </div>
 
           {showMap && (
-            <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
+            <div className="border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
               {/* 注意バナー */}
-              <div className='bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center'>
+              <div className="bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center">
                 📍 地図をクリックして座標を選択してください
               </div>
               <SimpleLocationPicker
@@ -249,40 +249,40 @@ export function BasicInfoFields({
             </div>
           )}
 
-          <div className='space-y-1'>
+          <div className="space-y-1">
             <Button
-              type='button'
-              variant='outline'
-              size='sm'
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={showOnMap}
               disabled={!watch('lat') || !watch('lng')}
-              className='w-full cursor-pointer'
+              className="w-full cursor-pointer"
             >
-              <Map className='w-4 h-4' />
+              <Map className="w-4 h-4" />
               地図で表示
             </Button>
-            <p className='text-xs text-gray-500 dark:text-gray-400'>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               入力した座標をGoogle Mapsで確認できます
             </p>
           </div>
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor='address'>住所</Label>
+          <Label htmlFor="address">住所</Label>
           <Input
-            id='address'
+            id="address"
             {...register('address')}
-            placeholder='住所（任意）'
+            placeholder="住所（任意）"
           />
           {errors.address && (
-            <p className='text-sm text-red-500'>{errors.address.message}</p>
+            <p className="text-sm text-red-500">{errors.address.message}</p>
           )}
         </div>
         <div>
           <Label
-            htmlFor='prefecture'
+            htmlFor="prefecture"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
           >
             都道府県
@@ -291,55 +291,59 @@ export function BasicInfoFields({
             onValueChange={(value) => setValue('prefecture', value)}
             value={prefectureValue}
           >
-            <SelectTrigger className='cursor-pointer'>
-              <SelectValue placeholder='都道府県を選択' />
+            <SelectTrigger className="cursor-pointer">
+              <SelectValue placeholder="都道府県を選択" />
             </SelectTrigger>
             <SelectContent>
               {PrefectureOptions.map((prefecture) => (
-                <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
+                <SelectItem
+                  key={prefecture}
+                  value={prefecture}
+                  className="cursor-pointer"
+                >
                   {prefecture}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {errors.prefecture && (
-            <p className='text-sm text-red-500'>{errors.prefecture.message}</p>
+            <p className="text-sm text-red-500">{errors.prefecture.message}</p>
           )}
         </div>
       </div>
 
       <div>
-        <Label htmlFor='url'>URL</Label>
-        <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-          <InputGroupAddon className='border-r-0'>
-            <Link className='h-4 w-4' />
+        <Label htmlFor="url">URL</Label>
+        <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+          <InputGroupAddon className="border-r-0">
+            <Link className="h-4 w-4" />
           </InputGroupAddon>
           <InputGroupInput
-            id='url'
-            type='url'
-            className='border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+            id="url"
+            type="url"
+            className="border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             {...register('url')}
-            placeholder='URL（任意）'
+            placeholder="URL（任意）"
           />
-          <InputGroupAddon align='inline-end' className='border-l-0 pr-2'>
+          <InputGroupAddon align="inline-end" className="border-l-0 pr-2">
             <InputGroupButton
-              type='button'
-              variant='ghost'
-              size='icon-sm'
+              type="button"
+              variant="ghost"
+              size="icon-sm"
               disabled={!urlValue}
               onClick={() =>
                 urlValue &&
                 window.open(urlValue, '_blank', 'noopener,noreferrer')
               }
-              title='新しいタブで開く'
-              className='h-8 w-8'
+              title="新しいタブで開く"
+              className="h-8 w-8"
             >
-              <ExternalLink className='h-4 w-4' />
+              <ExternalLink className="h-4 w-4" />
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
         {errors.url && (
-          <p className='text-sm text-red-500'>{errors.url.message}</p>
+          <p className="text-sm text-red-500">{errors.url.message}</p>
         )}
       </div>
     </div>

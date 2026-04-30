@@ -75,7 +75,7 @@ export default function FacilityMap({
 
   // 座標の有効性をチェック
   const isValidCoordinate = (
-    coords: [number, number] | undefined | null
+    coords: [number, number] | undefined | null,
   ): coords is [number, number] => {
     return (
       coords != null &&
@@ -150,7 +150,7 @@ export default function FacilityMap({
       spot.distanceToConvenience,
       spot.nearbyBathCoordinates,
       spot.distanceToBath,
-    ]
+    ],
   );
 
   // マーカーの色とアイコンを取得
@@ -386,10 +386,11 @@ export default function FacilityMap({
     };
   }, [spot.coordinates]);
 
-  const createFacilityPopupHTML = useCallback((facility: FacilityMarker): string => {
-    const style = getMarkerStyle(facility.type, currentZoom);
+  const createFacilityPopupHTML = useCallback(
+    (facility: FacilityMarker): string => {
+      const style = getMarkerStyle(facility.type, currentZoom);
 
-    return `
+      return `
       <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
         <div class="flex items-center gap-2 mb-2">
           <span style="font-size: 20px;">${style.icon}</span>
@@ -406,14 +407,16 @@ export default function FacilityMap({
           facility.distance
             ? `<div class="text-sm text-gray-600">
                 車中泊スポットから約 <strong>${formatDistance(
-                  facility.distance
+                  facility.distance,
                 )}</strong>
               </div>`
             : ''
         }
       </div>
     `;
-  }, [currentZoom]);
+    },
+    [currentZoom],
+  );
 
   // Update markers when facilities change or zoom level changes
   useEffect(() => {
@@ -473,7 +476,13 @@ export default function FacilityMap({
 
       markersRef.current.push(marker);
     });
-  }, [facilityMarkers, mapLoaded, currentZoom, isMapMoving, createFacilityPopupHTML]);
+  }, [
+    facilityMarkers,
+    mapLoaded,
+    currentZoom,
+    isMapMoving,
+    createFacilityPopupHTML,
+  ]);
 
   // Fit map to show all facilities only when facilities change (not on zoom)
   useEffect(() => {
@@ -492,8 +501,8 @@ export default function FacilityMap({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className='h-[400px] bg-gray-100 flex items-center justify-center rounded-lg'>
-        <p className='text-gray-600 dark:text-gray-400'>
+      <div className="h-[400px] bg-gray-100 flex items-center justify-center rounded-lg">
+        <p className="text-gray-600 dark:text-gray-400">
           Mapboxトークンが設定されていません
         </p>
       </div>
@@ -503,12 +512,12 @@ export default function FacilityMap({
   // 有効な座標がない場合のエラー表示
   if (!isValidCoordinate(spot.coordinates)) {
     return (
-      <div className='h-[400px] bg-gray-100 flex items-center justify-center rounded-lg'>
-        <div className='text-center'>
-          <p className='text-gray-600 dark:text-gray-400 mb-2'>
+      <div className="h-[400px] bg-gray-100 flex items-center justify-center rounded-lg">
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-2">
             地図情報が正しく設定されていません
           </p>
-          <p className='text-sm text-gray-500 dark:text-gray-500'>
+          <p className="text-sm text-gray-500 dark:text-gray-500">
             座標データ: [{spot.coordinates?.[0] || 'N/A'},{' '}
             {spot.coordinates?.[1] || 'N/A'}]
           </p>
@@ -521,11 +530,11 @@ export default function FacilityMap({
     <div>
       {/* タイトルと凡例 */}
       {(showTitle || (showLegend && facilityMarkers.length > 0)) && (
-        <div className='flex items-center justify-between mb-3 gap-4 flex-wrap'>
+        <div className="flex items-center justify-between mb-3 gap-4 flex-wrap">
           {showTitle && (
-            <div className='flex items-center gap-2'>
-              <MapPin className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {title}
               </h3>
             </div>
@@ -541,12 +550,12 @@ export default function FacilityMap({
         </div>
       )}
 
-      <div className='relative'>
-        <div ref={mapContainer} className='h-[400px] w-full rounded-lg' />
+      <div className="relative">
+        <div ref={mapContainer} className="h-[400px] w-full rounded-lg" />
 
         {/* 施設数表示 */}
-        <div className='absolute bottom-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600'>
-          <div className='text-xs text-gray-600 dark:text-gray-400'>
+        <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-md border dark:border-gray-600">
+          <div className="text-xs text-gray-600 dark:text-gray-400">
             施設数: {facilityMarkers.length}
           </div>
         </div>

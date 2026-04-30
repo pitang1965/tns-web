@@ -1,6 +1,6 @@
 // 座標の有効性をチェック（型ガード）
 export const isValidCoordinate = (
-  coords: [number, number] | undefined | null
+  coords: [number, number] | undefined | null,
 ): coords is [number, number] => {
   return (
     coords != null &&

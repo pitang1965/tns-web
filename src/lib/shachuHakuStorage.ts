@@ -19,7 +19,7 @@ export type SavedShachuHakuFilters = {
  * ローカルストレージにフィルター条件を保存する
  */
 export const saveFiltersToLocalStorage = (
-  filters: SavedShachuHakuFilters
+  filters: SavedShachuHakuFilters,
 ): void => {
   // SSR時はlocalStorageが存在しないのでスキップ
   if (typeof window === 'undefined') return;

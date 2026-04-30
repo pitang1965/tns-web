@@ -19,7 +19,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 type FacilitiesMapProps = {
   watch: UseFormWatch<ShachuHakuFormData>;
-}
+};
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -30,7 +30,7 @@ type FacilityData = {
   name: string;
   color: string;
   distance?: number;
-}
+};
 
 export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -187,7 +187,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
   const createFacilityPopupHTML = (
     facility: FacilityData,
-    zoom: number
+    zoom: number,
   ): string => {
     const style = getMarkerStyle(facility.type, zoom);
 
@@ -196,7 +196,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         <div class="flex items-center gap-2 mb-2">
           <span style="font-size: 20px;">${style.icon}</span>
           <h3 class="font-semibold text-gray-900">${getTypeLabel(
-            facility.type
+            facility.type,
           )}</h3>
         </div>
         ${
@@ -208,7 +208,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
           facility.distance
             ? `<div class="text-sm text-gray-600">
                 車中泊スポットから約 <strong>${formatDistance(
-                  facility.distance
+                  facility.distance,
                 )}</strong>
               </div>`
             : ''
@@ -476,7 +476,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       }
       // Clean up styles when component unmounts
       const styleElement = document.getElementById(
-        'admin-facility-marker-styles'
+        'admin-facility-marker-styles',
       );
       if (styleElement) {
         styleElement.remove();
@@ -517,7 +517,10 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
         if (facilities.length === 1) {
           // 施設が1つの場合は中心に配置
-          mapInstance.current!.setCenter([facilities[0].lng, facilities[0].lat]);
+          mapInstance.current!.setCenter([
+            facilities[0].lng,
+            facilities[0].lat,
+          ]);
           mapInstance.current!.setZoom(15);
         } else {
           // 複数の施設がある場合は全体が見えるように調整
@@ -540,9 +543,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   // Mapboxトークンが設定されていない場合
   if (!MAPBOX_TOKEN) {
     return (
-      <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-        <h3 className='text-lg font-medium mb-2'>施設マップ</h3>
-        <p className='text-red-500 text-sm'>
+      <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600">
+        <h3 className="text-lg font-medium mb-2">施設マップ</h3>
+        <p className="text-red-500 text-sm">
           Mapboxトークンが設定されていません
         </p>
       </div>
@@ -550,11 +553,11 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   }
 
   return (
-    <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 relative'>
-      <div className='flex items-center justify-between mb-3 gap-4 flex-wrap'>
-        <div className='flex items-center gap-2'>
-          <MapPin className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-          <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+    <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 relative">
+      <div className="flex items-center justify-between mb-3 gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             施設マップ
           </h3>
         </div>
@@ -570,11 +573,11 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
 
       <div
         ref={mapContainer}
-        className='w-full h-[300px] rounded-md overflow-hidden border border-gray-300 dark:border-gray-600'
+        className="w-full h-[300px] rounded-md overflow-hidden border border-gray-300 dark:border-gray-600"
       />
 
       {facilities.length > 0 && (
-        <p className='text-xs text-gray-500 mt-2'>
+        <p className="text-xs text-gray-500 mt-2">
           マーカーをクリックすると詳細が表示されます
         </p>
       )}

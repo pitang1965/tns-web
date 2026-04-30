@@ -25,8 +25,10 @@ const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => <LoadingState variant='card' message='地図を読み込み中...' />,
-  }
+    loading: () => (
+      <LoadingState variant="card" message="地図を読み込み中..." />
+    ),
+  },
 );
 
 type CoordinateInputProps = {
@@ -75,26 +77,26 @@ export function CoordinateInput({
   };
 
   return (
-    <div className='space-y-2'>
+    <div className="space-y-2">
       <div>
-        <Label className='whitespace-nowrap block mb-2'>座標</Label>
-        <div className='flex gap-2'>
-          <div className='flex-1'>
-            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-              <InputGroupAddon className='border-r-0'>
-                <InputGroupText className='text-xs'>緯度</InputGroupText>
+        <Label className="whitespace-nowrap block mb-2">座標</Label>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon className="border-r-0">
+                <InputGroupText className="text-xs">緯度</InputGroupText>
               </InputGroupAddon>
               <InputGroupInput
-                type='number'
-                step='any'
-                placeholder='35.6762'
-                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                type="number"
+                step="any"
+                placeholder="35.6762"
+                className="text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 {...register(latPath, {
                   setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
                   onChange: () => trigger(lonPath), // 経度
                 })}
               />
-              <InputGroupAddon align='inline-end' className='border-l-0'>
+              <InputGroupAddon align="inline-end" className="border-l-0">
                 <InputGroupText>°</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
@@ -108,22 +110,22 @@ export function CoordinateInput({
               </SmallText>
             )}
           </div>
-          <div className='flex-1'>
-            <InputGroup className='has-[[data-slot=input-group-control]:focus-visible]:ring-0'>
-              <InputGroupAddon className='border-r-0'>
-                <InputGroupText className='text-xs'>経度</InputGroupText>
+          <div className="flex-1">
+            <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon className="border-r-0">
+                <InputGroupText className="text-xs">経度</InputGroupText>
               </InputGroupAddon>
               <InputGroupInput
-                type='number'
-                step='any'
-                placeholder='139.6503'
-                className='text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                type="number"
+                step="any"
+                placeholder="139.6503"
+                className="text-right border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 {...register(lonPath, {
                   setValueAs: (v) => (v === '' ? undefined : parseFloat(v)),
                   onChange: () => trigger(latPath), // 緯度
                 })}
               />
-              <InputGroupAddon align='inline-end' className='border-l-0'>
+              <InputGroupAddon align="inline-end" className="border-l-0">
                 <InputGroupText>°</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
@@ -138,8 +140,8 @@ export function CoordinateInput({
             )}
           </div>
         </div>
-        <div className='space-y-2 mt-2'>
-          <ButtonGroup className='w-full flex-col sm:flex-row'>
+        <div className="space-y-2 mt-2">
+          <ButtonGroup className="w-full flex-col sm:flex-row">
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
                 // 明示的に数値に変換
@@ -147,24 +149,24 @@ export function CoordinateInput({
                 setValue(lonPath, Number(lng), { shouldValidate: true });
                 trigger([latPath, lonPath]);
               }}
-              className='flex-1'
+              className="flex-1"
             />
             <Button
-              type='button'
-              variant='outline'
-              size='sm'
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={() => setShowMap(!showMap)}
-              className='flex-1 cursor-pointer'
+              className="flex-1 cursor-pointer"
             >
-              <MapPin className='w-4 h-4' />
+              <MapPin className="w-4 h-4" />
               {showMap ? '選択完了' : '地図で選択'}
             </Button>
           </ButtonGroup>
           {/* Map picker */}
           {showMap && (
-            <div className='border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800'>
+            <div className="border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
               {/* 注意バナー */}
-              <div className='bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center'>
+              <div className="bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center">
                 📍 地図をクリックして座標を選択してください
               </div>
               <SimpleLocationPicker

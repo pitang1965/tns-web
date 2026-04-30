@@ -40,7 +40,7 @@ export const DayRouteNavigationButton: React.FC<
       activity.place.location.latitude !== 0 &&
       activity.place.location.longitude !== 0 &&
       !isNaN(activity.place.location.latitude) &&
-      !isNaN(activity.place.location.longitude)
+      !isNaN(activity.place.location.longitude),
   );
 
   // アクティビティが1つ以上ない場合は非表示
@@ -51,7 +51,7 @@ export const DayRouteNavigationButton: React.FC<
   // デバイスタイプを検出する関数
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
+      navigator.userAgent,
     );
   };
 
@@ -74,7 +74,7 @@ export const DayRouteNavigationButton: React.FC<
             currentLocation.latitude,
             currentLocation.longitude,
             firstLat,
-            firstLng
+            firstLng,
           );
           if (distance <= HOME_PROXIMITY_THRESHOLD) {
             routeActivities = routeActivities.slice(1);
@@ -91,7 +91,9 @@ export const DayRouteNavigationButton: React.FC<
     const formatActivity = (activity: Activity) => {
       const { latitude, longitude } = activity.place.location!;
       const addressString = formatAddress(activity.place.address);
-      return addressString ? encodeURIComponent(addressString) : `${latitude},${longitude}`;
+      return addressString
+        ? encodeURIComponent(addressString)
+        : `${latitude},${longitude}`;
     };
 
     // 現在地あり: 現在地→アクティビティ群、なし: アクティビティ群のみ
@@ -119,12 +121,12 @@ export const DayRouteNavigationButton: React.FC<
 
   return (
     <Button
-      variant='outline'
-      size='sm'
+      variant="outline"
+      size="sm"
       onClick={openFullRoute}
       className={`flex items-center gap-2 cursor-pointer ${className}`}
     >
-      <Route className='w-4 h-4' />
+      <Route className="w-4 h-4" />
       <span>全体ルート検索</span>
     </Button>
   );

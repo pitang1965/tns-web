@@ -56,7 +56,7 @@ export const preRegisterKnownIcons = (mapInstance: mapboxgl.Map): void => {
 // 不足しているアイコンを空の透明アイコンで置き換える関数
 export const handleMissingImage = (
   mapInstance: mapboxgl.Map,
-  imageId: string
+  imageId: string,
 ): void => {
   try {
     mapInstance.addImage(imageId, createEmptyImage(), {

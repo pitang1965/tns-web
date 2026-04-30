@@ -10,7 +10,7 @@ export const useActivityForm = (dayIndex: number, activityIndex: number) => {
   const basePath = `dayPlans.${dayIndex}.activities.${activityIndex}`;
 
   const getFieldError = (
-    fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number]
+    fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number],
   ) => {
     return errors?.dayPlans?.[dayIndex]?.activities?.[activityIndex]?.[
       fieldName
@@ -18,10 +18,10 @@ export const useActivityForm = (dayIndex: number, activityIndex: number) => {
   };
 
   const getFieldRegister = (
-    fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number]
+    fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number],
   ) => {
     return register(
-      `dayPlans.${dayIndex}.activities.${activityIndex}.${fieldName}` as any
+      `dayPlans.${dayIndex}.activities.${activityIndex}.${fieldName}` as any,
     );
   };
 

@@ -46,7 +46,7 @@ export async function generateMetadata({
   const description =
     descriptionParts.length > 0
       ? `${descriptionParts.join(
-          '・'
+          '・',
         )}の車中泊スポットを検索・閲覧できます。詳細情報、料金、設備、周辺施設などをご確認いただけます。`
       : '全国の車中泊スポットを検索・閲覧できます。道の駅、SA・PA、RVパークなど様々な種類のスポットの詳細情報、料金、設備、周辺施設などをご確認いただけます。';
 
@@ -98,7 +98,10 @@ export default function ShachuHakuPage() {
       <BreadcrumbJsonLd
         items={[
           { name: 'ホーム', url: 'https://tabi.over40web.club' },
-          { name: '車中泊マップ', url: 'https://tabi.over40web.club/shachu-haku' },
+          {
+            name: '車中泊マップ',
+            url: 'https://tabi.over40web.club/shachu-haku',
+          },
         ]}
       />
       <ShachuHakuClient />

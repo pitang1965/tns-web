@@ -36,47 +36,47 @@ export function SpotPopup({
       className={`bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg p-2 sm:p-3 relative overflow-y-auto flex flex-col ${className}`}
     >
       <Button
-        variant='ghost'
-        size='sm'
+        variant="ghost"
+        size="sm"
         onClick={onClose}
-        className='absolute top-1 right-1 h-7 w-7 p-0 cursor-pointer z-10'
-        title='閉じる'
+        className="absolute top-1 right-1 h-7 w-7 p-0 cursor-pointer z-10"
+        title="閉じる"
       >
         ✕
       </Button>
-      <div className='flex items-start gap-2 mb-2 pr-8'>
-        <h3 className='font-semibold text-base leading-tight flex-grow'>
+      <div className="flex items-start gap-2 mb-2 pr-8">
+        <h3 className="font-semibold text-base leading-tight flex-grow">
           {spot.name}
         </h3>
         {actionButton}
       </div>
-      <div className='space-y-2'>
-        <div className='flex gap-1.5 flex-wrap'>
+      <div className="space-y-2">
+        <div className="flex gap-1.5 flex-wrap">
           <Badge className={`${getTypeColor(spot.type)} text-white text-xs`}>
             {CampingSpotTypeLabels[spot.type]}
           </Badge>
           <Badge
             className={`${getPricingColor(
               spot.pricing.isFree,
-              spot.pricing.pricePerNight
+              spot.pricing.pricePerNight,
             )} text-white text-xs`}
           >
             {spot.pricing.isFree
               ? '無料'
               : spot.pricing.pricePerNight
-              ? `¥${spot.pricing.pricePerNight}`
-              : '有料：？円'}
+                ? `¥${spot.pricing.pricePerNight}`
+                : '有料：？円'}
           </Badge>
           <Badge
             className={`${getRatingColor(
-              calculateSecurityLevel(spot)
+              calculateSecurityLevel(spot),
             )} text-white text-xs`}
           >
             🔒 {calculateSecurityLevel(spot)}/5
           </Badge>
           <Badge
             className={`${getRatingColor(
-              calculateQuietnessLevel(spot)
+              calculateQuietnessLevel(spot),
             )} text-white text-xs`}
           >
             🔇 {calculateQuietnessLevel(spot)}/5
@@ -84,20 +84,20 @@ export function SpotPopup({
         </div>
 
         {/* 追加情報 */}
-        <div className='text-sm space-y-1 text-gray-700 dark:text-gray-300'>
-          <div className='text-gray-900 dark:text-gray-100'>
+        <div className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+          <div className="text-gray-900 dark:text-gray-100">
             {spot.address || spot.prefecture}
           </div>
           {spot.updatedAt && (
-            <div className='text-xs text-gray-500 dark:text-gray-500'>
+            <div className="text-xs text-gray-500 dark:text-gray-500">
               {formatDate(spot.updatedAt.toString())}更新
             </div>
           )}
           {/* 距離・標高情報を1行に（折り返し可能） */}
-          <div className='flex flex-wrap gap-x-3 gap-y-0.5'>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5">
             {spot.distanceToToilet != null && (
               <span>
-                <strong className='text-gray-900 dark:text-gray-100'>
+                <strong className="text-gray-900 dark:text-gray-100">
                   トイレ:
                 </strong>{' '}
                 {formatFacilityDistance(spot.distanceToToilet)}
@@ -105,7 +105,7 @@ export function SpotPopup({
             )}
             {spot.distanceToBath != null && (
               <span>
-                <strong className='text-gray-900 dark:text-gray-100'>
+                <strong className="text-gray-900 dark:text-gray-100">
                   入浴施設:
                 </strong>{' '}
                 {formatFacilityDistance(spot.distanceToBath)}
@@ -113,7 +113,7 @@ export function SpotPopup({
             )}
             {spot.distanceToConvenience != null && (
               <span>
-                <strong className='text-gray-900 dark:text-gray-100'>
+                <strong className="text-gray-900 dark:text-gray-100">
                   コンビニ:
                 </strong>{' '}
                 {formatFacilityDistance(spot.distanceToConvenience)}
@@ -121,7 +121,7 @@ export function SpotPopup({
             )}
             {spot.elevation && (
               <span>
-                <strong className='text-gray-900 dark:text-gray-100'>
+                <strong className="text-gray-900 dark:text-gray-100">
                   標高:
                 </strong>{' '}
                 {spot.elevation}m
@@ -129,19 +129,19 @@ export function SpotPopup({
             )}
           </div>
           {(spot.hasRoof || spot.hasPowerOutlet) && (
-            <div className='flex gap-1.5 flex-wrap mt-1'>
+            <div className="flex gap-1.5 flex-wrap mt-1">
               {spot.hasRoof && (
                 <Badge
-                  variant='secondary'
-                  className='text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'
+                  variant="secondary"
+                  className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                 >
                   屋根付き
                 </Badge>
               )}
               {spot.hasPowerOutlet && (
                 <Badge
-                  variant='secondary'
-                  className='text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                  variant="secondary"
+                  className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                 >
                   電源
                 </Badge>
@@ -149,11 +149,11 @@ export function SpotPopup({
             </div>
           )}
           {spot.notes && (
-            <div className='mt-2'>
-              <strong className='text-gray-900 dark:text-gray-100'>
+            <div className="mt-2">
+              <strong className="text-gray-900 dark:text-gray-100">
                 備考:{' '}
               </strong>
-              <span className='text-gray-700 dark:text-gray-300 whitespace-pre-wrap'>
+              <span className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {spot.notes}
               </span>
             </div>

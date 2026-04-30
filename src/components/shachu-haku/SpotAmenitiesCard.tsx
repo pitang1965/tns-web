@@ -13,8 +13,8 @@ export function SpotAmenitiesCard({ spot }: SpotAmenitiesCardProps) {
         <CardTitle>設備</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-2 gap-3 text-sm'>
-          <div className='flex items-center gap-2'>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="flex items-center gap-2">
             <Car
               className={`w-4 h-4 ${
                 spot.hasRoof ? 'text-green-600' : 'text-gray-400'
@@ -30,7 +30,7 @@ export function SpotAmenitiesCard({ spot }: SpotAmenitiesCardProps) {
               屋根{spot.hasRoof ? 'あり' : 'なし'}
             </span>
           </div>
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Zap
               className={`w-4 h-4 ${
                 spot.hasPowerOutlet ? 'text-green-600' : 'text-gray-400'
@@ -49,11 +49,11 @@ export function SpotAmenitiesCard({ spot }: SpotAmenitiesCardProps) {
         </div>
 
         {spot.amenities && spot.amenities.length > 0 && (
-          <div className='mt-3'>
-            <div className='font-semibold text-gray-900 dark:text-gray-100 mb-2'>
+          <div className="mt-3">
+            <div className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
               その他設備
             </div>
-            <div className='text-sm text-gray-700 dark:text-gray-300'>
+            <div className="text-sm text-gray-700 dark:text-gray-300">
               {spot.amenities.join('、')}
             </div>
           </div>

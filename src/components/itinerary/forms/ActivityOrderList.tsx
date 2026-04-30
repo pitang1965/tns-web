@@ -51,7 +51,7 @@ export function ActivityOrderList({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -62,10 +62,10 @@ export function ActivityOrderList({
     }
 
     const oldIndex = activities.findIndex(
-      (activity) => activity.id === active.id
+      (activity) => activity.id === active.id,
     );
     const newIndex = activities.findIndex(
-      (activity) => activity.id === over.id
+      (activity) => activity.id === over.id,
     );
 
     if (oldIndex !== -1 && newIndex !== -1) {
@@ -74,10 +74,10 @@ export function ActivityOrderList({
   };
 
   return (
-    <div className='space-y-2'>
-      <div className='flex items-center justify-between'>
-        <h4 className='text-sm font-medium'>並び順</h4>
-        <span className='text-xs text-muted-foreground'>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium">並び順</h4>
+        <span className="text-xs text-muted-foreground">
           ドラッグで並び替え
         </span>
       </div>
@@ -91,7 +91,7 @@ export function ActivityOrderList({
           items={activities.map((activity) => activity.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {activities.map((activity, index) => (
               <SortableActivityListItem
                 key={activity.id}
@@ -106,13 +106,13 @@ export function ActivityOrderList({
 
       {onAdd && (
         <Button
-          type='button'
-          variant='ghost'
-          size='sm'
+          type="button"
+          variant="ghost"
+          size="sm"
           onClick={onAdd}
-          className='w-full cursor-pointer text-xs h-8'
+          className="w-full cursor-pointer text-xs h-8"
         >
-          <PlusCircle className='h-3.5 w-3.5 mr-1.5' />
+          <PlusCircle className="h-3.5 w-3.5 mr-1.5" />
           追加
         </Button>
       )}

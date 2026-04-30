@@ -66,7 +66,7 @@ const shareWithWebAPIForItinerary = async (shareData: ShareItineraryData) => {
  * 旅程用のクリップボードコピー機能
  */
 const shareWithClipboardForItinerary = async (
-  shareData: ShareItineraryData
+  shareData: ShareItineraryData,
 ) => {
   if (!shareData.id) return false;
 
@@ -175,7 +175,7 @@ export const createCampingSpotShareData = (data: CampingSpotShareData) => {
     ) {
       params.set(
         'min_security',
-        data.clientFilters.minSecurityLevel.toString()
+        data.clientFilters.minSecurityLevel.toString(),
       );
     }
     if (
@@ -184,13 +184,13 @@ export const createCampingSpotShareData = (data: CampingSpotShareData) => {
     ) {
       params.set(
         'min_quietness',
-        data.clientFilters.minQuietnessLevel.toString()
+        data.clientFilters.minQuietnessLevel.toString(),
       );
     }
     if (data.clientFilters.maxToiletDistance !== null) {
       params.set(
         'max_toilet_dist',
-        data.clientFilters.maxToiletDistance!.toString()
+        data.clientFilters.maxToiletDistance!.toString(),
       );
     }
     if (data.clientFilters.minElevation !== null) {

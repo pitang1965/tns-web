@@ -4,7 +4,7 @@ import { LoadingState } from '@/components/common/LoadingState';
 
 export default function ShachuHakuEditPage() {
   return (
-    <Suspense fallback={<LoadingState variant='fullscreen' />}>
+    <Suspense fallback={<LoadingState variant="fullscreen" />}>
       <ShachuHakuEditor />
     </Suspense>
   );

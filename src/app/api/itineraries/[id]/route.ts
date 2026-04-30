@@ -14,7 +14,7 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -23,7 +23,7 @@ export async function GET(
     if (!isValidObjectId(id)) {
       return NextResponse.json(
         { error: 'Invalid itinerary ID' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +35,7 @@ export async function GET(
     if (!itinerary) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -49,11 +49,11 @@ export async function GET(
   } catch (error) {
     logger.error(
       error instanceof Error ? error : new Error('Error fetching itinerary'),
-      { url: request.url }
+      { url: request.url },
     );
     return NextResponse.json(
       { error: 'Error fetching itinerary' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

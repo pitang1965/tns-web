@@ -11,11 +11,12 @@ import HeroPreview from '@/components/landing/HeroPreview';
 
 type PublicHomeProps = {
   initialSpots?: any[];
-}
+};
 
 export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
-  const [MapComponent, setMapComponent] =
-    useState<ComponentType<{ initialSpots?: any[] }> | null>(null);
+  const [MapComponent, setMapComponent] = useState<ComponentType<{
+    initialSpots?: any[];
+  }> | null>(null);
 
   useEffect(() => {
     // ユーザーの最初の操作をトリガーにマップを読み込む
@@ -31,7 +32,7 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
     };
 
     events.forEach((e) =>
-      window.addEventListener(e, loadMap, { once: true, passive: true })
+      window.addEventListener(e, loadMap, { once: true, passive: true }),
     );
 
     return () => {
@@ -40,7 +41,7 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
   }, []);
 
   return (
-    <div className='flex flex-col bg-background text-foreground'>
+    <div className="flex flex-col bg-background text-foreground">
       {/* Hero Map Section */}
       {MapComponent ? (
         <MapComponent initialSpots={initialSpots} />
@@ -64,19 +65,19 @@ export default function PublicHome({ initialSpots = [] }: PublicHomeProps) {
       <CTASection />
 
       {/* Footer Legal */}
-      <div className='py-8 px-6 bg-gray-50 dark:bg-gray-800'>
-        <SmallText className='text-center text-gray-600 dark:text-gray-400'>
+      <div className="py-8 px-6 bg-gray-50 dark:bg-gray-800">
+        <SmallText className="text-center text-gray-600 dark:text-gray-400">
           続行することにより、本アプリの
           <a
-            href='/terms'
-            className='text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1'
+            href="/terms"
+            className="text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1"
           >
             利用規約
           </a>
           及び
           <a
-            href='/privacy'
-            className='text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1'
+            href="/privacy"
+            className="text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1"
           >
             プライバシーに関する声明
           </a>

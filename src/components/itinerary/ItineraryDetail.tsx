@@ -113,24 +113,24 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
 
   if (error) {
     return (
-      <div className='container mx-auto p-4'>
-        <div className='bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6'>
-          <h2 className='text-xl font-semibold text-red-800 dark:text-red-200 mb-3'>
+      <div className="container mx-auto p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-red-800 dark:text-red-200 mb-3">
             エラーが発生しました
           </h2>
-          <div className='text-red-700 dark:text-red-300 whitespace-pre-line mb-4'>
+          <div className="text-red-700 dark:text-red-300 whitespace-pre-line mb-4">
             {error}
           </div>
-          <div className='flex gap-3'>
+          <div className="flex gap-3">
             <Button
-              variant='outline'
+              variant="outline"
               onClick={actions.handleBack}
-              className='cursor-pointer'
+              className="cursor-pointer"
             >
               旅程一覧に戻る
             </Button>
             {access.isOwner && (
-              <Button onClick={actions.handleEdit} className='cursor-pointer'>
+              <Button onClick={actions.handleEdit} className="cursor-pointer">
                 旅程を編集
               </Button>
             )}
@@ -156,22 +156,22 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   }
 
   return (
-    <main className='container mx-auto p-4'>
-      <div className='pt-8 md:pt-12'></div>
-      <div className='flex flex-col md:flex-row gap-6'>
-        <div className='hidden md:block'>
+    <main className="container mx-auto p-4">
+      <div className="pt-8 md:pt-12"></div>
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="hidden md:block">
           <ItineraryToc initialItinerary={metadata} />
         </div>
-        <div className='flex-1'>
+        <div className="flex-1">
           <ItineraryHeader itinerary={itinerary ?? metadata} />
 
           {!user && access.isPublic && (
-            <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md'>
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
               <LargeText>
                 この旅程を編集するには
                 <Button
-                  variant='link'
-                  className='p-0 mx-1 h-auto cursor-pointer'
+                  variant="link"
+                  className="p-0 mx-1 h-auto cursor-pointer"
                   onClick={actions.handleLogin}
                 >
                   ログイン
@@ -198,7 +198,7 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           )}
 
           <FixedActionButtons
-            mode='detail'
+            mode="detail"
             onBack={actions.handleBack}
             onEdit={access.isOwner ? actions.handleEdit : undefined}
             onDelete={access.isOwner ? actions.handleDeleteConfirm : undefined}
@@ -214,11 +214,11 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
           <ConfirmationDialog
             isOpen={actions.isConfirmOpen}
             onOpenChange={actions.setIsConfirmOpen}
-            title='旅程の削除'
-            description='この旅程を削除してもよろしいですか？この操作は取り消せません。'
-            confirmLabel='削除'
+            title="旅程の削除"
+            description="この旅程を削除してもよろしいですか？この操作は取り消せません。"
+            confirmLabel="削除"
             onConfirm={actions.handleDelete}
-            variant='destructive'
+            variant="destructive"
           />
         </div>
       </div>

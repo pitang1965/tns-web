@@ -31,7 +31,7 @@ export function useSpotFiltering({
   // Apply client-side filters to spots
   const filteredSpots = useMemo(
     () => filterSpotsClientSide(spots, clientFilters),
-    [spots, clientFilters]
+    [spots, clientFilters],
   );
 
   // Filter spots within visible bounds
@@ -53,7 +53,7 @@ export function useSpotFiltering({
   // Generate active filter descriptions for display
   const activeFilterDescriptions = useMemo(
     () => getActiveFilterDescriptions(searchTerm, typeFilter, clientFilters),
-    [searchTerm, typeFilter, clientFilters]
+    [searchTerm, typeFilter, clientFilters],
   );
 
   return {

@@ -23,13 +23,20 @@ function EnvironmentClass({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={environment === 'development' ? 'dev-mode' : ''} style={{ width: '100%' }}>
+    <div
+      className={environment === 'development' ? 'dev-mode' : ''}
+      style={{ width: '100%' }}
+    >
       {children}
     </div>
   );
 }
 
-export function EnvironmentWrapper({ children }: { children: React.ReactNode }) {
+export function EnvironmentWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <Suspense fallback={<>{children}</>}>
       <EnvironmentClass>{children}</EnvironmentClass>

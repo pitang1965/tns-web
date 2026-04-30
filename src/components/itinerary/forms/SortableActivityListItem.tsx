@@ -39,21 +39,23 @@ export function SortableActivityListItem({
     >
       {/* ドラッグハンドル */}
       <button
-        type='button'
+        type="button"
         {...attributes}
         {...listeners}
-        className='cursor-grab active:cursor-grabbing flex-shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors'
-        title='ドラッグして並び替え'
+        className="cursor-grab active:cursor-grabbing flex-shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+        title="ドラッグして並び替え"
       >
-        <Menu className='h-4 w-4' />
+        <Menu className="h-4 w-4" />
       </button>
 
       {/* アクティビティ情報 */}
-      <div className='flex-1 min-w-0 flex items-center gap-1.5'>
-        <span className='text-xs font-medium text-muted-foreground w-6 text-right flex-shrink-0'>
+      <div className="flex-1 min-w-0 flex items-center gap-1.5">
+        <span className="text-xs font-medium text-muted-foreground w-6 text-right flex-shrink-0">
           {index + 1}.
         </span>
-        <span className='text-sm truncate'>{title || '（タイトル未設定）'}</span>
+        <span className="text-sm truncate">
+          {title || '（タイトル未設定）'}
+        </span>
       </div>
     </div>
   );

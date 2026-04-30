@@ -243,10 +243,10 @@ export default function ShachuHakuForm({
   };
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <Card className='w-full max-w-4xl max-h-[90vh] flex flex-col'>
-        <CardHeader className='shrink-0'>
-          <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <CardHeader className="shrink-0">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>
               {isEdit ? '車中泊スポット編集' : '車中泊スポット作成'}
             </CardTitle>
@@ -256,7 +256,7 @@ export default function ShachuHakuForm({
             />
           </div>
         </CardHeader>
-        <CardContent ref={cardRef} className='overflow-auto flex-1'>
+        <CardContent ref={cardRef} className="overflow-auto flex-1">
           <form
             onSubmit={handleSubmit(handleFormSubmit)}
             onKeyDown={(e) => {
@@ -268,7 +268,7 @@ export default function ShachuHakuForm({
                 e.preventDefault();
               }
             }}
-            className='space-y-6'
+            className="space-y-6"
           >
             <BasicInfoFields
               spot={spot}
@@ -305,72 +305,72 @@ export default function ShachuHakuForm({
         </CardContent>
 
         {/* Footer with all action buttons */}
-        <CardFooter className='flex flex-col gap-3 border-t pt-4 shrink-0'>
+        <CardFooter className="flex flex-col gap-3 border-t pt-4 shrink-0">
           {/* Navigation buttons */}
           {navigationData && onNavigate && (
-            <div className='flex items-center justify-center gap-2 w-full'>
+            <div className="flex items-center justify-center gap-2 w-full">
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 disabled={!navigationData.prevId}
                 onClick={() =>
                   navigationData.prevId &&
                   handleNavigateWithScroll(navigationData.prevId)
                 }
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
-                <ChevronLeft className='w-4 h-4 mr-1' />
+                <ChevronLeft className="w-4 h-4 mr-1" />
                 前のスポット
               </Button>
-              <span className='text-sm text-gray-600 dark:text-gray-400 px-2'>
+              <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
                 {navigationData.currentIndex + 1} / {navigationData.total}
               </span>
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 disabled={!navigationData.nextId}
                 onClick={() =>
                   navigationData.nextId &&
                   handleNavigateWithScroll(navigationData.nextId)
                 }
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 次のスポット
-                <ChevronRight className='w-4 h-4 ml-1' />
+                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           )}
 
           {/* Action buttons */}
-          <div className='flex justify-end gap-2 w-full'>
+          <div className="flex justify-end gap-2 w-full">
             <Button
-              type='button'
-              variant='outline'
+              type="button"
+              variant="outline"
               onClick={handleClose}
-              className='cursor-pointer'
+              className="cursor-pointer"
             >
-              <ArrowLeft className='w-4 h-4 mr-2' />
+              <ArrowLeft className="w-4 h-4 mr-2" />
               戻る
             </Button>
             {isEdit && (
               <Button
-                type='button'
-                variant='destructive'
+                type="button"
+                variant="destructive"
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={deleteLoading || loading}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
-                <Trash2 className='w-4 h-4 mr-2' />
+                <Trash2 className="w-4 h-4 mr-2" />
                 削除
               </Button>
             )}
             <Button
-              type='button'
+              type="button"
               disabled={loading}
-              className='cursor-pointer'
+              className="cursor-pointer"
               onClick={handleSubmit(handleFormSubmit)}
             >
-              <Save className='w-4 h-4 mr-2' />
+              <Save className="w-4 h-4 mr-2" />
               {loading ? '保存中...' : isEdit ? '更新' : '作成'}
             </Button>
           </div>

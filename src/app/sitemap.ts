@@ -72,16 +72,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .sort({ updatedAt: -1 })
       .lean();
 
-    const campingSpotPages: MetadataRoute.Sitemap = campingSpots.map((spot) => ({
-      url: `${BASE_URL}/shachu-haku/${spot._id}`,
-      lastModified: new Date(spot.updatedAt || Date.now()),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    }));
+    const campingSpotPages: MetadataRoute.Sitemap = campingSpots.map(
+      (spot) => ({
+        url: `${BASE_URL}/shachu-haku/${spot._id}`,
+        lastModified: new Date(spot.updatedAt || Date.now()),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      }),
+    );
 
     return [...staticPages, ...campingSpotPages];
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error generating sitemap'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error generating sitemap'),
+    );
     // エラー時は静的ページのみ返す
     return staticPages;
   }

@@ -14,7 +14,9 @@ export function useRouteLayer({
 }: UseRouteLayerProps) {
   // activitiesの内容をメモ化して、参照ではなく内容の変更を検知
   const activitiesKey = useMemo(() => {
-    return activities.map((a) => `${a.id}-${a.latitude}-${a.longitude}`).join(',');
+    return activities
+      .map((a) => `${a.id}-${a.latitude}-${a.longitude}`)
+      .join(',');
   }, [JSON.stringify(activities)]);
 
   // ルートライン（アクティビティ間の線）を追加する関数
@@ -103,7 +105,14 @@ export function useRouteLayer({
       // アクティビティが1つ以下の場合はルートラインを削除
       removeRouteLines();
     }
-  }, [mapInstance, mapLoaded, activities, activitiesKey, addRouteLines, removeRouteLines]);
+  }, [
+    mapInstance,
+    mapLoaded,
+    activities,
+    activitiesKey,
+    addRouteLines,
+    removeRouteLines,
+  ]);
 
   // クリーンアップ時にルートラインを削除
   useEffect(() => {

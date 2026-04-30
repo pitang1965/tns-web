@@ -17,16 +17,18 @@ export type CSVImportError = {
   row: number;
   name: string;
   error: string;
-}
+};
 
 export type CSVImportResult = {
   success: number;
   errors: CSVImportError[];
   totalRows: number;
   processedCount: number;
-}
+};
 
-export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImportResult> {
+export async function importCampingSpotsFromCSV(
+  csvData: string,
+): Promise<CSVImportResult> {
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
@@ -50,7 +52,9 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
 
   // Check if headers are in Japanese or English
   const isJapaneseHeaders = headers.includes('名称');
-  const nameIndex = isJapaneseHeaders ? headers.indexOf('名称') : headers.indexOf('name');
+  const nameIndex = isJapaneseHeaders
+    ? headers.indexOf('名称')
+    : headers.indexOf('name');
 
   for (let i = 0; i < dataRows.length; i++) {
     const rowNum = i + 2; // 1-indexed, header is row 1
@@ -107,7 +111,7 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
               campingSpotData.coordinates[1],
               campingSpotData.coordinates[0],
               spot.coordinates[1],
-              spot.coordinates[0]
+              spot.coordinates[0],
             )
           : Infinity;
 
@@ -125,7 +129,7 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
           campingSpotData.coordinates[1],
           campingSpotData.coordinates[0],
           duplicateSpot.coordinates[1],
-          duplicateSpot.coordinates[0]
+          duplicateSpot.coordinates[0],
         );
         results.errors.push({
           row: rowNum,
@@ -141,8 +145,11 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
 
       results.success++;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`[CSV Import] Error at row ${rowNum} "${spotName}": ${errorMessage}`);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      console.error(
+        `[CSV Import] Error at row ${rowNum} "${spotName}": ${errorMessage}`,
+      );
       results.errors.push({
         row: rowNum,
         name: spotName,
@@ -151,7 +158,9 @@ export async function importCampingSpotsFromCSV(csvData: string): Promise<CSVImp
     }
   }
 
-  console.log(`[CSV Import] Done: ${results.success} success, ${results.errors.length} errors out of ${totalRows}`);
+  console.log(
+    `[CSV Import] Done: ${results.success} success, ${results.errors.length} errors out of ${totalRows}`,
+  );
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');

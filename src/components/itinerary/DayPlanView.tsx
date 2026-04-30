@@ -28,7 +28,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useCurrentLocation, calculateDistance } from '@/hooks/useCurrentLocation';
+import {
+  useCurrentLocation,
+  calculateDistance,
+} from '@/hooks/useCurrentLocation';
 
 type DayPlan = ServerItineraryDocument['dayPlans'][number];
 
@@ -45,7 +48,14 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const [showFullMap, setShowFullMap] = useState(false);
   const [showLocationAlert, setShowLocationAlert] = useState(false);
   const [includeCurrentLocation, setIncludeCurrentLocation] = useState(false);
-  const { currentLocation, permissionGranted, loading, error, requestLocation, clearError } = useCurrentLocation();
+  const {
+    currentLocation,
+    permissionGranted,
+    loading,
+    error,
+    requestLocation,
+    clearError,
+  } = useCurrentLocation();
 
   // 日付表示の生成
   const dayDisplay = day.date
@@ -110,7 +120,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
           currentLocation.latitude,
           currentLocation.longitude,
           firstActivity.latitude,
-          firstActivity.longitude
+          firstActivity.longitude,
         );
         if (distance <= HOME_PROXIMITY_THRESHOLD) {
           routeActivities = routeActivities.slice(1);
@@ -135,7 +145,10 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const shouldShowMap = activitiesWithLocation.length >= 1;
 
   // チェックボックスの表示条件（位置情報取得済みのときのみ）
-  const shouldShowLocationCheckbox = permissionGranted && !!currentLocation && activitiesWithLocation.length >= 1;
+  const shouldShowLocationCheckbox =
+    permissionGranted &&
+    !!currentLocation &&
+    activitiesWithLocation.length >= 1;
 
   // マップに渡すアクティビティ（チェックボックスで切り替え）
   const mapActivities =
@@ -144,7 +157,8 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
       : activitiesWithLocation;
 
   // 位置情報許可ボタンを表示するかどうか（マップが表示されていて位置情報がない場合）
-  const shouldShowLocationPermissionButton = !permissionGranted && activitiesWithLocation.length >= 1;
+  const shouldShowLocationPermissionButton =
+    !permissionGranted && activitiesWithLocation.length >= 1;
 
   // メモが存在するかチェック
   const hasNotes = day.notes && day.notes.trim().length > 0;
@@ -156,17 +170,19 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   };
 
   return (
-    <div className='mb-6 bg-background text-foreground p-4 rounded-lg'>
-      <div className='flex justify-between items-center mb-4'>
+    <div className="mb-6 bg-background text-foreground p-4 rounded-lg">
+      <div className="flex justify-between items-center mb-4">
         <H3>{dayDisplay}</H3>
 
-        <div className='flex items-center gap-2 flex-wrap'>
+        <div className="flex items-center gap-2 flex-wrap">
           {/* 現在地を含めるチェックボックス（位置情報取得済みのときのみ） */}
           {shouldShowLocationCheckbox && (
-            <label className='flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer select-none'>
+            <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer select-none">
               <Checkbox
                 checked={includeCurrentLocation}
-                onCheckedChange={(checked) => setIncludeCurrentLocation(checked)}
+                onCheckedChange={(checked) =>
+                  setIncludeCurrentLocation(checked)
+                }
               />
               現在地を含める
             </label>
@@ -176,37 +192,41 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
           {activitiesWithLocation.length >= 1 && (
             <DayRouteNavigationButton
               activities={day.activities}
-              currentLocation={includeCurrentLocation && currentLocation ? currentLocation : undefined}
+              currentLocation={
+                includeCurrentLocation && currentLocation
+                  ? currentLocation
+                  : undefined
+              }
             />
           )}
 
           {/* ルートマップボタン */}
           {shouldShowMap && (
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() => setShowFullMap(true)}
-              className='flex items-center gap-1 cursor-pointer'
+              className="flex items-center gap-1 cursor-pointer"
             >
-              <Map className='h-4 w-4' />
+              <Map className="h-4 w-4" />
               <span>ルートマップ</span>
             </Button>
           )}
 
           {/* 位置情報許可ボタン */}
           {shouldShowLocationPermissionButton && (
-            <div className='flex flex-col items-start gap-1'>
+            <div className="flex flex-col items-start gap-1">
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 onClick={() => setShowLocationAlert(true)}
                 disabled={loading}
-                className='flex items-center gap-1 cursor-pointer'
+                className="flex items-center gap-1 cursor-pointer"
               >
-                <MapPin className='h-4 w-4' />
+                <MapPin className="h-4 w-4" />
                 <span>{loading ? '取得中...' : '位置情報を許可'}</span>
               </Button>
-              <p className='text-xs text-muted-foreground'>
+              <p className="text-xs text-muted-foreground">
                 現在位置からのルート検索が利用できます
               </p>
             </div>
@@ -216,7 +236,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
 
       {/* ルートマップ (コンパクト表示) */}
       {shouldShowMap && (
-        <div className='mb-4'>
+        <div className="mb-4">
           <DailyRouteMap
             activities={mapActivities}
             compact={true}
@@ -227,15 +247,15 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
 
       {/* その日のメモ */}
       {hasNotes && (
-        <div className='mb-4 bg-muted/50 p-3 rounded-md'>
+        <div className="mb-4 bg-muted/50 p-3 rounded-md">
           <H3>メモ</H3>
-          <Text className='whitespace-pre-wrap'>{day.notes}</Text>
+          <Text className="whitespace-pre-wrap">{day.notes}</Text>
         </div>
       )}
 
       {/* アクティビティリスト */}
       {hasActivities ? (
-        <ul className='space-y-2'>
+        <ul className="space-y-2">
           {day.activities.map((activity, activityIndex) => (
             <ActivityView
               key={activity.id}
@@ -253,11 +273,11 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
 
       {/* フルスクリーンマップダイアログ */}
       <Dialog open={showFullMap} onOpenChange={setShowFullMap}>
-        <DialogContent className='sm:max-w-[90vw] max-h-[90vh]'>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>{dayDisplay}のルートマップ</DialogTitle>
           </DialogHeader>
-          <div className='h-[70vh] w-full'>
+          <div className="h-[70vh] w-full">
             <DailyRouteMap
               activities={mapActivities}
               compact={false}
@@ -286,21 +306,24 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
       </AlertDialog>
 
       {/* 位置情報エラーのAlertDialog */}
-      <AlertDialog open={!!error} onOpenChange={(open) => { if (!open) clearError(); }}>
+      <AlertDialog
+        open={!!error}
+        onOpenChange={(open) => {
+          if (!open) clearError();
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>位置情報を取得できませんでした</AlertDialogTitle>
-            <AlertDialogDescription className='space-y-2'>
-              <span className='block'>{error}</span>
-              <span className='block text-sm'>
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">{error}</span>
+              <span className="block text-sm">
                 位置情報がブロックされている場合は、ブラウザのアドレスバー左側のアイコンから設定を変更してください。
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={clearError}>
-              閉じる
-            </AlertDialogAction>
+            <AlertDialogAction onClick={clearError}>閉じる</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

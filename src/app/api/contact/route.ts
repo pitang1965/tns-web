@@ -12,8 +12,11 @@ export async function POST(request: NextRequest) {
     if (!process.env.ADMIN_EMAIL) {
       logger.error(new Error('ADMIN_EMAIL is not configured'));
       return NextResponse.json(
-        { error: 'メール送信サービスの設定に問題があります。管理者にお問い合わせください。' },
-        { status: 500 }
+        {
+          error:
+            'メール送信サービスの設定に問題があります。管理者にお問い合わせください。',
+        },
+        { status: 500 },
       );
     }
 
@@ -29,22 +32,18 @@ export async function POST(request: NextRequest) {
       const userMessage = result.isConfigError
         ? 'メール送信サービスの設定に問題があります。管理者にお問い合わせください。'
         : 'メール送信に失敗しました。しばらく時間をおいて再度お試しください。';
-      return NextResponse.json(
-        { error: userMessage },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: userMessage }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
       message: 'お問い合わせを受け付けました',
     });
-
   } catch (error) {
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
         { error: '入力内容に不備があります' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -53,7 +52,7 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(
       { error: 'サーバーエラーが発生しました' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

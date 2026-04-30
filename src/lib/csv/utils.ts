@@ -108,7 +108,7 @@ export function escapeCSVField(field: unknown): string {
  * @returns CSV formatted string
  */
 export function arrayToCSV(rows: unknown[][]): string {
-  return rows.map(row => row.map(escapeCSVField).join(',')).join('\r\n');
+  return rows.map((row) => row.map(escapeCSVField).join(',')).join('\r\n');
 }
 
 /**
@@ -139,7 +139,7 @@ export function downloadCSV(csvContent: string, filename: string): void {
  * @returns Array of objects where keys are column headers
  */
 export function csvRowsToObjects<T = Record<string, string>>(
-  rows: string[][]
+  rows: string[][],
 ): T[] {
   if (rows.length === 0) {
     return [];
@@ -166,12 +166,10 @@ export function csvRowsToObjects<T = Record<string, string>>(
  */
 export function objectsToCSVRows<T extends Record<string, unknown>>(
   data: T[],
-  headers: (keyof T)[]
+  headers: (keyof T)[],
 ): unknown[][] {
   const headerRow = headers.map(String);
-  const dataRows = data.map((item) =>
-    headers.map((header) => item[header])
-  );
+  const dataRows = data.map((item) => headers.map((header) => item[header]));
   return [headerRow, ...dataRows];
 }
 
@@ -184,7 +182,7 @@ export type CSVExportResult = {
   errorCount: number;
   csvContent?: string;
   errors?: string[];
-}
+};
 
 /**
  * Generate timestamp-based filename
@@ -195,7 +193,7 @@ export type CSVExportResult = {
  */
 export function generateCSVFilename(
   prefix: string,
-  extension: string = 'csv'
+  extension: string = 'csv',
 ): string {
   const date = new Date().toISOString().split('T')[0];
   return `${prefix}-${date}.${extension}`;

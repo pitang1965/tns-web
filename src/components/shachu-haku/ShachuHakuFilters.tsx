@@ -16,7 +16,16 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { MapPin, Search, Navigation, Filter, ChevronDown, ChevronUp, RotateCcw, X } from 'lucide-react';
+import {
+  MapPin,
+  Search,
+  Navigation,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  X,
+} from 'lucide-react';
 import {
   CampingSpotTypeLabels,
   PrefectureOptions,
@@ -59,7 +68,8 @@ export default function ShachuHakuFilters({
       onToggle: () =>
         onClientFiltersChange({
           ...clientFilters,
-          pricingFilter: clientFilters.pricingFilter === 'free' ? 'all' : 'free',
+          pricingFilter:
+            clientFilters.pricingFilter === 'free' ? 'all' : 'free',
         }),
     },
     {
@@ -156,45 +166,45 @@ export default function ShachuHakuFilters({
   };
 
   return (
-    <Card className='mb-4'>
-      <CardContent className='pt-4 pb-4'>
+    <Card className="mb-4">
+      <CardContent className="pt-4 pb-4">
         {/* Mobile Layout */}
         <Collapsible
           open={isOpen}
           onOpenChange={setIsOpen}
-          className='block 2xl:hidden'
+          className="block 2xl:hidden"
         >
           {/* Trigger Button */}
           <CollapsibleTrigger asChild>
             <Button
-              variant='outline'
-              className='w-full justify-between h-10 mb-3'
+              variant="outline"
+              className="w-full justify-between h-10 mb-3"
             >
-              <div className='flex items-center gap-2'>
-                <Filter className='w-4 h-4' />
-                <span className='text-sm font-medium'>
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                <span className="text-sm font-medium">
                   表示範囲・絞り込み設定
                 </span>
                 {activeFiltersCount > 0 && (
-                  <span className='ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white'>
+                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white">
                     {activeFiltersCount}
                   </span>
                 )}
               </div>
               {isOpen ? (
-                <ChevronUp className='w-4 h-4' />
+                <ChevronUp className="w-4 h-4" />
               ) : (
-                <ChevronDown className='w-4 h-4' />
+                <ChevronDown className="w-4 h-4" />
               )}
             </Button>
           </CollapsibleTrigger>
 
           {/* Quick Filter Chips - always visible on mobile */}
-          <div className='flex flex-wrap gap-1.5 mb-2'>
+          <div className="flex flex-wrap gap-1.5 mb-2">
             {quickFilters.map((chip) => (
               <button
                 key={chip.label}
-                type='button'
+                type="button"
                 onClick={chip.onToggle}
                 className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
                   chip.isActive
@@ -209,158 +219,172 @@ export default function ShachuHakuFilters({
 
           {/* Collapsible Content */}
           <CollapsibleContent>
-            <div className='space-y-3' suppressHydrationWarning>
-            {/* Location Jump */}
-            <div className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <MapPin className='w-4 h-4 text-gray-500 dark:text-gray-400' />
-                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  表示範囲:
-                </span>
-              </div>
+            <div className="space-y-3" suppressHydrationWarning>
+              {/* Location Jump */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    表示範囲:
+                  </span>
+                </div>
 
-              <div className='flex flex-wrap gap-1 items-center'>
-                <Button
-                  onClick={handleCurrentLocation}
-                  size='sm'
-                  variant='outline'
-                  className='h-7 text-xs cursor-pointer'
-                >
-                  <Navigation className='w-3 h-3 mr-1' />
-                  現在地
-                </Button>
-
-                {Object.keys(REGION_COORDINATES).map((region) => (
+                <div className="flex flex-wrap gap-1 items-center">
                   <Button
-                    key={region}
-                    variant='ghost'
-                    size='sm'
-                    onClick={() => handleRegionJump(region)}
-                    className='text-xs px-2 h-7 cursor-pointer'
+                    onClick={handleCurrentLocation}
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs cursor-pointer"
                   >
-                    {region}
+                    <Navigation className="w-3 h-3 mr-1" />
+                    現在地
                   </Button>
-                ))}
 
-                <Select onValueChange={handlePrefectureJump}>
-                  <SelectTrigger className='w-[120px] h-7 text-xs cursor-pointer'>
-                    <SelectValue placeholder='都道府県...' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PrefectureOptions.map((prefecture) => (
-                      <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
-                        {prefecture}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                  {Object.keys(REGION_COORDINATES).map((region) => (
+                    <Button
+                      key={region}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRegionJump(region)}
+                      className="text-xs px-2 h-7 cursor-pointer"
+                    >
+                      {region}
+                    </Button>
+                  ))}
 
-            {/* Search and Type Filter */}
-            <div className='flex flex-col md:flex-row gap-2 items-start md:items-center pt-2 border-t border-gray-200 dark:border-gray-700'>
-              <div className='flex items-center gap-2'>
-                <Filter className='w-4 h-4 text-gray-500 dark:text-gray-400' />
-                <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  絞り込み:
-                </span>
+                  <Select onValueChange={handlePrefectureJump}>
+                    <SelectTrigger className="w-[120px] h-7 text-xs cursor-pointer">
+                      <SelectValue placeholder="都道府県..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PrefectureOptions.map((prefecture) => (
+                        <SelectItem
+                          key={prefecture}
+                          value={prefecture}
+                          className="cursor-pointer"
+                        >
+                          {prefecture}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className='flex flex-col sm:flex-row gap-2 flex-1'>
-                <div className='flex gap-1 flex-1'>
-                  <div className='relative flex-1'>
-                    <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-                    <Input
-                      ref={inputRef}
-                      placeholder='キーワードで絞り込み...'
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyDown={handleSearchKeyDown}
-                      className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
-                    />
-                    {inputValue && (
-                      <button
-                        type='button'
-                        onClick={handleSearchClear}
-                        className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
-                      >
-                        <X className='h-3 w-3 text-white' />
-                      </button>
-                    )}
+
+              {/* Search and Type Filter */}
+              <div className="flex flex-col md:flex-row gap-2 items-start md:items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    絞り込み:
+                  </span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 flex-1">
+                  <div className="flex gap-1 flex-1">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        ref={inputRef}
+                        placeholder="キーワードで絞り込み..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleSearchKeyDown}
+                        className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
+                      />
+                      {inputValue && (
+                        <button
+                          type="button"
+                          onClick={handleSearchClear}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer"
+                        >
+                          <X className="h-3 w-3 text-white" />
+                        </button>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handleSearchSubmit}
+                      size="sm"
+                      className="h-9 px-3 cursor-pointer"
+                      disabled={!isSearchDirty}
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
                   </div>
+                  <Select value={typeFilter} onValueChange={onTypeFilterChange}>
+                    <SelectTrigger
+                      className={`h-9 w-full sm:w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}
+                    >
+                      <SelectValue placeholder="全種別" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="cursor-pointer">
+                        全種別
+                      </SelectItem>
+                      {Object.entries(CampingSpotTypeLabels).map(
+                        ([key, label]) => (
+                          <SelectItem
+                            key={key}
+                            value={key}
+                            className="cursor-pointer"
+                          >
+                            {label}
+                          </SelectItem>
+                        ),
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <ClientSideFilters
+                    filters={clientFilters}
+                    onFiltersChange={onClientFiltersChange}
+                  />
+                </div>
+              </div>
+
+              {/* Reset All Button */}
+              {activeFiltersCount > 0 && (
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                   <Button
-                    onClick={handleSearchSubmit}
-                    size='sm'
-                    className='h-9 px-3 cursor-pointer'
-                    disabled={!isSearchDirty}
+                    onClick={onResetAll}
+                    variant="outline"
+                    size="sm"
+                    className="w-full h-8 text-xs cursor-pointer active:scale-95 transition-transform"
                   >
-                    <Search className='w-4 h-4' />
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    全ての条件をリセット
                   </Button>
                 </div>
-                <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                  <SelectTrigger className={`h-9 w-full sm:w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
-                    <SelectValue placeholder='全種別' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='all' className='cursor-pointer'>全種別</SelectItem>
-                    {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key} className='cursor-pointer'>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <ClientSideFilters
-                  filters={clientFilters}
-                  onFiltersChange={onClientFiltersChange}
-                />
-              </div>
-            </div>
-
-            {/* Reset All Button */}
-            {activeFiltersCount > 0 && (
-              <div className='pt-2 border-t border-gray-200 dark:border-gray-700'>
-                <Button
-                  onClick={onResetAll}
-                  variant='outline'
-                  size='sm'
-                  className='w-full h-8 text-xs cursor-pointer active:scale-95 transition-transform'
-                >
-                  <RotateCcw className='w-3 h-3 mr-1' />
-                  全ての条件をリセット
-                </Button>
-              </div>
-            )}
+              )}
             </div>
           </CollapsibleContent>
         </Collapsible>
 
         {/* Desktop Layout (2xl and above) */}
-        <div className='hidden 2xl:flex 2xl:flex-col gap-3'>
+        <div className="hidden 2xl:flex 2xl:flex-col gap-3">
           {/* Location Jump */}
-          <div className='flex items-center gap-2'>
-            <MapPin className='w-4 h-4 text-gray-500 dark:text-gray-400' />
-            <span className='text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap'>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
               表示範囲:
             </span>
 
             <Button
               onClick={onCurrentLocation}
-              size='sm'
-              variant='outline'
-              className='h-7 text-xs cursor-pointer'
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs cursor-pointer"
             >
-              <Navigation className='w-3 h-3 mr-1' />
+              <Navigation className="w-3 h-3 mr-1" />
               現在地
             </Button>
 
-            <div className='flex items-center gap-1'>
+            <div className="flex items-center gap-1">
               {Object.keys(REGION_COORDINATES).map((region) => (
                 <Button
                   key={region}
-                  variant='ghost'
-                  size='sm'
+                  variant="ghost"
+                  size="sm"
                   onClick={() => onRegionJump(region)}
-                  className='text-xs px-2 h-7 cursor-pointer'
+                  className="text-xs px-2 h-7 cursor-pointer"
                 >
                   {region}
                 </Button>
@@ -368,12 +392,16 @@ export default function ShachuHakuFilters({
             </div>
 
             <Select onValueChange={onPrefectureJump}>
-              <SelectTrigger className='w-[120px] h-7 text-xs cursor-pointer'>
-                <SelectValue placeholder='都道府県...' />
+              <SelectTrigger className="w-[120px] h-7 text-xs cursor-pointer">
+                <SelectValue placeholder="都道府県..." />
               </SelectTrigger>
               <SelectContent>
                 {PrefectureOptions.map((prefecture) => (
-                  <SelectItem key={prefecture} value={prefecture} className='cursor-pointer'>
+                  <SelectItem
+                    key={prefecture}
+                    value={prefecture}
+                    className="cursor-pointer"
+                  >
                     {prefecture}
                   </SelectItem>
                 ))}
@@ -382,22 +410,22 @@ export default function ShachuHakuFilters({
           </div>
 
           {/* Search and Type Filter */}
-          <div className='flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700'>
-            <Filter className='w-4 h-4 text-gray-500 dark:text-gray-400' />
-            <span className='text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap'>
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
               絞り込み:
             </span>
             {activeFiltersCount > 0 && (
-              <span className='px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white'>
+              <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white">
                 {activeFiltersCount}
               </span>
             )}
-            <div className='flex gap-2 flex-1'>
-              <div className='flex gap-1 flex-1 max-w-sm'>
-                <div className='relative flex-1'>
-                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+            <div className="flex gap-2 flex-1">
+              <div className="flex gap-1 flex-1 max-w-sm">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder='キーワードで絞り込み...'
+                    placeholder="キーワードで絞り込み..."
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
@@ -405,37 +433,45 @@ export default function ShachuHakuFilters({
                   />
                   {inputValue && (
                     <button
-                      type='button'
+                      type="button"
                       onClick={handleSearchClear}
-                      className='absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer'
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer"
                     >
-                      <X className='h-3 w-3 text-white' />
+                      <X className="h-3 w-3 text-white" />
                     </button>
                   )}
                 </div>
                 <Button
                   onClick={handleSearchSubmit}
-                  size='sm'
-                  className='h-9 px-3 cursor-pointer'
+                  size="sm"
+                  className="h-9 px-3 cursor-pointer"
                   disabled={inputValue.trim() === searchTerm}
                 >
-                  <Search className='w-4 h-4' />
+                  <Search className="w-4 h-4" />
                 </Button>
               </div>
               <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                <SelectTrigger className={`h-9 w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}>
-                  <SelectValue placeholder='全種別' />
+                <SelectTrigger
+                  className={`h-9 w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}
+                >
+                  <SelectValue placeholder="全種別" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='all' className='cursor-pointer'>全種別</SelectItem>
+                  <SelectItem value="all" className="cursor-pointer">
+                    全種別
+                  </SelectItem>
                   {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key} className='cursor-pointer'>
+                    <SelectItem
+                      key={key}
+                      value={key}
+                      className="cursor-pointer"
+                    >
                       {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <div className='ml-2'>
+              <div className="ml-2">
                 <ClientSideFilters
                   filters={clientFilters}
                   onFiltersChange={onClientFiltersChange}
@@ -445,11 +481,11 @@ export default function ShachuHakuFilters({
               {activeFiltersCount > 0 && (
                 <Button
                   onClick={onResetAll}
-                  variant='outline'
-                  size='sm'
-                  className='h-8 text-xs cursor-pointer active:scale-95 transition-transform whitespace-nowrap'
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs cursor-pointer active:scale-95 transition-transform whitespace-nowrap"
                 >
-                  <RotateCcw className='w-3 h-3 mr-1' />
+                  <RotateCcw className="w-3 h-3 mr-1" />
                   全てリセット
                 </Button>
               )}
@@ -457,11 +493,11 @@ export default function ShachuHakuFilters({
           </div>
 
           {/* Quick Filter Chips - desktop */}
-          <div className='flex gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700'>
+          <div className="flex gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700">
             {quickFilters.map((chip) => (
               <button
                 key={chip.label}
-                type='button'
+                type="button"
                 onClick={chip.onToggle}
                 className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
                   chip.isActive

@@ -20,8 +20,9 @@ export function isAdmin(user: User | null | undefined): boolean {
   const adminEmails = getAdminEmails();
   return !!(
     user?.email &&
-    adminEmails?.split(',')
-      .map(email => email.trim())
+    adminEmails
+      ?.split(',')
+      .map((email) => email.trim())
       .includes(user.email)
   );
 }
@@ -47,7 +48,9 @@ export function isPremiumMember(user: User | null | undefined): boolean {
  * プレミアム会員のタイプを取得する
  * 管理者とプレミアム会員を区別する
  */
-export function getPremiumMemberType(user: User | null | undefined): 'admin' | 'premium' | null {
+export function getPremiumMemberType(
+  user: User | null | undefined,
+): 'admin' | 'premium' | null {
   if (isAdmin(user)) return 'admin';
 
   // 将来的には以下のロジックが有効になる：
@@ -59,7 +62,9 @@ export function getPremiumMemberType(user: User | null | undefined): 'admin' | '
 /**
  * プレミアム会員のラベルを取得する
  */
-export function getPremiumMemberLabel(user: User | null | undefined): string | null {
+export function getPremiumMemberLabel(
+  user: User | null | undefined,
+): string | null {
   const type = getPremiumMemberType(user);
   switch (type) {
     case 'admin':
@@ -74,7 +79,7 @@ export function getPremiumMemberLabel(user: User | null | undefined): string | n
 // 旅程作成制限に関する定数
 export const ITINERARY_LIMITS = {
   FREE_USER_LIMIT: 10,
-  PREMIUM_UNLIMITED: -1 // -1は無制限を表す
+  PREMIUM_UNLIMITED: -1, // -1は無制限を表す
 } as const;
 
 /**
@@ -92,7 +97,7 @@ export function getItineraryLimit(user: User | null | undefined): number {
  */
 export function canCreateItinerary(
   user: User | null | undefined,
-  currentItineraryCount: number
+  currentItineraryCount: number,
 ): boolean {
   const limit = getItineraryLimit(user);
 
@@ -110,7 +115,7 @@ export function canCreateItinerary(
  */
 export function getItineraryLimitStatus(
   user: User | null | undefined,
-  itineraries: ClientItineraryDocument[]
+  itineraries: ClientItineraryDocument[],
 ) {
   const currentCount = itineraries.length;
   const limit = getItineraryLimit(user);
@@ -121,6 +126,9 @@ export function getItineraryLimitStatus(
     limit,
     canCreate,
     isPremium: isPremiumMember(user),
-    remaining: limit === ITINERARY_LIMITS.PREMIUM_UNLIMITED ? -1 : Math.max(0, limit - currentCount)
+    remaining:
+      limit === ITINERARY_LIMITS.PREMIUM_UNLIMITED
+        ? -1
+        : Math.max(0, limit - currentCount),
   };
 }

@@ -22,7 +22,7 @@ export function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ): number {
   const R = 6371000; // 地球の半径（メートル）
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -68,7 +68,9 @@ export function useCurrentLocation(): UseCurrentLocationResult {
         const { latitude, longitude, accuracy } = position.coords;
 
         if (accuracy >= MAX_ACCURACY_METERS) {
-          setError('位置情報の精度が低すぎるため使用できませんでした（有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください）');
+          setError(
+            '位置情報の精度が低すぎるため使用できませんでした（有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください）',
+          );
           setPermissionGranted(false);
           setLoading(false);
           return;
@@ -86,7 +88,9 @@ export function useCurrentLocation(): UseCurrentLocationResult {
         const isKoreanPeninsula = latitude >= 35.5 && longitude < 130.0;
 
         if (!isInJapanBounds || isKoreanPeninsula) {
-          setError('位置情報が日本国外を示しています。有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください');
+          setError(
+            '位置情報が日本国外を示しています。有線LAN接続時はWi-Fiまたはモバイル回線をご利用ください',
+          );
           setPermissionGranted(false);
           setLoading(false);
           return;
@@ -117,7 +121,7 @@ export function useCurrentLocation(): UseCurrentLocationResult {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 60000, // 1分間キャッシュ
-      }
+      },
     );
   }, []);
 

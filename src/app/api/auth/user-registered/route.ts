@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!userId || !email) {
       return NextResponse.json(
         { error: 'Missing required fields' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       logger.error(new Error('ADMIN_EMAIL environment variable not set'));
       return NextResponse.json(
         { error: 'Admin email not configured' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -48,18 +48,20 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       logger.error(
         new Error(`[ユーザー登録通知] メール送信失敗: ${result.error}`),
-        { userId, isConfigError: result.isConfigError }
+        { userId, isConfigError: result.isConfigError },
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error(
-      error instanceof Error ? error : new Error('Error in user registration webhook'),
+      error instanceof Error
+        ? error
+        : new Error('Error in user registration webhook'),
     );
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

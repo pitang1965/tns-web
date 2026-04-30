@@ -35,7 +35,7 @@ export function formatDistance(meters: number): string {
  * formatFacilityDistance(undefined) // "不明"
  */
 export function formatFacilityDistance(
-  distance: number | null | undefined
+  distance: number | null | undefined,
 ): string {
   if (distance === 0) {
     return '敷地内にあり';

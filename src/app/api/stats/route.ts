@@ -14,11 +14,12 @@ export async function GET() {
     // Get MongoDB database for itineraries collection
     const db = await getDb();
 
-    const [campingSpotCount, itineraryCount, submissionCount] = await Promise.all([
-      CampingSpot.countDocuments({}), // Count all spots, not just verified
-      db.collection('itineraries').countDocuments({ isPublic: true }),
-      CampingSpotSubmission.countDocuments({ status: 'approved' }),
-    ]);
+    const [campingSpotCount, itineraryCount, submissionCount] =
+      await Promise.all([
+        CampingSpot.countDocuments({}), // Count all spots, not just verified
+        db.collection('itineraries').countDocuments({ isPublic: true }),
+        CampingSpotSubmission.countDocuments({ status: 'approved' }),
+      ]);
 
     return NextResponse.json({
       campingSpots: campingSpotCount,
@@ -26,10 +27,12 @@ export async function GET() {
       submissions: submissionCount,
     });
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error fetching stats'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error fetching stats'),
+    );
     return NextResponse.json(
       { error: 'Failed to fetch statistics' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

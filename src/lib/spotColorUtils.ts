@@ -40,7 +40,7 @@ export const getRatingColor = (rating: number): string => {
  */
 export const getPricingColor = (
   isFree: boolean,
-  pricePerNight?: number
+  pricePerNight?: number,
 ): string => {
   if (isFree) return 'bg-green-700 hover:bg-green-800'; // 無料：緑色
   if (!pricePerNight) return 'bg-gray-500 hover:bg-gray-600'; // 料金未設定：グレー

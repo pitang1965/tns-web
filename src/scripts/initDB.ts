@@ -35,7 +35,9 @@ async function initDb() {
 
   const uri = process.env.MONGODB_URI;
   if (!uri) {
-    throw new Error('❌ MONGODB_URI is not defined in the environment variables.');
+    throw new Error(
+      '❌ MONGODB_URI is not defined in the environment variables.',
+    );
   }
 
   // データベース名を抽出して確認
@@ -48,24 +50,32 @@ async function initDb() {
   // 本番環境データベースへの接続を防ぐ
   if (targetDbName === PRODUCTION_DB_NAME) {
     console.error('❌ ERROR: Attempting to initialize PRODUCTION database!');
-    console.error('❌ エラー：本番環境データベースを初期化しようとしています！');
+    console.error(
+      '❌ エラー：本番環境データベースを初期化しようとしています！',
+    );
     console.error(`\n⚠️  Current database: ${targetDbName}`);
     console.error(`⚠️  Expected database: ${DEVELOPMENT_DB_NAME}`);
-    console.error('\n💡 Please update MONGODB_URI in .env.local to use itinerary_db_dev');
-    console.error('💡 .env.local の MONGODB_URI を itinerary_db_dev に更新してください');
+    console.error(
+      '\n💡 Please update MONGODB_URI in .env.local to use itinerary_db_dev',
+    );
+    console.error(
+      '💡 .env.local の MONGODB_URI を itinerary_db_dev に更新してください',
+    );
     process.exit(1);
   }
 
   // 開発環境でも確認を求める
   const confirmed = await confirmAction(
     `⚠️  This will DELETE ALL data in "${targetDbName}" and insert sample data.\n` +
-    `⚠️  "${targetDbName}" の全データを削除し、サンプルデータを挿入します。\n` +
-    `\nDo you want to continue? (y/N): `
+      `⚠️  "${targetDbName}" の全データを削除し、サンプルデータを挿入します。\n` +
+      `\nDo you want to continue? (y/N): `,
   );
 
   if (!confirmed) {
     console.log('✅ Operation cancelled. Database unchanged.');
-    console.log('✅ 操作がキャンセルされました。データベースは変更されていません。');
+    console.log(
+      '✅ 操作がキャンセルされました。データベースは変更されていません。',
+    );
     process.exit(0);
   }
 

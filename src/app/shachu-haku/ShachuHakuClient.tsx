@@ -45,7 +45,7 @@ const ShachuHakuMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg' />
+      <div className="h-[600px] bg-gray-100 animate-pulse rounded-lg" />
     ),
   },
 );
@@ -448,8 +448,8 @@ export default function ShachuHakuClient() {
         actionButton={
           <Button
             onClick={() => handleNavigateToSpotDetail(selectedSpot._id)}
-            className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
-            size='sm'
+            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0"
+            size="sm"
           >
             もっと見る
           </Button>
@@ -460,38 +460,38 @@ export default function ShachuHakuClient() {
   }, [selectedSpot, isLandscape]);
 
   return (
-    <div className='container mx-auto p-2 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6'>
-      <div className='space-y-3 sm:space-y-4'>
-        <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4'>
+    <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className='text-3xl font-bold'>車中泊スポット</h1>
-            <div className='text-sm text-gray-600 dark:text-gray-300 mt-1'>
+            <h1 className="text-3xl font-bold">車中泊スポット</h1>
+            <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               ログイン不要で車中泊スポットを検索・閲覧できます
             </div>
           </div>
-          <div className='flex flex-col sm:flex-row gap-2'>
-            <Link href='/shachu-haku/shindan'>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link href="/shachu-haku/shindan">
               <Button
-                variant='outline'
-                className='w-full sm:w-auto cursor-pointer whitespace-nowrap border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950'
+                variant="outline"
+                className="w-full sm:w-auto cursor-pointer whitespace-nowrap border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950"
               >
-                <Sparkles className='w-4 h-4' />
+                <Sparkles className="w-4 h-4" />
                 スポット診断
               </Button>
             </Link>
             <Button
               onClick={handleShare}
-              variant='outline'
-              className='w-full sm:w-auto cursor-pointer whitespace-nowrap'
+              variant="outline"
+              className="w-full sm:w-auto cursor-pointer whitespace-nowrap"
             >
-              <Share2 className='w-4 h-4' />
+              <Share2 className="w-4 h-4" />
               車中泊情報を共有
             </Button>
           </div>
         </div>
       </div>
 
-      <div className='w-full'>
+      <div className="w-full">
         <ShachuHakuFilters
           searchTerm={searchTerm}
           onSearchTermChange={(v) => {
@@ -515,19 +515,19 @@ export default function ShachuHakuClient() {
         />
 
         {/* Tab Navigation */}
-        <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
+        <div className="flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
             onClick={() => handleTabChange('map')}
-            className='rounded-b-none cursor-pointer'
+            className="rounded-b-none cursor-pointer"
           >
-            <MapPin className='w-4 h-4 mr-2' />
+            <MapPin className="w-4 h-4 mr-2" />
             地図表示
           </Button>
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
             onClick={() => handleTabChange('list')}
-            className='rounded-b-none cursor-pointer'
+            className="rounded-b-none cursor-pointer"
           >
             一覧表示
           </Button>
@@ -535,7 +535,7 @@ export default function ShachuHakuClient() {
 
         {/* Map Tab Content - Always render but hide with visibility */}
         <div
-          className='space-y-4'
+          className="space-y-4"
           style={{
             visibility: activeTab === 'map' ? 'visible' : 'hidden',
             height: activeTab === 'map' ? 'auto' : '0',
@@ -543,21 +543,21 @@ export default function ShachuHakuClient() {
           }}
         >
           <Card>
-            <CardHeader className='px-3! pt-1.5! pb-0! sm:px-6! sm:pt-6! sm:pb-3! space-y-0'>
+            <CardHeader className="px-3! pt-1.5! pb-0! sm:px-6! sm:pt-6! sm:pb-3! space-y-0">
               {/* カスタムポップアップ - ポートレート時はヘッダーに表示 */}
               {activeTab === 'map' && selectedSpot && !isLandscape ? (
                 spotPopup
               ) : (
                 <>
-                  <CardTitle className='flex items-center justify-between gap-2 text-base sm:text-lg md:text-xl mb-0'>
-                    <div className='flex items-center gap-2'>
-                      <MapPin className='w-4 h-4 sm:w-5 sm:h-5' />
+                  <CardTitle className="flex items-center justify-between gap-2 text-base sm:text-lg md:text-xl mb-0">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
                       {loading ? (
-                        <span className='flex items-center gap-2'>
-                          読み込み中... <Spinner className='size-4' />
+                        <span className="flex items-center gap-2">
+                          読み込み中... <Spinner className="size-4" />
                         </span>
                       ) : isBoundsTooWide ? (
-                        <span className='text-amber-600 dark:text-amber-400 text-sm font-medium'>
+                        <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">
                           地図を拡大してください
                         </span>
                       ) : (
@@ -565,13 +565,13 @@ export default function ShachuHakuClient() {
                       )}
                     </div>
                     <AdLink
-                      href='https://amzn.to/48vDnfQ'
-                      label='ポータブル電源セール'
-                      shortLabel='ポタ電セール'
+                      href="https://amzn.to/48vDnfQ"
+                      label="ポータブル電源セール"
+                      shortLabel="ポタ電セール"
                     />
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
-                    <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+                    <div className="text-sm text-muted-foreground space-y-1 mt-2">
                       {activeFilterDescriptions.map((desc, index) => (
                         <div key={index}>{desc}</div>
                       ))}
@@ -580,7 +580,7 @@ export default function ShachuHakuClient() {
                 </>
               )}
             </CardHeader>
-            <CardContent className='px-3! pt-2! pb-3! sm:px-6! sm:pt-3! sm:pb-6!'>
+            <CardContent className="px-3! pt-2! pb-3! sm:px-6! sm:pt-3! sm:pb-6!">
               {/* ランドスケープ時は地図とポップアップを横並びに */}
               <div
                 className={
@@ -604,8 +604,8 @@ export default function ShachuHakuClient() {
                 </div>
                 {/* ランドスケープ時はポップアップを右側に表示 */}
                 {activeTab === 'map' && selectedSpot && isLandscape && (
-                  <div className='w-64 sm:w-80 shrink-0 flex flex-col'>
-                    <div className='flex-1'>{spotPopup}</div>
+                  <div className="w-64 sm:w-80 shrink-0 flex flex-col">
+                    <div className="flex-1">{spotPopup}</div>
                   </div>
                 )}
               </div>
@@ -615,14 +615,14 @@ export default function ShachuHakuClient() {
 
         {/* List Tab Content */}
         {activeTab === 'list' && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             {/* Filter Notice */}
             {savedBounds && (
-              <Card className='bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800'>
-                <CardContent className='pt-4 pb-4'>
-                  <div className='flex items-start gap-2'>
-                    <Info className='w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5' />
-                    <div className='text-sm text-blue-800 dark:text-blue-200'>
+              <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-800 dark:text-blue-200">
                       <strong>地図表示の範囲内</strong>
                       のスポットを表示しています。より広い範囲のスポットを表示するには、地図表示でズームアウトしてから一覧表示に切り替えてください。
                     </div>
@@ -635,22 +635,22 @@ export default function ShachuHakuClient() {
             {listLoading || !listData ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className='flex items-center gap-2'>
+                  <CardTitle className="flex items-center gap-2">
                     車中泊スポット一覧 (読み込み中...{' '}
-                    <Spinner className='size-4' />)
+                    <Spinner className="size-4" />)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className='space-y-4'>
+                  <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className='border rounded-lg p-4'>
-                        <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
-                        <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
-                        <div className='flex gap-2'>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                      <div key={i} className="border rounded-lg p-4">
+                        <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3"></div>
+                        <div className="flex gap-2">
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
                         </div>
                       </div>
                     ))}
@@ -676,25 +676,25 @@ export default function ShachuHakuClient() {
       </div>
 
       {/* スポット投稿促進・アクションセクション */}
-      <Card className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'>
-        <CardContent className='pt-6 pb-6'>
-          <div className='text-center space-y-3'>
-            <div className='flex justify-center'>
-              <div className='p-3 bg-blue-100 dark:bg-blue-800/50 rounded-full'>
-                <Plus className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+      <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700">
+        <CardContent className="pt-6 pb-6">
+          <div className="text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="p-3 bg-blue-100 dark:bg-blue-800/50 rounded-full">
+                <Plus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             <div>
-              <h2 className='text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2'>
+              <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
                 あなたの車中泊スポットを教えてください
               </h2>
-              <p className='text-sm text-blue-700 dark:text-blue-300 mb-4'>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
                 車旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
               </p>
             </div>
-            <Link href='/shachu-haku/submit'>
-              <Button className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'>
-                <Plus className='w-4 h-4' />
+            <Link href="/shachu-haku/submit">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
+                <Plus className="w-4 h-4" />
                 スポット投稿
               </Button>
             </Link>

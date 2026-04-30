@@ -1,4 +1,7 @@
-import { ServerItineraryDocument, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import {
+  ServerItineraryDocument,
+  ClientItineraryDocument,
+} from '@/data/schemas/itinerarySchema';
 
 type ServerActivity =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
@@ -8,7 +11,7 @@ type Activity = ServerActivity | ClientActivity;
 
 export const isValidCoordinate = (
   latitude?: number,
-  longitude?: number
+  longitude?: number,
 ): boolean => {
   return (
     latitude !== undefined &&
@@ -23,12 +26,12 @@ export const isValidCoordinate = (
 
 export const isMobileDevice = (): boolean => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
+    navigator.userAgent,
   );
 };
 
 export const formatAddress = (
-  address: Activity['place']['address']
+  address: Activity['place']['address'],
 ): string | null => {
   // addressは既に文字列なのでそのまま返す
   return address || null;
@@ -40,7 +43,7 @@ export const filterValidActivities = (activities: Activity[]): Activity[] => {
       activity.place.location &&
       isValidCoordinate(
         activity.place.location.latitude,
-        activity.place.location.longitude
-      )
+        activity.place.location.longitude,
+      ),
   );
 };

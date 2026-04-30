@@ -70,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='ja' suppressHydrationWarning>
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <WebsiteJsonLd />
       </head>
@@ -79,9 +79,9 @@ export default function RootLayout({
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy='afterInteractive'
+              strategy="afterInteractive"
             />
-            <Script id='google-analytics' strategy='afterInteractive'>
+            <Script id="google-analytics" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
@@ -95,31 +95,31 @@ export default function RootLayout({
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-            crossOrigin='anonymous'
-            strategy='afterInteractive'
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
           />
         )}
         <ErrorBoundary>
           <Auth0Provider>
             <ThemeProvider
-              attribute='class'
-              defaultTheme='system'
+              attribute="class"
+              defaultTheme="system"
               enableSystem
               disableTransitionOnChange
             >
               <EnvironmentWrapper>
-                  <div className='flex flex-col min-h-screen bg-background text-foreground'>
-                    <Header />
-                    {/* 固定ヘッダー用のスペーサー */}
-                    <div className='h-12' />
-                    <AdSense />
-                    <main className='flex-1 relative'>
-                      <div className='pb-16'>{children}</div>
-                      <Toaster />
-                    </main>
-                    <Footer />
-                  </div>
-                </EnvironmentWrapper>
+                <div className="flex flex-col min-h-screen bg-background text-foreground">
+                  <Header />
+                  {/* 固定ヘッダー用のスペーサー */}
+                  <div className="h-12" />
+                  <AdSense />
+                  <main className="flex-1 relative">
+                    <div className="pb-16">{children}</div>
+                    <Toaster />
+                  </main>
+                  <Footer />
+                </div>
+              </EnvironmentWrapper>
             </ThemeProvider>
           </Auth0Provider>
         </ErrorBoundary>

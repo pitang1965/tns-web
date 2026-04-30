@@ -40,7 +40,7 @@ export function useAutoSetPrefecture(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (name: any, value: any, options?: any) => void,
   toast: ToastFunction,
-  options?: UseAutoSetPrefectureOptions
+  options?: UseAutoSetPrefectureOptions,
 ) {
   const lastProcessedAddressRef = useRef<string | null>(null);
   const hasShownPostalCodeToastRef = useRef<boolean>(false);

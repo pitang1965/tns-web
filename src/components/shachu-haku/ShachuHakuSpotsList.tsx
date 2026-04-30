@@ -54,17 +54,17 @@ export function ShachuHakuSpotsList({
     return (
       <Card>
         <CardHeader>
-          <CardTitle className='flex items-center justify-between gap-2'>
+          <CardTitle className="flex items-center justify-between gap-2">
             <span>車中泊スポット一覧</span>
             <AdLink
-              href='https://amzn.to/48vDnfQ'
-              label='ポータブル電源セール'
-              shortLabel='ポタ電セール'
+              href="https://amzn.to/48vDnfQ"
+              label="ポータブル電源セール"
+              shortLabel="ポタ電セール"
             />
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='text-center py-8 text-gray-500'>
+          <div className="text-center py-8 text-gray-500">
             {hasFilters
               ? '詳細フィルターの条件に一致する車中泊スポットがありません'
               : '条件に一致する車中泊スポットがありません'}
@@ -77,7 +77,7 @@ export function ShachuHakuSpotsList({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='flex items-center justify-between gap-2'>
+        <CardTitle className="flex items-center justify-between gap-2">
           <span>
             {hasFilters
               ? `このページに${filteredSpots.length}件表示中`
@@ -87,13 +87,13 @@ export function ShachuHakuSpotsList({
                 )}件を表示`}
           </span>
           <AdLink
-            href='https://amzn.to/48vDnfQ'
-            label='ポータブル電源セール'
-            shortLabel='ポタ電セール'
+            href="https://amzn.to/48vDnfQ"
+            label="ポータブル電源セール"
+            shortLabel="ポタ電セール"
           />
         </CardTitle>
         {activeFilterDescriptions.length > 0 && (
-          <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+          <div className="text-sm text-muted-foreground space-y-1 mt-2">
             {activeFilterDescriptions.map((desc, index) => (
               <div key={index}>{desc}</div>
             ))}
@@ -101,7 +101,7 @@ export function ShachuHakuSpotsList({
         )}
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
+        <div className="space-y-4">
           {filteredSpots.map((spot) => (
             <ShachuHakuSpotItem
               key={spot._id}
@@ -112,23 +112,23 @@ export function ShachuHakuSpotsList({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className='flex justify-center items-center gap-2 mt-6'>
+            <div className="flex justify-center items-center gap-2 mt-6">
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 前へ
               </Button>
-              <span className='text-sm text-gray-600 dark:text-gray-300'>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {page} / {totalPages} ページ
               </span>
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 次へ
               </Button>

@@ -9,10 +9,10 @@ import { extractCoordinatesFromGoogleMapsUrl } from '@/lib/maps';
 type CoordinatesFromClipboardButtonProps = {
   onCoordinatesExtracted: (
     latitude: number | string,
-    longitude: number | string
+    longitude: number | string,
   ) => void;
   className?: string;
-}
+};
 
 export const CoordinatesFromClipboardButton: React.FC<
   CoordinatesFromClipboardButtonProps
@@ -49,13 +49,13 @@ export const CoordinatesFromClipboardButton: React.FC<
 
   return (
     <Button
-      type='button'
-      variant='outline'
-      size='sm'
+      type="button"
+      variant="outline"
+      size="sm"
       className={`cursor-pointer ${className}`}
       onClick={handleGoogleMapsUrl}
     >
-      <ClipboardPaste className='w-4 h-4' />
+      <ClipboardPaste className="w-4 h-4" />
       クリップボードから取得
     </Button>
   );

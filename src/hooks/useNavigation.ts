@@ -1,4 +1,7 @@
-import { ServerItineraryDocument, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import {
+  ServerItineraryDocument,
+  ClientItineraryDocument,
+} from '@/data/schemas/itinerarySchema';
 import {
   isValidCoordinate,
   isMobileDevice,
@@ -58,7 +61,7 @@ export const useNavigation = ({
     if (!activities.length || currentActivityIndex < 0) return;
 
     const remainingActivities = filterValidActivities(
-      activities.slice(currentActivityIndex)
+      activities.slice(currentActivityIndex),
     );
 
     if (remainingActivities.length < 2) return;
@@ -85,7 +88,7 @@ export const useNavigation = ({
     if (isMobileDevice()) {
       if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         const mobileUrl = `https://www.google.com/maps/dir/Current+Location/${waypoints.join(
-          '/'
+          '/',
         )}?travelmode=driving`;
         window.location.href = mobileUrl;
       } else {
@@ -106,7 +109,7 @@ export const useNavigation = ({
     if (!activities.length || currentActivityIndex < 0) return false;
 
     const remainingActivities = filterValidActivities(
-      activities.slice(currentActivityIndex)
+      activities.slice(currentActivityIndex),
     );
 
     return remainingActivities.length >= 2;

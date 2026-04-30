@@ -14,13 +14,13 @@ export function SpotRestrictionsCard({ spot }: SpotRestrictionsCardProps) {
         <CardTitle>制限事項</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className='space-y-1'>
+        <div className="space-y-1">
           {spot.restrictions.map((restriction, index) => (
             <div
               key={index}
-              className='text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2'
+              className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2"
             >
-              <span className='text-red-500 mt-1'>•</span>
+              <span className="text-red-500 mt-1">•</span>
               <span>{restriction}</span>
             </div>
           ))}

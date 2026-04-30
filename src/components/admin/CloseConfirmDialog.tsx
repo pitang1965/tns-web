@@ -38,7 +38,7 @@ export function CloseConfirmDialog({
           <AlertDialogCancel>入力を続ける</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className='bg-red-600 hover:bg-red-700'
+            className="bg-red-600 hover:bg-red-700"
           >
             破棄して戻る
           </AlertDialogAction>

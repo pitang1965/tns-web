@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.json(
         { error: '認証されていません' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -29,15 +29,18 @@ export async function GET(request: NextRequest) {
         limit: limitStatus.limit,
         remaining: limitStatus.remaining,
         isPremium: limitStatus.isPremium,
-        itineraries: itineraries
-      }
+        itineraries: itineraries,
+      },
     });
-
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error checking itinerary limit'));
+    logger.error(
+      error instanceof Error
+        ? error
+        : new Error('Error checking itinerary limit'),
+    );
     return NextResponse.json(
       { error: '制限チェックに失敗しました' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

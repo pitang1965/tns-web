@@ -31,7 +31,7 @@ import { useEffect, RefObject } from 'react';
 export function useScrollRestoration(
   containerRef: RefObject<HTMLElement | null>,
   storageKey: string,
-  dependencies: any[] = []
+  dependencies: any[] = [],
 ) {
   // スクロール位置の復元
   useEffect(() => {

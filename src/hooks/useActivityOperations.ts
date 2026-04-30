@@ -38,7 +38,7 @@ export function useActivityOperations({
           url: null,
         },
       ],
-      { shouldValidate: true, shouldDirty: true }
+      { shouldValidate: true, shouldDirty: true },
     );
   };
 
@@ -75,7 +75,7 @@ export function useActivityOperations({
     const currentActivities = watch(`dayPlans.${dayIndex}.activities`) || [];
     setValue(
       `dayPlans.${dayIndex}.activities`,
-      currentActivities.filter((_, index) => index !== activityIndex)
+      currentActivities.filter((_, index) => index !== activityIndex),
     );
   };
 

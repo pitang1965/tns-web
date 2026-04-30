@@ -1,7 +1,4 @@
-import {
-  isInAppBrowser,
-  safeWindowOpen,
-} from '@/lib/browserDetection';
+import { isInAppBrowser, safeWindowOpen } from '@/lib/browserDetection';
 import { isValidCoordinate } from '@/lib/coordinates';
 import { toast as toastFn } from '@/components/ui/use-toast';
 
@@ -10,7 +7,7 @@ type ToastFn = typeof toastFn;
 // 現在地からのルート検索を開く（iOS/Android/Desktop 対応）
 export function openCurrentLocationRoute(
   coordinates: [number, number] | undefined | null,
-  toast: ToastFn
+  toast: ToastFn,
 ): void {
   if (!isValidCoordinate(coordinates)) {
     toast({
@@ -72,7 +69,7 @@ export function openCurrentLocationRoute(
 // Google Maps でスポットを表示する
 export function showSpotOnMap(
   coordinates: [number, number] | undefined | null,
-  toast: ToastFn
+  toast: ToastFn,
 ): void {
   if (!isValidCoordinate(coordinates)) {
     toast({

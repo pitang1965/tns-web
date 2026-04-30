@@ -29,7 +29,9 @@ function getEnvironment(): Promise<EnvironmentResponse> {
         });
     } else {
       // サーバーサイドでは unknown を返す（クライアントで再度取得される）
-      environmentPromise = Promise.resolve({ environment: 'unknown' as Environment });
+      environmentPromise = Promise.resolve({
+        environment: 'unknown' as Environment,
+      });
     }
   }
   return environmentPromise;

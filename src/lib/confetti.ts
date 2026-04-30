@@ -30,7 +30,7 @@ export function playCelebrationSound(existingCtx?: AudioContext) {
       gain.gain.setValueAtTime(0.08, now + note.start);
       gain.gain.exponentialRampToValueAtTime(
         0.001,
-        now + note.start + note.duration
+        now + note.start + note.duration,
       );
       osc.connect(gain);
       gain.connect(ctx.destination);

@@ -186,7 +186,7 @@ export function useFormSubmit({
           if (result.code === 'DUPLICATE') {
             toast({
               title: '重複エラー',
-              description: <p className='font-semibold'>{result.error}</p>,
+              description: <p className="font-semibold">{result.error}</p>,
               variant: 'destructive',
               duration: 10000,
             });
@@ -224,10 +224,10 @@ export function useFormSubmit({
       toast({
         title: errorTitle,
         description: (
-          <div className='space-y-2'>
-            <p className='font-semibold'>{errorMessage}</p>
+          <div className="space-y-2">
+            <p className="font-semibold">{errorMessage}</p>
             {errorDetails && (
-              <p className='text-sm whitespace-pre-wrap'>{errorDetails}</p>
+              <p className="text-sm whitespace-pre-wrap">{errorDetails}</p>
             )}
           </div>
         ),

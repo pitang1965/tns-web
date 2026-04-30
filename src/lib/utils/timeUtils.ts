@@ -1,6 +1,6 @@
 export const adjustTime = (
   timeString: string,
-  delayMinutes: number
+  delayMinutes: number,
 ): string => {
   const [hours, minutes] = timeString.split(':').map(Number);
 
@@ -13,6 +13,6 @@ export const adjustTime = (
 
   return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(
     2,
-    '0'
+    '0',
   )}`;
 };

@@ -26,7 +26,7 @@ async function getDatabase() {
 }
 
 export async function createItinerary(
-  newItinerary: ClientItineraryInput
+  newItinerary: ClientItineraryInput,
 ): Promise<ClientItineraryDocument> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
@@ -74,7 +74,9 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in getItineraries'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error in getItineraries'),
+    );
     return [];
   }
 }
@@ -93,7 +95,11 @@ export async function getPublicItineraries(): Promise<
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in getPublicItineraries'));
+    logger.error(
+      error instanceof Error
+        ? error
+        : new Error('Error in getPublicItineraries'),
+    );
     // Facebook Webview やネットワークエラーに対するフォールバック
     // 空配列を返してページは正常に表示させる
     return [];
@@ -102,7 +108,7 @@ export async function getPublicItineraries(): Promise<
 
 // 以下の関数はサーバーサイドでのみ使用します
 export async function getItineraryById(
-  id: string
+  id: string,
 ): Promise<ClientItineraryDocument | null> {
   const db = await getDb();
 
@@ -131,14 +137,17 @@ export async function getItineraryById(
     // toClientItinerary関数を使用して変換
     return toClientItinerary(itinerary);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in getItineraryById'), { id });
+    logger.error(
+      error instanceof Error ? error : new Error('Error in getItineraryById'),
+      { id },
+    );
     return null;
   }
 }
 
 export async function getItineraryWithDay(
   id: string,
-  dayIndex: number
+  dayIndex: number,
 ): Promise<{ metadata: any; dayPlan: any } | null> {
   const db = await getDb();
 
@@ -209,14 +218,19 @@ export async function getItineraryWithDay(
 
     return { metadata, dayPlan };
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in getItineraryWithDay'), { id, dayIndex });
+    logger.error(
+      error instanceof Error
+        ? error
+        : new Error('Error in getItineraryWithDay'),
+      { id, dayIndex },
+    );
     return null;
   }
 }
 
 export async function updateItinerary(
   id: string,
-  updatedData: ClientItineraryInput
+  updatedData: ClientItineraryInput,
 ): Promise<ClientItineraryDocument> {
   const user = await getAuthenticatedUser();
   const db = await getDatabase();
@@ -265,7 +279,7 @@ export async function updateItinerary(
       .collection<ServerItineraryDocument>('itineraries')
       .updateOne(
         { _id: objectId as any, 'owner.id': user.sub },
-        { $set: updateDoc }
+        { $set: updateDoc },
       );
 
     if (result.matchedCount === 0) {
@@ -289,7 +303,10 @@ export async function updateItinerary(
 
     return toClientItinerary(updatedWithStringId);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in updateItinerary'), { id });
+    logger.error(
+      error instanceof Error ? error : new Error('Error in updateItinerary'),
+      { id },
+    );
     throw error;
   }
 }
@@ -307,7 +324,9 @@ export async function getAllItineraries(): Promise<ClientItineraryDocument[]> {
 
     return itineraries.map(toClientItinerary);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in getAllItineraries'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error in getAllItineraries'),
+    );
     return [];
   }
 }

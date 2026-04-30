@@ -29,47 +29,47 @@ export function BasicInfoSection({
   } = useFormContext();
 
   return (
-    <div className='border rounded-lg p-4 space-y-4'>
-      <Collapsible open={isOpen} onOpenChange={onOpenChange} className='mb-4'>
-        <CollapsibleTrigger className='flex items-center justify-between w-full p-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600'>
+    <div className="border rounded-lg p-4 space-y-4">
+      <Collapsible open={isOpen} onOpenChange={onOpenChange} className="mb-4">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600">
           <H3>旅程基本情報</H3>
-          <span className='text-gray-500 dark:text-gray-400'>
+          <span className="text-gray-500 dark:text-gray-400">
             {isOpen ? '▲' : '▼'}
           </span>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className='space-y-4 my-4'>
+          <div className="space-y-4 my-4">
             <Label
-              htmlFor='title'
+              htmlFor="title"
               className="after:content-['*'] after:ml-0.5 after:text-red-500"
             >
               旅程タイトル
             </Label>
             <Input
-              id='title'
+              id="title"
               {...register('title')}
-              placeholder='旅全体を簡潔に説明。例：東北グランドツーリング'
+              placeholder="旅全体を簡潔に説明。例：東北グランドツーリング"
             />
             {errors.title && (
               <SmallText>{errors.title.message as string}</SmallText>
             )}
           </div>
-          <div className='space-y-4 my-4'>
-            <Label htmlFor='description'>説明</Label>
+          <div className="space-y-4 my-4">
+            <Label htmlFor="description">説明</Label>
             <Textarea
-              id='description'
+              id="description"
               {...register('description')}
-              placeholder='説明'
+              placeholder="説明"
             />
             {errors.description && (
               <SmallText>{errors.description.message as string}</SmallText>
             )}
           </div>
-          <div className='space-y-4 my-4'>
-            <Label htmlFor='startDate'>開始日</Label>
+          <div className="space-y-4 my-4">
+            <Label htmlFor="startDate">開始日</Label>
             <Input
-              id='startDate'
-              type='date'
+              id="startDate"
+              type="date"
               {...register('startDate', {
                 setValueAs: (value) => {
                   // input[type="date"]から受け取った値を処理
@@ -82,16 +82,16 @@ export function BasicInfoSection({
               <SmallText>{errors.startDate.message as string}</SmallText>
             )}
           </div>
-          <div className='space-y-4 my-4'>
+          <div className="space-y-4 my-4">
             <Label
-              htmlFor='numberOfDays'
+              htmlFor="numberOfDays"
               className="after:content-['*'] after:ml-0.5 after:text-red-500"
             >
               日数
             </Label>
             <Input
-              id='numberOfDays'
-              type='number'
+              id="numberOfDays"
+              type="number"
               min={1}
               {...register('numberOfDays', {
                 valueAsNumber: true, // 文字列ではなく数値として扱う
@@ -101,23 +101,23 @@ export function BasicInfoSection({
               <SmallText>{errors.numberOfDays.message as string}</SmallText>
             )}
           </div>
-          <div className='flex items-center justify-between space-y-0 my-4'>
-            <Label htmlFor='isPublic'>公開設定</Label>
-            <div className='flex items-center gap-2'>
-              <span className='text-sm text-gray-500'>非公開</span>
+          <div className="flex items-center justify-between space-y-0 my-4">
+            <Label htmlFor="isPublic">公開設定</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">非公開</span>
               <Controller
-                name='isPublic'
+                name="isPublic"
                 control={control}
                 defaultValue={false}
                 render={({ field }) => (
                   <Switch
-                    id='isPublic'
+                    id="isPublic"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
                 )}
               />
-              <span className='text-sm text-gray-500'>公開</span>
+              <span className="text-sm text-gray-500">公開</span>
             </div>
           </div>
         </CollapsibleContent>

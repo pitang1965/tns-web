@@ -35,55 +35,59 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
   };
 
   return (
-    <Card className='flex flex-col h-full interactive-card'>
+    <Card className="flex flex-col h-full interactive-card">
       <CardHeader>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-start justify-between gap-2'>
-            <CardTitle className='line-clamp-2 flex-1'>{itinerary.title}</CardTitle>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="line-clamp-2 flex-1">
+              {itinerary.title}
+            </CardTitle>
             {itinerary.isPublic ? (
-              <Badge className='flex-shrink-0'>公開</Badge>
+              <Badge className="flex-shrink-0">公開</Badge>
             ) : (
-              <Badge variant='outline' className='flex-shrink-0'>非公開</Badge>
+              <Badge variant="outline" className="flex-shrink-0">
+                非公開
+              </Badge>
             )}
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        <CardDescription className='mb-2'>
+        <CardDescription className="mb-2">
           {formatItineraryDuration(itinerary.startDate, itinerary.numberOfDays)}
         </CardDescription>
-        <CardDescription className='line-clamp-3'>
+        <CardDescription className="line-clamp-3">
           {itinerary.description}
         </CardDescription>
       </CardContent>
-      <CardFooter className='mt-auto'>
-        <div className='flex gap-2 w-full'>
+      <CardFooter className="mt-auto">
+        <div className="flex gap-2 w-full">
           <Button
-            size='sm'
-            variant='secondary'
-            className='flex-1 cursor-pointer'
+            size="sm"
+            variant="secondary"
+            className="flex-1 cursor-pointer"
             onClick={() => router.push(`/itineraries/${itinerary.id}`)}
           >
-            <Eye className='w-4 h-4 mr-1' />
+            <Eye className="w-4 h-4 mr-1" />
             見る
           </Button>
           {user && itinerary.owner && user.sub === itinerary.owner.id && (
             <>
               <Button
-                size='sm'
-                className='flex-1 cursor-pointer'
+                size="sm"
+                className="flex-1 cursor-pointer"
                 onClick={() => router.push(`/itineraries/${itinerary.id}/edit`)}
               >
-                <Pencil className='w-4 h-4 mr-1' />
+                <Pencil className="w-4 h-4 mr-1" />
                 編集
               </Button>
               <Button
-                variant='destructive'
-                size='sm'
-                className='flex-1 cursor-pointer'
+                variant="destructive"
+                size="sm"
+                className="flex-1 cursor-pointer"
                 onClick={() => setIsConfirmOpen(true)}
               >
-                <Trash2 className='w-4 h-4 mr-1' />
+                <Trash2 className="w-4 h-4 mr-1" />
                 削除
               </Button>
             </>
@@ -93,11 +97,11 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
       <ConfirmationDialog
         isOpen={isConfirmOpen}
         onOpenChange={setIsConfirmOpen}
-        title='旅程の削除'
-        description='この旅程を削除してもよろしいですか？この操作は取り消せません。'
-        confirmLabel='削除'
+        title="旅程の削除"
+        description="この旅程を削除してもよろしいですか？この操作は取り消せません。"
+        confirmLabel="削除"
         onConfirm={handleDelete}
-        variant='destructive'
+        variant="destructive"
       />
     </Card>
   );

@@ -1,7 +1,15 @@
 'use client';
 
 import { H2, Text } from '@/components/common/Typography';
-import { Map, Share2, Navigation, FileText, MapPin, Car, Sparkles } from 'lucide-react';
+import {
+  Map,
+  Share2,
+  Navigation,
+  FileText,
+  MapPin,
+  Car,
+  Sparkles,
+} from 'lucide-react';
 
 const features = [
   {
@@ -57,27 +65,27 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className='py-16 px-6 bg-gray-50 dark:bg-gray-800'>
-      <div className='max-w-6xl mx-auto'>
-        <H2 className='text-center mb-12'>主な機能</H2>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+    <section className="py-16 px-6 bg-gray-50 dark:bg-gray-800">
+      <div className="max-w-6xl mx-auto">
+        <H2 className="text-center mb-12">主な機能</H2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <a
                 key={index}
                 href={feature.link}
-                className='group bg-white dark:bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1'
+                className="group bg-white dark:bg-gray-900 rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <div className='flex items-start space-x-4'>
-                  <div className='shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors'>
-                    <Icon className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+                <div className="flex items-start space-x-4">
+                  <div className="shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                    <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className='flex-1'>
-                    <h3 className='font-semibold text-lg mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors'>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {feature.title}
                     </h3>
-                    <Text className='text-gray-600 dark:text-gray-400 text-sm'>
+                    <Text className="text-gray-600 dark:text-gray-400 text-sm">
                       {feature.description}
                     </Text>
                   </div>

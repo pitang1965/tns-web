@@ -28,7 +28,7 @@ type ActivityControlsProps = {
   onShiftSubsequentActivities?: (
     dayIndex: number,
     activityIndex: number,
-    minutes: number
+    minutes: number,
   ) => void;
 };
 
@@ -58,7 +58,7 @@ export function ActivityControls({
   const handleTimeShiftConfirm = (
     dayIndex: number,
     activityIndex: number,
-    delayMinutes: number
+    delayMinutes: number,
   ) => {
     if (onShiftSubsequentActivities) {
       onShiftSubsequentActivities(dayIndex, activityIndex, delayMinutes);
@@ -86,75 +86,90 @@ export function ActivityControls({
       <ButtonGroup>
         {moveActivity && !isFirst && (
           <Button
-            type='button'
-            variant='outline'
-            size='sm'
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() =>
               moveActivity(dayIndex, activityIndex, activityIndex - 1)
             }
-            title='上に移動'
-            className='cursor-pointer'
+            title="上に移動"
+            className="cursor-pointer"
           >
-            <MoveUp className='h-4 w-4' />
+            <MoveUp className="h-4 w-4" />
           </Button>
         )}
         {moveActivity && !isLast && (
           <Button
-            type='button'
-            variant='outline'
-            size='sm'
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={() =>
               moveActivity(dayIndex, activityIndex, activityIndex + 1)
             }
-            title='下に移動'
-            className='cursor-pointer'
+            title="下に移動"
+            className="cursor-pointer"
           >
-            <MoveDown className='h-4 w-4' />
+            <MoveDown className="h-4 w-4" />
           </Button>
         )}
         <Button
-          type='button'
-          variant='outline'
-          size='sm'
+          type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setIsDeleteConfirmOpen(true)}
-          title='削除'
-          className='cursor-pointer'
+          title="削除"
+          className="cursor-pointer"
         >
-          <Trash2 className='h-4 w-4' />
+          <Trash2 className="h-4 w-4" />
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              title='その他のオプション'
-              className='cursor-pointer'
+              type="button"
+              variant="outline"
+              size="sm"
+              title="その他のオプション"
+              className="cursor-pointer"
             >
-              <MoreVertical className='h-4 w-4' />
+              <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
+          <DropdownMenuContent align="end">
             {insertActivity && (
-              <DropdownMenuItem onClick={() => insertActivity(dayIndex, activityIndex)} className='cursor-pointer'>
+              <DropdownMenuItem
+                onClick={() => insertActivity(dayIndex, activityIndex)}
+                className="cursor-pointer"
+              >
                 上にアクティビティを追加
               </DropdownMenuItem>
             )}
             {insertActivity && (
-              <DropdownMenuItem onClick={() => insertActivity(dayIndex, activityIndex + 1)} className='cursor-pointer'>
+              <DropdownMenuItem
+                onClick={() => insertActivity(dayIndex, activityIndex + 1)}
+                className="cursor-pointer"
+              >
                 下にアクティビティを追加
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onClick={handleShiftSubsequentActivities} className='cursor-pointer'>
+            <DropdownMenuItem
+              onClick={handleShiftSubsequentActivities}
+              className="cursor-pointer"
+            >
               以降のアクティビティの時間をずらす
             </DropdownMenuItem>
             {isPreviousDayAvailable && (
-              <DropdownMenuItem onClick={() => setIsPrevDayConfirmOpen(true)} className='cursor-pointer'>
+              <DropdownMenuItem
+                onClick={() => setIsPrevDayConfirmOpen(true)}
+                className="cursor-pointer"
+              >
                 前日の末尾に移動
               </DropdownMenuItem>
             )}
             {isNextDayAvailable && (
-              <DropdownMenuItem onClick={() => setIsNextDayConfirmOpen(true)} className='cursor-pointer'>
+              <DropdownMenuItem
+                onClick={() => setIsNextDayConfirmOpen(true)}
+                className="cursor-pointer"
+              >
                 翌日の先頭に移動
               </DropdownMenuItem>
             )}
@@ -171,26 +186,26 @@ export function ActivityControls({
       <ConfirmationDialog
         isOpen={isDeleteConfirmOpen}
         onOpenChange={setIsDeleteConfirmOpen}
-        title='アクティビティの削除'
-        description='このアクティビィティを削除してもよろしいですか？'
-        confirmLabel='削除'
+        title="アクティビティの削除"
+        description="このアクティビィティを削除してもよろしいですか？"
+        confirmLabel="削除"
         onConfirm={handleDelete}
-        variant='destructive'
+        variant="destructive"
       />
       <ConfirmationDialog
         isOpen={isPrevDayConfirmOpen}
         onOpenChange={setIsPrevDayConfirmOpen}
-        title='前日に移動'
-        description='このアクティビティを前日に移動しますか？前日の末尾に追加され、時刻情報はクリアされます。'
-        confirmLabel='移動'
+        title="前日に移動"
+        description="このアクティビティを前日に移動しますか？前日の末尾に追加され、時刻情報はクリアされます。"
+        confirmLabel="移動"
         onConfirm={handleMoveToPreviousDay}
       />
       <ConfirmationDialog
         isOpen={isNextDayConfirmOpen}
         onOpenChange={setIsNextDayConfirmOpen}
-        title='翌日に移動'
-        description='このアクティビティを翌日に移動しますか？翌日の先頭に追加され、時刻情報はクリアされます。'
-        confirmLabel='移動'
+        title="翌日に移動"
+        description="このアクティビティを翌日に移動しますか？翌日の先頭に追加され、時刻情報はクリアされます。"
+        confirmLabel="移動"
         onConfirm={handleMoveToNextDay}
       />
     </>

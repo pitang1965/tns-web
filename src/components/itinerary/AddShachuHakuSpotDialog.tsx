@@ -25,8 +25,10 @@ const SimpleLocationPicker = dynamic(
   () => import('@/components/common/SimpleLocationPicker'),
   {
     ssr: false,
-    loading: () => <LoadingState variant="card" message="地図を読み込み中..." />,
-  }
+    loading: () => (
+      <LoadingState variant="card" message="地図を読み込み中..." />
+    ),
+  },
 );
 
 type AddShachuHakuSpotDialogProps = {
@@ -48,9 +50,8 @@ export function AddShachuHakuSpotDialog({
     lng: number;
   } | null>(null);
   const [nearbySpots, setNearbySpots] = useState<CampingSpotWithDistance[]>([]);
-  const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithDistance | null>(
-    null
-  );
+  const [selectedSpot, setSelectedSpot] =
+    useState<CampingSpotWithDistance | null>(null);
 
   // Reset state when dialog closes
   const handleOpenChange = useCallback(
@@ -63,7 +64,7 @@ export function AddShachuHakuSpotDialog({
       }
       onOpenChange(newOpen);
     },
-    [onOpenChange]
+    [onOpenChange],
   );
 
   // Handle location selection from map
@@ -84,7 +85,7 @@ export function AddShachuHakuSpotDialog({
       const spots = await getNearestCampingSpots(
         selectedLocation.lat,
         selectedLocation.lng,
-        5 // Get 5 nearest spots
+        5, // Get 5 nearest spots
       );
 
       setNearbySpots(spots);
@@ -163,7 +164,8 @@ export function AddShachuHakuSpotDialog({
                   <MapPin className="h-4 w-4 text-primary" />
                   <span className="font-medium">選択した座標:</span>
                   <span className="text-muted-foreground">
-                    {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                    {selectedLocation.lat.toFixed(6)},{' '}
+                    {selectedLocation.lng.toFixed(6)}
                   </span>
                 </div>
               )}
@@ -183,7 +185,8 @@ export function AddShachuHakuSpotDialog({
                   <MapPin className="h-4 w-4 text-primary" />
                   <span className="font-medium">検索地点:</span>
                   <span className="text-muted-foreground">
-                    {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                    {selectedLocation.lat.toFixed(6)},{' '}
+                    {selectedLocation.lng.toFixed(6)}
                   </span>
                 </div>
               )}

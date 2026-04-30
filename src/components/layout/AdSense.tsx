@@ -55,9 +55,9 @@ export function AdSense() {
       className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
     >
       {isDev ? (
-        <div className='flex justify-center py-1'>
+        <div className="flex justify-center py-1">
           <div
-            className='bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400'
+            className="bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400"
             style={{
               width: isMobile ? '320px' : '728px',
               height: isMobile ? '100px' : '90px',
@@ -68,9 +68,9 @@ export function AdSense() {
         </div>
       ) : (
         <>
-          <div className='flex justify-center py-1'>
+          <div className="flex justify-center py-1">
             <ins
-              className='adsbygoogle'
+              className="adsbygoogle"
               style={{
                 display: 'inline-block',
                 width: isMobile ? '320px' : '728px',
@@ -78,10 +78,10 @@ export function AdSense() {
               }}
               data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
               data-ad-slot={isMobile ? '9582885398' : '8653673455'}
-              data-full-width-responsive='false'
+              data-full-width-responsive="false"
             />
           </div>
-          <Script id='adsense-push-header' strategy='lazyOnload'>
+          <Script id="adsense-push-header" strategy="lazyOnload">
             {`
               try {
                 if (typeof window !== 'undefined' && window.adsbygoogle) {

@@ -11,7 +11,7 @@ import { useWatch } from 'react-hook-form';
 export function useSyncFormWithJotai(
   formMethods: any, // react-hook-formのメソッド
   atomToSync: any, // 同期するJotaiのアトム
-  initialData?: any // 初期データ（オプション）
+  initialData?: any, // 初期データ（オプション）
 ) {
   // Jotaiの状態を取得（更新用）
   const [, setAtomValue] = useAtom(atomToSync);

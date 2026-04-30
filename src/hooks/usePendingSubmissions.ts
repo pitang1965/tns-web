@@ -55,7 +55,7 @@ export function usePendingSubmissions({
       setLoading(true);
       const submissions = await getCampingSpotSubmissions();
       const count = submissions.filter(
-        (s: { status: string }) => s.status === 'pending'
+        (s: { status: string }) => s.status === 'pending',
       ).length;
       setPendingCount(count);
     } catch (error) {

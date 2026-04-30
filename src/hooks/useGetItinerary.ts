@@ -36,7 +36,8 @@ export const useGetItinerary = (id: string): UseGetItineraryResult => {
         if (!metaRes.ok) {
           // metaが失敗した場合、キャッシュがあればそのまま表示
           // キャッシュがなければフルフェッチにフォールスルー
-          if (!cached) await fetchFull(id, cancelled, setItinerary, setLoading, setError);
+          if (!cached)
+            await fetchFull(id, cancelled, setItinerary, setLoading, setError);
           return;
         }
 
@@ -74,7 +75,7 @@ async function fetchFull(
   cancelled: boolean,
   setItinerary: (v: ClientItineraryDocument) => void,
   setLoading: (v: boolean) => void,
-  setError: (v: string | null) => void
+  setError: (v: string | null) => void,
 ) {
   try {
     const res = await fetch(`/api/itineraries/${id}`);

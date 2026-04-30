@@ -13,7 +13,10 @@ import { logger } from '@/lib/logger';
  */
 export async function ensureDbConnection() {
   try {
-    if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    if (
+      mongoose.connection.readyState === 0 ||
+      mongoose.connection.readyState === 3
+    ) {
       // APP_MONGODB_URI を優先して使用（MCPサーバーとの競合を避けるため）
       const uri = process.env.APP_MONGODB_URI || process.env.MONGODB_URI!;
 
@@ -48,13 +51,15 @@ export async function ensureDbConnection() {
     }
   } catch (error) {
     logger.error(
-      error instanceof Error ? error : new Error('Failed to establish MongoDB connection'),
-      { readyState: mongoose.connection.readyState }
+      error instanceof Error
+        ? error
+        : new Error('Failed to establish MongoDB connection'),
+      { readyState: mongoose.connection.readyState },
     );
     throw new Error(
       `Database connection failed: ${
         error instanceof Error ? error.message : 'Unknown error'
-      }`
+      }`,
     );
   }
 }

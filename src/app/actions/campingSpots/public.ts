@@ -88,12 +88,15 @@ export async function getPublicCampingSpotsByBounds(
     searchTerm?: string;
     prefecture?: string;
     type?: string;
-  }
+  },
 ) {
   await ensureDbConnection();
 
   // Reject requests with too-wide bounds (scraping prevention)
-  if (bounds.east - bounds.west > MAX_LNG_SPAN || bounds.north - bounds.south > MAX_LAT_SPAN) {
+  if (
+    bounds.east - bounds.west > MAX_LNG_SPAN ||
+    bounds.north - bounds.south > MAX_LAT_SPAN
+  ) {
     return [];
   }
 
@@ -115,13 +118,13 @@ export async function getPublicCampingSpotsByBounds(
     // Only add $and condition if there are actual patterns
     if (fuzzyPatterns.length > 0) {
       // Each keyword must match at least one of: name, prefecture, address, or notes
-      query.$and = fuzzyPatterns.map(pattern => ({
+      query.$and = fuzzyPatterns.map((pattern) => ({
         $or: [
           { name: { $regex: pattern, $options: 'i' } },
           { prefecture: { $regex: pattern, $options: 'i' } },
           { address: { $regex: pattern, $options: 'i' } },
-          { notes: { $regex: pattern, $options: 'i' } }
-        ]
+          { notes: { $regex: pattern, $options: 'i' } },
+        ],
       }));
     }
   }
@@ -148,7 +151,7 @@ export async function getPublicCampingSpotsWithPagination(
     prefecture?: string;
     type?: string;
     bounds?: { north: number; south: number; east: number; west: number };
-  }
+  },
 ) {
   await ensureDbConnection();
 
@@ -161,13 +164,13 @@ export async function getPublicCampingSpotsWithPagination(
     // Only add $and condition if there are actual patterns
     if (fuzzyPatterns.length > 0) {
       // Each keyword must match at least one of: name, prefecture, address, or notes
-      query.$and = fuzzyPatterns.map(pattern => ({
+      query.$and = fuzzyPatterns.map((pattern) => ({
         $or: [
           { name: { $regex: pattern, $options: 'i' } },
           { prefecture: { $regex: pattern, $options: 'i' } },
           { address: { $regex: pattern, $options: 'i' } },
-          { notes: { $regex: pattern, $options: 'i' } }
-        ]
+          { notes: { $regex: pattern, $options: 'i' } },
+        ],
       }));
     }
   }
@@ -220,7 +223,7 @@ export async function getNearestCampingSpots(
   latitude: number,
   longitude: number,
   limit: number = 5,
-  maxDistance?: number // in meters
+  maxDistance?: number, // in meters
 ) {
   await ensureDbConnection();
 
@@ -237,7 +240,9 @@ export async function getNearestCampingSpots(
 
   // Add maxDistance filter if provided
   if (maxDistance !== undefined) {
-    (query.coordinates as Record<string, Record<string, unknown>>).$near.$maxDistance = maxDistance;
+    (
+      query.coordinates as Record<string, Record<string, unknown>>
+    ).$near.$maxDistance = maxDistance;
   }
 
   const spots = await CampingSpot.find(query).limit(limit).lean();
@@ -248,7 +253,7 @@ export async function getNearestCampingSpots(
       latitude,
       longitude,
       spot.coordinates[1], // lat
-      spot.coordinates[0] // lng
+      spot.coordinates[0], // lng
     );
 
     return {

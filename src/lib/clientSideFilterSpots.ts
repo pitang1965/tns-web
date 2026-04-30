@@ -10,7 +10,7 @@ import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilte
  */
 export function filterSpotsClientSide(
   spots: CampingSpotWithId[],
-  filters: ClientSideFilterValues
+  filters: ClientSideFilterValues,
 ): CampingSpotWithId[] {
   return spots.filter((spot) => {
     // 料金フィルター
@@ -79,7 +79,7 @@ export function filterSpotsClientSide(
  * フィルターがアクティブかどうかを判定する関数
  */
 export function hasActiveClientFilters(
-  filters: ClientSideFilterValues
+  filters: ClientSideFilterValues,
 ): boolean {
   return (
     filters.pricingFilter !== 'all' ||

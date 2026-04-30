@@ -71,23 +71,23 @@ export function EditItineraryClient({
 
   if (!itinerary) {
     return (
-      <div className='container mx-auto p-4'>旅程が見つかりませんでした。</div>
+      <div className="container mx-auto p-4">旅程が見つかりませんでした。</div>
     );
   }
 
   return (
-    <main className='min-w-[320px]'>
-      <div className='flex flex-col lg:flex-row gap-6'>
-        <div className='hidden lg:block w-1/4 max-w-[250px]'>
+    <main className="min-w-[320px]">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="hidden lg:block w-1/4 max-w-[250px]">
           <ItineraryToc initialItinerary={itinerary} />
         </div>
-        <div className='flex-1 min-w-0 sm:min-w-[320px]'>
+        <div className="flex-1 min-w-0 sm:min-w-[320px]">
           <ItineraryForm
             initialData={itinerary}
             onSubmit={handleSubmit}
-            title='旅程編集'
-            description='旅程の詳細を編集してください。* の付いた項目は入力必須です。'
-            submitLabel='更新'
+            title="旅程編集"
+            description="旅程の詳細を編集してください。* の付いた項目は入力必須です。"
+            submitLabel="更新"
             isSubmitting={isSubmitting}
           />
         </div>

@@ -95,81 +95,81 @@ export function ContactForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-      <div className='space-y-2'>
-        <Label htmlFor='name'>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="name">
           お名前 *
           {user && (
-            <span className='text-sm text-muted-foreground ml-2'>
+            <span className="text-sm text-muted-foreground ml-2">
               (ログイン情報から自動入力)
             </span>
           )}
         </Label>
         <Input
-          id='name'
-          type='text'
+          id="name"
+          type="text"
           placeholder={user?.name || '山田太郎'}
           {...register('name')}
           className={errors.name ? 'border-red-500' : ''}
         />
         {errors.name && (
-          <p className='text-sm text-red-500'>{errors.name.message}</p>
+          <p className="text-sm text-red-500">{errors.name.message}</p>
         )}
       </div>
 
-      <div className='space-y-2'>
-        <Label htmlFor='email'>
+      <div className="space-y-2">
+        <Label htmlFor="email">
           メールアドレス *
           {user && (
-            <span className='text-sm text-muted-foreground ml-2'>
+            <span className="text-sm text-muted-foreground ml-2">
               (ログイン情報から自動入力)
             </span>
           )}
         </Label>
         <Input
-          id='email'
-          type='email'
+          id="email"
+          type="email"
           placeholder={user?.email || 'example@example.com'}
           {...register('email')}
           className={errors.email ? 'border-red-500' : ''}
         />
         {errors.email && (
-          <p className='text-sm text-red-500'>{errors.email.message}</p>
+          <p className="text-sm text-red-500">{errors.email.message}</p>
         )}
       </div>
 
-      <div className='space-y-2'>
-        <Label htmlFor='subject'>件名 *</Label>
+      <div className="space-y-2">
+        <Label htmlFor="subject">件名 *</Label>
         <Input
-          id='subject'
-          type='text'
-          placeholder='お問い合わせの件名'
+          id="subject"
+          type="text"
+          placeholder="お問い合わせの件名"
           {...register('subject')}
           className={errors.subject ? 'border-red-500' : ''}
         />
         {errors.subject && (
-          <p className='text-sm text-red-500'>{errors.subject.message}</p>
+          <p className="text-sm text-red-500">{errors.subject.message}</p>
         )}
       </div>
 
-      <div className='space-y-2'>
-        <Label htmlFor='message'>メッセージ *</Label>
+      <div className="space-y-2">
+        <Label htmlFor="message">メッセージ *</Label>
         <Textarea
-          id='message'
+          id="message"
           rows={12}
-          placeholder='お問い合わせの内容をご記入ください'
+          placeholder="お問い合わせの内容をご記入ください"
           {...register('message')}
           className={errors.message ? 'border-red-500' : ''}
         />
         {errors.message && (
-          <p className='text-sm text-red-500'>{errors.message.message}</p>
+          <p className="text-sm text-red-500">{errors.message.message}</p>
         )}
       </div>
 
       <Button
-        type='submit'
+        type="submit"
         disabled={isSubmitting}
-        className='w-full cursor-pointer'
+        className="w-full cursor-pointer"
       >
         {isSubmitting ? '送信中...' : 'お問い合わせを送信'}
       </Button>

@@ -16,7 +16,6 @@ type ItineraryHeaderProps = {
       };
 };
 
-
 const calculateEndDate = (startDate: string, days: number): Date => {
   const start = new Date(startDate);
   const end = new Date(start);
@@ -27,14 +26,13 @@ const calculateEndDate = (startDate: string, days: number): Date => {
 export const ItineraryHeader: React.FC<ItineraryHeaderProps> = ({
   itinerary,
 }) => {
-
   // numberOfDays か totalDays のどちらかを使用
   const days =
     'numberOfDays' in itinerary
       ? itinerary.numberOfDays
       : 'totalDays' in itinerary
-      ? itinerary.totalDays
-      : 0;
+        ? itinerary.totalDays
+        : 0;
 
   const formatDate = (date: Date | string): string => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -48,13 +46,13 @@ export const ItineraryHeader: React.FC<ItineraryHeaderProps> = ({
 
   const periodDisplay = itinerary.startDate
     ? `${formatDate(itinerary.startDate)} ～ ${formatDate(
-        calculateEndDate(itinerary.startDate, days || 1)
+        calculateEndDate(itinerary.startDate, days || 1),
       )}`
     : `${days}日間`;
 
   return (
-    <div className='flex flex-col items-center justify-between p-6 bg-background text-foreground w-full'>
-      <div className='flex items-center gap-2'>
+    <div className="flex flex-col items-center justify-between p-6 bg-background text-foreground w-full">
+      <div className="flex items-center gap-2">
         <H1>{itinerary.title}</H1>
         {'isPublic' in itinerary && (
           <Badge variant={itinerary.isPublic ? 'default' : 'outline'}>

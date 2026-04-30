@@ -11,7 +11,7 @@ import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilte
 export function getActiveFilterDescriptions(
   searchTerm: string,
   typeFilter: string,
-  clientFilters: ClientSideFilterValues
+  clientFilters: ClientSideFilterValues,
 ): string[] {
   const descriptions: string[] = [];
 
@@ -38,7 +38,7 @@ export function getActiveFilterDescriptions(
 
   if (clientFilters.minSecurityLevel > 0) {
     descriptions.push(
-      `セキュリティレベル：${clientFilters.minSecurityLevel}以上`
+      `セキュリティレベル：${clientFilters.minSecurityLevel}以上`,
     );
   }
 
@@ -48,13 +48,13 @@ export function getActiveFilterDescriptions(
 
   if (clientFilters.maxToiletDistance !== null) {
     descriptions.push(
-      `トイレまでの距離：${clientFilters.maxToiletDistance}m以内`
+      `トイレまでの距離：${clientFilters.maxToiletDistance}m以内`,
     );
   }
 
   if (clientFilters.maxConvenienceDistance !== null) {
     descriptions.push(
-      `コンビニまでの距離：${clientFilters.maxConvenienceDistance}m以内`
+      `コンビニまでの距離：${clientFilters.maxConvenienceDistance}m以内`,
     );
   }
 
@@ -63,7 +63,7 @@ export function getActiveFilterDescriptions(
     clientFilters.maxElevation !== null
   ) {
     descriptions.push(
-      `標高：${clientFilters.minElevation}m〜${clientFilters.maxElevation}m`
+      `標高：${clientFilters.minElevation}m〜${clientFilters.maxElevation}m`,
     );
   } else if (clientFilters.minElevation !== null) {
     descriptions.push(`標高：${clientFilters.minElevation}m以上`);

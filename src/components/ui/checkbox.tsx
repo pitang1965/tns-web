@@ -3,7 +3,10 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+interface CheckboxProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type'
+> {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }
@@ -20,11 +23,11 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       }}
       className={cn(
         'h-4 w-4 rounded border border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2',
-        className
+        className,
       )}
       {...props}
     />
-  )
+  ),
 );
 
 Checkbox.displayName = 'Checkbox';

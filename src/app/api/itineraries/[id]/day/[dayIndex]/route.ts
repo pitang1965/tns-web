@@ -10,7 +10,7 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string; dayIndex: string }> }
+  { params }: { params: Promise<{ id: string; dayIndex: string }> },
 ) {
   try {
     const { id, dayIndex } = await params;
@@ -20,7 +20,7 @@ export async function GET(
     if (!isValidObjectId(id)) {
       return NextResponse.json(
         { error: 'Invalid itinerary ID' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,19 +35,19 @@ export async function GET(
       .collection('itineraries')
       .findOne(
         { _id: new ObjectId(id) },
-        { projection: { dayPlans: { $size: '$dayPlans' } } }
+        { projection: { dayPlans: { $size: '$dayPlans' } } },
       );
 
     if (!itinerary) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const totalDays = itinerary.dayPlans || 0;
     console.log(
-      `Total days in itinerary: ${totalDays}, requested day: ${dayIndexNum}`
+      `Total days in itinerary: ${totalDays}, requested day: ${dayIndexNum}`,
     );
 
     // dayPlansが空の場合の特別処理
@@ -59,7 +59,7 @@ export async function GET(
           suggestion: '旅程を編集して日程を追加してください。',
           totalDays: 0,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -74,7 +74,7 @@ export async function GET(
           }日目が指定されましたが、この旅程は${totalDays}日間です。`,
           totalDays: totalDays,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -137,7 +137,7 @@ export async function GET(
     if (!result || result.length === 0) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -155,7 +155,7 @@ export async function GET(
           }日間です。`,
           totalDays: itineraryData.totalDays,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -179,10 +179,12 @@ export async function GET(
 
     return NextResponse.json(response);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error fetching day data'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error fetching day data'),
+    );
     return NextResponse.json(
       { error: 'Error fetching day data' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

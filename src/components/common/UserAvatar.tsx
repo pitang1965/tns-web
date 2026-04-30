@@ -10,7 +10,7 @@ type UserAvatarProps = {
 
 export function UserAvatar({ user }: UserAvatarProps) {
   return (
-    <Link href='/account'>
+    <Link href="/account">
       <Avatar>
         <AvatarImage src={user.picture || undefined} />
         <AvatarFallback>{user?.name}</AvatarFallback>

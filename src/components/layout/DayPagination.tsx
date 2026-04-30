@@ -18,7 +18,7 @@ type DayPaginationProps = {
   renderDayPlan: (dayPlan: DayPlan, index: number) => React.ReactNode;
   onDayChange?: (day: number) => void;
   currentPage: number;
-}
+};
 export const DayPagination: React.FC<DayPaginationProps> = ({
   dayPlans,
   totalDays,
@@ -70,7 +70,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               {page}日目
             </PaginationLink>
           </PaginationItem>
-        )
+        ),
       );
     }
 
@@ -89,7 +89,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
         >
           1日目
         </PaginationLink>
-      </PaginationItem>
+      </PaginationItem>,
     );
 
     // 現在のページが前方に寄っている場合
@@ -107,24 +107,24 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               >
                 {i}日目
               </PaginationLink>
-            </PaginationItem>
+            </PaginationItem>,
           );
         }
       }
       if (actualTotalDays > 4) {
         items.push(
-          <PaginationItem key='ellipsis1'>
+          <PaginationItem key="ellipsis1">
             <PaginationEllipsis />
-          </PaginationItem>
+          </PaginationItem>,
         );
       }
     }
     // 現在のページが後方に寄っている場合
     else if (currentPage > actualTotalDays - 3) {
       items.push(
-        <PaginationItem key='ellipsis1'>
+        <PaginationItem key="ellipsis1">
           <PaginationEllipsis />
-        </PaginationItem>
+        </PaginationItem>,
       );
       for (let i = actualTotalDays - 3; i < actualTotalDays; i++) {
         if (i > 1) {
@@ -139,7 +139,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               >
                 {i}日目
               </PaginationLink>
-            </PaginationItem>
+            </PaginationItem>,
           );
         }
       }
@@ -147,9 +147,9 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     // 中間にある場合
     else {
       items.push(
-        <PaginationItem key='ellipsis1'>
+        <PaginationItem key="ellipsis1">
           <PaginationEllipsis />
-        </PaginationItem>
+        </PaginationItem>,
       );
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
         if (i > 1 && i < actualTotalDays) {
@@ -164,14 +164,14 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
               >
                 {i}日目
               </PaginationLink>
-            </PaginationItem>
+            </PaginationItem>,
           );
         }
       }
       items.push(
-        <PaginationItem key='ellipsis2'>
+        <PaginationItem key="ellipsis2">
           <PaginationEllipsis />
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
@@ -188,13 +188,12 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
           >
             {actualTotalDays}日目
           </PaginationLink>
-        </PaginationItem>
+        </PaginationItem>,
       );
     }
 
     return items;
   };
-
 
   return (
     <>
@@ -206,7 +205,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
         : currentDayPlan && renderDayPlan(currentDayPlan, currentPage - 1)}
 
       {actualTotalDays > 1 && (
-        <div className='mt-6'>
+        <div className="mt-6">
           <Pagination>
             <PaginationContent>
               <PaginationItem>

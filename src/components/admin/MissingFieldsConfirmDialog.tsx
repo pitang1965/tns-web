@@ -34,21 +34,22 @@ export function MissingFieldsConfirmDialog({
 }: MissingFieldsConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className='max-w-2xl max-h-[80vh] overflow-y-auto'>
+      <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <AlertDialogHeader>
           <AlertDialogTitle>未入力項目の確認</AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className='space-y-4 text-left'>
-              <p className='text-sm text-gray-700 dark:text-gray-300'>
-                以下の項目が入力されていませんが、このまま{isEdit ? '更新' : '作成'}しますか？
+            <div className="space-y-4 text-left">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                以下の項目が入力されていませんが、このまま
+                {isEdit ? '更新' : '作成'}しますか？
               </p>
 
               {missingFields.empty.length > 0 && (
-                <div className='space-y-2'>
-                  <p className='font-medium text-sm text-gray-900 dark:text-gray-100'>
+                <div className="space-y-2">
+                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
                     以下が入力されていません:
                   </p>
-                  <ul className='list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300'>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
                     {missingFields.empty.map((field, index) => (
                       <li key={index}>{field}</li>
                     ))}
@@ -57,11 +58,11 @@ export function MissingFieldsConfirmDialog({
               )}
 
               {missingFields.unchecked.length > 0 && (
-                <div className='space-y-2'>
-                  <p className='font-medium text-sm text-gray-900 dark:text-gray-100'>
+                <div className="space-y-2">
+                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
                     次で大丈夫ですか？
                   </p>
-                  <ul className='list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300'>
+                  <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
                     {missingFields.unchecked.map((field, index) => (
                       <li key={index}>{field}</li>
                     ))}
@@ -75,10 +76,7 @@ export function MissingFieldsConfirmDialog({
           <AlertDialogCancel disabled={loading}>
             戻って入力する
           </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-            disabled={loading}
-          >
+          <AlertDialogAction onClick={onConfirm} disabled={loading}>
             {loading ? '保存中...' : `このまま${isEdit ? '更新' : '作成'}`}
           </AlertDialogAction>
         </AlertDialogFooter>

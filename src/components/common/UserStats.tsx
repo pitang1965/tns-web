@@ -17,7 +17,7 @@ export default function UserStats({ itineraries }: UserStatsProps) {
     (sum, i) =>
       sum +
       i.dayPlans.reduce((daySum, day) => daySum + day.activities.length, 0),
-    0
+    0,
   );
 
   const stats = [
@@ -52,19 +52,19 @@ export default function UserStats({ itineraries }: UserStatsProps) {
   ];
 
   return (
-    <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
           <Card key={stat.title}>
-            <CardContent className='p-4'>
-              <div className='flex items-center space-x-2'>
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
                 <div className={`p-2 rounded-md ${stat.bgColor}`}>
                   <Icon className={`h-4 w-4 ${stat.color}`} />
                 </div>
                 <div>
-                  <p className='text-2xl font-bold'>{stat.value}</p>
-                  <p className='text-xs text-muted-foreground'>{stat.title}</p>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.title}</p>
                 </div>
               </div>
             </CardContent>

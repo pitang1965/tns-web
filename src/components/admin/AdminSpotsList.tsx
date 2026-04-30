@@ -38,7 +38,7 @@ type AdminSpotsListProps = {
   searchTerm?: string;
   typeFilter?: string;
   allSpotIds?: string[]; // All filtered spot IDs for navigation
-}
+};
 
 export function AdminSpotsList({
   spots,
@@ -60,7 +60,7 @@ export function AdminSpotsList({
   const activeFilterDescriptions = getActiveFilterDescriptions(
     searchTerm,
     typeFilter,
-    clientFilters
+    clientFilters,
   );
 
   const pageSize = 20;
@@ -72,7 +72,7 @@ export function AdminSpotsList({
           <CardTitle>車中泊スポット一覧</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='text-center py-8 text-gray-500'>
+          <div className="text-center py-8 text-gray-500">
             {hasFilters
               ? '詳細フィルターの条件に一致する車中泊スポットがありません'
               : '条件に一致する車中泊スポットがありません'}
@@ -90,11 +90,11 @@ export function AdminSpotsList({
             ? `このページに${filteredSpots.length}件表示中`
             : `${total}件中 ${(page - 1) * pageSize + 1}-${Math.min(
                 page * pageSize,
-                total
+                total,
               )}件を表示`}
         </CardTitle>
         {activeFilterDescriptions.length > 0 && (
-          <div className='text-sm text-muted-foreground space-y-1 mt-2'>
+          <div className="text-sm text-muted-foreground space-y-1 mt-2">
             {activeFilterDescriptions.map((desc, index) => (
               <div key={index}>{desc}</div>
             ))}
@@ -102,66 +102,63 @@ export function AdminSpotsList({
         )}
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
+        <div className="space-y-4">
           {filteredSpots.map((spot) => (
-            <div
-              key={spot._id}
-              className='border rounded-lg p-4'
-            >
-              <div className='flex justify-between items-start'>
-                <div className='flex-1'>
-                  <h3 className='font-semibold text-lg'>{spot.name}</h3>
-                  <p className='text-gray-600 dark:text-gray-300'>
+            <div key={spot._id} className="border rounded-lg p-4">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{spot.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     {spot.address}
                   </p>
                   {spot.updatedAt && (
-                    <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                       {formatDate(spot.updatedAt.toString())}更新
                     </p>
                   )}
-                  <div className='flex gap-2 mt-2 flex-wrap'>
+                  <div className="flex gap-2 mt-2 flex-wrap">
                     <Badge className={`${getTypeColor(spot.type)} text-white`}>
                       {CampingSpotTypeLabels[spot.type]}
                     </Badge>
                     <Badge
                       className={`${getPricingColor(
                         spot.pricing.isFree,
-                        spot.pricing.pricePerNight
+                        spot.pricing.pricePerNight,
                       )} text-white`}
                     >
                       {spot.pricing.isFree
                         ? '無料'
                         : spot.pricing.pricePerNight
-                        ? `¥${spot.pricing.pricePerNight}`
-                        : '有料：？円'}
+                          ? `¥${spot.pricing.pricePerNight}`
+                          : '有料：？円'}
                     </Badge>
                     <Badge
                       className={`${getRatingColor(
-                        calculateSecurityLevel(spot)
+                        calculateSecurityLevel(spot),
                       )} text-white`}
                     >
                       治安 {calculateSecurityLevel(spot)}/5 🔒
                     </Badge>
                     <Badge
                       className={`${getRatingColor(
-                        calculateQuietnessLevel(spot)
+                        calculateQuietnessLevel(spot),
                       )} text-white`}
                     >
                       静けさ {calculateQuietnessLevel(spot)}/5 🔇
                     </Badge>
                     {spot.isVerified && (
-                      <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
+                      <Badge className="bg-blue-500 text-white hover:bg-blue-600">
                         ✓ 確認済み
                       </Badge>
                     )}
                   </div>
                   {spot.notes && (
-                    <p className='text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2'>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
                       {spot.notes}
                     </p>
                   )}
                 </div>
-                <div className='flex gap-2'>
+                <div className="flex gap-2">
                   <Link
                     href={`/admin/shachu-haku/${spot._id}`}
                     onClick={() => {
@@ -170,18 +167,22 @@ export function AdminSpotsList({
 
                       // Save all filtered spot IDs to sessionStorage for navigation
                       // Use allSpotIds if available (all filtered spots), otherwise fall back to current page
-                      const spotIds = allSpotIds && allSpotIds.length > 0
-                        ? allSpotIds
-                        : filteredSpots.map(s => s._id);
-                      sessionStorage.setItem('admin-spot-ids', JSON.stringify(spotIds));
+                      const spotIds =
+                        allSpotIds && allSpotIds.length > 0
+                          ? allSpotIds
+                          : filteredSpots.map((s) => s._id);
+                      sessionStorage.setItem(
+                        'admin-spot-ids',
+                        JSON.stringify(spotIds),
+                      );
                     }}
                   >
                     <Button
-                      size='sm'
-                      variant='outline'
-                      className='cursor-pointer hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 dark:hover:bg-blue-950 transition-colors duration-200'
+                      size="sm"
+                      variant="outline"
+                      className="cursor-pointer hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 dark:hover:bg-blue-950 transition-colors duration-200"
                     >
-                      <Edit className='w-4 h-4 mr-1' />
+                      <Edit className="w-4 h-4 mr-1" />
                       編集
                     </Button>
                   </Link>
@@ -192,23 +193,23 @@ export function AdminSpotsList({
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className='flex justify-center items-center gap-2 mt-6'>
+            <div className="flex justify-center items-center gap-2 mt-6">
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => onPageChange(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 前へ
               </Button>
-              <span className='text-sm text-gray-600 dark:text-gray-300'>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {page} / {totalPages} ページ
               </span>
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 次へ
               </Button>

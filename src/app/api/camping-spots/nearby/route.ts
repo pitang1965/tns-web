@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     if (isNaN(lat) || isNaN(lng)) {
       return NextResponse.json(
         { error: '有効な座標を指定してください' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
           lat,
           lng,
           spot.nearbyToiletCoordinates[1],
-          spot.nearbyToiletCoordinates[0]
+          spot.nearbyToiletCoordinates[0],
         );
         if (distance <= SEARCH_RANGES.toilet) {
           facilities.push({
@@ -89,7 +89,7 @@ export async function GET(request: Request) {
           lat,
           lng,
           spot.nearbyConvenienceCoordinates[1],
-          spot.nearbyConvenienceCoordinates[0]
+          spot.nearbyConvenienceCoordinates[0],
         );
         if (distance <= SEARCH_RANGES.convenience) {
           facilities.push({
@@ -106,7 +106,7 @@ export async function GET(request: Request) {
           lat,
           lng,
           spot.nearbyBathCoordinates[1],
-          spot.nearbyBathCoordinates[0]
+          spot.nearbyBathCoordinates[0],
         );
         if (distance <= SEARCH_RANGES.bath) {
           facilities.push({
@@ -129,10 +129,12 @@ export async function GET(request: Request) {
 
     return NextResponse.json(nearbySpots);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error fetching nearby spots'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error fetching nearby spots'),
+    );
     return NextResponse.json(
       { error: '近隣スポットの取得に失敗しました' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

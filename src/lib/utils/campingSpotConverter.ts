@@ -44,9 +44,7 @@ export type CampingSpotWithDistance = {
 /**
  * Maps camping spot type to PlaceType
  */
-export function mapCampingSpotTypeToPlaceType(
-  campingType: string
-): PlaceType {
+export function mapCampingSpotTypeToPlaceType(campingType: string): PlaceType {
   const mapping: Record<string, PlaceType> = {
     roadside_station: 'PARKING_FREE_MICHINOEKI',
     sa_pa: 'PARKING_FREE_SERVICE_AREA',
@@ -65,7 +63,7 @@ export function mapCampingSpotTypeToPlaceType(
  * Builds a description string from camping spot information
  */
 export function buildCampingSpotDescription(
-  spot: CampingSpotWithDistance
+  spot: CampingSpotWithDistance,
 ): string {
   const parts: string[] = [];
 

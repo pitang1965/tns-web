@@ -13,7 +13,10 @@ type ItineraryLimitStatusProps = {
   itineraries: ClientItineraryDocument[];
 };
 
-export default function ItineraryLimitStatus({ user, itineraries }: ItineraryLimitStatusProps) {
+export default function ItineraryLimitStatus({
+  user,
+  itineraries,
+}: ItineraryLimitStatusProps) {
   const status = getItineraryLimitStatus(user, itineraries);
 
   if (status.isPremium) {
@@ -59,15 +62,18 @@ export default function ItineraryLimitStatus({ user, itineraries }: ItineraryLim
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span>作成済み旅程</span>
-          <span className={isNearLimit ? 'text-orange-600 font-medium' : 'text-muted-foreground'}>
+          <span
+            className={
+              isNearLimit
+                ? 'text-orange-600 font-medium'
+                : 'text-muted-foreground'
+            }
+          >
             {status.currentCount} / {status.limit}
           </span>
         </div>
 
-        <Progress
-          value={progressPercentage}
-          className="h-2"
-        />
+        <Progress value={progressPercentage} className="h-2" />
 
         <div className="flex items-center justify-between">
           {isAtLimit ? (
@@ -75,7 +81,10 @@ export default function ItineraryLimitStatus({ user, itineraries }: ItineraryLim
               制限に達しています
             </Badge>
           ) : isNearLimit ? (
-            <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700">
+            <Badge
+              variant="secondary"
+              className="text-xs bg-orange-100 text-orange-700"
+            >
               あと{status.remaining}個
             </Badge>
           ) : (

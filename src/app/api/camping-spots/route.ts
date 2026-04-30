@@ -44,10 +44,14 @@ export async function GET(request: Request) {
 
     return NextResponse.json(geoJSON);
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error fetching camping spots'));
+    logger.error(
+      error instanceof Error
+        ? error
+        : new Error('Error fetching camping spots'),
+    );
     return NextResponse.json(
       { error: 'Failed to fetch camping spots' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

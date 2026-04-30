@@ -44,7 +44,7 @@ const ShachuHakuMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className='h-[600px] bg-gray-100 animate-pulse rounded-lg' />
+      <div className="h-[600px] bg-gray-100 animate-pulse rounded-lg" />
     ),
   },
 );
@@ -362,12 +362,12 @@ export default function AdminClient() {
 
   if (!isAdmin) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen space-y-4'>
-        <h1 className='text-2xl font-bold text-red-600'>アクセス拒否</h1>
-        <p className='text-gray-600 dark:text-gray-300'>
+      <div className="flex flex-col justify-center items-center h-screen space-y-4">
+        <h1 className="text-2xl font-bold text-red-600">アクセス拒否</h1>
+        <p className="text-gray-600 dark:text-gray-300">
           この機能は管理者のみ利用可能です。
         </p>
-        <p className='text-sm text-gray-500 dark:text-gray-400'>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           管理者権限が必要な場合は、システム管理者にお問い合わせください。
         </p>
       </div>
@@ -375,22 +375,22 @@ export default function AdminClient() {
   }
 
   return (
-    <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
-      <div className='space-y-4'>
-        <div className='flex justify-between items-center bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-4 py-3'>
-          <h1 className='text-3xl font-bold'>車中泊スポット管理</h1>
-          <div className='flex gap-2'>
-            <Link href='/admin/submissions'>
+    <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
+      <div className="space-y-4">
+        <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-4 py-3">
+          <h1 className="text-3xl font-bold">車中泊スポット管理</h1>
+          <div className="flex gap-2">
+            <Link href="/admin/submissions">
               <Button
-                variant='outline'
-                className='hidden md:flex relative cursor-pointer'
+                variant="outline"
+                className="hidden md:flex relative cursor-pointer"
               >
-                <Users className='w-4 h-4 mr-2' />
+                <Users className="w-4 h-4 mr-2" />
                 投稿管理
                 {pendingSubmissionsCount > 0 && (
                   <Badge
-                    variant='destructive'
-                    className='ml-2 px-1.5 py-0.5 text-xs'
+                    variant="destructive"
+                    className="ml-2 px-1.5 py-0.5 text-xs"
                   >
                     {pendingSubmissionsCount}
                   </Badge>
@@ -399,28 +399,28 @@ export default function AdminClient() {
             </Link>
             <Button
               onClick={() => setShowImportDialog(true)}
-              variant='outline'
+              variant="outline"
               disabled={loading}
-              className='hidden md:flex cursor-pointer'
+              className="hidden md:flex cursor-pointer"
             >
-              <Upload className='w-4 h-4 mr-2' />
+              <Upload className="w-4 h-4 mr-2" />
               CSVインポート
             </Button>
             <Button
               onClick={exportToCSV}
-              variant='outline'
+              variant="outline"
               disabled={loading}
-              className='hidden md:flex cursor-pointer'
+              className="hidden md:flex cursor-pointer"
             >
-              <Download className='w-4 h-4 mr-2' />
+              <Download className="w-4 h-4 mr-2" />
               CSVエクスポート
             </Button>
             <Button
               onClick={() => openForm()}
               disabled={loading}
-              className='hidden md:flex cursor-pointer'
+              className="hidden md:flex cursor-pointer"
             >
-              <Plus className='w-4 h-4 mr-2' />
+              <Plus className="w-4 h-4 mr-2" />
               新規追加
             </Button>
           </div>
@@ -428,14 +428,14 @@ export default function AdminClient() {
         <Button
           onClick={() => openForm()}
           disabled={loading}
-          className='md:hidden w-full cursor-pointer'
+          className="md:hidden w-full cursor-pointer"
         >
-          <Plus className='w-4 h-4 mr-2' />
+          <Plus className="w-4 h-4 mr-2" />
           新規追加
         </Button>
       </div>
 
-      <div className='w-full'>
+      <div className="w-full">
         <ShachuHakuFilters
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
@@ -450,19 +450,19 @@ export default function AdminClient() {
         />
 
         {/* Tab Navigation */}
-        <div className='flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700'>
+        <div className="flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
           <Button
             variant={activeTab === 'map' ? 'default' : 'ghost'}
             onClick={() => startTransition(() => setActiveTab('map'))}
-            className='rounded-b-none cursor-pointer'
+            className="rounded-b-none cursor-pointer"
           >
-            <MapPin className='w-4 h-4 mr-2' />
+            <MapPin className="w-4 h-4 mr-2" />
             地図表示
           </Button>
           <Button
             variant={activeTab === 'list' ? 'default' : 'ghost'}
             onClick={() => startTransition(() => setActiveTab('list'))}
-            className='rounded-b-none cursor-pointer'
+            className="rounded-b-none cursor-pointer"
           >
             一覧表示
           </Button>
@@ -477,23 +477,23 @@ export default function AdminClient() {
           }}
         >
           {/* lg以上: 地図と詳細パネルを横並び / lg未満: 縦積み */}
-          <div className='flex flex-col lg:flex-row lg:items-stretch gap-4'>
+          <div className="flex flex-col lg:flex-row lg:items-stretch gap-4">
             {/* 地図 */}
-            <div className='flex-1 min-w-0'>
+            <div className="flex-1 min-w-0">
               <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='flex items-center gap-2'>
-                    <MapPin className='w-5 h-5' />
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
                     {loading ? (
-                      <span className='flex items-center gap-2'>
-                        読み込み中... <Spinner className='size-4' />
+                      <span className="flex items-center gap-2">
+                        読み込み中... <Spinner className="size-4" />
                       </span>
                     ) : (
                       `表示範囲内: ${visibleSpots.length}件（全${totalCount}件中）`
                     )}
                   </CardTitle>
                   {!loading && activeFilterDescriptions.length > 0 && (
-                    <div className='text-sm text-muted-foreground space-y-1 mt-1'>
+                    <div className="text-sm text-muted-foreground space-y-1 mt-1">
                       {activeFilterDescriptions.map((desc, index) => (
                         <div key={index}>{desc}</div>
                       ))}
@@ -502,7 +502,7 @@ export default function AdminClient() {
                 </CardHeader>
                 <CardContent>
                   <ShachuHakuMap
-                    key='shachu-haku-admin-map'
+                    key="shachu-haku-admin-map"
                     spots={filteredSpots}
                     onSpotSelect={handleSpotSelect}
                     onBoundsChange={handleBoundsChangeWrapper}
@@ -538,16 +538,16 @@ export default function AdminClient() {
 
             {/* スポット詳細パネル: lg以上は右側固定幅、lg未満は下に表示 */}
             {activeTab === 'map' && selectedSpot && (
-              <div className='lg:w-80 lg:shrink-0 lg:flex lg:flex-col'>
+              <div className="lg:w-80 lg:shrink-0 lg:flex lg:flex-col">
                 <SpotPopup
                   spot={selectedSpot}
                   onClose={clearSelection}
-                  className='lg:flex-1'
+                  className="lg:flex-1"
                   actionButton={
                     <Button
                       onClick={() => handleNavigateToEdit(selectedSpot._id)}
-                      className='bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0'
-                      size='sm'
+                      className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-3 py-1 shrink-0"
+                      size="sm"
                     >
                       編集
                     </Button>
@@ -560,27 +560,27 @@ export default function AdminClient() {
 
         {/* List Tab Content */}
         {activeTab === 'list' && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             {/* List - loading state pattern */}
             {listLoading || !listData ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className='flex items-center gap-2'>
+                  <CardTitle className="flex items-center gap-2">
                     車中泊スポット一覧 (読み込み中...{' '}
-                    <Spinner className='size-4' />)
+                    <Spinner className="size-4" />)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className='space-y-4'>
+                  <div className="space-y-4">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className='border rounded-lg p-4'>
-                        <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2'></div>
-                        <div className='h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3'></div>
-                        <div className='flex gap-2'>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
-                          <div className='h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20'></div>
+                      <div key={i} className="border rounded-lg p-4">
+                        <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/4 mb-2"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-1/2 mb-3"></div>
+                        <div className="flex gap-2">
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-16"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
+                          <div className="h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded w-20"></div>
                         </div>
                       </div>
                     ))}

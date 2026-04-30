@@ -55,30 +55,30 @@ export const PublicItineraryItem: React.FC<Props> = ({ itinerary }) => {
   };
 
   return (
-    <Card className='flex flex-col h-full interactive-card'>
+    <Card className="flex flex-col h-full interactive-card">
       <CardHeader>
-        <CardTitle className='line-clamp-2'>{itinerary.title}</CardTitle>
+        <CardTitle className="line-clamp-2">{itinerary.title}</CardTitle>
         {itinerary.owner && (
-          <span className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             作成者: {displayCreator(itinerary.owner)}
           </span>
         )}
       </CardHeader>
       <CardContent>
-        <CardDescription className='mb-2'>
+        <CardDescription className="mb-2">
           {formatItineraryDuration(itinerary.startDate, itinerary.numberOfDays)}
         </CardDescription>
-        <CardDescription className='line-clamp-3'>
+        <CardDescription className="line-clamp-3">
           {itinerary.description}
         </CardDescription>
       </CardContent>
-      <CardFooter className='mt-auto'>
-        <div className='flex gap-2 w-full'>
-          <Link href={`/itineraries/${itinerary.id}`} className='flex-1'>
+      <CardFooter className="mt-auto">
+        <div className="flex gap-2 w-full">
+          <Link href={`/itineraries/${itinerary.id}`} className="flex-1">
             <Button
-              size='sm'
-              variant='secondary'
-              className='flex-1 cursor-pointer'
+              size="sm"
+              variant="secondary"
+              className="flex-1 cursor-pointer"
             >
               見る
             </Button>

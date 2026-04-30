@@ -735,17 +735,17 @@ export default function ShachuHakuMap({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className='h-[600px] bg-gray-100 flex items-center justify-center rounded-lg'>
-        <p className='text-gray-600'>Mapboxトークンが設定されていません</p>
+      <div className="h-[600px] bg-gray-100 flex items-center justify-center rounded-lg">
+        <p className="text-gray-600">Mapboxトークンが設定されていません</p>
       </div>
     );
   }
 
   return (
-    <div className='relative w-full'>
+    <div className="relative w-full">
       {/* 16:10 aspect ratio with max height limits */}
-      <div className='w-full aspect-16/10 max-h-[300px] sm:max-h-[600px]'>
-        <div ref={mapContainer} className='w-full h-full rounded-lg' />
+      <div className="w-full aspect-16/10 max-h-[300px] sm:max-h-[600px]">
+        <div ref={mapContainer} className="w-full h-full rounded-lg" />
       </div>
     </div>
   );

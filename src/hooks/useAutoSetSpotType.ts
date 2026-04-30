@@ -39,7 +39,7 @@ export function useAutoSetSpotType(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (name: any, value: any, options?: any) => void,
   toast: ToastFunction,
-  options?: UseAutoSetSpotTypeOptions
+  options?: UseAutoSetSpotTypeOptions,
 ) {
   const lastAutoSetTypeRef = useRef<string | null>(null);
 

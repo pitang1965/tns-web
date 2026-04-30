@@ -1,6 +1,11 @@
 // Helper function to convert FormData to CampingSpot format
-export function convertFormDataToCampingSpot(formObject: Record<string, unknown>) {
-  const obj = formObject as Record<string, string | boolean | number | undefined>;
+export function convertFormDataToCampingSpot(
+  formObject: Record<string, unknown>,
+) {
+  const obj = formObject as Record<
+    string,
+    string | boolean | number | undefined
+  >;
   return {
     ...formObject,
     coordinates: [Number(obj.lng), Number(obj.lat)],
@@ -24,10 +29,7 @@ export function convertFormDataToCampingSpot(formObject: Record<string, unknown>
       String(obj.nearbyToiletLng).trim() !== '' &&
       !isNaN(Number(obj.nearbyToiletLat)) &&
       !isNaN(Number(obj.nearbyToiletLng))
-        ? [
-            Number(obj.nearbyToiletLng),
-            Number(obj.nearbyToiletLat),
-          ]
+        ? [Number(obj.nearbyToiletLng), Number(obj.nearbyToiletLat)]
         : undefined,
     nearbyConvenienceCoordinates:
       obj.nearbyConvenienceLat &&
@@ -36,10 +38,7 @@ export function convertFormDataToCampingSpot(formObject: Record<string, unknown>
       String(obj.nearbyConvenienceLng).trim() !== '' &&
       !isNaN(Number(obj.nearbyConvenienceLat)) &&
       !isNaN(Number(obj.nearbyConvenienceLng))
-        ? [
-            Number(obj.nearbyConvenienceLng),
-            Number(obj.nearbyConvenienceLat),
-          ]
+        ? [Number(obj.nearbyConvenienceLng), Number(obj.nearbyConvenienceLat)]
         : undefined,
     nearbyBathCoordinates:
       obj.nearbyBathLat &&
@@ -82,9 +81,7 @@ export function convertFormDataToCampingSpot(formObject: Record<string, unknown>
     hasPowerOutlet: obj.hasPowerOutlet === 'true',
     pricing: {
       isFree: obj.isFree === 'true',
-      pricePerNight: obj.pricePerNight
-        ? Number(obj.pricePerNight)
-        : undefined,
+      pricePerNight: obj.pricePerNight ? Number(obj.pricePerNight) : undefined,
       priceNote: (obj.priceNote as string | undefined) || undefined,
     },
     capacity:

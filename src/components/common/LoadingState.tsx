@@ -12,7 +12,7 @@ type LoadingStateProps = {
   className?: string;
   /** カードバリエーションの高さ (デフォルト: 400px) */
   height?: number;
-}
+};
 
 export function LoadingState({
   variant = 'fullscreen',
@@ -23,10 +23,15 @@ export function LoadingState({
   // Overlay variant - 固定オーバーレイ
   if (variant === 'overlay') {
     return (
-      <div className={cn('fixed inset-0 bg-black/50 flex items-center justify-center z-50', className)}>
-        <div className='flex flex-col items-center gap-4'>
-          <Spinner className='size-12 text-white' />
-          <p className='text-white text-sm'>{message}</p>
+      <div
+        className={cn(
+          'fixed inset-0 bg-black/50 flex items-center justify-center z-50',
+          className,
+        )}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <Spinner className="size-12 text-white" />
+          <p className="text-white text-sm">{message}</p>
         </div>
       </div>
     );
@@ -35,10 +40,12 @@ export function LoadingState({
   // Fullscreen variant - ページ全体でセンタリング (h-screen)
   if (variant === 'fullscreen') {
     return (
-      <div className={cn('flex justify-center items-center h-screen', className)}>
-        <div className='flex flex-col items-center gap-3'>
-          <Spinner className='size-10 text-primary' />
-          <p className='text-sm text-muted-foreground'>{message}</p>
+      <div
+        className={cn('flex justify-center items-center h-screen', className)}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <Spinner className="size-10 text-primary" />
+          <p className="text-sm text-muted-foreground">{message}</p>
         </div>
       </div>
     );
@@ -48,8 +55,8 @@ export function LoadingState({
   if (variant === 'inline') {
     return (
       <div className={cn('flex items-center gap-2', className)}>
-        <Spinner className='size-4 text-primary' />
-        <span className='text-sm text-muted-foreground'>{message}</span>
+        <Spinner className="size-4 text-primary" />
+        <span className="text-sm text-muted-foreground">{message}</span>
       </div>
     );
   }
@@ -58,12 +65,17 @@ export function LoadingState({
   if (variant === 'card') {
     return (
       <div
-        className={cn('bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg flex items-center justify-center', className)}
+        className={cn(
+          'bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg flex items-center justify-center',
+          className,
+        )}
         style={{ height: `${height}px` }}
       >
-        <div className='flex flex-col items-center gap-3'>
-          <Spinner className='size-8 text-gray-500 dark:text-gray-400' />
-          <div className='text-gray-500 dark:text-gray-400 text-sm'>{message}</div>
+        <div className="flex flex-col items-center gap-3">
+          <Spinner className="size-8 text-gray-500 dark:text-gray-400" />
+          <div className="text-gray-500 dark:text-gray-400 text-sm">
+            {message}
+          </div>
         </div>
       </div>
     );

@@ -54,7 +54,9 @@ export const generateMetadata = async ({
 
   // URLを構築（searchParamsがある場合はそれも含める）
   const baseUrl = `https://tabi.over40web.club/itineraries/${id}`;
-  const url = resolvedSearchParams.day ? `${baseUrl}?day=${resolvedSearchParams.day}` : baseUrl;
+  const url = resolvedSearchParams.day
+    ? `${baseUrl}?day=${resolvedSearchParams.day}`
+    : baseUrl;
 
   return {
     title: title,

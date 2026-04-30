@@ -55,7 +55,7 @@ const FacilityMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className='h-[400px] bg-gray-100 animate-pulse rounded-lg' />
+      <div className="h-[400px] bg-gray-100 animate-pulse rounded-lg" />
     ),
   },
 );
@@ -151,38 +151,38 @@ ${spot.notes ?? 'なし'} → `;
   })();
 
   return (
-    <div className='container mx-auto p-6 space-y-6'>
+    <div className="container mx-auto p-6 space-y-6">
       {/* ヘッダー */}
-      <div className='space-y-4'>
+      <div className="space-y-4">
         <div>
           <Link href={isFromList ? '/shachu-haku?tab=list' : '/shachu-haku'}>
-            <Button variant='outline' size='sm'>
-              <ArrowLeft className='w-4 h-4 mr-2' />
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               {isFromList ? '一覧に戻る' : '地図に戻る'}
             </Button>
           </Link>
         </div>
 
-        <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4'>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               {spot.name}
             </h1>
-            <p className='text-gray-600 dark:text-gray-400'>{spot.address}</p>
+            <p className="text-gray-600 dark:text-gray-400">{spot.address}</p>
             {spot.updatedAt && (
-              <p className='text-sm text-gray-500 dark:text-gray-500 mt-1'>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
                 {formatDate(spot.updatedAt.toString())}更新
               </p>
             )}
           </div>
-          <div className='flex flex-wrap gap-2'>
+          <div className="flex flex-wrap gap-2">
             <Button
               onClick={() => openCurrentLocationRoute(spot.coordinates, toast)}
-              variant='outline'
-              size='sm'
-              className='cursor-pointer'
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
             >
-              <Navigation className='w-4 h-4 mr-2' />
+              <Navigation className="w-4 h-4 mr-2" />
               ルート検索
             </Button>
             <Button
@@ -193,30 +193,30 @@ ${spot.notes ?? 'なし'} → `;
                 const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                 window.open(url, '_blank');
               }}
-              variant='outline'
-              size='sm'
-              className='cursor-pointer'
-              title='名称と住所で Google AI モード検索'
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
+              title="名称と住所で Google AI モード検索"
             >
-              <Search className='w-4 h-4 mr-2' />
+              <Search className="w-4 h-4 mr-2" />
               AI検索
             </Button>
             <Button
               onClick={() => showSpotOnMap(spot.coordinates, toast)}
-              variant='outline'
-              size='sm'
-              className='cursor-pointer'
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
             >
-              <Map className='w-4 h-4 mr-2' />
+              <Map className="w-4 h-4 mr-2" />
               地図で表示
             </Button>
             <Button
               onClick={handleShare}
-              variant='outline'
-              size='sm'
-              className='cursor-pointer'
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
             >
-              <Share2 className='w-4 h-4 mr-2' />
+              <Share2 className="w-4 h-4 mr-2" />
               共有
             </Button>
           </div>
@@ -224,7 +224,7 @@ ${spot.notes ?? 'なし'} → `;
       </div>
 
       {/* バッジ */}
-      <div className='flex gap-2 flex-wrap'>
+      <div className="flex gap-2 flex-wrap">
         <Badge className={`${getTypeColor(spot.type)} text-white`}>
           {CampingSpotTypeLabels[spot.type]}
         </Badge>
@@ -241,25 +241,25 @@ ${spot.notes ?? 'なし'} → `;
               : '有料：？円'}
         </Badge>
         <Badge className={`${getRatingColor(securityLevel)} text-white`}>
-          <Shield className='w-3 h-3 mr-1' />
+          <Shield className="w-3 h-3 mr-1" />
           治安 {securityLevel}/5
         </Badge>
         <Badge className={`${getRatingColor(quietnessLevel)} text-white`}>
-          <Volume2 className='w-3 h-3 mr-1' />
+          <Volume2 className="w-3 h-3 mr-1" />
           静けさ {quietnessLevel}/5
         </Badge>
         {spot.isVerified && (
-          <Badge className='bg-blue-500 text-white'>✓ 確認済み</Badge>
+          <Badge className="bg-blue-500 text-white">✓ 確認済み</Badge>
         )}
       </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* メイン情報 */}
-        <div className='lg:col-span-2 space-y-6'>
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <MapPin className='w-5 h-5' />
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
                 施設マップ
               </CardTitle>
             </CardHeader>
@@ -268,16 +268,16 @@ ${spot.notes ?? 'なし'} → `;
             </CardContent>
           </Card>
 
-          <div className='flex gap-3 flex-wrap'>
+          <div className="flex gap-3 flex-wrap">
             <AdLink
-              href='https://amzn.to/48vDnfQ'
-              label='ポータブル電源セール'
-              shortLabel='ポタ電セール'
+              href="https://amzn.to/48vDnfQ"
+              label="ポータブル電源セール"
+              shortLabel="ポタ電セール"
             />
             <AdLink
-              href='https://amzn.to/4tTWIzU'
-              label='走行充電器'
-              shortLabel='走行充電器'
+              href="https://amzn.to/4tTWIzU"
+              label="走行充電器"
+              shortLabel="走行充電器"
             />
           </div>
 
@@ -287,7 +287,7 @@ ${spot.notes ?? 'なし'} → `;
                 <CardTitle>詳細・備考</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className='text-gray-700 dark:text-gray-300 whitespace-pre-wrap'>
+                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                   {spot.notes}
                 </p>
               </CardContent>
@@ -296,7 +296,7 @@ ${spot.notes ?? 'なし'} → `;
         </div>
 
         {/* サイドバー */}
-        <div className='space-y-6'>
+        <div className="space-y-6">
           <SpotBasicInfoCard spot={spot} />
           <SpotFacilitiesCard spot={spot} />
           <SpotSecurityCard spot={spot} />
@@ -307,19 +307,19 @@ ${spot.notes ?? 'なし'} → `;
       </div>
 
       {/* 情報修正依頼カード */}
-      <Card className='bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'>
-        <CardContent className='pt-6 pb-6'>
-          <div className='text-center space-y-3'>
-            <div className='flex justify-center'>
-              <div className='p-3 bg-amber-100 dark:bg-amber-800/50 rounded-full'>
-                <PenLine className='w-6 h-6 text-amber-600 dark:text-amber-400' />
+      <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700">
+        <CardContent className="pt-6 pb-6">
+          <div className="text-center space-y-3">
+            <div className="flex justify-center">
+              <div className="p-3 bg-amber-100 dark:bg-amber-800/50 rounded-full">
+                <PenLine className="w-6 h-6 text-amber-600 dark:text-amber-400" />
               </div>
             </div>
             <div>
-              <h2 className='text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2'>
+              <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
                 情報の更新・修正をお知らせください
               </h2>
-              <p className='text-sm text-amber-700 dark:text-amber-300 mb-4'>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
                 掲載情報に誤りや変更がある場合は、お問い合わせフォームからご連絡ください。
                 <br />
                 スポット名・料金・設備状況などの修正前の情報が自動入力されます。
@@ -327,10 +327,10 @@ ${spot.notes ?? 'なし'} → `;
             </div>
             <Link href={correctionContactUrl}>
               <Button
-                variant='outline'
-                className='cursor-pointer border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50'
+                variant="outline"
+                className="cursor-pointer border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50"
               >
-                <PenLine className='w-4 h-4 mr-2' />
+                <PenLine className="w-4 h-4 mr-2" />
                 情報の修正を依頼する
               </Button>
             </Link>

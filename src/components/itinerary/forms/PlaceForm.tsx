@@ -27,7 +27,9 @@ export function PlaceForm({
 }: PlaceFormProps) {
   const { register, setValue, watch } = useFormContext<ClientItineraryInput>();
 
-  const selectedType = watch(`${basePath}.place.type` as Path<ClientItineraryInput>) as PlaceType | undefined;
+  const selectedType = watch(
+    `${basePath}.place.type` as Path<ClientItineraryInput>,
+  ) as PlaceType | undefined;
   const isHomeType = selectedType === 'HOME';
 
   return (
@@ -51,7 +53,7 @@ export function PlaceForm({
         </div>
         <Select
           value={String(
-            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || ''
+            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '',
           )}
           onValueChange={(value) => {
             setValue(
@@ -59,16 +61,16 @@ export function PlaceForm({
               value,
               {
                 shouldValidate: true,
-              }
+              },
             );
           }}
         >
-          <SelectTrigger className='cursor-pointer'>
+          <SelectTrigger className="cursor-pointer">
             <SelectValue placeholder="タイプを選択" />
           </SelectTrigger>
           <SelectContent>
             {Object.entries(PLACE_TYPES).map(([value, label]) => (
-              <SelectItem key={value} value={value} className='cursor-pointer'>
+              <SelectItem key={value} value={value} className="cursor-pointer">
                 {String(label)}
               </SelectItem>
             ))}
@@ -79,7 +81,9 @@ export function PlaceForm({
       <div className="space-y-2">
         <Label>住所</Label>
         <Input
-          {...register(`${basePath}.place.address` as Path<ClientItineraryInput>)}
+          {...register(
+            `${basePath}.place.address` as Path<ClientItineraryInput>,
+          )}
           placeholder="例: 東京都渋谷区恵比寿南1-2-3"
         />
       </div>

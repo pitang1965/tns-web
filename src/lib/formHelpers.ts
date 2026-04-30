@@ -48,7 +48,7 @@ export const getErrorsForDisplay = (errors: any): Record<string, string> => {
 // ページネーションヘッダーをレンダリングする関数
 export const renderPaginationHeader = (
   currentIndex: number,
-  watch: UseFormWatch<ClientItineraryInput>
+  watch: UseFormWatch<ClientItineraryInput>,
 ): React.ReactElement => {
   const numberOfDays = watch('numberOfDays') || 0;
   return React.createElement(
@@ -58,7 +58,7 @@ export const renderPaginationHeader = (
     React.createElement(
       'span',
       { className: 'text-sm text-gray-500' },
-      `${currentIndex + 1} / ${numberOfDays}日目`
-    )
+      `${currentIndex + 1} / ${numberOfDays}日目`,
+    ),
   );
 };

@@ -19,7 +19,7 @@ const SubmissionEditForm = dynamic(
   () => import('@/components/admin/SubmissionEditForm'),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function SubmissionsAdminPage() {
@@ -34,7 +34,7 @@ export default function SubmissionsAdminPage() {
       .includes(user.email);
 
   const [submissions, setSubmissions] = useState<CampingSpotSubmissionWithId[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('pending');
@@ -120,10 +120,10 @@ export default function SubmissionsAdminPage() {
 
   if (isLoading) {
     return (
-      <div className='flex justify-center items-center h-screen'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-2'></div>
-          <p className='text-gray-600 dark:text-gray-400'>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-2"></div>
+          <p className="text-gray-600 dark:text-gray-400">
             認証情報を確認中...
           </p>
         </div>
@@ -133,10 +133,10 @@ export default function SubmissionsAdminPage() {
 
   if (!user) {
     return (
-      <div className='flex justify-center items-center h-screen'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-2'></div>
-          <p className='text-gray-600 dark:text-gray-400'>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-2"></div>
+          <p className="text-gray-600 dark:text-gray-400">
             ログインページに移動中...
           </p>
         </div>
@@ -146,9 +146,9 @@ export default function SubmissionsAdminPage() {
 
   if (!isAdmin) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen space-y-4'>
-        <h1 className='text-2xl font-bold text-red-600'>アクセス拒否</h1>
-        <p className='text-gray-600 dark:text-gray-300'>
+      <div className="flex flex-col justify-center items-center h-screen space-y-4">
+        <h1 className="text-2xl font-bold text-red-600">アクセス拒否</h1>
+        <p className="text-gray-600 dark:text-gray-300">
           この機能は管理者のみ利用可能です。
         </p>
       </div>
@@ -156,10 +156,15 @@ export default function SubmissionsAdminPage() {
   }
 
   return (
-    <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
-      <div className='flex justify-between items-center'>
-        <h1 className='text-3xl font-bold'>投稿管理</h1>
-        <Button onClick={handleRefresh} variant='outline' disabled={loading} className='cursor-pointer'>
+    <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">投稿管理</h1>
+        <Button
+          onClick={handleRefresh}
+          variant="outline"
+          disabled={loading}
+          className="cursor-pointer"
+        >
           <RefreshCw
             className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`}
           />
@@ -168,58 +173,58 @@ export default function SubmissionsAdminPage() {
       </div>
 
       {/* Stats Cards - Hidden on mobile */}
-      <div className='hidden md:grid grid-cols-1 md:grid-cols-4 gap-4'>
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-2'>
-              <Clock className='w-5 h-5 text-orange-600' />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-orange-600" />
               <div>
-                <div className='text-2xl font-bold text-orange-600'>
+                <div className="text-2xl font-bold text-orange-600">
                   {submissionStats.pending}
                 </div>
-                <div className='text-sm text-gray-600'>承認待ち</div>
+                <div className="text-sm text-gray-600">承認待ち</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-2'>
-              <CheckCircle className='w-5 h-5 text-green-600' />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-600" />
               <div>
-                <div className='text-2xl font-bold text-green-600'>
+                <div className="text-2xl font-bold text-green-600">
                   {submissionStats.approved}
                 </div>
-                <div className='text-sm text-gray-600'>承認済み</div>
+                <div className="text-sm text-gray-600">承認済み</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-2'>
-              <XCircle className='w-5 h-5 text-red-600' />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-600" />
               <div>
-                <div className='text-2xl font-bold text-red-600'>
+                <div className="text-2xl font-bold text-red-600">
                   {submissionStats.rejected}
                 </div>
-                <div className='text-sm text-gray-600'>却下</div>
+                <div className="text-sm text-gray-600">却下</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-2'>
-              <Users className='w-5 h-5 text-blue-600' />
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-600" />
               <div>
-                <div className='text-2xl font-bold text-blue-600'>
+                <div className="text-2xl font-bold text-blue-600">
                   {submissionStats.total}
                 </div>
-                <div className='text-sm text-gray-600'>総投稿数</div>
+                <div className="text-sm text-gray-600">総投稿数</div>
               </div>
             </div>
           </CardContent>
@@ -228,22 +233,22 @@ export default function SubmissionsAdminPage() {
 
       {/* Tabs for filtering */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='grid w-full grid-cols-4'>
-          <TabsTrigger value='pending' className='cursor-pointer'>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="pending" className="cursor-pointer">
             承認待ち ({submissionStats.pending})
           </TabsTrigger>
-          <TabsTrigger value='approved' className='cursor-pointer'>
+          <TabsTrigger value="approved" className="cursor-pointer">
             承認済み ({submissionStats.approved})
           </TabsTrigger>
-          <TabsTrigger value='rejected' className='cursor-pointer'>
+          <TabsTrigger value="rejected" className="cursor-pointer">
             却下 ({submissionStats.rejected})
           </TabsTrigger>
-          <TabsTrigger value='all' className='cursor-pointer'>
+          <TabsTrigger value="all" className="cursor-pointer">
             すべて ({submissionStats.total})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className='mt-6'>
+        <TabsContent value={activeTab} className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -256,18 +261,18 @@ export default function SubmissionsAdminPage() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className='text-center py-8'>
-                  <LoadingState variant='inline' />
+                <div className="text-center py-8">
+                  <LoadingState variant="inline" />
                 </div>
               ) : filteredSubmissions.length === 0 ? (
-                <div className='text-center py-8 text-gray-500'>
+                <div className="text-center py-8 text-gray-500">
                   {activeTab === 'pending' && '承認待ちの投稿はありません'}
                   {activeTab === 'approved' && '承認済みの投稿はありません'}
                   {activeTab === 'rejected' && '却下された投稿はありません'}
                   {activeTab === 'all' && '投稿はありません'}
                 </div>
               ) : (
-                <div className='space-y-4'>
+                <div className="space-y-4">
                   {filteredSubmissions.map((submission) => (
                     <SubmissionReviewCard
                       key={submission._id}

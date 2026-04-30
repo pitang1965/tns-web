@@ -48,7 +48,9 @@ export class Auth0ManagementClient {
       return data.access_token;
     } catch (error) {
       logger.error(
-        error instanceof Error ? error : new Error('Error getting Auth0 management token'),
+        error instanceof Error
+          ? error
+          : new Error('Error getting Auth0 management token'),
       );
       throw error;
     }
@@ -65,7 +67,7 @@ export class Auth0ManagementClient {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!usersResponse.ok) {
@@ -80,7 +82,7 @@ export class Auth0ManagementClient {
       const todayStart = new Date(
         today.getFullYear(),
         today.getMonth(),
-        today.getDate()
+        today.getDate(),
       );
       const weekStart = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -111,13 +113,13 @@ export class Auth0ManagementClient {
       const query = `created_at:[${since.toISOString()} TO *]`;
       const response = await fetch(
         `https://${this.domain}/api/v2/users?q=${encodeURIComponent(
-          query
+          query,
         )}&per_page=0&include_totals=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -131,7 +133,9 @@ export class Auth0ManagementClient {
       return data.total || 0;
     } catch (error) {
       logger.error(
-        error instanceof Error ? error : new Error(`Error getting user count since ${since.toISOString()}`),
+        error instanceof Error
+          ? error
+          : new Error(`Error getting user count since ${since.toISOString()}`),
       );
       return 0;
     }

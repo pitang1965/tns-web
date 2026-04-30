@@ -9,7 +9,7 @@ type DeleteConfirmDialogProps = {
   loading: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-}
+};
 
 export function DeleteConfirmDialog({
   spot,
@@ -18,24 +18,29 @@ export function DeleteConfirmDialog({
   onCancel,
 }: DeleteConfirmDialogProps) {
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60'>
-      <Card className='w-full max-w-md'>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className='text-red-600'>削除確認</CardTitle>
+          <CardTitle className="text-red-600">削除確認</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className='mb-4'>
+          <p className="mb-4">
             「{spot?.name}」を削除しますか？この操作は取り消せません。
           </p>
-          <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={onCancel} disabled={loading} className='cursor-pointer'>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              disabled={loading}
+              className="cursor-pointer"
+            >
               キャンセル
             </Button>
             <Button
-              variant='destructive'
+              variant="destructive"
               onClick={onConfirm}
               disabled={loading}
-              className='cursor-pointer'
+              className="cursor-pointer"
             >
               削除
             </Button>

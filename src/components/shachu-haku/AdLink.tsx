@@ -7,7 +7,12 @@ type AdLinkProps = {
   className?: string;
 };
 
-export function AdLink({ href, label, shortLabel, className = '' }: AdLinkProps) {
+export function AdLink({
+  href,
+  label,
+  shortLabel,
+  className = '',
+}: AdLinkProps) {
   // 環境変数で表示/非表示を制御
   if (process.env.NEXT_PUBLIC_SHOW_AD_LINK !== 'true') {
     return null;
@@ -16,8 +21,8 @@ export function AdLink({ href, label, shortLabel, className = '' }: AdLinkProps)
   return (
     <a
       href={href}
-      target='_blank'
-      rel='noopener noreferrer'
+      target="_blank"
+      rel="noopener noreferrer"
       className={`
         group relative inline-flex items-center gap-1.5 px-3 py-1.5
         text-xs font-medium whitespace-nowrap
@@ -31,15 +36,15 @@ export function AdLink({ href, label, shortLabel, className = '' }: AdLinkProps)
         ${className}
       `}
     >
-      <Zap className='w-3.5 h-3.5 animate-bounce-subtle' />
-      <span className='hidden sm:inline'>{label}</span>
-      <span className='sm:hidden'>{shortLabel}</span>
-      <ExternalLink className='w-3 h-3 group-hover:translate-x-0.5 transition-transform' />
+      <Zap className="w-3.5 h-3.5 animate-bounce-subtle" />
+      <span className="hidden sm:inline">{label}</span>
+      <span className="sm:hidden">{shortLabel}</span>
+      <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
 
       {/* キラキラエフェクト */}
-      <span className='absolute -top-0.5 -right-0.5 flex h-2 w-2'>
-        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-300 opacity-75'></span>
-        <span className='relative inline-flex rounded-full h-2 w-2 bg-yellow-400'></span>
+      <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-300 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
       </span>
     </a>
   );

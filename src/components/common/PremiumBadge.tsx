@@ -27,9 +27,9 @@ export default function PremiumBadge({
     if (!showIcon) return null;
     switch (memberType) {
       case 'admin':
-        return <Shield size={variant === 'large' ? 16 : 12} className='mr-1' />;
+        return <Shield size={variant === 'large' ? 16 : 12} className="mr-1" />;
       case 'premium':
-        return <Crown size={variant === 'large' ? 16 : 12} className='mr-1' />;
+        return <Crown size={variant === 'large' ? 16 : 12} className="mr-1" />;
       default:
         return null;
     }

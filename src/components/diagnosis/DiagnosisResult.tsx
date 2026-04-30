@@ -22,7 +22,11 @@ type DiagnosisResultProps = {
 
 const RANK_ICONS = ['', '1', '2', '3'];
 
-export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResultProps) {
+export function DiagnosisResultView({
+  result,
+  answers,
+  onReset,
+}: DiagnosisResultProps) {
   const { persona, recommendations } = result;
   const [copied, setCopied] = useState(false);
 
@@ -45,7 +49,9 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
       const answerValue = answers[q.id];
       const selectedOption = q.options.find((opt) => opt.value === answerValue);
       lines.push(`Q${index + 1}. ${q.question}`);
-      lines.push(`   → ${selectedOption?.label || '未回答'} (${answerValue || '-'})`);
+      lines.push(
+        `   → ${selectedOption?.label || '未回答'} (${answerValue || '-'})`,
+      );
     });
 
     lines.push('');
@@ -77,12 +83,18 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
       {/* ペルソナ結果 */}
       <Card className="overflow-hidden">
         <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5 pb-4 text-center">
-          <p className="text-sm text-muted-foreground">あなたの車中泊スタイルは...</p>
+          <p className="text-sm text-muted-foreground">
+            あなたの車中泊スタイルは...
+          </p>
           <div className="mt-2 text-5xl">{persona.emoji}</div>
-          <h2 className="mt-2 text-2xl font-bold text-foreground">{persona.name}</h2>
+          <h2 className="mt-2 text-2xl font-bold text-foreground">
+            {persona.name}
+          </h2>
         </CardHeader>
         <CardContent className="pt-4">
-          <p className="text-center text-muted-foreground">{persona.description}</p>
+          <p className="text-center text-muted-foreground">
+            {persona.description}
+          </p>
         </CardContent>
       </Card>
 
@@ -97,9 +109,11 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
               key={recommendation.type}
               className={cn(
                 'flex items-start gap-3 rounded-lg border p-3',
-                index === 0 && 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
+                index === 0 &&
+                  'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
                 index === 1 && 'border-gray-300 bg-gray-50 dark:bg-gray-800/50',
-                index === 2 && 'border-orange-300 bg-orange-50 dark:bg-orange-900/20'
+                index === 2 &&
+                  'border-orange-300 bg-orange-50 dark:bg-orange-900/20',
               )}
             >
               <div
@@ -108,7 +122,7 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
                   index === 0 && 'bg-yellow-400 text-yellow-900',
                   index === 1 && 'bg-gray-300 text-gray-700',
                   index === 2 && 'bg-orange-400 text-orange-900',
-                  index > 2 && 'bg-muted text-muted-foreground'
+                  index > 2 && 'bg-muted text-muted-foreground',
                 )}
               >
                 {RANK_ICONS[index + 1] || index + 1}
@@ -156,7 +170,11 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
             onClick={handleCopyDebugInfo}
             className="gap-1 text-xs text-muted-foreground"
           >
-            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            {copied ? (
+              <Check className="h-3 w-3" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
             {copied ? 'コピー済み' : '回答と結果をコピー'}
           </Button>
         </div>
@@ -167,7 +185,10 @@ export function DiagnosisResultView({ result, answers, onReset }: DiagnosisResul
         <p className="text-sm text-muted-foreground">
           友達にも診断してもらいましょう！
           <br />
-          <Link href="/shachu-haku/shindan" className="text-primary hover:underline">
+          <Link
+            href="/shachu-haku/shindan"
+            className="text-primary hover:underline"
+          >
             車中泊スポット診断
           </Link>
         </p>

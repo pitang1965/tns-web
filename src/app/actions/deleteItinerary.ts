@@ -25,7 +25,10 @@ export async function deleteItinerary(id: string) {
 
     return { success: true, message: 'Itinerary deleted successfully' };
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error deleting itinerary'), { id });
+    logger.error(
+      error instanceof Error ? error : new Error('Error deleting itinerary'),
+      { id },
+    );
     return { success: false, message: 'Error deleting itinerary' };
   }
 }

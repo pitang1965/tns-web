@@ -14,7 +14,9 @@ const dayPlanSchema = z.object({
 const baseSchema = z.object({
   title: z.string().min(1, '旅程タイトルを入力してください'),
   description: z.string().default(''),
-  numberOfDays: z.number({ invalid_type_error: '日数を入力してください' }).min(1, '日数を入力してください'),
+  numberOfDays: z
+    .number({ invalid_type_error: '日数を入力してください' })
+    .min(1, '日数を入力してください'),
   startDate: z.string().optional(),
   dayPlans: z.array(dayPlanSchema),
   owner: userReferenceSchema,
@@ -28,7 +30,7 @@ export const serverItinerarySchema = baseSchema.merge(
     _id: objectIdSchema.optional(), // ObjectId型として定義
     createdAt: z.date(),
     updatedAt: z.date(),
-  })
+  }),
 );
 
 // クライアントサイド用
@@ -37,7 +39,7 @@ export const clientItinerarySchema = baseSchema.merge(
     id: z.string().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
-  })
+  }),
 );
 
 // 型定義
@@ -59,7 +61,7 @@ export type ClientItineraryInput = Omit<
 
 // Helper function - サーバー側でのみ使用
 export function toClientItinerary(
-  doc: ServerItineraryDocument
+  doc: ServerItineraryDocument,
 ): ClientItineraryDocument {
   const { _id, ...rest } = doc;
 
@@ -85,8 +87,8 @@ export function toClientItinerary(
         typeof _id === 'string'
           ? _id
           : mongoObjectId && _id instanceof mongoObjectId
-          ? _id.toString()
-          : String(_id);
+            ? _id.toString()
+            : String(_id);
     } catch {
       // mongodbが利用できない場合
       idStr = String(_id);
@@ -109,7 +111,7 @@ export class ItineraryDateHelper {
   // 終了日を計算（開始日がある場合のみ）
   static calculateEndDate(
     startDate: string | undefined,
-    numberOfDays: number
+    numberOfDays: number,
   ): string | undefined {
     if (!startDate) return undefined;
 
@@ -121,7 +123,7 @@ export class ItineraryDateHelper {
   // 特定の日のインデックスから日付を計算
   static calculateDateForDay(
     startDate: string | undefined,
-    dayIndex: number
+    dayIndex: number,
   ): string | undefined {
     if (!startDate) return undefined;
 
@@ -154,8 +156,8 @@ export class ItineraryManager {
       const currentDate = params.startDate
         ? new Date(
             new Date(params.startDate).setDate(
-              new Date(params.startDate).getDate() + i
-            )
+              new Date(params.startDate).getDate() + i,
+            ),
           )
         : new Date(new Date().setDate(new Date().getDate() + i));
 
@@ -180,7 +182,7 @@ export class ItineraryManager {
   // 日数の変更
   static updateDuration(
     itinerary: z.infer<typeof baseSchema>,
-    newNumberOfDays: number
+    newNumberOfDays: number,
   ): z.infer<typeof baseSchema> {
     const currentDays = itinerary.numberOfDays;
 
@@ -199,11 +201,11 @@ export class ItineraryManager {
           const currentDate = itinerary.startDate
             ? new Date(
                 new Date(itinerary.startDate).setDate(
-                  new Date(itinerary.startDate).getDate() + currentDays + i
-                )
+                  new Date(itinerary.startDate).getDate() + currentDays + i,
+                ),
               )
             : new Date(
-                new Date().setDate(new Date().getDate() + currentDays + i)
+                new Date().setDate(new Date().getDate() + currentDays + i),
               );
 
           return {
@@ -212,7 +214,7 @@ export class ItineraryManager {
             activities: [],
             notes: '', // notesフィールドを明示的に初期化
           };
-        }
+        },
       );
 
       return {
@@ -228,7 +230,7 @@ export class ItineraryManager {
   // 開始日の設定/変更
   static updateStartDate(
     itinerary: z.infer<typeof baseSchema>,
-    newStartDate: string | undefined
+    newStartDate: string | undefined,
   ): z.infer<typeof baseSchema> {
     return {
       ...itinerary,
@@ -243,14 +245,14 @@ export class ItineraryManager {
   } {
     const endDate = ItineraryDateHelper.calculateEndDate(
       itinerary.startDate,
-      itinerary.numberOfDays
+      itinerary.numberOfDays,
     );
 
     return {
       duration: `${itinerary.numberOfDays}日間`,
       dateRange: itinerary.startDate
         ? `${ItineraryDateHelper.formatDateDisplay(
-            itinerary.startDate
+            itinerary.startDate,
           )} 〜 ${ItineraryDateHelper.formatDateDisplay(endDate)}`
         : '日程未定',
     };

@@ -28,7 +28,7 @@ async function DashboardContent() {
       <UserStats itineraries={itineraries} />
 
       {/* Main Content - Single Column */}
-      <div className='space-y-6'>
+      <div className="space-y-6">
         <QuickActions />
         <ItineraryLimitStatus user={session?.user} itineraries={itineraries} />
         <RecentViews />
@@ -39,16 +39,16 @@ async function DashboardContent() {
 
 export default function LoggedInHome({ userName }: LoggedInHomeProps) {
   return (
-    <div className='container mx-auto px-4 pt-8 space-y-6'>
+    <div className="container mx-auto px-4 pt-8 space-y-6">
       {/* Welcome Header */}
-      <div className='text-center lg:text-left'>
+      <div className="text-center lg:text-left">
         <H2>{userName}さんのダッシュボード</H2>
       </div>
 
       {/* Dashboard Content */}
       <Suspense
         fallback={
-          <div className='flex justify-center items-center py-12'>
+          <div className="flex justify-center items-center py-12">
             <LoadingSpinner />
           </div>
         }

@@ -50,7 +50,7 @@ export function normalizeSpaces(text: string): string {
  */
 export function normalizeAlphanumeric(text: string): string {
   return text.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (char) =>
-    String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+    String.fromCharCode(char.charCodeAt(0) - 0xfee0),
   );
 }
 

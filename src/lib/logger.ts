@@ -32,7 +32,7 @@ class SentryLogger implements Logger {
   private logMessage(
     message: string,
     level: Sentry.SeverityLevel,
-    extraInfo: Record<string, any>
+    extraInfo: Record<string, any>,
   ) {
     Sentry.withScope((scope) => {
       Object.entries(extraInfo).forEach(([key, value]) => {

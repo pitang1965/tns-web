@@ -32,7 +32,7 @@ export function NearbyFacilityFields({
 
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
+      navigator.userAgent,
     );
   };
 
@@ -40,7 +40,7 @@ export function NearbyFacilityFields({
     fromLat: string,
     fromLng: string,
     toLat: string,
-    toLng: string
+    toLng: string,
   ) => {
     if (!fromLat || !fromLng || !toLat || !toLng) {
       toast({
@@ -62,14 +62,14 @@ export function NearbyFacilityFields({
   };
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       <div>
-        <div className='flex flex-col sm:flex-row sm:items-center gap-2'>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           {watch('name') && (
             <Button
-              type='button'
-              variant='ghost'
-              size='sm'
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 const lat = watch('lat');
                 const lng = watch('lng');
@@ -84,25 +84,25 @@ export function NearbyFacilityFields({
                 const url = `https://www.google.com/maps?q=${lat},${lng}`;
                 window.open(url, '_blank');
               }}
-              className='p-1 h-auto self-start sm:self-center cursor-pointer'
-              title='地図で表示'
+              className="p-1 h-auto self-start sm:self-center cursor-pointer"
+              title="地図で表示"
             >
-              <Map className='w-4 h-4' />
+              <Map className="w-4 h-4" />
             </Button>
           )}
-          <Label className='text-lg font-semibold'>
+          <Label className="text-lg font-semibold">
             {watch('name') ? (
               <span>
                 「
                 <span
-                  className='cursor-pointer hover:bg-yellow-200 hover:text-gray-800 px-1 rounded transition-colors inline-flex items-center gap-1'
+                  className="cursor-pointer hover:bg-yellow-200 hover:text-gray-800 px-1 rounded transition-colors inline-flex items-center gap-1"
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(watch('name'));
                       toast({
                         title: 'コピー完了',
                         description: `「${watch(
-                          'name'
+                          'name',
                         )}」をクリップボードにコピーしました`,
                       });
                     } catch (error) {
@@ -113,10 +113,10 @@ export function NearbyFacilityFields({
                       });
                     }
                   }}
-                  title='クリックしてコピー'
+                  title="クリックしてコピー"
                 >
                   {watch('name')}
-                  <Copy className='w-3 h-3 ml-1 opacity-60' />
+                  <Copy className="w-3 h-3 ml-1 opacity-60" />
                 </span>
                 」の近くの施設の情報
               </span>
@@ -127,7 +127,7 @@ export function NearbyFacilityFields({
         </div>
 
         {/* 近隣スポットから施設をコピー */}
-        <div className='mt-4'>
+        <div className="mt-4">
           <NearbySpotsSelector
             lat={watch('lat') || ''}
             lng={watch('lng') || ''}
@@ -135,16 +135,16 @@ export function NearbyFacilityFields({
           />
         </div>
 
-        <div className='space-y-6 mt-4'>
+        <div className="space-y-6 mt-4">
           {/* トイレ情報 */}
-          <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <div className='flex items-center gap-2'>
-                <Label className='text-md font-medium'>トイレ</Label>
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
+              <div className="flex items-center gap-2">
+                <Label className="text-md font-medium">トイレ</Label>
                 <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={!watch('name') || !watch('address')}
                   onClick={() => {
                     const name = watch('name');
@@ -153,27 +153,28 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                     window.open(url, '_blank');
                   }}
-                  className='p-1 h-auto cursor-pointer'
-                  title='最寄りのトイレをGoogle AI モード検索'
+                  className="p-1 h-auto cursor-pointer"
+                  title="最寄りのトイレをGoogle AI モード検索"
                 >
-                  <Search className='w-4 h-4' />
+                  <Search className="w-4 h-4" />
                 </Button>
               </div>
-              <div className='flex flex-col sm:flex-row gap-2'>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
-                  type='button'
-                  variant='secondary'
-                  size='sm'
+                  type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setValue('distanceToToilet', '0');
                     setValue('nearbyToiletLat', '');
                     setValue('nearbyToiletLng', '');
                     toast({
                       title: '設定完了',
-                      description: 'トイレを「敷地内にあるが場所不明」に設定しました',
+                      description:
+                        'トイレを「敷地内にあるが場所不明」に設定しました',
                     });
                   }}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
                   敷地内にあるが場所不明
                 </Button>
@@ -184,9 +185,9 @@ export function NearbyFacilityFields({
                   }}
                 />
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     const lat = watch('nearbyToiletLat');
                     const lng = watch('nearbyToiletLng');
@@ -201,75 +202,75 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Map className='w-4 h-4' />
+                  <Map className="w-4 h-4" />
                   地図で表示
                 </Button>
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     openRoute(
                       watch('lat') || '',
                       watch('lng') || '',
                       watch('nearbyToiletLat') || '',
-                      watch('nearbyToiletLng') || ''
+                      watch('nearbyToiletLng') || '',
                     );
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Route className='w-4 h-4' />
+                  <Route className="w-4 h-4" />
                   ルート検索
                 </Button>
               </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
               <div>
-                <Label htmlFor='distanceToToilet'>距離 (m)</Label>
+                <Label htmlFor="distanceToToilet">距離 (m)</Label>
                 <Input
-                  id='distanceToToilet'
-                  type='number'
-                  min='0'
-                  placeholder='距離(m)または空欄'
+                  id="distanceToToilet"
+                  type="number"
+                  min="0"
+                  placeholder="距離(m)または空欄"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToToilet')}
                 />
                 {errors.distanceToToilet && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.distanceToToilet.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyToiletLat'>緯度</Label>
+                <Label htmlFor="nearbyToiletLat">緯度</Label>
                 <Input
-                  id='nearbyToiletLat'
-                  type='number'
-                  step='any'
-                  placeholder='緯度（任意）'
+                  id="nearbyToiletLat"
+                  type="number"
+                  step="any"
+                  placeholder="緯度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyToiletLat')}
                 />
                 {errors.nearbyToiletLat && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyToiletLat.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyToiletLng'>経度</Label>
+                <Label htmlFor="nearbyToiletLng">経度</Label>
                 <Input
-                  id='nearbyToiletLng'
-                  type='number'
-                  step='any'
-                  placeholder='経度（任意）'
+                  id="nearbyToiletLng"
+                  type="number"
+                  step="any"
+                  placeholder="経度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyToiletLng')}
                 />
                 {errors.nearbyToiletLng && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyToiletLng.message}
                   </p>
                 )}
@@ -278,14 +279,14 @@ export function NearbyFacilityFields({
           </div>
 
           {/* コンビニ情報 */}
-          <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <div className='flex items-center gap-2'>
-                <Label className='text-md font-medium'>コンビニ</Label>
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
+              <div className="flex items-center gap-2">
+                <Label className="text-md font-medium">コンビニ</Label>
                 <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={!watch('name') || !watch('address')}
                   onClick={() => {
                     const name = watch('name');
@@ -294,13 +295,13 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                     window.open(url, '_blank');
                   }}
-                  className='p-1 h-auto cursor-pointer'
-                  title='最寄りの24時間営業コンビニを Google AI モード検索'
+                  className="p-1 h-auto cursor-pointer"
+                  title="最寄りの24時間営業コンビニを Google AI モード検索"
                 >
-                  <Search className='w-4 h-4' />
+                  <Search className="w-4 h-4" />
                 </Button>
               </div>
-              <div className='flex flex-col sm:flex-row gap-2'>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <CoordinatesFromClipboardButton
                   onCoordinatesExtracted={(lat, lng) => {
                     setValue('nearbyConvenienceLat', lat.toString());
@@ -308,9 +309,9 @@ export function NearbyFacilityFields({
                   }}
                 />
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     const lat = watch('nearbyConvenienceLat');
                     const lng = watch('nearbyConvenienceLng');
@@ -325,75 +326,75 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Map className='w-4 h-4' />
+                  <Map className="w-4 h-4" />
                   地図で表示
                 </Button>
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     openRoute(
                       watch('lat') || '',
                       watch('lng') || '',
                       watch('nearbyConvenienceLat') || '',
-                      watch('nearbyConvenienceLng') || ''
+                      watch('nearbyConvenienceLng') || '',
                     );
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Route className='w-4 h-4' />
+                  <Route className="w-4 h-4" />
                   ルート検索
                 </Button>
               </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
               <div>
-                <Label htmlFor='distanceToConvenience'>距離 (m)</Label>
+                <Label htmlFor="distanceToConvenience">距離 (m)</Label>
                 <Input
-                  id='distanceToConvenience'
-                  type='number'
-                  min='0'
+                  id="distanceToConvenience"
+                  type="number"
+                  min="0"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToConvenience')}
-                  placeholder='距離(m)または空欄'
+                  placeholder="距離(m)または空欄"
                 />
                 {errors.distanceToConvenience && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.distanceToConvenience.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyConvenienceLat'>緯度</Label>
+                <Label htmlFor="nearbyConvenienceLat">緯度</Label>
                 <Input
-                  id='nearbyConvenienceLat'
-                  type='number'
-                  step='any'
-                  placeholder='緯度（任意）'
+                  id="nearbyConvenienceLat"
+                  type="number"
+                  step="any"
+                  placeholder="緯度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyConvenienceLat')}
                 />
                 {errors.nearbyConvenienceLat && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyConvenienceLat.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyConvenienceLng'>経度</Label>
+                <Label htmlFor="nearbyConvenienceLng">経度</Label>
                 <Input
-                  id='nearbyConvenienceLng'
-                  type='number'
-                  step='any'
-                  placeholder='経度（任意）'
+                  id="nearbyConvenienceLng"
+                  type="number"
+                  step="any"
+                  placeholder="経度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyConvenienceLng')}
                 />
                 {errors.nearbyConvenienceLng && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyConvenienceLng.message}
                   </p>
                 )}
@@ -402,14 +403,14 @@ export function NearbyFacilityFields({
           </div>
 
           {/* 入浴施設情報 */}
-          <div className='border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600'>
-            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3'>
-              <div className='flex items-center gap-2'>
-                <Label className='text-md font-medium'>入浴施設</Label>
+          <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 dark:border-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
+              <div className="flex items-center gap-2">
+                <Label className="text-md font-medium">入浴施設</Label>
                 <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   disabled={!watch('name') || !watch('address')}
                   onClick={() => {
                     const name = watch('name');
@@ -418,27 +419,28 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&udm=50`;
                     window.open(url, '_blank');
                   }}
-                  className='p-1 h-auto cursor-pointer'
-                  title='最寄りの入浴施設を Google AI モード検索'
+                  className="p-1 h-auto cursor-pointer"
+                  title="最寄りの入浴施設を Google AI モード検索"
                 >
-                  <Search className='w-4 h-4' />
+                  <Search className="w-4 h-4" />
                 </Button>
               </div>
-              <div className='flex flex-col sm:flex-row gap-2'>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
-                  type='button'
-                  variant='secondary'
-                  size='sm'
+                  type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setValue('distanceToBath', '0');
                     setValue('nearbyBathLat', '');
                     setValue('nearbyBathLng', '');
                     toast({
                       title: '設定完了',
-                      description: '入浴施設を「敷地内にあるが場所不明」に設定しました',
+                      description:
+                        '入浴施設を「敷地内にあるが場所不明」に設定しました',
                     });
                   }}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
                   敷地内にあるが場所不明
                 </Button>
@@ -449,9 +451,9 @@ export function NearbyFacilityFields({
                   }}
                 />
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     const lat = watch('nearbyBathLat');
                     const lng = watch('nearbyBathLng');
@@ -466,75 +468,75 @@ export function NearbyFacilityFields({
                     const url = `https://www.google.com/maps?q=${lat},${lng}`;
                     window.open(url, '_blank');
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Map className='w-4 h-4' />
+                  <Map className="w-4 h-4" />
                   地図で表示
                 </Button>
                 <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     openRoute(
                       watch('lat') || '',
                       watch('lng') || '',
                       watch('nearbyBathLat') || '',
-                      watch('nearbyBathLng') || ''
+                      watch('nearbyBathLng') || '',
                     );
                   }}
-                  className='flex items-center gap-1 cursor-pointer'
+                  className="flex items-center gap-1 cursor-pointer"
                 >
-                  <Route className='w-4 h-4' />
+                  <Route className="w-4 h-4" />
                   ルート検索
                 </Button>
               </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-3'>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
               <div>
-                <Label htmlFor='distanceToBath'>距離 (m)</Label>
+                <Label htmlFor="distanceToBath">距離 (m)</Label>
                 <Input
-                  id='distanceToBath'
-                  type='number'
-                  min='0'
+                  id="distanceToBath"
+                  type="number"
+                  min="0"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('distanceToBath')}
-                  placeholder='距離(m)または空欄'
+                  placeholder="距離(m)または空欄"
                 />
                 {errors.distanceToBath && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.distanceToBath.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyBathLat'>緯度</Label>
+                <Label htmlFor="nearbyBathLat">緯度</Label>
                 <Input
-                  id='nearbyBathLat'
-                  type='number'
-                  step='any'
-                  placeholder='緯度（任意）'
+                  id="nearbyBathLat"
+                  type="number"
+                  step="any"
+                  placeholder="緯度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyBathLat')}
                 />
                 {errors.nearbyBathLat && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyBathLat.message}
                   </p>
                 )}
               </div>
               <div>
-                <Label htmlFor='nearbyBathLng'>経度</Label>
+                <Label htmlFor="nearbyBathLng">経度</Label>
                 <Input
-                  id='nearbyBathLng'
-                  type='number'
-                  step='any'
-                  placeholder='経度（任意）'
+                  id="nearbyBathLng"
+                  type="number"
+                  step="any"
+                  placeholder="経度（任意）"
                   onWheel={(e) => e.currentTarget.blur()}
                   {...register('nearbyBathLng')}
                 />
                 {errors.nearbyBathLng && (
-                  <p className='text-sm text-red-500'>
+                  <p className="text-sm text-red-500">
                     {errors.nearbyBathLng.message}
                   </p>
                 )}

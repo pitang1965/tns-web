@@ -22,7 +22,11 @@ export default function SimpleLocationPicker({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [position, setPosition] = useState({
     lat: initialLat,
     lng: initialLng,
@@ -132,39 +136,39 @@ export default function SimpleLocationPicker({
   };
 
   if (!mounted) {
-    return <LoadingState variant='card' message='地図を読み込み中...' />;
+    return <LoadingState variant="card" message="地図を読み込み中..." />;
   }
 
   return (
-    <div className='h-[400px] w-full'>
-      <div className='relative w-full h-full'>
+    <div className="h-[400px] w-full">
+      <div className="relative w-full h-full">
         <div
           ref={mapContainer}
-          className='w-full h-full rounded-lg cursor-crosshair'
+          className="w-full h-full rounded-lg cursor-crosshair"
         />
-        <div className='absolute top-2 right-2 z-10'>
+        <div className="absolute top-2 right-2 z-10">
           <Button
-            type='button'
-            size='sm'
-            variant='secondary'
+            type="button"
+            size="sm"
+            variant="secondary"
             onClick={handleLocate}
             disabled={locating}
-            className='shadow-md bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
-            title='現在地に移動'
+            className="shadow-md bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+            title="現在地に移動"
           >
             {locating ? (
-              <Loader2 className='w-4 h-4 animate-spin' />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <LocateFixed className='w-4 h-4' />
+              <LocateFixed className="w-4 h-4" />
             )}
             現在地
           </Button>
         </div>
       </div>
       {locateError && (
-        <p className='mt-1 text-xs text-red-500'>{locateError}</p>
+        <p className="mt-1 text-xs text-red-500">{locateError}</p>
       )}
-      <div className='mt-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded'>
+      <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded">
         地図をクリック、またはマーカーをドラッグして位置を選択してください。
         <br />
         現在の座標: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}

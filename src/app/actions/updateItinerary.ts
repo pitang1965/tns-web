@@ -7,7 +7,7 @@ import { logger } from '@/lib/logger';
 
 export async function updateItineraryAction(
   id: string,
-  data: ClientItineraryInput
+  data: ClientItineraryInput,
 ) {
   try {
     const session = await auth0.getSession();
@@ -61,7 +61,10 @@ export async function updateItineraryAction(
 
     return { success: true, id: updatedItinerary.id };
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error updating itinerary'), { id });
+    logger.error(
+      error instanceof Error ? error : new Error('Error updating itinerary'),
+      { id },
+    );
     return {
       success: false,
       error:

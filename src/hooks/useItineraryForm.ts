@@ -24,7 +24,7 @@ const DEFAULT_ITINERARY = {
 type UseItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
   onSubmit: (
-    data: ClientItineraryInput
+    data: ClientItineraryInput,
   ) => Promise<{ success: boolean; id?: string; error?: string }>;
   submitLabel: string;
   isSubmitting: boolean;
@@ -97,7 +97,8 @@ export function useItineraryForm({
       // フォームの既存データを優先し、なければ initialData にフォールバック
       const currentDayPlan = currentDayPlans[index];
       const fallbackDayPlan = initialData?.dayPlans?.[index];
-      const activities = currentDayPlan?.activities ?? fallbackDayPlan?.activities ?? [];
+      const activities =
+        currentDayPlan?.activities ?? fallbackDayPlan?.activities ?? [];
       const notes = currentDayPlan?.notes ?? fallbackDayPlan?.notes ?? '';
 
       if (startDate) {

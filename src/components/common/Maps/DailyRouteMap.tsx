@@ -63,18 +63,18 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
         compact ? 'h-[400px]' : 'h-[600px]'
       }`}
     >
-      <div ref={mapContainer} className='w-full h-full' />
+      <div ref={mapContainer} className="w-full h-full" />
 
       {/* コントロールボタン */}
-      <div className='absolute bottom-2 right-2 z-10 flex flex-col gap-2'>
+      <div className="absolute bottom-2 right-2 z-10 flex flex-col gap-2">
         {activities.length > 1 && (
           <Button
             onClick={updateMapBounds}
-            size='sm'
-            variant='outline'
-            className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
+            size="sm"
+            variant="outline"
+            className="bg-white hover:bg-gray-100 text-gray-800 shadow-md"
           >
-            <ChevronsUp className='h-4 w-4 mr-1' />
+            <ChevronsUp className="h-4 w-4 mr-1" />
             全て表示
           </Button>
         )}
@@ -82,11 +82,11 @@ const DailyRouteMap: React.FC<DailyRouteMapProps> = ({
         {compact && onExpandClick && (
           <Button
             onClick={handleExpand}
-            size='sm'
-            variant='outline'
-            className='bg-white hover:bg-gray-100 text-gray-800 shadow-md'
+            size="sm"
+            variant="outline"
+            className="bg-white hover:bg-gray-100 text-gray-800 shadow-md"
           >
-            <Maximize2 className='h-4 w-4 mr-1' />
+            <Maximize2 className="h-4 w-4 mr-1" />
             拡大表示
           </Button>
         )}

@@ -44,26 +44,26 @@ export default function QuickActions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
+        <CardTitle className="flex items-center gap-2">
           <Zap size={20} />
           クイックアクション
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
               <Link key={action.href} href={action.href}>
                 <Button
-                  variant='ghost'
+                  variant="ghost"
                   className={`w-full h-auto p-4 flex flex-col items-start space-y-2 ${action.color} ${action.textColor} hover:scale-105 transition-all duration-200 cursor-pointer`}
                 >
-                  <div className='flex items-center gap-2 w-full'>
+                  <div className="flex items-center gap-2 w-full">
                     <Icon size={20} />
-                    <span className='font-medium'>{action.title}</span>
+                    <span className="font-medium">{action.title}</span>
                   </div>
-                  <p className='text-sm opacity-90 text-left'>
+                  <p className="text-sm opacity-90 text-left">
                     {action.description}
                   </p>
                 </Button>

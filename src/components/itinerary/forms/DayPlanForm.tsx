@@ -192,21 +192,21 @@ export function DayPlanForm({
   const shouldShowMap = activitiesWithLocation.length >= 2;
 
   return (
-    <div className='border rounded-lg p-4 space-y-4'>
-      <div className='flex justify-between items-center'>
+    <div className="border rounded-lg p-4 space-y-4">
+      <div className="flex justify-between items-center">
         <H3>{dayDisplay}</H3>
 
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           {/* 時間順並び替えボタン - アクティビティが2つ以上ある場合のみ表示 */}
           {totalActivities >= 2 && (
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={handleSortActivitiesByTime}
-              className='flex items-center gap-1 cursor-pointer'
-              type='button'
+              className="flex items-center gap-1 cursor-pointer"
+              type="button"
             >
-              <Clock className='h-4 w-4' />
+              <Clock className="h-4 w-4" />
               <span>時間でソート</span>
             </Button>
           )}
@@ -214,12 +214,12 @@ export function DayPlanForm({
           {/* 位置情報を持つアクティビティが2つ以上ある場合のみボタンを表示 */}
           {shouldShowMap && (
             <Button
-              variant='outline'
-              size='sm'
+              variant="outline"
+              size="sm"
               onClick={() => setShowFullMap(true)}
-              className='flex items-center gap-1 cursor-pointer'
+              className="flex items-center gap-1 cursor-pointer"
             >
-              <Map className='h-4 w-4' />
+              <Map className="h-4 w-4" />
               <span>ルートマップ</span>
             </Button>
           )}
@@ -228,7 +228,7 @@ export function DayPlanForm({
 
       {/* ルートマップ (コンパクト表示) */}
       {shouldShowMap && (
-        <div className='mb-4'>
+        <div className="mb-4">
           <DailyRouteMap
             activities={activitiesWithLocation}
             compact={true}
@@ -239,7 +239,7 @@ export function DayPlanForm({
 
       {/* アクティビティの順序リスト - アクティビティが1つ以上ある場合のみ表示 */}
       {totalActivities > 0 && (
-        <div className='mb-4 p-3 border border-border/50 rounded-lg bg-muted/10'>
+        <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/10">
           <ActivityOrderList
             activities={watchedActivities.map((activity: any) => ({
               id: activity.id,
@@ -254,33 +254,33 @@ export function DayPlanForm({
       )}
 
       {/* デイノート - その日のメモ */}
-      <div className='mb-4'>
-        <Label htmlFor={`dayPlans.${dayIndex}.notes`} className='mb-2 block'>
+      <div className="mb-4">
+        <Label htmlFor={`dayPlans.${dayIndex}.notes`} className="mb-2 block">
           この日のメモ
         </Label>
         <Textarea
           id={`dayPlans.${dayIndex}.notes`}
-          placeholder='旅行の計画やメモを記入してください...'
-          className='min-h-24'
+          placeholder="旅行の計画やメモを記入してください..."
+          className="min-h-24"
           {...register(`dayPlans.${dayIndex}.notes`)}
         />
       </div>
 
-      <div className='space-y-4'>
+      <div className="space-y-4">
         {day.activities?.map((activity, activityIndex) => (
           <div key={activity.id}>
             {/* アクティビティ間の挿入ボタン */}
-            <div className='group/insert flex items-center gap-2 -mt-2 mb-2'>
-              <div className='flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors' />
+            <div className="group/insert flex items-center gap-2 -mt-2 mb-2">
+              <div className="flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors" />
               <button
-                type='button'
+                type="button"
                 onClick={() => insertActivity(dayIndex, activityIndex)}
-                className='opacity-30 group-hover/insert:opacity-100 focus-visible:opacity-100 flex items-center justify-center h-6 w-6 rounded-full border border-muted-foreground/30 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer'
-                title='ここにアクティビティを挿入'
+                className="opacity-30 group-hover/insert:opacity-100 focus-visible:opacity-100 flex items-center justify-center h-6 w-6 rounded-full border border-muted-foreground/30 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer"
+                title="ここにアクティビティを挿入"
               >
-                <Plus className='h-3.5 w-3.5' />
+                <Plus className="h-3.5 w-3.5" />
               </button>
-              <div className='flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors' />
+              <div className="flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors" />
             </div>
             <ActivityForm
               dayIndex={dayIndex}
@@ -302,34 +302,34 @@ export function DayPlanForm({
 
         {showCopyPreviousDayButton && (
           <Button
-            type='button'
-            variant='secondary'
+            type="button"
+            variant="secondary"
             onClick={handleCopyPreviousDayLastActivity}
-            className='w-full cursor-pointer'
+            className="w-full cursor-pointer"
           >
-            <Navigation className='h-4 w-4 mr-2' />
+            <Navigation className="h-4 w-4 mr-2" />
             前日最終地点を追加
           </Button>
         )}
 
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <Button
-            type='button'
-            variant='outline'
+            type="button"
+            variant="outline"
             onClick={() => addActivity(dayIndex)}
-            className='flex-1 cursor-pointer'
+            className="flex-1 cursor-pointer"
           >
-            <PlusCircle className='h-4 w-4 mr-2' />
+            <PlusCircle className="h-4 w-4 mr-2" />
             アクティビティを追加
           </Button>
 
           <Button
-            type='button'
-            variant='outline'
+            type="button"
+            variant="outline"
             onClick={() => setShowCampingSpotDialog(true)}
-            className='flex-1 cursor-pointer'
+            className="flex-1 cursor-pointer"
           >
-            <Tent className='h-4 w-4 mr-2' />
+            <Tent className="h-4 w-4 mr-2" />
             車中泊スポットを追加
           </Button>
         </div>
@@ -344,11 +344,11 @@ export function DayPlanForm({
 
       {/* フルスクリーンマップダイアログ */}
       <Dialog open={showFullMap} onOpenChange={setShowFullMap}>
-        <DialogContent className='sm:max-w-[90vw] max-h-[90vh]'>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>{dayDisplay}のルートマップ</DialogTitle>
           </DialogHeader>
-          <div className='h-[70vh] w-full'>
+          <div className="h-[70vh] w-full">
             <DailyRouteMap
               activities={activitiesWithLocation}
               compact={false}

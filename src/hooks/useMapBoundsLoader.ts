@@ -22,8 +22,10 @@ type Filters = {
 type UseMapBoundsLoaderOptions = {
   loadSpots: (
     bounds: Bounds,
-    filters?: Filters
-  ) => Promise<CampingSpotWithId[] | { spots: CampingSpotWithId[]; total: number }>;
+    filters?: Filters,
+  ) => Promise<
+    CampingSpotWithId[] | { spots: CampingSpotWithId[]; total: number }
+  >;
   setLoading: (loading: boolean) => void;
   setSpots: (spots: CampingSpotWithId[]) => void;
   setTotalCount?: (total: number) => void;
@@ -37,7 +39,11 @@ type UseMapBoundsLoaderOptions = {
     prefectureFilter: string;
     typeFilter: string;
   };
-  onLoadSuccess?: (data: CampingSpotWithId[], bounds: Bounds, filters: Filters) => Promise<void>;
+  onLoadSuccess?: (
+    data: CampingSpotWithId[],
+    bounds: Bounds,
+    filters: Filters,
+  ) => Promise<void>;
   onBoundsTooWide?: (tooWide: boolean) => void;
 };
 
@@ -69,7 +75,10 @@ export function useMapBoundsLoader({
   filtersRef.current = filters;
 
   // Helper function to check if bounds have significantly changed
-  const boundsHaveChanged = (oldBounds: Bounds | null, newBounds: Bounds): boolean => {
+  const boundsHaveChanged = (
+    oldBounds: Bounds | null,
+    newBounds: Bounds,
+  ): boolean => {
     if (!oldBounds) return true;
 
     // Calculate the difference as a percentage of the current view
@@ -104,7 +113,10 @@ export function useMapBoundsLoader({
   };
 
   // Load spots with abort controller support
-  const loadSpotsWithAbort = async (bounds: Bounds, requestFilters: Filters) => {
+  const loadSpotsWithAbort = async (
+    bounds: Bounds,
+    requestFilters: Filters,
+  ) => {
     // Cancel previous request if it exists
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -198,13 +210,20 @@ export function useMapBoundsLoader({
         // (spots were cleared, so we must reload)
         const wasWide = wasBoundsTooWideRef.current;
         wasBoundsTooWideRef.current = false;
-        if (!wasWide && !isInitialLoad && isZoomIn(lastLoadedBoundsRef.current, bounds)) {
+        if (
+          !wasWide &&
+          !isInitialLoad &&
+          isZoomIn(lastLoadedBoundsRef.current, bounds)
+        ) {
           return; // Skip loading for zoom in
         }
 
         // Check if bounds have significantly changed
         // Skip this check on initial load
-        if (!isInitialLoad && !boundsHaveChanged(lastLoadedBoundsRef.current, bounds)) {
+        if (
+          !isInitialLoad &&
+          !boundsHaveChanged(lastLoadedBoundsRef.current, bounds)
+        ) {
           return; // Skip loading if bounds haven't changed significantly
         }
 
@@ -236,7 +255,7 @@ export function useMapBoundsLoader({
         boundsTimeoutRef.current = setTimeout(executeLoad, debounceTime);
       }
     },
-    [] // Empty deps - all functions used inside are from refs or props that don't change
+    [], // Empty deps - all functions used inside are from refs or props that don't change
   );
 
   // Cleanup function

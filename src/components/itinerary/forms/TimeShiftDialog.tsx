@@ -76,11 +76,15 @@ export function TimeShiftDialog({
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="add" id="add" />
-                        <label htmlFor="add" className="cursor-pointer">時間を後ろにずらす（遅くする）</label>
+                        <label htmlFor="add" className="cursor-pointer">
+                          時間を後ろにずらす（遅くする）
+                        </label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="subtract" id="subtract" />
-                        <label htmlFor="subtract" className="cursor-pointer">時間を前にずらす（早くする）</label>
+                        <label htmlFor="subtract" className="cursor-pointer">
+                          時間を前にずらす（早くする）
+                        </label>
                       </div>
                     </RadioGroup>
                   </FormControl>
@@ -95,12 +99,7 @@ export function TimeShiftDialog({
                 <FormItem>
                   <FormLabel>分数</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min="1"
-                      placeholder="15"
-                      {...field}
-                    />
+                    <Input type="number" min="1" placeholder="15" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,10 +107,17 @@ export function TimeShiftDialog({
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="cursor-pointer">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="cursor-pointer"
+              >
                 キャンセル
               </Button>
-              <Button type="submit" className="cursor-pointer">適用</Button>
+              <Button type="submit" className="cursor-pointer">
+                適用
+              </Button>
             </DialogFooter>
           </form>
         </Form>

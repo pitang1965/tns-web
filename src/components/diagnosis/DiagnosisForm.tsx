@@ -1,6 +1,9 @@
 'use client';
 
-import { DiagnosisAnswer, QuestionDefinition } from '@/data/schemas/diagnosisSchema';
+import {
+  DiagnosisAnswer,
+  QuestionDefinition,
+} from '@/data/schemas/diagnosisSchema';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

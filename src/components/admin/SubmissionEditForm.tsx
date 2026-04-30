@@ -13,7 +13,10 @@ import {
 } from '@/data/schemas/campingSpot';
 import { createCampingSpot } from '../../app/actions/campingSpots/admin';
 import { approveSubmissionWithoutCreating } from '../../app/actions/campingSpotSubmissions';
-import { ShachuHakuFormEditSchema, ShachuHakuFormData } from './validationSchemas';
+import {
+  ShachuHakuFormEditSchema,
+  ShachuHakuFormData,
+} from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
 import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
@@ -25,7 +28,7 @@ type SubmissionEditFormProps = {
   submission: CampingSpotSubmissionWithId;
   onClose: () => void;
   onSuccess: () => void;
-}
+};
 
 export default function SubmissionEditForm({
   submission,
@@ -207,20 +210,20 @@ export default function SubmissionEditForm({
       formData.append('securityHasGate', data.securityHasGate.toString());
       formData.append(
         'securityHasLighting',
-        data.securityHasLighting.toString()
+        data.securityHasLighting.toString(),
       );
       formData.append('securityHasStaff', data.securityHasStaff.toString());
       formData.append(
         'nightNoiseHasNoiseIssues',
-        data.nightNoiseHasNoiseIssues.toString()
+        data.nightNoiseHasNoiseIssues.toString(),
       );
       formData.append(
         'nightNoiseNearBusyRoad',
-        data.nightNoiseNearBusyRoad.toString()
+        data.nightNoiseNearBusyRoad.toString(),
       );
       formData.append(
         'nightNoiseIsQuietArea',
-        data.nightNoiseIsQuietArea.toString()
+        data.nightNoiseIsQuietArea.toString(),
       );
 
       // 旧評価システム（段階的廃止予定）
@@ -261,7 +264,10 @@ export default function SubmissionEditForm({
 
       // 2. 投稿を承認済みにする（スポット作成は行わない）
       console.log('SubmissionEditForm: Approving submission...');
-      await approveSubmissionWithoutCreating(submission._id, `編集後に承認: ${data.name}`);
+      await approveSubmissionWithoutCreating(
+        submission._id,
+        `編集後に承認: ${data.name}`,
+      );
       console.log('SubmissionEditForm: Submission approved successfully');
 
       console.log('SubmissionEditForm: Calling onSuccess...');
@@ -279,34 +285,39 @@ export default function SubmissionEditForm({
   };
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
         <CardHeader>
-          <div className='flex items-start justify-between gap-2'>
-            <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <CardTitle>投稿の編集と承認</CardTitle>
               <SpotSearchButtons
                 name={watch('name') ?? ''}
                 address={watch('address') ?? ''}
               />
             </div>
-            <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer shrink-0'>
-              <X className='w-4 h-4' />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              className="cursor-pointer shrink-0"
+            >
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className='mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg'>
-            <h3 className='font-medium text-blue-800 dark:text-blue-200 mb-2'>
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <h3 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
               投稿情報の編集
             </h3>
-            <p className='text-sm text-blue-700 dark:text-blue-300'>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
               この画面では投稿された車中泊スポットの情報を確認・編集し、不足している情報を追加できます。
               「承認して作成」ボタンをクリックすると、車中泊スポットとして公開され、投稿が承認済みになります。
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <BasicInfoFields
               spot={null}
               register={register}
@@ -339,16 +350,21 @@ export default function SubmissionEditForm({
             <FacilitiesMap watch={watch} />
 
             {/* Submit Buttons */}
-            <div className='flex justify-end gap-2'>
-              <Button type='button' variant='outline' onClick={onClose} className='cursor-pointer'>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="cursor-pointer"
+              >
                 キャンセル
               </Button>
               <Button
-                type='submit'
+                type="submit"
                 disabled={loading}
-                className='bg-green-600 hover:bg-green-700 cursor-pointer'
+                className="bg-green-600 hover:bg-green-700 cursor-pointer"
               >
-                <Save className='w-4 h-4 mr-2' />
+                <Save className="w-4 h-4 mr-2" />
                 {loading ? '処理中...' : '承認して作成'}
               </Button>
             </div>

@@ -10,16 +10,16 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className='container mx-auto px-4 py-8 max-w-4xl'>
-      <h1 className='text-3xl font-bold mb-8'>利用規約</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8">利用規約</h1>
 
-      <div className='prose max-w-none'>
-        <p className='mb-6'>
+      <div className="prose max-w-none">
+        <p className="mb-6">
           この利用規約（以下「本規約」）は、車旅のしおり（以下「当サービス」）の利用条件を定めるものです。登録ユーザーの皆さま（以下「ユーザー」）には、本規約に従って、当サービスをご利用いただきます。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>第1条（適用）</h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">第1条（適用）</h2>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             本規約は、ユーザーと当サービスの利用に関わる一切の関係に適用されるものとします。
           </li>
@@ -28,8 +28,8 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>第2条（利用登録）</h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">第2条（利用登録）</h2>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             当サービスにおいては、登録希望者が本規約に同意の上、当サービスの定める方法によって利用登録を申請し、当サービスがこれを承認することによって、利用登録が完了するものとします。
           </li>
@@ -38,10 +38,10 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第3条（ユーザーIDおよびパスワードの管理）
         </h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             ユーザーは、自己の責任において、当サービスのユーザーIDおよびパスワードを適切に管理するものとします。
           </li>
@@ -50,24 +50,24 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第4条（サービス内容）
         </h2>
-        <p className='mb-4'>
+        <p className="mb-4">
           当サービスは、旅行計画の作成・管理・共有機能を提供します。具体的には：
         </p>
-        <ul className='list-disc pl-6 mb-6'>
+        <ul className="list-disc pl-6 mb-6">
           <li>旅行プランの作成・編集</li>
           <li>地図機能との連携</li>
           <li>旅行データの保存・管理</li>
           <li>その他関連する機能</li>
         </ul>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>第5条（禁止事項）</h2>
-        <p className='mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">第5条（禁止事項）</h2>
+        <p className="mb-4">
           ユーザーは、当サービスの利用にあたり、以下の行為をしてはなりません。
         </p>
-        <ul className='list-disc pl-6 mb-6'>
+        <ul className="list-disc pl-6 mb-6">
           <li>法令または公序良俗に違反する行為</li>
           <li>犯罪行為に関連する行為</li>
           <li>
@@ -83,10 +83,10 @@ export default function TermsPage() {
           <li>その他、当サービスが不適切と判断する行為</li>
         </ul>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第6条（本サービスの提供の停止等）
         </h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             当サービスは、以下のいずれかの事由があると判断した場合、ユーザーに事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。
           </li>
@@ -98,8 +98,8 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>第7条（著作権）</h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">第7条（著作権）</h2>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             ユーザーは、自ら著作権等の必要な知的財産権を有するか、または必要な権利者の許諾を得た文章、画像や映像等の情報に関してのみ、当サービスを利用し、投稿ないしアップロードすることができるものとします。
           </li>
@@ -108,8 +108,8 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>第8条（免責事項）</h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">第8条（免責事項）</h2>
+        <ol className="list-decimal pl-6 mb-6">
           <li>
             当サービスは、本サービスに事実上または法律上の瑕疵（安全性、信頼性、正確性、完全性、有効性、特定の目的への適合性、セキュリティなどに関する欠陥、エラーやバグ、権利侵害などを含みます。）がないことを明示的にも黙示的にも保証しておりません。
           </li>
@@ -118,52 +118,52 @@ export default function TermsPage() {
           </li>
         </ol>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第9条（サービス内容の変更等）
         </h2>
-        <p className='mb-6'>
+        <p className="mb-6">
           当サービスは、ユーザーに通知することなく、本サービスの内容を変更しまたは本サービスの提供を中止することができるものとし、これによってユーザーに生じた損害について一切の責任を負いません。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第10条（利用規約の変更）
         </h2>
-        <p className='mb-6'>
+        <p className="mb-6">
           当サービスは、必要と判断した場合には、ユーザーに通知することなくいつでも本規約を変更することができるものとします。なお、本規約の変更後、本サービスの利用を開始した場合には、当該ユーザーは変更後の規約に同意したものとみなします。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第11条（個人情報の取扱い）
         </h2>
-        <p className='mb-6'>
+        <p className="mb-6">
           当サービスは、本サービスの利用によって取得する個人情報については、当サービス「プライバシーポリシー」に従い適切に取り扱うものとします。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第12条（通知または連絡）
         </h2>
-        <p className='mb-6'>
+        <p className="mb-6">
           ユーザーと当サービスとの間の通知または連絡は、当サービスの定める方法によって行うものとします。当サービスは、ユーザーから、当サービスが別途定める方式に従った変更届け出がない限り、現在登録されている連絡先が有効なものとみなして当該連絡先へ通知または連絡を行い、これらは、発信時にユーザーへ到達したものとみなします。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第13条（権利義務の譲渡の禁止）
         </h2>
-        <p className='mb-6'>
+        <p className="mb-6">
           ユーザーは、当サービスの書面による事前の承諾なく、利用契約上の地位または本規約に基づく権利もしくは義務を第三者に譲渡し、または担保に供することはできません。
         </p>
 
-        <h2 className='text-2xl font-semibold mt-8 mb-4'>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
           第14条（準拠法・裁判管轄）
         </h2>
-        <ol className='list-decimal pl-6 mb-6'>
+        <ol className="list-decimal pl-6 mb-6">
           <li>本規約の解釈にあたっては、日本法を準拠法とします。</li>
           <li>
             本サービスに関して紛争が生じた場合には、当サービスの本店所在地を管轄する裁判所を専属的合意管轄とします。
           </li>
         </ol>
 
-        <p className='text-sm text-gray-600 mt-8'>
+        <p className="text-sm text-gray-600 mt-8">
           制定日: 2025年9月23日
           <br />
           最終更新日: 2025年9月23日

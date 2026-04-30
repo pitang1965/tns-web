@@ -5,7 +5,10 @@ import {
   PersonaType,
   SpotRecommendation,
 } from '@/data/schemas/diagnosisSchema';
-import { CampingSpotTypeLabels, CampingSpotType } from '@/data/schemas/campingSpot';
+import {
+  CampingSpotTypeLabels,
+  CampingSpotType,
+} from '@/data/schemas/campingSpot';
 
 // ペルソナ定義
 export const PERSONAS: Record<PersonaType, PersonaInfo> = {
@@ -165,7 +168,7 @@ const SPOT_BADGES: Record<string, string[]> = {
 
 // ペルソナスコア計算
 export function calculatePersonaScores(
-  answers: DiagnosisAnswer
+  answers: DiagnosisAnswer,
 ): { persona: PersonaType; score: number }[] {
   const scores: Record<PersonaType, number> = {
     machiyoru: 0,
@@ -187,7 +190,7 @@ export function calculatePersonaScores(
           scores[persona as PersonaType] += points ?? 0;
         });
       }
-    }
+    },
   );
 
   // スコア順にソート
@@ -223,7 +226,7 @@ function getExcludedSpotTypes(answers: DiagnosisAnswer): string[] {
 export function getRecommendedSpots(
   persona: PersonaInfo,
   excludedTypes: string[],
-  answers: DiagnosisAnswer
+  answers: DiagnosisAnswer,
 ): SpotRecommendation[] {
   // 全スポットタイプを取得
   const allSpotTypes = Object.keys(CampingSpotTypeLabels);
@@ -270,7 +273,9 @@ export function getRecommendedSpots(
     .filter((item) => item.score > 0)
     .map((item, index) => ({
       type: item.type,
-      label: DIAGNOSIS_SPOT_LABELS[item.type] || CampingSpotTypeLabels[item.type as CampingSpotType],
+      label:
+        DIAGNOSIS_SPOT_LABELS[item.type] ||
+        CampingSpotTypeLabels[item.type as CampingSpotType],
       rank: index + 1,
       badges: SPOT_BADGES[item.type] || [],
       excluded: excludedTypes.includes(item.type),
@@ -280,7 +285,9 @@ export function getRecommendedSpots(
 }
 
 // 診断結果を計算
-export function calculateDiagnosisResult(answers: DiagnosisAnswer): DiagnosisResult {
+export function calculateDiagnosisResult(
+  answers: DiagnosisAnswer,
+): DiagnosisResult {
   // ペルソナスコアを計算
   const personaScores = calculatePersonaScores(answers);
   const topPersona = personaScores[0];

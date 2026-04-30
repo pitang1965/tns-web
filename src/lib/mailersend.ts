@@ -26,7 +26,7 @@ export class MailerSendClient {
   constructor(
     apiToken: string,
     defaultFromEmail: string,
-    defaultFromName?: string
+    defaultFromName?: string,
   ) {
     this.apiToken = apiToken;
     this.defaultFrom = {
@@ -73,12 +73,15 @@ export class MailerSendClient {
 
         if (status === 401 || status === 403) {
           logger.error(
-            new Error(`[MailerSend] 認証エラー (HTTP ${status}): APIキーが無効です`),
-            { status, to: emailData.to }
+            new Error(
+              `[MailerSend] 認証エラー (HTTP ${status}): APIキーが無効です`,
+            ),
+            { status, to: emailData.to },
           );
           return {
             success: false,
-            error: 'メール送信サービスの認証に失敗しました。APIキーを確認してください。',
+            error:
+              'メール送信サービスの認証に失敗しました。APIキーを確認してください。',
             isConfigError: true,
           };
         }
@@ -86,7 +89,7 @@ export class MailerSendClient {
         if (status === 422) {
           logger.error(
             new Error(`[MailerSend] バリデーションエラー (HTTP ${status})`),
-            { status, to: emailData.to, detail: errorData.message }
+            { status, to: emailData.to, detail: errorData.message },
           );
           return {
             success: false,
@@ -101,13 +104,14 @@ export class MailerSendClient {
           });
           return {
             success: false,
-            error: 'メール送信のレート制限に達しました。しばらく時間をおいて再度お試しください。',
+            error:
+              'メール送信のレート制限に達しました。しばらく時間をおいて再度お試しください。',
           };
         }
 
         logger.error(
           new Error(`[MailerSend] メール送信失敗 (HTTP ${status})`),
-          { status, to: emailData.to, detail: errorData.message }
+          { status, to: emailData.to, detail: errorData.message },
         );
         return {
           success: false,
@@ -124,7 +128,7 @@ export class MailerSendClient {
         error instanceof Error
           ? error
           : new Error('[MailerSend] ネットワークエラー'),
-        { to: emailData.to }
+        { to: emailData.to },
       );
       return {
         success: false,
@@ -278,7 +282,7 @@ ${data.submitterEmail ? `投稿者メール: ${data.submitterEmail}` : ''}
       ${
         data.createdAt
           ? `<p><strong>登録日時:</strong> ${new Date(
-              data.createdAt
+              data.createdAt,
             ).toLocaleString('ja-JP')}</p>`
           : ''
       }
@@ -325,7 +329,7 @@ ${userStatsText}
 const mailerSend = new MailerSendClient(
   process.env.MAILERSEND_API_TOKEN || '',
   process.env.MAILERSEND_FROM_EMAIL || '',
-  process.env.MAILERSEND_FROM_NAME || '車旅のしおり'
+  process.env.MAILERSEND_FROM_NAME || '車旅のしおり',
 );
 
 export default mailerSend;

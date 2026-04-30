@@ -3,31 +3,34 @@ import { TabBar } from '@/components/layout/TabBar';
 
 export function Footer() {
   return (
-    <footer className='flex flex-col items-center justify-center bg-background text-foreground p-2 pb-20 md:pb-2'>
-      <div className='md:hidden'>
+    <footer className="flex flex-col items-center justify-center bg-background text-foreground p-2 pb-20 md:pb-2">
+      <div className="md:hidden">
         <TabBar />
       </div>
 
       {/* フッターリンク */}
-      <div className='flex flex-wrap gap-4 mb-2 text-sm text-muted-foreground'>
+      <div className="flex flex-wrap gap-4 mb-2 text-sm text-muted-foreground">
         <Link
-          href='/privacy'
-          className='underline underline-offset-4 hover:text-foreground transition-colors'
+          href="/privacy"
+          className="underline underline-offset-4 hover:text-foreground transition-colors"
         >
           プライバシーポリシー
         </Link>
-        <Link href='/terms' className='underline underline-offset-4 hover:text-foreground transition-colors'>
+        <Link
+          href="/terms"
+          className="underline underline-offset-4 hover:text-foreground transition-colors"
+        >
           利用規約
         </Link>
         <Link
-          href='/contact'
-          className='underline underline-offset-4 hover:text-foreground transition-colors'
+          href="/contact"
+          className="underline underline-offset-4 hover:text-foreground transition-colors"
         >
           お問い合わせ
         </Link>
       </div>
 
-      <p className='text-xs text-muted-foreground text-center max-w-md'>
+      <p className="text-xs text-muted-foreground text-center max-w-md">
         掲載情報は変更されている可能性があります。お出かけ前に現地の看板や公式サイトで最新情報をご確認ください。
       </p>
     </footer>

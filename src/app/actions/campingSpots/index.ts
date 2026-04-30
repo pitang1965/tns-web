@@ -18,10 +18,7 @@ export {
 } from './admin';
 
 // Re-export all CSV functions
-export {
-  importCampingSpotsFromCSV,
-  getCampingSpotsForExport,
-} from './csv';
+export { importCampingSpotsFromCSV, getCampingSpotsForExport } from './csv';
 
 // Re-export auth function
 export { checkAdminAuth } from './auth';

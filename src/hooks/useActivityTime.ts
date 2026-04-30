@@ -8,7 +8,7 @@ export const useActivityTime = () => {
   const handleShiftSubsequentActivities = (
     dayIndex: number,
     activityIndex: number,
-    delayMinutes: number
+    delayMinutes: number,
   ) => {
     const activities = getValues(`dayPlans.${dayIndex}.activities`);
 

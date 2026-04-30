@@ -62,7 +62,7 @@ export function isAndroidWebView(): boolean {
 export function safePostMessage(
   targetWindow: Window,
   message: any,
-  origin: string = '*'
+  origin: string = '*',
 ): boolean {
   if (typeof window === 'undefined') return false;
 
@@ -88,7 +88,7 @@ export function safePostMessage(
 export function safeWindowOpen(
   url: string,
   target: string = '_blank',
-  features?: string
+  features?: string,
 ): Window | null {
   if (typeof window === 'undefined') return null;
 

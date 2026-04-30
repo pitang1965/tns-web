@@ -29,7 +29,7 @@ import { getErrorsForDisplay, renderPaginationHeader } from '@/lib/formHelpers';
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
   onSubmit: (
-    data: ClientItineraryInput
+    data: ClientItineraryInput,
   ) => Promise<{ success: boolean; id?: string; error?: string }>;
   title: string;
   description: string;
@@ -72,25 +72,32 @@ export function ItineraryForm({
   });
 
   // useDayParamフックを使用して日付パラメータを管理
-  const dayParamHook = useDayParam(
-    (watch('numberOfDays') || 1) - 1
-  );
+  const dayParamHook = useDayParam((watch('numberOfDays') || 1) - 1);
 
   // アクティビティ操作フック
-  const { addActivity, insertActivity, removeActivity, moveToPreviousDay, moveToNextDay } =
-    useActivityOperations({
-      watch,
-      setValue,
-      setFormModified,
-    });
+  const {
+    addActivity,
+    insertActivity,
+    removeActivity,
+    moveToPreviousDay,
+    moveToNextDay,
+  } = useActivityOperations({
+    watch,
+    setValue,
+    setFormModified,
+  });
 
   // ナビゲーションフック
-  const { isBackConfirmOpen, setIsBackConfirmOpen, handleBack, handleConfirmedBack } =
-    useFormNavigation({
-      isCreating,
-      itineraryId,
-      formModified,
-    });
+  const {
+    isBackConfirmOpen,
+    setIsBackConfirmOpen,
+    handleBack,
+    handleConfirmedBack,
+  } = useFormNavigation({
+    isCreating,
+    itineraryId,
+    formModified,
+  });
 
   useEffect(() => {
     // 1日目表示時は基本情報を展開、それ以外では折りたたむ
@@ -115,10 +122,9 @@ export function ItineraryForm({
     );
   };
 
-
   return (
     <>
-      <Card className='max-w-2xl mx-auto'>
+      <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
@@ -134,7 +140,7 @@ export function ItineraryForm({
                 console.log('Form onSubmit triggered.');
                 // 明示的にボタンクリックで処理する
               }}
-              className='space-y-4'
+              className="space-y-4"
             >
               {/* BasicInfoSectionコンポーネントを使用 */}
               <BasicInfoSection
@@ -142,7 +148,7 @@ export function ItineraryForm({
                 onOpenChange={setIsBasicInfoOpen}
               />
 
-              <div className='space-y-4 my-4'>
+              <div className="space-y-4 my-4">
                 {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
                 {/* dayPlansが存在しない場合でもDayPaginationを表示 */}
                 <DayPagination
@@ -160,7 +166,7 @@ export function ItineraryForm({
               </div>
               {process.env.NODE_ENV === 'development' &&
                 Object.keys(errors).length > 0 && (
-                  <div className='mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-800 dark:text-red-200'>
+                  <div className="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-800 dark:text-red-200">
                     <LargeText>フォームにエラーがあります:</LargeText>
                     <pre>
                       {JSON.stringify(getErrorsForDisplay(errors), null, 2)}
@@ -182,11 +188,11 @@ export function ItineraryForm({
       <ConfirmationDialog
         isOpen={isBackConfirmOpen}
         onOpenChange={setIsBackConfirmOpen}
-        title='入力内容の破棄'
-        description='入力内容は破棄されます。よろしいですか？'
-        confirmLabel='入力を破棄'
+        title="入力内容の破棄"
+        description="入力内容は破棄されます。よろしいですか？"
+        confirmLabel="入力を破棄"
         onConfirm={handleConfirmedBack}
-        variant='destructive'
+        variant="destructive"
       />
     </>
   );

@@ -71,7 +71,7 @@ export const useShachuHakuFilters = ({
         return {
           pricingFilter:
             (searchParams.get(
-              'pricing'
+              'pricing',
             ) as ClientSideFilterValues['pricingFilter']) || 'all',
           minSecurityLevel: parseInt(searchParams.get('min_security') || '0'),
           minQuietnessLevel: parseInt(searchParams.get('min_quietness') || '0'),
@@ -105,7 +105,7 @@ export const useShachuHakuFilters = ({
         minElevation: null,
         maxElevation: null,
       };
-    }
+    },
   );
 
   // Map state for zoom and center

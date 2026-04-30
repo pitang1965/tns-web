@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { CampingSpotSubmission as CampingSpotSubmissionType } from '@/data/schemas/campingSpot';
 
-export interface ICampingSpotSubmission extends CampingSpotSubmissionType, Document {
+export interface ICampingSpotSubmission
+  extends CampingSpotSubmissionType, Document {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -18,11 +19,15 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
       type: [Number],
       required: false,
       validate: {
-        validator: function(v: number[]) {
+        validator: function (v: number[]) {
           if (!v || v.length === 0) return true; // Optional field
-          return v.length === 2 &&
-                 v[0] >= -180 && v[0] <= 180 && // longitude
-                 v[1] >= -90 && v[1] <= 90;     // latitude
+          return (
+            v.length === 2 &&
+            v[0] >= -180 &&
+            v[0] <= 180 && // longitude
+            v[1] >= -90 &&
+            v[1] <= 90
+          ); // latitude
         },
         message: '座標は[経度, 緯度]の形式で、有効な範囲内である必要があります',
       },
@@ -40,7 +45,7 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
       type: String,
       trim: true,
       validate: {
-        validator: function(v: string) {
+        validator: function (v: string) {
           if (!v) return true; // Optional field
           try {
             new URL(v);
@@ -54,7 +59,16 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
     },
     type: {
       type: String,
-      enum: ['roadside_station', 'sa_pa', 'rv_park', 'auto_campground', 'onsen_facility', 'convenience_store', 'parking_lot', 'other'],
+      enum: [
+        'roadside_station',
+        'sa_pa',
+        'rv_park',
+        'auto_campground',
+        'onsen_facility',
+        'convenience_store',
+        'parking_lot',
+        'other',
+      ],
       default: 'other',
     },
     hasRoof: {
@@ -85,7 +99,7 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
       type: String,
       trim: true,
       validate: {
-        validator: function(v: string) {
+        validator: function (v: string) {
           if (!v) return true; // Optional field
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         },
@@ -118,7 +132,7 @@ const CampingSpotSubmissionSchema = new Schema<ICampingSpotSubmission>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Indexes for efficient querying
@@ -126,7 +140,11 @@ CampingSpotSubmissionSchema.index({ status: 1, submittedAt: -1 });
 CampingSpotSubmissionSchema.index({ coordinates: '2dsphere' });
 CampingSpotSubmissionSchema.index({ prefecture: 1 });
 
-const CampingSpotSubmission = mongoose.models.CampingSpotSubmission ||
-  mongoose.model<ICampingSpotSubmission>('CampingSpotSubmission', CampingSpotSubmissionSchema);
+const CampingSpotSubmission =
+  mongoose.models.CampingSpotSubmission ||
+  mongoose.model<ICampingSpotSubmission>(
+    'CampingSpotSubmission',
+    CampingSpotSubmissionSchema,
+  );
 
 export default CampingSpotSubmission;

@@ -38,41 +38,41 @@ export const AdminItineraryItem: React.FC<Props> = ({ itinerary }) => {
   };
 
   return (
-    <Card className='flex flex-col h-full'>
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <div className='flex flex-col gap-2'>
-          <div className='flex items-start justify-between gap-2'>
-            <CardTitle className='line-clamp-2 flex-1'>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="line-clamp-2 flex-1">
               {itinerary.title}
             </CardTitle>
             {itinerary.isPublic ? (
-              <Badge className='flex-shrink-0'>公開</Badge>
+              <Badge className="flex-shrink-0">公開</Badge>
             ) : (
-              <Badge variant='outline' className='flex-shrink-0'>
+              <Badge variant="outline" className="flex-shrink-0">
                 非公開
               </Badge>
             )}
           </div>
         </div>
       </CardHeader>
-      <CardContent className='space-y-2'>
-        <CardDescription className='mb-2'>
+      <CardContent className="space-y-2">
+        <CardDescription className="mb-2">
           {formatItineraryDuration(itinerary.startDate, itinerary.numberOfDays)}
         </CardDescription>
-        <CardDescription className='line-clamp-3'>
+        <CardDescription className="line-clamp-3">
           {itinerary.description}
         </CardDescription>
-        <div className='pt-2 space-y-1 text-xs text-muted-foreground border-t'>
+        <div className="pt-2 space-y-1 text-xs text-muted-foreground border-t">
           <div>作成者: {itinerary.owner?.name || '不明'}</div>
           <div>作成日: {formatDate(itinerary.createdAt)}</div>
           <div>更新日: {formatDate(itinerary.updatedAt)}</div>
         </div>
       </CardContent>
-      <CardFooter className='mt-auto'>
+      <CardFooter className="mt-auto">
         <Button
-          size='sm'
-          variant='secondary'
-          className='w-full cursor-pointer'
+          size="sm"
+          variant="secondary"
+          className="w-full cursor-pointer"
           onClick={() => router.push(`/itineraries/${itinerary.id}`)}
         >
           見る

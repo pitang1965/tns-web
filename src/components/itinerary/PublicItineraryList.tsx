@@ -23,17 +23,17 @@ export const PublicItineraryList: React.FC<Props> = ({
   const limitedItineraries = itineraries.slice(0, limit);
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {limitedItineraries.length > 0 ? (
         limitedItineraries.map((itinerary) => (
           <PublicItineraryItem key={itinerary.id} itinerary={itinerary} />
         ))
       ) : (
-        <div className='col-span-full text-center py-8'>
-          <LargeText className='text-gray-600'>
+        <div className="col-span-full text-center py-8">
+          <LargeText className="text-gray-600">
             現在公開されている旅程がありません。
           </LargeText>
-          <p className='text-sm text-gray-500 mt-2'>
+          <p className="text-sm text-gray-500 mt-2">
             データの読み込みに問題がある場合は、しばらくしてから再度お試しください。
           </p>
         </div>

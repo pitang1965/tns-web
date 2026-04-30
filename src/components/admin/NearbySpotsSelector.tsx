@@ -54,7 +54,9 @@ export function NearbySpotsSelector({
   setValue,
 }: NearbySpotsSelectorProps) {
   const { toast } = useToast();
-  const [closestFacilities, setClosestFacilities] = useState<ClosestFacility[]>([]);
+  const [closestFacilities, setClosestFacilities] = useState<ClosestFacility[]>(
+    [],
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +72,7 @@ export function NearbySpotsSelector({
         setError(null);
 
         const response = await fetch(
-          `/api/camping-spots/nearby?lat=${lat}&lng=${lng}`
+          `/api/camping-spots/nearby?lat=${lat}&lng=${lng}`,
         );
 
         if (!response.ok) {
@@ -100,14 +102,19 @@ export function NearbySpotsSelector({
         // Map を配列に変換し、施設タイプの順序でソート
         const facilityOrder: FacilityType[] = ['toilet', 'convenience', 'bath'];
         const sorted = Array.from(facilityMap.values()).sort((a, b) => {
-          return facilityOrder.indexOf(a.facilityType) - facilityOrder.indexOf(b.facilityType);
+          return (
+            facilityOrder.indexOf(a.facilityType) -
+            facilityOrder.indexOf(b.facilityType)
+          );
         });
 
         setClosestFacilities(sorted);
       } catch (err) {
         console.error('Error fetching nearby spots:', err);
         setError(
-          err instanceof Error ? err.message : '近隣スポットの取得に失敗しました'
+          err instanceof Error
+            ? err.message
+            : '近隣スポットの取得に失敗しました',
         );
       } finally {
         setLoading(false);
@@ -143,8 +150,8 @@ export function NearbySpotsSelector({
 
   if (!lat || !lng || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) {
     return (
-      <div className='text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
-        <MapPin className='w-4 h-4 inline mr-2' />
+      <div className="text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <MapPin className="w-4 h-4 inline mr-2" />
         車中泊スポットの座標を入力すると、近隣スポットから施設情報をコピーできます
       </div>
     );
@@ -152,7 +159,7 @@ export function NearbySpotsSelector({
 
   if (loading) {
     return (
-      <div className='text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
+      <div className="text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         近隣スポットを検索中...
       </div>
     );
@@ -160,7 +167,7 @@ export function NearbySpotsSelector({
 
   if (error) {
     return (
-      <div className='text-sm text-red-500 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg'>
+      <div className="text-sm text-red-500 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
         {error}
       </div>
     );
@@ -168,41 +175,42 @@ export function NearbySpotsSelector({
 
   if (closestFacilities.length === 0) {
     return (
-      <div className='text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg'>
+      <div className="text-sm text-gray-500 dark:text-gray-400 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         近隣に施設情報を持つスポットが見つかりませんでした
       </div>
     );
   }
 
   return (
-    <div className='space-y-3'>
-      <div className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+    <div className="space-y-3">
+      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
         📍 最も近い施設の座標をコピー
       </div>
-      <div className='space-y-2'>
+      <div className="space-y-2">
         {closestFacilities.map((facility) => (
           <div
             key={`${facility.spotId}-${facility.facilityType}`}
-            className='border rounded-lg p-3 bg-white dark:bg-gray-900 dark:border-gray-700'
+            className="border rounded-lg p-3 bg-white dark:bg-gray-900 dark:border-gray-700"
           >
-            <div className='flex items-center justify-between'>
-              <div className='flex-1'>
-                <div className='text-sm font-medium mb-1'>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-sm font-medium mb-1">
                   {FACILITY_ICONS[facility.facilityType]}{' '}
-                  {FACILITY_LABELS[facility.facilityType]} ({formatDistance(facility.distance)})
+                  {FACILITY_LABELS[facility.facilityType]} (
+                  {formatDistance(facility.distance)})
                 </div>
-                <div className='text-xs text-gray-600 dark:text-gray-400'>
+                <div className="text-xs text-gray-600 dark:text-gray-400">
                   {facility.spotName}
                 </div>
               </div>
               <Button
-                type='button'
-                variant='outline'
-                size='sm'
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => handleCopyFacility(facility)}
-                className='h-8 px-3 cursor-pointer ml-3'
+                className="h-8 px-3 cursor-pointer ml-3"
               >
-                <Copy className='w-3 h-3 mr-1' />
+                <Copy className="w-3 h-3 mr-1" />
                 コピー
               </Button>
             </div>

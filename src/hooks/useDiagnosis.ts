@@ -30,7 +30,9 @@ export function useDiagnosis() {
   const displayStep = isIntro ? 0 : state.currentStep;
   // 進捗は質問番号/全質問数（質問1で10%、質問10で100%）
   const progress = isIntro ? 0 : ((displayStep + 1) / totalSteps) * 100;
-  const currentQuestion = isIntro ? null : DIAGNOSIS_QUESTIONS[state.currentStep];
+  const currentQuestion = isIntro
+    ? null
+    : DIAGNOSIS_QUESTIONS[state.currentStep];
 
   const setAnswer = useCallback(
     (questionId: keyof DiagnosisAnswer, value: string) => {
@@ -42,7 +44,7 @@ export function useDiagnosis() {
         },
       }));
     },
-    []
+    [],
   );
 
   const goToNext = useCallback(() => {
@@ -51,7 +53,9 @@ export function useDiagnosis() {
 
       if (nextStep >= totalSteps) {
         // 全問完了、結果を計算
-        const result = calculateDiagnosisResult(prev.answers as DiagnosisAnswer);
+        const result = calculateDiagnosisResult(
+          prev.answers as DiagnosisAnswer,
+        );
         return {
           ...prev,
           currentStep: nextStep,

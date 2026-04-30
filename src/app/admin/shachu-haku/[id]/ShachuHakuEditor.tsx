@@ -19,7 +19,7 @@ const ShachuHakuForm = dynamic(
   () => import('@/components/admin/ShachuHakuForm'),
   {
     ssr: false,
-  }
+  },
 );
 
 export default function ShachuHakuEditor() {
@@ -57,7 +57,8 @@ export default function ShachuHakuEditor() {
         currentIndex,
         total: spotIds.length,
         prevId: currentIndex > 0 ? spotIds[currentIndex - 1] : null,
-        nextId: currentIndex < spotIds.length - 1 ? spotIds[currentIndex + 1] : null,
+        nextId:
+          currentIndex < spotIds.length - 1 ? spotIds[currentIndex + 1] : null,
       };
     } catch (e) {
       console.error('Failed to parse navigation data:', e);
@@ -81,7 +82,7 @@ export default function ShachuHakuEditor() {
         setError(
           err instanceof Error
             ? err.message
-            : '車中泊スポットの読み込みに失敗しました'
+            : '車中泊スポットの読み込みに失敗しました',
         );
         toast({
           title: 'エラー',
@@ -126,18 +127,18 @@ export default function ShachuHakuEditor() {
 
   if (!isAdmin) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen space-y-4'>
-        <h1 className='text-2xl font-bold text-red-600'>アクセス拒否</h1>
-        <p className='text-gray-600 dark:text-gray-300'>
+      <div className="flex flex-col justify-center items-center h-screen space-y-4">
+        <h1 className="text-2xl font-bold text-red-600">アクセス拒否</h1>
+        <p className="text-gray-600 dark:text-gray-300">
           この機能は管理者のみ利用可能です。
         </p>
-        <p className='text-sm text-gray-500 dark:text-gray-400'>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           管理者権限が必要な場合は、システム管理者にお問い合わせください。
         </p>
-        <div className='flex gap-4'>
-          <Link href='/'>
-            <Button variant='outline'>
-              <ArrowLeft className='w-4 h-4 mr-2' />
+        <div className="flex gap-4">
+          <Link href="/">
+            <Button variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               トップページに戻る
             </Button>
           </Link>
@@ -147,19 +148,19 @@ export default function ShachuHakuEditor() {
   }
 
   if (loading) {
-    return <LoadingState variant='fullscreen' />;
+    return <LoadingState variant="fullscreen" />;
   }
 
   if (error || !spot) {
     return (
-      <div className='flex flex-col justify-center items-center h-screen space-y-4'>
-        <h1 className='text-2xl font-bold text-red-600'>エラー</h1>
-        <p className='text-gray-600 dark:text-gray-300'>
+      <div className="flex flex-col justify-center items-center h-screen space-y-4">
+        <h1 className="text-2xl font-bold text-red-600">エラー</h1>
+        <p className="text-gray-600 dark:text-gray-300">
           {error || '車中泊スポットが見つかりませんでした'}
         </p>
-        <Link href='/admin/shachu-haku'>
-          <Button variant='outline'>
-            <ArrowLeft className='w-4 h-4 mr-2' />
+        <Link href="/admin/shachu-haku">
+          <Button variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
             管理画面に戻る
           </Button>
         </Link>
@@ -168,22 +169,24 @@ export default function ShachuHakuEditor() {
   }
 
   return (
-    <div className='container mx-auto px-6 py-6 space-y-6 min-h-screen'>
-      <div className='flex flex-col gap-4'>
+    <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
+      <div className="flex flex-col gap-4">
         {/* Header section - responsive layout */}
-        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-          <div className='flex items-center gap-4'>
-            <Link href='/admin/shachu-haku'>
-              <Button variant='outline' size='sm'>
-                <ArrowLeft className='w-4 h-4 mr-2' />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Link href="/admin/shachu-haku">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 戻る
               </Button>
             </Link>
-            <h1 className='text-2xl md:text-3xl font-bold'>車中泊スポット編集</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">
+              車中泊スポット編集
+            </h1>
           </div>
 
           {navigationData && (
-            <div className='flex items-center gap-2 justify-between md:justify-end'>
+            <div className="flex items-center gap-2 justify-between md:justify-end">
               <Link
                 href={
                   navigationData.prevId
@@ -192,16 +195,16 @@ export default function ShachuHakuEditor() {
                 }
               >
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant="outline"
+                  size="sm"
                   disabled={!navigationData.prevId}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
-                  <ChevronLeft className='w-4 h-4 mr-1' />
+                  <ChevronLeft className="w-4 h-4 mr-1" />
                   前のスポット
                 </Button>
               </Link>
-              <span className='text-sm text-gray-600 dark:text-gray-400 px-2'>
+              <span className="text-sm text-gray-600 dark:text-gray-400 px-2">
                 {navigationData.currentIndex + 1} / {navigationData.total}
               </span>
               <Link
@@ -212,13 +215,13 @@ export default function ShachuHakuEditor() {
                 }
               >
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant="outline"
+                  size="sm"
                   disabled={!navigationData.nextId}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
                   次のスポット
-                  <ChevronRight className='w-4 h-4 ml-1' />
+                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>

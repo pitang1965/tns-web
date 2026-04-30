@@ -5,7 +5,10 @@ import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
-import { ClientItineraryInput, ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import {
+  ClientItineraryInput,
+  ClientItineraryDocument,
+} from '@/data/schemas/itinerarySchema';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,20 +62,23 @@ export default withPageAuthRequired(function NewItineraryPage() {
     }
   }, [user]);
 
-  const initialData = useMemo(() => ({
-    title: '',
-    description: '',
-    startDate: undefined,
-    numberOfDays: 1,
-    isPublic: false,
-    dayPlans: [],
-    sharedWith: [],
-    owner: {
-      id: user?.sub || 'dummy-id',
-      name: user?.name || 'Test User',
-      email: user?.email || 'test@example.com',
-    },
-  }), [user?.sub, user?.name, user?.email]);
+  const initialData = useMemo(
+    () => ({
+      title: '',
+      description: '',
+      startDate: undefined,
+      numberOfDays: 1,
+      isPublic: false,
+      dayPlans: [],
+      sharedWith: [],
+      owner: {
+        id: user?.sub || 'dummy-id',
+        name: user?.name || 'Test User',
+        email: user?.email || 'test@example.com',
+      },
+    }),
+    [user?.sub, user?.name, user?.email],
+  );
 
   const handleSubmit = async (data: ClientItineraryInput) => {
     console.log('Submitting form data:', data);
@@ -122,7 +128,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
 
   if (isLoading) {
     return (
-      <main className='container mx-auto p-4'>
+      <main className="container mx-auto p-4">
         <LoadingSpinner />
       </main>
     );
@@ -130,7 +136,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
 
   if (!canCreate) {
     return (
-      <main className='container mx-auto p-4 max-w-2xl'>
+      <main className="container mx-auto p-4 max-w-2xl">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -149,7 +155,9 @@ export default withPageAuthRequired(function NewItineraryPage() {
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Crown className="text-amber-500" size={20} />
-                  <span className="font-medium">プレミアム会員なら無制限！</span>
+                  <span className="font-medium">
+                    プレミアム会員なら無制限！
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   プレミアム会員になると、旅程を無制限に作成できます。
@@ -158,14 +166,10 @@ export default withPageAuthRequired(function NewItineraryPage() {
 
               <div className="flex gap-3 justify-center">
                 <Link href="/itineraries">
-                  <Button variant="outline">
-                    旅程一覧に戻る
-                  </Button>
+                  <Button variant="outline">旅程一覧に戻る</Button>
                 </Link>
                 <Link href="/account">
-                  <Button>
-                    プレミアム会員について
-                  </Button>
+                  <Button>プレミアム会員について</Button>
                 </Link>
               </div>
             </div>
@@ -176,13 +180,13 @@ export default withPageAuthRequired(function NewItineraryPage() {
   }
 
   return (
-    <main className='container mx-auto p-4'>
+    <main className="container mx-auto p-4">
       <ItineraryForm
         initialData={initialData}
         onSubmit={handleSubmit}
-        title='旅程作成'
-        description='新しい旅程の詳細を入力してください。* の付いた項目は入力必須です。'
-        submitLabel='作成'
+        title="旅程作成"
+        description="新しい旅程の詳細を入力してください。* の付いた項目は入力必須です。"
+        submitLabel="作成"
         isSubmitting={isSubmitting}
       />
     </main>

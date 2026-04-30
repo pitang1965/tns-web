@@ -15,7 +15,7 @@ function getMongoUri(): string {
   if (uri) return uri;
 
   throw new Error(
-    'Invalid/Missing environment variable: "APP_MONGODB_URI" or "MONGODB_URI"'
+    'Invalid/Missing environment variable: "APP_MONGODB_URI" or "MONGODB_URI"',
   );
 }
 

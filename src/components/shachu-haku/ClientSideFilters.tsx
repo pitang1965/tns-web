@@ -57,23 +57,23 @@ export default function ClientSideFilters({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className='relative inline-flex items-center justify-center h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer'
-          type='button'
+          className="relative inline-flex items-center justify-center h-9 w-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground cursor-pointer"
+          type="button"
         >
-          <MoreVertical className='h-4 w-4' />
+          <MoreVertical className="h-4 w-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-80' align='end'>
-        <div className='flex items-center justify-between px-2 py-1.5'>
-          <DropdownMenuLabel className='p-0'>詳細フィルター</DropdownMenuLabel>
+      <DropdownMenuContent className="w-80" align="end">
+        <div className="flex items-center justify-between px-2 py-1.5">
+          <DropdownMenuLabel className="p-0">詳細フィルター</DropdownMenuLabel>
           {activeFiltersCount > 0 && (
             <Button
-              variant='ghost'
-              size='sm'
+              variant="ghost"
+              size="sm"
               onClick={handleReset}
-              className='h-8 px-2 cursor-pointer'
+              className="h-8 px-2 cursor-pointer"
             >
-              <FilterX className='h-4 w-4 mr-1' />
+              <FilterX className="h-4 w-4 mr-1" />
               リセット
             </Button>
           )}
@@ -81,8 +81,8 @@ export default function ClientSideFilters({
         <DropdownMenuSeparator />
 
         {/* 料金フィルター */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>料金</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">料金</p>
           <DropdownMenuRadioGroup
             value={filters.pricingFilter}
             onValueChange={(value) =>
@@ -92,17 +92,17 @@ export default function ClientSideFilters({
               })
             }
           >
-            <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='free'>無料のみ</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='paid'>有料のみ</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="all">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="free">無料のみ</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="paid">有料のみ</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
         <DropdownMenuSeparator />
 
         {/* 治安レベル */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>治安レベル</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">治安レベル</p>
           <DropdownMenuRadioGroup
             value={filters.minSecurityLevel.toString()}
             onValueChange={(value) =>
@@ -112,17 +112,17 @@ export default function ClientSideFilters({
               })
             }
           >
-            <DropdownMenuRadioItem value='0'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='3'>3以上</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='4'>4以上</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="0">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="3">3以上</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="4">4以上</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
         <DropdownMenuSeparator />
 
         {/* 静けさレベル */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>静けさレベル</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">静けさレベル</p>
           <DropdownMenuRadioGroup
             value={filters.minQuietnessLevel.toString()}
             onValueChange={(value) =>
@@ -132,17 +132,17 @@ export default function ClientSideFilters({
               })
             }
           >
-            <DropdownMenuRadioItem value='0'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='3'>3以上</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='4'>4以上</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="0">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="3">3以上</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="4">4以上</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
         <DropdownMenuSeparator />
 
         {/* トイレまでの距離 */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>トイレまでの距離</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">トイレまでの距離</p>
           <DropdownMenuRadioGroup
             value={filters.maxToiletDistance?.toString() || 'all'}
             onValueChange={(value) =>
@@ -152,18 +152,18 @@ export default function ClientSideFilters({
               })
             }
           >
-            <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='100'>100m以内</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='200'>200m以内</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='300'>300m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="all">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="100">100m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="200">200m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="300">300m以内</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
         <DropdownMenuSeparator />
 
         {/* コンビニまでの距離 */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>コンビニまでの距離</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">コンビニまでの距離</p>
           <DropdownMenuRadioGroup
             value={filters.maxConvenienceDistance?.toString() || 'all'}
             onValueChange={(value) =>
@@ -174,18 +174,18 @@ export default function ClientSideFilters({
               })
             }
           >
-            <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='100'>100m以内</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='200'>200m以内</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='300'>300m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="all">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="100">100m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="200">200m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="300">300m以内</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 
         <DropdownMenuSeparator />
 
         {/* 標高 */}
-        <div className='px-2 py-2'>
-          <p className='text-sm font-medium mb-2'>標高</p>
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">標高</p>
           <DropdownMenuRadioGroup
             value={
               filters.minElevation !== null
@@ -216,14 +216,14 @@ export default function ClientSideFilters({
               }
             }}
           >
-            <DropdownMenuRadioItem value='all'>すべて</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='max-500'>
+            <DropdownMenuRadioItem value="all">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="max-500">
               500m未満
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='min-500'>
+            <DropdownMenuRadioItem value="min-500">
               500m以上
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='min-1000'>
+            <DropdownMenuRadioItem value="min-1000">
               1000m以上
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

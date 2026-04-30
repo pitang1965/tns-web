@@ -27,56 +27,56 @@ export function ShachuHakuSpotItem({
 }: ShachuHakuSpotItemProps) {
   return (
     <div
-      className='border rounded-lg p-4 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 cursor-pointer'
+      className="border rounded-lg p-4 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 cursor-pointer"
       onClick={() => onNavigateToDetail(spot._id)}
     >
-      <div className='flex justify-between items-start'>
-        <div className='flex-1'>
-          <h2 className='font-semibold text-lg'>{spot.name}</h2>
-          <p className='text-gray-600 dark:text-gray-300'>{spot.address}</p>
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <h2 className="font-semibold text-lg">{spot.name}</h2>
+          <p className="text-gray-600 dark:text-gray-300">{spot.address}</p>
           {spot.updatedAt && (
-            <p className='text-xs text-gray-500 dark:text-gray-500 mt-1'>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
               {formatDate(spot.updatedAt.toString())}更新
             </p>
           )}
-          <div className='flex gap-2 mt-2 flex-wrap'>
+          <div className="flex gap-2 mt-2 flex-wrap">
             <Badge className={`${getTypeColor(spot.type)} text-white`}>
               {CampingSpotTypeLabels[spot.type]}
             </Badge>
             <Badge
               className={`${getPricingColor(
                 spot.pricing.isFree,
-                spot.pricing.pricePerNight
+                spot.pricing.pricePerNight,
               )} text-white`}
             >
               {spot.pricing.isFree
                 ? '無料'
                 : spot.pricing.pricePerNight
-                ? `¥${spot.pricing.pricePerNight}`
-                : '有料：？円'}
+                  ? `¥${spot.pricing.pricePerNight}`
+                  : '有料：？円'}
             </Badge>
             <Badge
               className={`${getRatingColor(
-                calculateSecurityLevel(spot)
+                calculateSecurityLevel(spot),
               )} text-white`}
             >
               治安 {calculateSecurityLevel(spot)}/5 🔒
             </Badge>
             <Badge
               className={`${getRatingColor(
-                calculateQuietnessLevel(spot)
+                calculateQuietnessLevel(spot),
               )} text-white`}
             >
               静けさ {calculateQuietnessLevel(spot)}/5 🔇
             </Badge>
             {spot.isVerified && (
-              <Badge className='bg-blue-500 text-white hover:bg-blue-600'>
+              <Badge className="bg-blue-500 text-white hover:bg-blue-600">
                 ✓ 確認済み
               </Badge>
             )}
           </div>
           {spot.notes && (
-            <p className='text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2'>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
               {spot.notes}
             </p>
           )}

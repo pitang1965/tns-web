@@ -21,12 +21,16 @@ export const ItineraryList: React.FC<Props> = ({ itinerariesPromise }) => {
   };
 
   return (
-    <div className='flex flex-col gap-2'>
-      <Button onClick={handleCreateNew} size='sm' className='w-fit cursor-pointer'>
-        <Plus className='w-4 h-4 mr-1' />
+    <div className="flex flex-col gap-2">
+      <Button
+        onClick={handleCreateNew}
+        size="sm"
+        className="w-fit cursor-pointer"
+      >
+        <Plus className="w-4 h-4 mr-1" />
         新規作成
       </Button>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {itineraries.length > 0 ? (
           itineraries.map((itinerary) => (
             <ItineraryItem key={itinerary.id} itinerary={itinerary} />

@@ -49,14 +49,15 @@ export function extractCoordinatesFromGoogleMapsUrl(input: string) {
  */
 export function calculateBoundsFromZoomAndCenter(
   center: [number, number],
-  zoom: number
+  zoom: number,
 ): { north: number; south: number; east: number; west: number } {
   const [lng, lat] = center;
 
   // ズームレベルに基づいて、画面に表示される範囲を計算
   // Mapboxの場合、zoom 0 では全世界が表示され、zoom が 1 増えるごとに表示範囲が半分になる
   // 標準的な16:9のアスペクト比を想定
-  const metersPerPixel = (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
+  const metersPerPixel =
+    (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
 
   // 一般的な地図の表示サイズ（600px height として計算）
   const mapHeightPixels = 600;

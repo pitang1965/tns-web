@@ -1,5 +1,14 @@
-import { useState, useEffect, useCallback, useRef, MutableRefObject } from 'react';
-import { getCampingSpotsWithPagination, getCampingSpotIdsOnly } from '../app/actions/campingSpots/admin';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  MutableRefObject,
+} from 'react';
+import {
+  getCampingSpotsWithPagination,
+  getCampingSpotIdsOnly,
+} from '../app/actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
 type ListData = {
@@ -138,7 +147,7 @@ export function useAdminListData({
       const data = await getCampingSpotsWithPagination(
         currentPage,
         pageSize,
-        filters
+        filters,
       );
       setListData(data);
 
@@ -156,7 +165,14 @@ export function useAdminListData({
     } finally {
       setListLoading(false);
     }
-  }, [searchTerm, typeFilter, currentPage, pageSize, toast, initialLoadDoneRef]);
+  }, [
+    searchTerm,
+    typeFilter,
+    currentPage,
+    pageSize,
+    toast,
+    initialLoadDoneRef,
+  ]);
 
   // Refresh all spot IDs with current filters
   const refreshAllSpotIds = useCallback(async () => {

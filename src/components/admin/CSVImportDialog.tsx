@@ -14,13 +14,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { importCampingSpotsFromCSV, CSVImportResult } from '../../app/actions/campingSpots/csv';
+import {
+  importCampingSpotsFromCSV,
+  CSVImportResult,
+} from '../../app/actions/campingSpots/csv';
 import { downloadCampingSpotTemplate } from '@/lib/csv/campingSpots';
 
 type CSVImportDialogProps = {
   onClose: () => void;
   onSuccess: (result: CSVImportResult) => void;
-}
+};
 
 export default function CSVImportDialog({
   onClose,
@@ -34,12 +37,12 @@ export default function CSVImportDialog({
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    const isCSV = selectedFile && (
-      selectedFile.type === 'text/csv' ||
-      selectedFile.type === 'application/vnd.ms-excel' ||
-      selectedFile.type === 'application/csv' ||
-      selectedFile.name.endsWith('.csv')
-    );
+    const isCSV =
+      selectedFile &&
+      (selectedFile.type === 'text/csv' ||
+        selectedFile.type === 'application/vnd.ms-excel' ||
+        selectedFile.type === 'application/csv' ||
+        selectedFile.name.endsWith('.csv'));
     if (isCSV) {
       setFile(selectedFile);
       setResult(null);
@@ -74,7 +77,8 @@ export default function CSVImportDialog({
       }
     } catch (error) {
       console.error('Import error:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       toast({
         title: 'インポートエラー',
         description: errorMessage || 'インポート処理でエラーが発生しました',
@@ -91,24 +95,29 @@ export default function CSVImportDialog({
   };
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <Card className='w-full max-w-4xl max-h-[90vh] overflow-auto'>
-        <CardHeader className='flex flex-row items-center justify-between'>
-          <CardTitle className='flex items-center gap-2'>
-            <Upload className='w-5 h-5' />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5" />
             CSVインポート
           </CardTitle>
-          <Button variant='outline' size='sm' onClick={onClose} className='cursor-pointer'>
-            <X className='w-4 h-4' />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="cursor-pointer"
+          >
+            <X className="w-4 h-4" />
           </Button>
         </CardHeader>
-        <CardContent className='space-y-6'>
+        <CardContent className="space-y-6">
           {/* Instructions */}
-          <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4'>
-            <h3 className='font-semibold text-blue-800 dark:text-blue-200 mb-2'>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
               CSVフォーマット
             </h3>
-            <div className='text-sm text-blue-700 dark:text-blue-300 space-y-1'>
+            <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
               <p>• ヘッダー行は必須です</p>
               <p>
                 • 座標は小数点形式で入力してください（例: 35.6762, 139.6503）
@@ -120,50 +129,50 @@ export default function CSVImportDialog({
                 • 重複チェック: 100m以内の既存スポットは重複として扱われます
               </p>
             </div>
-            <div className='mt-3'>
+            <div className="mt-3">
               <Button
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
                 onClick={downloadTemplate}
-                className='text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer'
+                className="text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
               >
-                <Download className='w-4 h-4 mr-2' />
+                <Download className="w-4 h-4 mr-2" />
                 テンプレートをダウンロード
               </Button>
             </div>
           </div>
 
           {/* File Upload */}
-          <div className='space-y-4'>
-            <div className='border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center'>
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
               <input
                 ref={fileInputRef}
-                type='file'
-                accept='.csv'
+                type="file"
+                accept=".csv"
                 onChange={handleFileSelect}
-                className='hidden'
+                className="hidden"
               />
-              <FileText className='mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4' />
-              <p className='text-gray-600 dark:text-gray-300 mb-4'>
+              <FileText className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
                 CSVファイルを選択してください
               </p>
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={importing}
-                className='cursor-pointer'
+                className="cursor-pointer"
               >
                 ファイルを選択
               </Button>
             </div>
 
             {file && (
-              <div className='flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg'>
-                <div className='flex items-center gap-3'>
-                  <FileText className='w-5 h-5 text-green-600' />
+              <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-green-600" />
                   <div>
-                    <p className='font-medium text-green-800'>{file.name}</p>
-                    <p className='text-sm text-green-600'>
+                    <p className="font-medium text-green-800">{file.name}</p>
+                    <p className="text-sm text-green-600">
                       サイズ: {(file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -171,7 +180,7 @@ export default function CSVImportDialog({
                 <Button
                   onClick={handleImport}
                   disabled={importing}
-                  className='bg-green-600 hover:bg-green-700 cursor-pointer'
+                  className="bg-green-600 hover:bg-green-700 cursor-pointer"
                 >
                   {importing ? 'インポート中...' : 'インポート開始'}
                 </Button>
@@ -181,19 +190,19 @@ export default function CSVImportDialog({
 
           {/* Results */}
           {result && (
-            <div className='space-y-4'>
-              <div className='text-sm text-gray-500 text-right'>
+            <div className="space-y-4">
+              <div className="text-sm text-gray-500 text-right">
                 {result.totalRows}件中 {result.processedCount}件処理
               </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <Card className='bg-green-50 border-green-200'>
-                  <CardContent className='p-4 flex items-center gap-3'>
-                    <CheckCircle className='w-8 h-8 text-green-600' />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
                     <div>
-                      <div className='text-2xl font-bold text-green-800'>
+                      <div className="text-2xl font-bold text-green-800">
                         {result.success}
                       </div>
-                      <div className='text-sm text-green-600'>成功</div>
+                      <div className="text-sm text-green-600">成功</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -204,7 +213,7 @@ export default function CSVImportDialog({
                       : 'bg-gray-50 border-gray-200'
                   }
                 >
-                  <CardContent className='p-4 flex items-center gap-3'>
+                  <CardContent className="p-4 flex items-center gap-3">
                     <AlertTriangle
                       className={`w-8 h-8 ${
                         result.errors.length > 0
@@ -239,25 +248,28 @@ export default function CSVImportDialog({
               {result.errors.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className='text-red-600'>エラー詳細</CardTitle>
+                    <CardTitle className="text-red-600">エラー詳細</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ScrollArea className='h-64'>
-                      <div className='space-y-3'>
+                    <ScrollArea className="h-64">
+                      <div className="space-y-3">
                         {result.errors.map((error, index) => (
                           <div
                             key={index}
-                            className='border border-red-200 rounded-lg p-3 bg-red-50'
+                            className="border border-red-200 rounded-lg p-3 bg-red-50"
                           >
-                            <div className='flex items-start gap-2'>
-                              <Badge variant='destructive' className='text-xs shrink-0'>
+                            <div className="flex items-start gap-2">
+                              <Badge
+                                variant="destructive"
+                                className="text-xs shrink-0"
+                              >
                                 行 {error.row}
                               </Badge>
-                              <div className='flex-1 min-w-0'>
-                                <p className='text-sm text-red-800 font-medium truncate'>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-red-800 font-medium truncate">
                                   {error.name}
                                 </p>
-                                <p className='text-xs text-red-600 mt-1 wrap-break-word'>
+                                <p className="text-xs text-red-600 mt-1 wrap-break-word">
                                   {error.error}
                                 </p>
                               </div>
@@ -270,18 +282,20 @@ export default function CSVImportDialog({
                 </Card>
               )}
 
-              <div className='flex justify-end gap-2'>
+              <div className="flex justify-end gap-2">
                 <Button
-                  variant='outline'
+                  variant="outline"
                   onClick={() => {
                     setFile(null);
                     setResult(null);
                   }}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                 >
                   新しいファイルを選択
                 </Button>
-                <Button onClick={onClose} className='cursor-pointer'>閉じる</Button>
+                <Button onClick={onClose} className="cursor-pointer">
+                  閉じる
+                </Button>
               </div>
             </div>
           )}

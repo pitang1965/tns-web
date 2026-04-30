@@ -28,7 +28,7 @@ const TabLink = ({ href, icon, label }: TabLinkProps) => {
       }`}
     >
       {icon}
-      <span className='text-xs'>{label}</span>
+      <span className="text-xs">{label}</span>
     </Link>
   );
 };
@@ -41,11 +41,11 @@ export function TabBar() {
   }
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 bg-background text-foreground shadow-top z-50'>
-      <div className='flex justify-around py-2'>
-        <TabLink href='/' icon={<Info />} label='情報' />
-        <TabLink href='/itineraries' icon={<BookHeart />} label='旅程' />
-        <TabLink href='/shachu-haku' icon={<MapPin />} label='車中泊' />
+    <nav className="fixed bottom-0 left-0 right-0 bg-background text-foreground shadow-top z-50">
+      <div className="flex justify-around py-2">
+        <TabLink href="/" icon={<Info />} label="情報" />
+        <TabLink href="/itineraries" icon={<BookHeart />} label="旅程" />
+        <TabLink href="/shachu-haku" icon={<MapPin />} label="車中泊" />
       </div>
     </nav>
   );

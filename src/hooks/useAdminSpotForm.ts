@@ -69,7 +69,7 @@ type UseAdminSpotFormReturn = {
  */
 export function useAdminSpotForm(): UseAdminSpotFormReturn {
   const [selectedSpot, setSelectedSpot] = useState<CampingSpotWithId | null>(
-    null
+    null,
   );
   const [showForm, setShowForm] = useState(false);
 

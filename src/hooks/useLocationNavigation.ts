@@ -54,7 +54,7 @@ export function useLocationNavigation({
         setSavedBounds(bounds);
       }
     },
-    [setMapCenter, setMapZoom, setSavedBounds]
+    [setMapCenter, setMapZoom, setSavedBounds],
   );
 
   // Handle region jump
@@ -80,7 +80,7 @@ export function useLocationNavigation({
         setSavedBounds(bounds);
       }
     },
-    [setMapCenter, setMapZoom, setSavedBounds]
+    [setMapCenter, setMapZoom, setSavedBounds],
   );
 
   // Handle current location jump
@@ -122,7 +122,7 @@ export function useLocationNavigation({
           variant: 'destructive',
         });
         console.error('Geolocation error:', error);
-      }
+      },
     );
   }, [setMapCenter, setMapZoom, setSavedBounds, toast]);
 

@@ -13,7 +13,9 @@ export function useInAppBrowserWarning() {
   useEffect(() => {
     // アプリ内ブラウザ警告の表示判定
     try {
-      const dismissedDate = localStorage.getItem('inAppBrowserWarningDismissed');
+      const dismissedDate = localStorage.getItem(
+        'inAppBrowserWarningDismissed',
+      );
       const today = new Date().toDateString();
 
       // 今日既に閉じている場合はスキップ
@@ -22,7 +24,7 @@ export function useInAppBrowserWarning() {
       const userAgent = navigator.userAgent || navigator.vendor;
       const isInAppBrowser =
         /Twitter|TwitterAndroid|FBAN|FBAV|Instagram|Line|FB_IAB|KAKAOTALK/i.test(
-          userAgent
+          userAgent,
         );
 
       if (isInAppBrowser) {
@@ -37,7 +39,10 @@ export function useInAppBrowserWarning() {
     setShowWarning(false);
     try {
       // 今日の日付を保存（翌日には再度表示される）
-      localStorage.setItem('inAppBrowserWarningDismissed', new Date().toDateString());
+      localStorage.setItem(
+        'inAppBrowserWarningDismissed',
+        new Date().toDateString(),
+      );
     } catch (error) {
       console.error('Failed to save warning state:', error);
     }

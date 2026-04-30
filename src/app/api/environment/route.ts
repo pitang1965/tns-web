@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     // APP_MONGODB_URIを優先（MCPサーバーによるMONGODB_URI上書きの影響を受けないため）
-    const mongoUri = process.env.APP_MONGODB_URI || process.env.MONGODB_URI || '';
+    const mongoUri =
+      process.env.APP_MONGODB_URI || process.env.MONGODB_URI || '';
 
     // データベース名を抽出して環境を判定
     let environment: 'development' | 'production' | 'unknown' = 'unknown';
@@ -17,13 +18,18 @@ export async function GET() {
       environment = 'production';
     }
 
-    return NextResponse.json({ environment }, {
-      headers: {
-        'Cache-Control': 'no-store',
+    return NextResponse.json(
+      { environment },
+      {
+        headers: {
+          'Cache-Control': 'no-store',
+        },
       },
-    });
+    );
   } catch (error) {
-    logger.error(error instanceof Error ? error : new Error('Error in /api/environment'));
+    logger.error(
+      error instanceof Error ? error : new Error('Error in /api/environment'),
+    );
     // エラー時は unknown を返す
     return NextResponse.json({ environment: 'unknown' }, { status: 200 });
   }

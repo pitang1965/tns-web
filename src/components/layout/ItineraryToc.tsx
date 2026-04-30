@@ -5,7 +5,10 @@ import { useAtom } from 'jotai';
 import { H3, Text, SmallText } from '@/components/common/Typography';
 import { formatDateWithWeekday } from '@/lib/date';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ItineraryMetadata, itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
+import {
+  ItineraryMetadata,
+  itineraryMetadataAtom,
+} from '@/data/store/itineraryAtoms';
 import {
   Collapsible,
   CollapsibleContent,
@@ -42,7 +45,9 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   useEffect(() => {
     const calculateOffset = () => {
       const header = document.querySelector('header');
-      const adContainer = document.querySelector('[class*="adsbygoogle"]')?.closest('div');
+      const adContainer = document
+        .querySelector('[class*="adsbygoogle"]')
+        ?.closest('div');
 
       if (header) {
         const hHeight = header.offsetHeight;
@@ -103,21 +108,21 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const summaries = displayData?.dayPlanSummaries || [];
 
   return (
-    <div className='w-80 shrink-0'>
-      <div 
-        className='fixed w-80 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-y-auto'
+    <div className="w-80 shrink-0">
+      <div
+        className="fixed w-80 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-y-auto"
         style={{
           top: `${topOffset}px`,
-          maxHeight: `calc(100vh - ${topOffset + 32}px)`
+          maxHeight: `calc(100vh - ${topOffset + 32}px)`,
         }}
       >
-        <div className='p-4'>
+        <div className="p-4">
           <H3>目次</H3>
           {summaries.length > 0 ? (
             summaries.map((day: DaySummary, index: number) => (
               <div
                 key={index}
-                className='mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded'
+                className="mb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
                 onClick={() => handleDayClick(index + 1)}
               >
                 <Text>
@@ -125,27 +130,27 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
                   {day.date && `: ${formatDateWithWeekday(day.date)}`}
                 </Text>
                 {day.notes && (
-                  <SmallText className='mt-1 ml-2'>{day.notes}</SmallText>
+                  <SmallText className="mt-1 ml-2">{day.notes}</SmallText>
                 )}
 
                 {day.activities && day.activities.length > 0 && (
-                  <Collapsible className='mt-2'>
-                    <CollapsibleTrigger 
-                      className='flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  <Collapsible className="mt-2">
+                    <CollapsibleTrigger
+                      className="flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <ChevronDown className='h-4 w-4 mr-1' />
+                      <ChevronDown className="h-4 w-4 mr-1" />
                       <span>アクティビティ一覧</span>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <ul className='ml-4 mt-2 space-y-1'>
+                      <ul className="ml-4 mt-2 space-y-1">
                         {day.activities.map((activity, actIndex) => (
                           <li
                             key={actIndex}
-                            className='text-sm text-gray-600 dark:text-gray-400'
+                            className="text-sm text-gray-600 dark:text-gray-400"
                           >
-                            <div className='flex'>
-                              <div className='w-5 flex-shrink-0'>
+                            <div className="flex">
+                              <div className="w-5 flex-shrink-0">
                                 {actIndex + 1}.
                               </div>
                               <SmallText>{activity.title}</SmallText>

@@ -10,7 +10,13 @@ export const activitySchema = z
     startTime: z.string().nullable(),
     endTime: z.string().nullable(),
     cost: z.number().nullable(),
-    url: z.union([z.string().url('有効なURLを入力してください'), z.literal(''), z.null()]).optional(),
+    url: z
+      .union([
+        z.string().url('有効なURLを入力してください'),
+        z.literal(''),
+        z.null(),
+      ])
+      .optional(),
   })
   .refine(
     (data) => {
@@ -23,5 +29,5 @@ export const activitySchema = z
     {
       message: '終了時間は開始時間より後に設定してください',
       path: ['endTime'], // エラーを表示するフィールド
-    }
+    },
   );
