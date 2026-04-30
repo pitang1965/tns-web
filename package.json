@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "init-db": "node --loader ts-node/esm --no-warnings --trace-warnings --trace-uncaught ./src/scripts/initDB.ts"
   },
   "dependencies": {
@@ -67,6 +69,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "16.2.1",
     "postcss": "^8",
+    "prettier": "^3.8.3",
     "tailwindcss": "^4.1.15",
     "ts-node": "^10.9.2",
     "typescript": "^5",
