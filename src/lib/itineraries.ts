@@ -69,6 +69,7 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
     const itineraries = await db
       .collection<ServerItineraryDocument>('itineraries')
       .find({ 'owner.id': user.sub })
+      .sort({ updatedAt: -1 })
       .toArray();
 
     return itineraries.map(toClientItinerary);
