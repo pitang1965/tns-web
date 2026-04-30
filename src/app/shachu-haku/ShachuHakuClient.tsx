@@ -201,7 +201,7 @@ export default function ShachuHakuClient() {
       }
       handleBoundsChange(bounds); // Call hook's handler
     },
-    [handleBoundsChange],
+    [handleBoundsChange, setSavedBounds],
   );
 
   // Sync URL with filters and map state

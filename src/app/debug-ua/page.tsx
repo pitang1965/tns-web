@@ -14,6 +14,7 @@ export default function DebugUserAgentPage() {
   const [today, setToday] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
 
     const ua = navigator.userAgent || navigator.vendor;

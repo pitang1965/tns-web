@@ -187,7 +187,12 @@ export default function AdminClient() {
 
       handleBoundsChange(bounds); // Call hook's handler
     },
-    [handleBoundsChange, initialLoadDoneRef, lastLoadedBoundsRef],
+    [
+      handleBoundsChange,
+      initialLoadDoneRef,
+      lastLoadedBoundsRef,
+      setSavedBounds,
+    ],
   );
 
   // Reload map data when switching to map tab or when filters change

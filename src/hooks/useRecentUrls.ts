@@ -27,6 +27,7 @@ export function useRecentUrls() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as RecentUrl[];
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRecentUrls(parsed);
       }
     } catch (error) {
@@ -51,7 +52,7 @@ export function useRecentUrls() {
         return newUrls;
       });
     },
-    [saveToStorage]
+    [saveToStorage],
   );
 
   // 履歴をクリア
@@ -65,13 +66,13 @@ export function useRecentUrls() {
     (urlToRemove: string) => {
       setRecentUrls((prevUrls) => {
         const filteredUrls = prevUrls.filter(
-          (item) => item.url !== urlToRemove
+          (item) => item.url !== urlToRemove,
         );
         saveToStorage(filteredUrls);
         return filteredUrls;
       });
     },
-    [saveToStorage]
+    [saveToStorage],
   );
 
   return {

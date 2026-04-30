@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ContactForm } from '@/components/contact/ContactForm';
 
 type Props = {
@@ -18,12 +19,12 @@ export default async function ContactPage({ searchParams }: Props) {
           <p className='text-muted-foreground mt-2'>
             <strong>車中泊場所の投稿について：</strong>
             現在、「車旅のしおり」の車中泊マップに掲載されていないおすすめの車中泊場所の投稿については
-            <a
+            <Link
               href='/shachu-haku/submit'
               className='text-primary hover:underline ml-1'
             >
               こちらの専用フォーム
-            </a>
+            </Link>
             からお願いいたします。
           </p>
         </div>
