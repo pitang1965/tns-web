@@ -3,10 +3,7 @@ import { notFound } from 'next/navigation';
 import { getCampingSpotById } from '../../actions/campingSpots/admin';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
-import {
-  CampingSpotJsonLd,
-  BreadcrumbJsonLd,
-} from '@/components/seo/JsonLd';
+import { CampingSpotJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
 type PageProps = {
   params: Promise<{ spotId: string }>;
@@ -49,8 +46,8 @@ export const generateMetadata = async ({
     const priceInfo = spot.pricing.isFree
       ? '無料'
       : spot.pricing.pricePerNight
-      ? `¥${spot.pricing.pricePerNight}`
-      : '料金要確認';
+        ? `¥${spot.pricing.pricePerNight}`
+        : '料金要確認';
     const description = `${spot.prefecture}の${typeLabel}「${spot.name}」の車中泊スポット情報。${priceInfo}。${spot.address}`;
     const url = `https://tabi.over40web.club/shachu-haku/${spotId}`;
 
@@ -118,69 +115,57 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
     notFound();
   }
 
+  let spot;
   try {
-    const spot = await getCampingSpotById(spotId);
-
-    if (!spot) {
-      console.error('SpotDetailPage: Spot not found for ID:', spotId);
-      notFound();
-    }
-
-    const typeLabel =
-      CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels] ||
-      spot.type;
-
-    return (
-      <>
-        <CampingSpotJsonLd
-          name={spot.name}
-          description={`${spot.prefecture}の${typeLabel}「${spot.name}」。${spot.address}`}
-          address={spot.address}
-          prefecture={spot.prefecture}
-          latitude={spot.coordinates[1]}
-          longitude={spot.coordinates[0]}
-          spotType={typeLabel}
-          isFree={spot.pricing.isFree}
-          pricePerNight={spot.pricing.pricePerNight}
-          url={`https://tabi.over40web.club/shachu-haku/${spotId}`}
-        />
-        <BreadcrumbJsonLd
-          items={[
-            { name: 'ホーム', url: 'https://tabi.over40web.club' },
-            {
-              name: '車中泊マップ',
-              url: 'https://tabi.over40web.club/shachu-haku',
-            },
-            {
-              name: spot.name,
-              url: `https://tabi.over40web.club/shachu-haku/${spotId}`,
-            },
-          ]}
-        />
-        <SpotDetailClient spot={spot} />
-      </>
-    );
+    spot = await getCampingSpotById(spotId);
   } catch (error) {
     // Enhanced error logging for debugging Facebook WebView issues
     console.error('SpotDetailPage: Error loading spot:', {
       spotId: spotId,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      userAgent:
-        typeof navigator !== 'undefined' ? navigator.userAgent : 'Server-side',
       timestamp: new Date().toISOString(),
     });
-
-    // For Facebook WebView and other In-App browsers, provide more specific error handling
-    if (
-      typeof navigator !== 'undefined' &&
-      /FBAN|FBAV|Instagram|Line|Twitter/.test(navigator.userAgent)
-    ) {
-      console.warn(
-        'SpotDetailPage: Error occurred in In-App Browser environment'
-      );
-    }
-
     notFound();
   }
+
+  if (!spot) {
+    console.error('SpotDetailPage: Spot not found for ID:', spotId);
+    notFound();
+  }
+
+  const typeLabel =
+    CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels] ||
+    spot.type;
+
+  return (
+    <>
+      <CampingSpotJsonLd
+        name={spot.name}
+        description={`${spot.prefecture}の${typeLabel}「${spot.name}」。${spot.address}`}
+        address={spot.address}
+        prefecture={spot.prefecture}
+        latitude={spot.coordinates[1]}
+        longitude={spot.coordinates[0]}
+        spotType={typeLabel}
+        isFree={spot.pricing.isFree}
+        pricePerNight={spot.pricing.pricePerNight}
+        url={`https://tabi.over40web.club/shachu-haku/${spotId}`}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'ホーム', url: 'https://tabi.over40web.club' },
+          {
+            name: '車中泊マップ',
+            url: 'https://tabi.over40web.club/shachu-haku',
+          },
+          {
+            name: spot.name,
+            url: `https://tabi.over40web.club/shachu-haku/${spotId}`,
+          },
+        ]}
+      />
+      <SpotDetailClient spot={spot} />
+    </>
+  );
 }

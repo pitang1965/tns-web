@@ -76,7 +76,7 @@ export function useMapMarkers({
       markerElement: HTMLElement,
       marker: mapboxgl.Marker,
       activity: ActivityLocation,
-      popup: mapboxgl.Popup
+      popup: mapboxgl.Popup,
     ) => {
       markerElement.addEventListener('mouseenter', () => {
         marker.getElement().style.zIndex = '10';
@@ -94,7 +94,7 @@ export function useMapMarkers({
         popup.remove();
       });
     },
-    [mapInstance]
+    [mapInstance],
   );
 
   // マーカーの更新と位置調整
@@ -151,7 +151,7 @@ export function useMapMarkers({
   }, [clearMarkers]);
 
   return {
-    markersRef: markersRef.current,
+    markersRef,
     clearMarkers,
   };
 }

@@ -88,7 +88,7 @@ export function useMapboxCore({
       {
         rootMargin: '100px', // 100px手前で読み込み開始
         threshold: 0, // 少しでも見えたら/見えなくなったら発火
-      }
+      },
     );
 
     observer.observe(mapContainer.current);
@@ -184,8 +184,8 @@ export function useMapboxCore({
 
   return {
     mapContainer,
-    mapInstance: mapInstance.current,
-    markerRef: markerRef.current,
+    mapInstance,
+    markerRef,
     mapLoaded,
     isVisible, // 画面内に表示されているかを返す
     centerOnMarker,
