@@ -45,7 +45,7 @@ export const PlaceView: React.FC<PlaceProps> = ({
 
   return (
     <div className="mt-1">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
         <PlaceTypeBadge type={type} />
         {url ? (
           <a

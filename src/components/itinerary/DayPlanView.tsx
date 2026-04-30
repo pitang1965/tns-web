@@ -171,7 +171,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
 
   return (
     <div className="mb-6 bg-background text-foreground p-4 rounded-lg">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
         <H3>{dayDisplay}</H3>
 
         <div className="flex items-center gap-2 flex-wrap">
