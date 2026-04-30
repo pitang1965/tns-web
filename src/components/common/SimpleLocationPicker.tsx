@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { setupJapaneseLabels, handleMapError } from '@/lib/mapboxIcons';
 import { LoadingState } from '@/components/common/LoadingState';
@@ -22,7 +22,7 @@ export default function SimpleLocationPicker({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [position, setPosition] = useState({
     lat: initialLat,
     lng: initialLng,
@@ -31,11 +31,7 @@ export default function SimpleLocationPicker({
   const [locateError, setLocateError] = useState<string | null>(null);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || !mapContainer.current) return;
+    if (!mapContainer.current) return;
 
     // Set Mapbox access token
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
@@ -105,7 +101,7 @@ export default function SimpleLocationPicker({
         map.current.remove();
       }
     };
-  }, [mounted, initialLat, initialLng, onLocationSelect]);
+  }, [initialLat, initialLng, onLocationSelect]);
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
