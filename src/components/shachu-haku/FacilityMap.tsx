@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import { formatDistance } from '@/lib/formatDistance';
@@ -386,6 +386,35 @@ export default function FacilityMap({
     };
   }, [spot.coordinates]);
 
+  const createFacilityPopupHTML = useCallback((facility: FacilityMarker): string => {
+    const style = getMarkerStyle(facility.type, currentZoom);
+
+    return `
+      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
+        <div class="flex items-center gap-2 mb-2">
+          <span style="font-size: 20px;">${style.icon}</span>
+          <h3 class="font-semibold text-gray-900">${
+            facility.type === 'camping' ? '車中泊スポット' : facility.name
+          }</h3>
+        </div>
+        ${
+          facility.type === 'camping'
+            ? `<div class="text-sm text-gray-600">${facility.name}</div>`
+            : ''
+        }
+        ${
+          facility.distance
+            ? `<div class="text-sm text-gray-600">
+                車中泊スポットから約 <strong>${formatDistance(
+                  facility.distance
+                )}</strong>
+              </div>`
+            : ''
+        }
+      </div>
+    `;
+  }, [currentZoom]);
+
   // Update markers when facilities change or zoom level changes
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
@@ -444,7 +473,7 @@ export default function FacilityMap({
 
       markersRef.current.push(marker);
     });
-  }, [facilityMarkers, mapLoaded, currentZoom, isMapMoving]);
+  }, [facilityMarkers, mapLoaded, currentZoom, isMapMoving, createFacilityPopupHTML]);
 
   // Fit map to show all facilities only when facilities change (not on zoom)
   useEffect(() => {
@@ -460,35 +489,6 @@ export default function FacilityMap({
       maxZoom: 16,
     });
   }, [facilityMarkers, mapLoaded]);
-
-  const createFacilityPopupHTML = (facility: FacilityMarker): string => {
-    const style = getMarkerStyle(facility.type, currentZoom);
-
-    return `
-      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
-        <div class="flex items-center gap-2 mb-2">
-          <span style="font-size: 20px;">${style.icon}</span>
-          <h3 class="font-semibold text-gray-900">${
-            facility.type === 'camping' ? '車中泊スポット' : facility.name
-          }</h3>
-        </div>
-        ${
-          facility.type === 'camping'
-            ? `<div class="text-sm text-gray-600">${facility.name}</div>`
-            : ''
-        }
-        ${
-          facility.distance
-            ? `<div class="text-sm text-gray-600">
-                車中泊スポットから約 <strong>${formatDistance(
-                  facility.distance
-                )}</strong>
-              </div>`
-            : ''
-        }
-      </div>
-    `;
-  };
 
   if (!MAPBOX_TOKEN) {
     return (

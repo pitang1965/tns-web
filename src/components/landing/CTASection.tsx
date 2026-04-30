@@ -2,6 +2,7 @@
 
 import { H2, LargeText } from '@/components/common/Typography';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CTASection() {
   return (
@@ -12,18 +13,18 @@ export default function CTASection() {
           車中泊スポットを探したり、旅程を作成したり、あなたの旅をサポートします。
         </LargeText>
         <div className='flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap'>
-          <a
+          <Link
             href='/shachu-haku'
             className='group inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105'
           >
             車中泊マップを見る
-          </a>
-          <a
+          </Link>
+          <Link
             href='/itineraries'
             className='inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-white/30 transition-all duration-300 border-2 border-white/40'
           >
             旅程一覧を見る
-          </a>
+          </Link>
           <a
             href='/auth/login'
             className='group inline-flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105'
