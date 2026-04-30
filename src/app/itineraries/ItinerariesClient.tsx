@@ -33,7 +33,7 @@ export function ItinerariesClient({
         みんなの旅程を探索したり、自分の旅程を管理できます。
       </LargeText>
 
-      <Tabs defaultValue="public" className="mt-6">
+      <Tabs defaultValue={isAuthenticated ? 'mine' : 'public'} className="mt-6">
         <TabsList>
           <TabsTrigger value="public">みんなの旅程</TabsTrigger>
           <TabsTrigger value="mine">自分の旅程</TabsTrigger>
