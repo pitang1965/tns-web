@@ -195,8 +195,50 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     return items;
   };
 
+  const paginationControls = actualTotalDays > 1 ? (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            onClick={(e) => {
+              e.preventDefault();
+              goToPreviousPage();
+            }}
+            className={
+              currentPage === 1
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer'
+            }
+          />
+        </PaginationItem>
+
+        {generatePaginationLinks()}
+
+        <PaginationItem>
+          <PaginationNext
+            onClick={(e) => {
+              e.preventDefault();
+              goToNextPage();
+            }}
+            className={
+              currentPage === actualTotalDays
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer'
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  ) : null;
+
   return (
     <>
+      {actualTotalDays > 1 && (
+        <div className="mb-4">
+          {paginationControls}
+        </div>
+      )}
+
       {dayPlans &&
       dayPlans.length > 0 &&
       currentPage > 0 &&
@@ -206,39 +248,7 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
 
       {actualTotalDays > 1 && (
         <div className="mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToPreviousPage();
-                  }}
-                  className={
-                    currentPage === 1
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-
-              {generatePaginationLinks()}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goToNextPage();
-                  }}
-                  className={
-                    currentPage === actualTotalDays
-                      ? 'pointer-events-none opacity-50'
-                      : 'cursor-pointer'
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          {paginationControls}
         </div>
       )}
     </>
