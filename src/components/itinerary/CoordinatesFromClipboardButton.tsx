@@ -51,7 +51,6 @@ export const CoordinatesFromClipboardButton: React.FC<
     <Button
       type="button"
       variant="outline"
-      size="sm"
       className={`cursor-pointer ${className}`}
       onClick={handleGoogleMapsUrl}
     >

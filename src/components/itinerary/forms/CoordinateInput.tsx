@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Path, useFormContext } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import {
   InputGroup,
   InputGroupAddon,
@@ -141,10 +140,9 @@ export function CoordinateInput({
           </div>
         </div>
         <div className="space-y-2 mt-2">
-          <ButtonGroup className="w-full flex-col sm:flex-row">
+          <div className="flex flex-col sm:flex-row gap-2">
             <CoordinatesFromClipboardButton
               onCoordinatesExtracted={(lat, lng) => {
-                // 明示的に数値に変換
                 setValue(latPath, Number(lat), { shouldValidate: true });
                 setValue(lonPath, Number(lng), { shouldValidate: true });
                 trigger([latPath, lonPath]);
@@ -154,18 +152,22 @@ export function CoordinateInput({
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => setShowMap(!showMap)}
               className="flex-1 cursor-pointer"
             >
               <MapPin className="w-4 h-4" />
               {showMap ? '選択完了' : '地図で選択'}
             </Button>
-          </ButtonGroup>
+            <div className="flex-1">
+              <PlaceNavigationButton
+                latitude={location?.latitude}
+                longitude={location?.longitude}
+              />
+            </div>
+          </div>
           {/* Map picker */}
           {showMap && (
             <div className="border-2 border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
-              {/* 注意バナー */}
               <div className="bg-yellow-100/90 dark:bg-yellow-900/30 text-yellow-900 dark:text-yellow-200 px-4 py-2 text-sm font-medium text-center">
                 📍 地図をクリックして座標を選択してください
               </div>
@@ -176,10 +178,6 @@ export function CoordinateInput({
               />
             </div>
           )}
-          <PlaceNavigationButton
-            latitude={location?.latitude}
-            longitude={location?.longitude}
-          />
         </div>
       </div>
       {location && !showMap && <LocationView location={location} />}
