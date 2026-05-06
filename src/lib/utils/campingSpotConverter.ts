@@ -14,6 +14,7 @@ export type CampingSpotWithDistance = {
   distanceToToilet?: number;
   distanceToBath?: number;
   distanceToConvenience?: number;
+  nearbyBathCoordinates?: [number, number]; // [lng, lat]
   hasRoof: boolean;
   hasPowerOutlet: boolean;
   pricing: {
@@ -147,6 +148,30 @@ export function buildCampingSpotDescription(
   }
 
   return parts.join(' | ');
+}
+
+/**
+ * Converts the linked bathing facility of a camping spot to an Activity object
+ */
+export function bathFacilityToActivity(spot: CampingSpotWithDistance) {
+  return {
+    id: crypto.randomUUID(),
+    title: '入浴',
+    place: {
+      name: '',
+      type: 'BATHING_FACILITY' as PlaceType,
+      address: null,
+      location: {
+        latitude: spot.nearbyBathCoordinates![1],
+        longitude: spot.nearbyBathCoordinates![0],
+      },
+    },
+    description: null,
+    startTime: null,
+    endTime: null,
+    cost: null,
+    url: null,
+  };
 }
 
 /**

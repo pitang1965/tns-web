@@ -88,11 +88,13 @@ export function DayPlanForm({
     });
   };
 
-  const handleAddCampingSpot = (activity: any) => {
+  const handleAddCampingSpot = (newActivities: any[]) => {
     const activities = watch(`dayPlans.${dayIndex}.activities`) || [];
-    setValue(`dayPlans.${dayIndex}.activities`, [...activities, activity], {
-      shouldValidate: true,
-    });
+    setValue(
+      `dayPlans.${dayIndex}.activities`,
+      [...activities, ...newActivities],
+      { shouldValidate: true },
+    );
   };
 
   const previousDayActivities =
