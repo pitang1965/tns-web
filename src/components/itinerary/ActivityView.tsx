@@ -39,11 +39,13 @@ export const ActivityView: React.FC<ActivityProps> = ({
             endTime={activity.endTime ?? undefined}
             className="ml-0"
           />
-          {activity.cost !== null && activity.cost !== undefined && (
-            <span className="text-gray-600 dark:text-gray-400 text-sm">
-              ({activity.cost > 0 ? `${activity.cost}円` : '無料'})
-            </span>
-          )}
+          {activity.cost !== null &&
+            activity.cost !== undefined &&
+            activity.cost > 0 && (
+              <span className="text-gray-600 dark:text-gray-400 text-sm">
+                ({activity.cost}円)
+              </span>
+            )}
         </div>
       </div>
       <PlaceView
