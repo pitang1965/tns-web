@@ -33,7 +33,8 @@ export function EditItineraryClient({
       const dayParam = searchParams.get('day');
       const dayDisplay = dayParam ? ` ${dayParam}日目` : '';
       const title = `${itinerary.title}${dayDisplay}`;
-      addUrl(pathname, title);
+      const url = dayParam ? `${pathname}?day=${dayParam}` : pathname;
+      addUrl(url, title);
     }
   }, [itinerary?.title, searchParams, pathname, addUrl]);
 

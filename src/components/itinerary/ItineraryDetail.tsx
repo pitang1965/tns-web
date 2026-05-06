@@ -88,11 +88,12 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   useEffect(() => {
     if (metadata && access.hasAccess) {
       const title = metadata.title || '旅程を表示';
-      const dayDisplay =
-        metadata.totalDays > 1 && currentDayIndex !== null
-          ? ` ${currentDayIndex + 1}日目`
-          : '';
-      addUrl(pathname, `${title}${dayDisplay}`);
+      const isDaySpecific = metadata.totalDays > 1 && currentDayIndex !== null;
+      const dayDisplay = isDaySpecific ? ` ${currentDayIndex + 1}日目` : '';
+      const url = isDaySpecific
+        ? `${pathname}?day=${currentDayIndex + 1}`
+        : pathname;
+      addUrl(url, `${title}${dayDisplay}`);
     }
   }, [metadata, access.hasAccess, currentDayIndex, pathname, addUrl]);
 
