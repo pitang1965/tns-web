@@ -50,6 +50,38 @@ type ShachuHakuMapProps = {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
+const isValidCoords = (coords: unknown): coords is [number, number] =>
+  Array.isArray(coords) &&
+  coords.length === 2 &&
+  typeof coords[0] === 'number' &&
+  typeof coords[1] === 'number' &&
+  !isNaN(coords[0]) &&
+  !isNaN(coords[1]);
+
+const FACILITY_CONFIGS = [
+  {
+    key: 'nearbyToiletCoordinates' as const,
+    distKey: 'distanceToToilet' as const,
+    emoji: '🚻',
+    label: 'トイレ',
+    color: '#8b5cf6',
+  },
+  {
+    key: 'nearbyConvenienceCoordinates' as const,
+    distKey: 'distanceToConvenience' as const,
+    emoji: '🏪',
+    label: 'コンビニ',
+    color: '#10b981',
+  },
+  {
+    key: 'nearbyBathCoordinates' as const,
+    distKey: 'distanceToBath' as const,
+    emoji: '♨️',
+    label: '入浴施設',
+    color: '#f59e0b',
+  },
+] as const;
+
 export default function ShachuHakuMap({
   spots,
   onSpotSelect,
@@ -78,38 +110,6 @@ export default function ShachuHakuMap({
     facilityMarkersRef.current.forEach((marker) => marker.remove());
     facilityMarkersRef.current = [];
   }, []);
-
-  const isValidCoords = (coords: unknown): coords is [number, number] =>
-    Array.isArray(coords) &&
-    coords.length === 2 &&
-    typeof coords[0] === 'number' &&
-    typeof coords[1] === 'number' &&
-    !isNaN(coords[0]) &&
-    !isNaN(coords[1]);
-
-  const FACILITY_CONFIGS = [
-    {
-      key: 'nearbyToiletCoordinates' as const,
-      distKey: 'distanceToToilet' as const,
-      emoji: '🚻',
-      label: 'トイレ',
-      color: '#8b5cf6',
-    },
-    {
-      key: 'nearbyConvenienceCoordinates' as const,
-      distKey: 'distanceToConvenience' as const,
-      emoji: '🏪',
-      label: 'コンビニ',
-      color: '#10b981',
-    },
-    {
-      key: 'nearbyBathCoordinates' as const,
-      distKey: 'distanceToBath' as const,
-      emoji: '♨️',
-      label: '入浴施設',
-      color: '#f59e0b',
-    },
-  ] as const;
 
   const showFacilityMarkers = useCallback(
     (spot: CampingSpotWithId) => {
@@ -505,7 +505,9 @@ export default function ShachuHakuMap({
 
       // Add security level number to marker only in detailed view
       if (isDetailedView) {
-        markerElement.textContent = calculateSecurityLevel(spot).toString();
+        markerElement.textContent = spot.isOvernightProhibited
+          ? '禁'
+          : calculateSecurityLevel(spot).toString();
       }
 
       const marker = new mapboxgl.Marker({
@@ -687,7 +689,7 @@ export default function ShachuHakuMap({
   }, [initialCenter, initialZoom, initialBounds, mapLoaded]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
-    // Color based on overall rating
+    if (spot.isOvernightProhibited) return '#dc2626'; // red-600
     const rating = calculateSecurityLevel(spot);
     return getMarkerColorByRating(rating);
   };
@@ -698,6 +700,7 @@ export default function ShachuHakuMap({
   ): string => {
     return `
       <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
+        ${spot.isOvernightProhibited ? '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:6px 8px;margin-bottom:8px;color:#991b1b;font-size:12px;font-weight:700;">⛔ 車中泊禁止スポット</div>' : ''}
         <h3 class="font-semibold text-lg mb-2 text-gray-900 wrap-break-word">${
           spot.name
         }</h3>

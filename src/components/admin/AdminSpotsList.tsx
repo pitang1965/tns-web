@@ -117,6 +117,11 @@ export function AdminSpotsList({
                     </p>
                   )}
                   <div className="flex gap-2 mt-2 flex-wrap">
+                    {spot.isOvernightProhibited && (
+                      <Badge className="bg-red-600 hover:bg-red-700 text-white">
+                        ⛔ 車中泊禁止
+                      </Badge>
+                    )}
                     <Badge className={`${getTypeColor(spot.type)} text-white`}>
                       {CampingSpotTypeLabels[spot.type]}
                     </Badge>

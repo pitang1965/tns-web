@@ -37,6 +37,7 @@ export const DEFAULT_FORM_VALUES = {
   quietnessLevel: '',
   securityLevel: '',
   overallRating: '',
+  isOvernightProhibited: false,
   hasRoof: false,
   hasPowerOutlet: false,
   isFree: undefined as any,

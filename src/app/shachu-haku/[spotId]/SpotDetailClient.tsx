@@ -152,6 +152,23 @@ ${spot.notes ?? 'なし'} → `;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* 車中泊禁止警告バナー */}
+      {spot.isOvernightProhibited && (
+        <div className="rounded-lg border-2 border-red-400 bg-red-50 dark:bg-red-950/40 dark:border-red-700 p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl shrink-0">⛔</span>
+            <div>
+              <p className="font-bold text-red-800 dark:text-red-300 text-lg">
+                このスポットは車中泊が禁止されています
+              </p>
+              <p className="text-sm text-red-700 dark:text-red-400 mt-1">
+                貼り紙等により車中泊が明示的に禁止されている場所です。制限事項または備考に詳細を記載しています。マナーを守り、禁止場所での車中泊はお控えください。
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <div className="space-y-4">
         <div>
@@ -225,6 +242,9 @@ ${spot.notes ?? 'なし'} → `;
 
       {/* バッジ */}
       <div className="flex gap-2 flex-wrap">
+        {spot.isOvernightProhibited && (
+          <Badge className="bg-red-600 text-white">⛔ 車中泊禁止</Badge>
+        )}
         <Badge className={`${getTypeColor(spot.type)} text-white`}>
           {CampingSpotTypeLabels[spot.type]}
         </Badge>

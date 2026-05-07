@@ -465,7 +465,9 @@ export default function ShachuHakuMap({
 
       // Add security level number to marker only in detailed view
       if (isDetailedView) {
-        markerElement.textContent = calculateSecurityLevel(spot).toString();
+        markerElement.textContent = spot.isOvernightProhibited
+          ? '禁'
+          : calculateSecurityLevel(spot).toString();
       }
 
       const marker = new mapboxgl.Marker({
@@ -613,7 +615,7 @@ export default function ShachuHakuMap({
   }, [initialCenter, initialZoom, initialBounds, mapLoaded]);
 
   const getMarkerColor = (spot: CampingSpotWithId): string => {
-    // Color based on calculated security level
+    if (spot.isOvernightProhibited) return '#dc2626'; // red-600
     const rating = calculateSecurityLevel(spot);
     return getMarkerColorByRating(rating);
   };

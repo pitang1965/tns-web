@@ -80,6 +80,7 @@ export function convertSpotToFormValues(
     quietnessLevel: (spot as any).quietnessLevel?.toString() || '',
     securityLevel: (spot as any).securityLevel?.toString() || '',
     overallRating: (spot as any).overallRating?.toString() || '',
+    isOvernightProhibited: spot.isOvernightProhibited || false,
     hasRoof: spot.hasRoof,
     hasPowerOutlet: spot.hasPowerOutlet,
     isFree: spot.pricing.isFree,

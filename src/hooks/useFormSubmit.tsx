@@ -166,6 +166,10 @@ export function useFormSubmit({
       }
 
       // Handle boolean fields
+      formData.append(
+        'isOvernightProhibited',
+        data.isOvernightProhibited.toString(),
+      );
       formData.append('hasRoof', data.hasRoof.toString());
       formData.append('hasPowerOutlet', data.hasPowerOutlet.toString());
       if (data.isFree !== undefined) {

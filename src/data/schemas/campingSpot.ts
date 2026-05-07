@@ -93,6 +93,7 @@ export const CampingSpotSchema = z.object({
   amenities: z.array(z.string().trim()).default([]),
   notes: z.string().trim().optional(),
   isVerified: z.boolean().default(false),
+  isOvernightProhibited: z.boolean().default(false),
   submittedBy: z.string().trim().optional(),
   lastVerified: z.date().optional(),
 });
@@ -658,6 +659,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
       : [],
     notes: csvRow.notes || undefined,
     isVerified: false,
+    isOvernightProhibited: false,
   };
 }
 
@@ -730,6 +732,7 @@ export function csvJapaneseRowToCampingSpot(
       : [],
     notes: csvRow['備考'] || undefined,
     isVerified: false,
+    isOvernightProhibited: false,
   };
 }
 

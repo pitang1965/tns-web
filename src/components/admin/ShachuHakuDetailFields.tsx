@@ -41,6 +41,31 @@ export function ShachuHakuDetailFields({
 
   return (
     <div className="space-y-6">
+      {/* 車中泊禁止フラグ */}
+      <div className="rounded-lg border-2 border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-4">
+        <div className="flex items-center space-x-3">
+          <Checkbox
+            id="isOvernightProhibited"
+            checked={watch('isOvernightProhibited')}
+            onCheckedChange={(checked) =>
+              setValue('isOvernightProhibited', !!checked)
+            }
+            className="border-red-500 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
+          />
+          <div>
+            <Label
+              htmlFor="isOvernightProhibited"
+              className="text-base font-bold text-red-700 dark:text-red-400 cursor-pointer"
+            >
+              ⛔ 車中泊禁止スポット
+            </Label>
+            <p className="text-sm text-red-600 dark:text-red-400 mt-0.5">
+              貼り紙等で車中泊が明示的に禁止されている場合にチェック。地図と詳細ページに警告表示されます。
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* セキュリティ情報 */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">セキュリティ情報</h3>

@@ -50,6 +50,7 @@ export interface ICampingSpot extends Document {
   amenities: string[];
   notes?: string;
   isVerified: boolean;
+  isOvernightProhibited: boolean;
   submittedBy?: string;
   lastVerified?: Date;
   createdAt: Date;
@@ -235,6 +236,10 @@ const campingSpotSchema = new Schema<ICampingSpot>(
       trim: true,
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isOvernightProhibited: {
       type: Boolean,
       default: false,
     },

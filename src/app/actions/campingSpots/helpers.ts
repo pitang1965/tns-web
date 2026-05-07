@@ -77,6 +77,9 @@ export function convertFormDataToCampingSpot(
       obj.overallRating && String(obj.overallRating).trim() !== ''
         ? Number(obj.overallRating)
         : undefined,
+    isOvernightProhibited:
+      obj.isOvernightProhibited === true ||
+      obj.isOvernightProhibited === 'true',
     hasRoof: obj.hasRoof === 'true',
     hasPowerOutlet: obj.hasPowerOutlet === 'true',
     pricing: {
