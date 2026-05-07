@@ -298,6 +298,13 @@ export const CampingSpotCSVSchema = z.object({
   restrictions: z.string().trim().optional().default(''),
   amenities: z.string().trim().optional().default(''),
   notes: z.string().trim().optional().default(''),
+  isOvernightProhibited: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '車中泊禁止はtrue/false/空欄で入力してください',
+    })
+    .optional()
+    .default('false'),
 });
 
 // CSV import schema with Japanese headers
@@ -508,6 +515,13 @@ export const CampingSpotCSVJapaneseSchema = z.object({
   制限事項: z.string().trim().optional().default(''),
   設備: z.string().trim().optional().default(''),
   備考: z.string().trim().optional().default(''),
+  車中泊禁止: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '車中泊禁止はtrue/false/空欄で入力してください',
+    })
+    .optional()
+    .default('false'),
 });
 
 // Filter schema for search functionality
@@ -659,7 +673,7 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
       : [],
     notes: csvRow.notes || undefined,
     isVerified: false,
-    isOvernightProhibited: false,
+    isOvernightProhibited: csvRow.isOvernightProhibited === 'true',
   };
 }
 
@@ -732,7 +746,7 @@ export function csvJapaneseRowToCampingSpot(
       : [],
     notes: csvRow['備考'] || undefined,
     isVerified: false,
-    isOvernightProhibited: false,
+    isOvernightProhibited: csvRow['車中泊禁止'] === 'true',
   };
 }
 
