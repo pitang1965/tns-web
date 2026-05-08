@@ -80,7 +80,8 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
   // ローディング：メタデータとAuth0ユーザーの両方が解決するまで待つ
   // Auth0は通常100〜300msで解決するため、体感速度への影響は最小限
   const loading = metadataLoading || userIsLoading;
-  const error = dayError;
+  // day fetchのエラーはキャッシュデータがある場合は無視する（オフライン対応）
+  const error = metadata && currentDayPlan ? null : dayError;
 
   const access = useItineraryAccess({ user, metadata });
   const actions = useItineraryActions({ id });

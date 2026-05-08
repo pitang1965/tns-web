@@ -288,7 +288,7 @@ const withPWA = withPWAInit({
       }
     },
     {
-      // HTMLページはネットワーク優先で短期キャッシュ
+      // HTMLページはネットワーク優先でキャッシュ（オフライン対応）
       urlPattern: ({ request, url }) => {
         // HTMLドキュメントのみマッチ（Accept: text/html）
         return request.destination === 'document';
@@ -298,7 +298,7 @@ const withPWA = withPWAInit({
         cacheName: 'pages',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 60 // 1分のみ（新デプロイ後すぐ更新されるように）
+          maxAgeSeconds: 24 * 60 * 60 // 24時間（オフライン時にアプリシェルを提供するため）
         },
         networkTimeoutSeconds: 5
       }
