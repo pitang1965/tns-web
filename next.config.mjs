@@ -6,6 +6,11 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  fallbacks: {
+    // ナビゲーションリクエストがオフラインで失敗した場合のフォールバックページ
+    // Cache-Control: no-storeの影響を受けないようにプリキャッシュされる
+    document: '/~offline',
+  },
   // キャッシュ戦略
   runtimeCaching: [
     // Mapbox静的アセット（スタイル、フォント、スプライト）

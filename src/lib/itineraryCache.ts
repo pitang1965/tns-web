@@ -69,6 +69,18 @@ export async function deleteCachedItinerary(id: string): Promise<void> {
   }
 }
 
+export async function getAllCachedItineraries(): Promise<
+  ClientItineraryDocument[]
+> {
+  try {
+    const db = await getDB();
+    const all = (await db.getAll(STORE_NAME)) as CacheEntry[];
+    return all.map((entry) => entry.data).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 export async function clearAllCachedItineraries(): Promise<void> {
   try {
     const db = await getDB();
