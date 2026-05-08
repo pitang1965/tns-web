@@ -113,6 +113,12 @@ export function useMapboxCore({
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [longitude, latitude] as [number, number],
         zoom,
+        cooperativeGestures: true,
+        locale: {
+          'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+          'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+          'TouchPanBlocker.Message': '2本指で地図を移動',
+        },
       });
 
       // エラーハンドラの設定

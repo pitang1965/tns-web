@@ -51,11 +51,15 @@ export default function SimpleLocationPicker({
       style: 'mapbox://styles/mapbox/streets-v12',
       center: [initialLng, initialLat],
       zoom: 13,
+      cooperativeGestures: true,
       locale: {
         'AttributionControl.ToggleAttribution': '帰属情報の表示切替',
         'NavigationControl.ResetBearing': '方角をリセット',
         'NavigationControl.ZoomIn': 'ズームイン',
         'NavigationControl.ZoomOut': 'ズームアウト',
+        'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+        'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+        'TouchPanBlocker.Message': '2本指で地図を移動',
       },
     });
 

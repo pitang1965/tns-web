@@ -407,6 +407,12 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [139.5631214, 35.3325289], // デフォルト位置（相模湾）
         zoom: 12,
+        cooperativeGestures: true,
+        locale: {
+          'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+          'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+          'TouchPanBlocker.Message': '2本指で地図を移動',
+        },
       });
 
       mapInstance.current.on('error', handleMapError);

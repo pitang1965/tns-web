@@ -280,6 +280,12 @@ export default function ShachuHakuMap({
         [122.0, 24.0], // 南西端（西端、南端）沖縄より南
         [154.0, 46.0], // 北東端（東端、北端）北海道より北
       ],
+      cooperativeGestures: true,
+      locale: {
+        'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+        'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+        'TouchPanBlocker.Message': '2本指で地図を移動',
+      },
     });
 
     // エラーハンドラの設定

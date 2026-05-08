@@ -45,6 +45,12 @@ export default function HeroMapSection({
       center: [138.0, 37.0], // 日本中心部
       zoom: 5,
       interactive: true,
+      cooperativeGestures: true,
+      locale: {
+        'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+        'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+        'TouchPanBlocker.Message': '2本指で地図を移動',
+      },
     });
 
     map.current.on('error', handleMapError);

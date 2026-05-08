@@ -297,6 +297,12 @@ export default function FacilityMap({
       style: 'mapbox://styles/mapbox/streets-v11',
       center: spot.coordinates,
       zoom: 14,
+      cooperativeGestures: true,
+      locale: {
+        'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+        'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+        'TouchPanBlocker.Message': '2本指で地図を移動',
+      },
     });
 
     // エラーハンドラの設定（In-App Browser対応）
