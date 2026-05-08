@@ -7,9 +7,9 @@ const withPWA = withPWAInit({
   register: true,
   skipWaiting: true,
   fallbacks: {
-    // ナビゲーションリクエストがオフラインで失敗した場合のフォールバックページ
-    // Cache-Control: no-storeの影響を受けないようにプリキャッシュされる
-    document: '/~offline',
+    // 静的HTMLファイルをフォールバックに使用
+    // Next.jsのforce-dynamic（Cache-Control: no-store）の影響を受けない
+    document: '/offline.html',
   },
   // キャッシュ戦略
   runtimeCaching: [

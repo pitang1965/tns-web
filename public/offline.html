@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>オフライン | 車旅のしおり</title>
+  <style>
+    :root {
+      --bg: #ffffff; --fg: #09090b; --muted: #71717a;
+      --border: #e4e4e7; --muted-bg: #f4f4f5;
+      --amber-bg: #fffbeb; --amber-border: #fde68a; --amber-text: #78350f;
+      --radius: 8px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #09090b; --fg: #fafafa; --muted: #a1a1aa;
+        --border: #27272a; --muted-bg: #18181b;
+        --amber-bg: rgba(245,158,11,0.15); --amber-border: rgba(245,158,11,0.4); --amber-text: #fcd34d;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+      background: var(--bg); color: var(--fg); font-size: 16px; line-height: 1.5;
+    }
+    #app { max-width: 768px; margin: 0 auto; padding: 24px 16px; }
+
+    /* バナー */
+    .banner {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--amber-bg); border: 1px solid var(--amber-border);
+      border-radius: var(--radius); padding: 8px 12px; margin-bottom: 20px;
+      font-size: 14px; color: var(--amber-text);
+    }
+    .banner button {
+      margin-left: auto; padding: 3px 10px; font-size: 12px; cursor: pointer;
+      border: 1px solid var(--amber-border); border-radius: 6px;
+      background: transparent; color: var(--amber-text);
+    }
+
+    /* タイポグラフィ */
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .desc { color: var(--muted); margin-bottom: 4px; }
+    .meta { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    /* 日程カード */
+    .day-card { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+    .day-header { background: var(--muted-bg); padding: 8px 16px; font-size: 13px; font-weight: 600; display: flex; gap: 8px; }
+    .day-header .date { font-weight: 400; color: var(--muted); }
+    .day-notes { padding: 8px 16px; font-size: 13px; color: var(--muted); background: var(--muted-bg); opacity: 0.7; border-bottom: 1px solid var(--border); }
+
+    /* アクティビティ */
+    .act { display: flex; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+    .act:last-child { border-bottom: none; }
+    .act-time { font-size: 12px; color: var(--muted); width: 40px; flex-shrink: 0; padding-top: 2px; font-variant-numeric: tabular-nums; }
+    .act-body { flex: 1; min-width: 0; }
+    .act-title { font-weight: 500; font-size: 15px; }
+    .act-sub { font-size: 13px; color: var(--muted); margin-top: 1px; }
+    .empty { padding: 10px 16px; font-size: 13px; color: var(--muted); }
+
+    /* オフライン画面 */
+    .center { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 40px 0 32px; }
+    .offline-title { font-size: 22px; font-weight: 700; margin: 16px 0 8px; }
+    .offline-msg { color: var(--muted); margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--fg); font-size: 14px; cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { background: var(--muted-bg); }
+
+    /* 旅程リスト */
+    .list { display: flex; flex-direction: column; gap: 8px; }
+    .list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      text-decoration: none; color: inherit;
+    }
+    .list-item:hover { background: var(--muted-bg); }
+    .item-title { font-weight: 500; }
+    .item-meta { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div id="app"><p style="color:var(--muted);padding:24px">読み込み中...</p></div>
+
+  <script>
+    const DB_NAME = 'tns-itinerary-cache';
+    const STORE_NAME = 'itineraries';
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+        req.onupgradeneeded = e => {
+          if (!e.target.result.objectStoreNames.contains(STORE_NAME))
+            e.target.result.createObjectStore(STORE_NAME);
+        };
+      });
+    }
+
+    async function getCached(id) {
+      const db = await openDB();
+      return new Promise(resolve => {
+        const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id);
+        req.onsuccess = () => resolve(req.result?.data ?? null);
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function getAllCached() {
+      const db = await openDB();
+      return new Promise(resolve => {
+        const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
+        req.onsuccess = () => resolve((req.result || []).map(e => e.data).filter(Boolean));
+        req.onerror = () => resolve([]);
+      });
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function fmtDate(s) {
+      if (!s) return '';
+      return new Date(s).toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' });
+    }
+
+    function dateRange(it) {
+      const n = it.numberOfDays;
+      if (!it.startDate) return n + '日間';
+      const s = new Date(it.startDate);
+      const e = new Date(s); e.setDate(e.getDate() + n - 1);
+      const f = d => d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+      return f(s) + ' 〜 ' + f(e) + '（' + n + '日間）';
+    }
+
+    const WIFI_OFF = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
+    const WIFI_OFF_LG = `<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
+    const RELOAD = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+    const CHEVRON = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+    function renderItinerary(it) {
+      let h = `
+        <div class="banner">${WIFI_OFF} オフライン表示（キャッシュデータ）
+          <button onclick="location.reload()">${RELOAD} 再試行</button>
+        </div>
+        <h1>${esc(it.title)}</h1>
+        ${it.description ? `<p class="desc">${esc(it.description)}</p>` : ''}
+        <p class="meta">${dateRange(it)}</p>
+      `;
+      (it.dayPlans || []).forEach((day, i) => {
+        h += `<div class="day-card">
+          <div class="day-header"><span>${i+1}日目</span>${day.date ? `<span class="date">${fmtDate(day.date)}</span>` : ''}</div>
+          ${day.notes ? `<div class="day-notes">${esc(day.notes)}</div>` : ''}
+          <div>`;
+        if (!(day.activities || []).length) {
+          h += `<div class="empty">アクティビティなし</div>`;
+        } else {
+          (day.activities || []).forEach(a => {
+            const subs = [];
+            if (a.place?.name) subs.push(esc(a.place.name));
+            if (a.description) subs.push(esc(a.description));
+            if (a.cost === 0) subs.push('（無料）');
+            else if (a.cost) subs.push('¥' + a.cost.toLocaleString());
+            h += `<div class="act">
+              <span class="act-time">${esc(a.startTime || '')}</span>
+              <div class="act-body">
+                <div class="act-title">${esc(a.title)}</div>
+                ${subs.map(s => `<div class="act-sub">${s}</div>`).join('')}
+              </div>
+            </div>`;
+          });
+        }
+        h += `</div></div>`;
+      });
+      document.getElementById('app').innerHTML = h;
+    }
+
+    function renderOffline(targetId, all) {
+      const msg = targetId
+        ? 'この旅程のデータはキャッシュされていません。<br>オンラインで一度開いてください。'
+        : 'インターネット接続を確認してください。';
+      let h = `
+        <div class="center" style="color:var(--muted)">
+          ${WIFI_OFF_LG}
+          <div class="offline-title" style="color:var(--fg)">オフラインです</div>
+          <p class="offline-msg">${msg}</p>
+          <button class="btn" onclick="location.reload()">${RELOAD} 再試行</button>
+        </div>
+      `;
+      if (all.length) {
+        h += `<h2>オフラインで閲覧できる旅程</h2><div class="list">`;
+        all.forEach(it => {
+          h += `<a class="list-item" href="/itineraries/${esc(it.id)}">
+            <div>
+              <div class="item-title">${esc(it.title)}</div>
+              <div class="item-meta">${dateRange(it)}</div>
+            </div>${CHEVRON}
+          </a>`;
+        });
+        h += `</div>`;
+      }
+      document.getElementById('app').innerHTML = h;
+    }
+
+    (async () => {
+      try {
+        const m = location.pathname.match(/^\/itineraries\/([a-zA-Z0-9]+)/);
+        const id = m?.[1] ?? null;
+        if (id) {
+          const it = await getCached(id);
+          if (it) { renderItinerary(it); return; }
+        }
+        renderOffline(id, await getAllCached());
+      } catch {
+        renderOffline(null, []);
+      }
+    })();
+  </script>
+</body>
+</html>
