@@ -109,6 +109,12 @@ export function useMapbox({ activities, initialZoom = 12 }: UseMapboxProps) {
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [centerLng, centerLat] as [number, number],
         zoom: initialZoom,
+        cooperativeGestures: true,
+        locale: {
+          'ScrollZoomBlocker.CtrlMessage': 'Ctrl + スクロールでズーム',
+          'ScrollZoomBlocker.CmdMessage': '⌘ + スクロールでズーム',
+          'TouchPanBlocker.Message': '2本指で地図を移動',
+        },
       });
       hasInitialized.current = true;
 
