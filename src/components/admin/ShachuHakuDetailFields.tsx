@@ -198,7 +198,7 @@ export function ShachuHakuDetailFields({
         <div className="space-y-3">
           <Label className="text-base font-semibold">収容台数</Label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="capacity">普通車</Label>
               <Input
                 id="capacity"
@@ -214,7 +214,7 @@ export function ShachuHakuDetailFields({
                 </p>
               )}
             </div>
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="capacityLarge">大型車</Label>
               <Input
                 id="capacityLarge"
@@ -272,7 +272,7 @@ export function ShachuHakuDetailFields({
           )}
         </div>
 
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="restrictions">制限事項</Label>
           <Input
             id="restrictions"
@@ -286,7 +286,7 @@ export function ShachuHakuDetailFields({
           )}
         </div>
 
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="amenities">その他設備</Label>
           <Input
             id="amenities"
@@ -298,7 +298,7 @@ export function ShachuHakuDetailFields({
           )}
         </div>
 
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="notes">備考</Label>
           <Textarea
             id="notes"

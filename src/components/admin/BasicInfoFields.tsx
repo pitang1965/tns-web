@@ -9,7 +9,6 @@ import {
   FieldErrors,
 } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
@@ -114,7 +113,7 @@ export function BasicInfoFields({
     <div className="space-y-6">
       {/* Basic Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+        <div className="space-y-1">
           <Label
             htmlFor="name"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -126,7 +125,7 @@ export function BasicInfoFields({
             <p className="text-sm text-red-500">{errors.name.message}</p>
           )}
         </div>
-        <div>
+        <div className="space-y-1">
           <Label
             htmlFor="type"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -210,7 +209,7 @@ export function BasicInfoFields({
 
         <div className="space-y-4">
           <div className="space-y-1">
-            <ButtonGroup className="w-full flex-col sm:flex-row">
+            <div className="flex flex-col sm:flex-row gap-4">
               <CoordinatesFromClipboardButton
                 onCoordinatesExtracted={(latitude, longitude) => {
                   setValue('lat', latitude.toString());
@@ -221,14 +220,13 @@ export function BasicInfoFields({
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={() => setShowMap(!showMap)}
                 className="flex-1 cursor-pointer"
               >
                 <MapPin className="w-4 h-4" />
                 {showMap ? '選択完了' : '地図で選択'}
               </Button>
-            </ButtonGroup>
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Google Maps の URL
               や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
@@ -269,7 +267,7 @@ export function BasicInfoFields({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="address">住所</Label>
           <Input
             id="address"
@@ -280,7 +278,7 @@ export function BasicInfoFields({
             <p className="text-sm text-red-500">{errors.address.message}</p>
           )}
         </div>
-        <div>
+        <div className="space-y-1">
           <Label
             htmlFor="prefecture"
             className="after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -312,7 +310,7 @@ export function BasicInfoFields({
         </div>
       </div>
 
-      <div>
+      <div className="space-y-1">
         <Label htmlFor="url">URL</Label>
         <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
           <InputGroupAddon className="border-r-0">

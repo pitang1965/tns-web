@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { LoadingState } from '@/components/common/LoadingState';
 import { Textarea } from '@/components/ui/textarea';
@@ -525,7 +524,7 @@ export default function ShachuHakuSubmissionForm({
 
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <ButtonGroup className="w-full flex-col sm:flex-row">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <CoordinatesFromClipboardButton
                       onCoordinatesExtracted={(latitude, longitude) => {
                         form.setValue('lat', latitude.toString());
@@ -536,14 +535,13 @@ export default function ShachuHakuSubmissionForm({
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
                       onClick={() => setShowMap(!showMap)}
                       className="flex-1 cursor-pointer"
                     >
                       <MapPin className="w-4 h-4" />
                       {showMap ? '選択完了' : '地図で選択'}
                     </Button>
-                  </ButtonGroup>
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Google Maps の URL
                     や座標をコピーしてから「クリップボードから取得」、または地図上でクリックして位置を選択できます
