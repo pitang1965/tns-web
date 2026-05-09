@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCampingSpotById } from '../../actions/campingSpots/admin';
@@ -165,7 +166,9 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
           },
         ]}
       />
-      <SpotDetailClient spot={spot} />
+      <Suspense fallback={null}>
+        <SpotDetailClient spot={spot} />
+      </Suspense>
     </>
   );
 }

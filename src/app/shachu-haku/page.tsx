@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import ShachuHakuClient from './ShachuHakuClient';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
@@ -104,7 +105,9 @@ export default function ShachuHakuPage() {
           },
         ]}
       />
-      <ShachuHakuClient />
+      <Suspense fallback={<div className="container mx-auto p-4">読み込み中...</div>}>
+        <ShachuHakuClient />
+      </Suspense>
     </>
   );
 }
