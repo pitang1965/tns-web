@@ -102,21 +102,29 @@
     }
 
     async function getCached(id) {
-      const db = await openDB();
-      return new Promise(resolve => {
-        const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id);
-        req.onsuccess = () => resolve(req.result?.data ?? null);
-        req.onerror = () => resolve(null);
-      });
+      try {
+        const db = await openDB();
+        return new Promise(resolve => {
+          const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).get(id);
+          req.onsuccess = () => resolve(req.result?.data ?? null);
+          req.onerror = () => resolve(null);
+        });
+      } catch {
+        return null;
+      }
     }
 
     async function getAllCached() {
-      const db = await openDB();
-      return new Promise(resolve => {
-        const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
-        req.onsuccess = () => resolve((req.result || []).map(e => e.data).filter(Boolean));
-        req.onerror = () => resolve([]);
-      });
+      try {
+        const db = await openDB();
+        return new Promise(resolve => {
+          const req = db.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
+          req.onsuccess = () => resolve((req.result || []).map(e => e.data).filter(Boolean));
+          req.onerror = () => resolve([]);
+        });
+      } catch {
+        return [];
+      }
     }
 
     function esc(s) {
@@ -207,16 +215,16 @@
     }
 
     (async () => {
+      const m = location.pathname.match(/^\/itineraries\/([a-zA-Z0-9]+)/);
+      const id = m?.[1] ?? null;
       try {
-        const m = location.pathname.match(/^\/itineraries\/([a-zA-Z0-9]+)/);
-        const id = m?.[1] ?? null;
         if (id) {
           const it = await getCached(id);
           if (it) { renderItinerary(it); return; }
         }
         renderOffline(id, await getAllCached());
       } catch {
-        renderOffline(null, []);
+        renderOffline(id, []);
       }
     })();
   </script>

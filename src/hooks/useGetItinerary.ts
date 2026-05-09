@@ -88,11 +88,11 @@ async function fetchFull(
       return;
     }
     const data: ClientItineraryDocument = await res.json();
+    await setCachedItinerary(id, data);
     if (!cancelled) {
       setItinerary(data);
       setLoading(false);
     }
-    await setCachedItinerary(id, data);
   } catch (err) {
     if (!cancelled) {
       setError(err instanceof Error ? err.message : '不明なエラー');

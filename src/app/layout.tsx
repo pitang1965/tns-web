@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import './globals.css';
