@@ -13,6 +13,7 @@ type ActivityProps = {
   // 複数経由地ルート検索用のプロパティ
   allActivities?: ActivityType[];
   isOwner?: boolean; // 所有者かどうか（自宅の座標・住所表示制御用）
+  dayIndex?: number; // 目次からのスクロールターゲット用
 };
 
 export const ActivityView: React.FC<ActivityProps> = ({
@@ -21,13 +22,19 @@ export const ActivityView: React.FC<ActivityProps> = ({
   total,
   allActivities,
   isOwner = false,
+  dayIndex,
 }) => {
   // indexとtotalが両方提供された場合のみ、番号表示を追加
   const titlePrefix =
     index !== undefined && total !== undefined ? `${index + 1}/${total}: ` : '';
 
+  const elementId =
+    dayIndex !== undefined && index !== undefined
+      ? `activity-${dayIndex}-${index}`
+      : undefined;
+
   return (
-    <li className="bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50">
+    <li id={elementId} className="bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50">
       <div>
         <H3>
           {titlePrefix}

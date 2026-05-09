@@ -42,6 +42,7 @@ function toMetadata(itinerary: ClientItineraryDocument) {
     dayPlanSummaries: itinerary.dayPlans.map((dp) => ({
       date: dp.date,
       notes: dp.notes,
+      activities: dp.activities.map((act) => ({ title: act.title })),
     })),
   };
 }
@@ -97,6 +98,21 @@ const ItineraryDetail: React.FC<ItineraryDetailProps> = ({ id }) => {
       addUrl(url, `${title}${dayDisplay}`);
     }
   }, [metadata, access.hasAccess, currentDayIndex, pathname, addUrl]);
+
+  // 日切り替え後に目次のアクティビティクリックでハッシュ指定された要素へスクロール
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const el = document.getElementById(hash.slice(1));
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search,
+      );
+    }
+  }, [currentDayPlan]);
 
   const renderDayPlan = (dayPlan: DayPlan, index: number) => {
     return (

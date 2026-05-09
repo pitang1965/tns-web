@@ -264,6 +264,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
               total={day.activities.length}
               allActivities={day.activities}
               isOwner={isOwner}
+              dayIndex={dayIndex}
             />
           ))}
         </ul>

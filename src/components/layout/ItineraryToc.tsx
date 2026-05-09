@@ -96,12 +96,30 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   }, []);
 
   const handleDayClick = (dayNumber: number) => {
-    // 現在のURLを取得
     const params = new URLSearchParams(searchParams.toString());
-    // dayパラメータを設定
     params.set('day', dayNumber.toString());
-    // 新しいURLに遷移
     router.push(`?${params.toString()}`);
+  };
+
+  const handleActivityClick = (
+    e: React.MouseEvent,
+    dayNumber: number,
+    dayIndex: number,
+    actIndex: number,
+  ) => {
+    e.stopPropagation();
+    const hash = `activity-${dayIndex}-${actIndex}`;
+    const currentDay = parseInt(searchParams.get('day') || '1');
+
+    if (dayNumber === currentDay) {
+      // 同じ日はすでにDOMにあるので直接スクロール
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // 異なる日は日切り替え＋ハッシュをURLに付与してuseEffectでスクロール
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('day', dayNumber.toString());
+      router.push(`?${params.toString()}#${hash}`);
+    }
   };
 
   // 表示用のデータを取得
@@ -147,10 +165,13 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
                         {day.activities.map((activity, actIndex) => (
                           <li
                             key={actIndex}
-                            className="text-sm text-gray-600 dark:text-gray-400"
+                            className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer underline hover:text-gray-900 dark:hover:text-gray-100"
+                            onClick={(e) =>
+                              handleActivityClick(e, index + 1, index, actIndex)
+                            }
                           >
                             <div className="flex">
-                              <div className="w-5 flex-shrink-0">
+                              <div className="w-5 shrink-0">
                                 {actIndex + 1}.
                               </div>
                               <SmallText>{activity.title}</SmallText>
