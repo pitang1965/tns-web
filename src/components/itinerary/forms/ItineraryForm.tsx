@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { FormProvider, useWatch } from 'react-hook-form';
 import {
   ClientItineraryInput,
   ClientItineraryDocument,
@@ -45,9 +45,6 @@ export function ItineraryForm({
   submitLabel,
   isSubmitting = false,
 }: ItineraryFormProps) {
-  // 旅程全体に関する情報の折りたたみ
-  const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(false);
-
   const itineraryId = initialData?._id;
 
   // カスタムフックを使用
@@ -71,8 +68,27 @@ export function ItineraryForm({
     isSubmitting,
   });
 
+  const numberOfDays = useWatch({
+    control: methods.control,
+    name: 'numberOfDays',
+  });
+  const dayPlans = useWatch({ control: methods.control, name: 'dayPlans' });
+
   // useDayParamフックを使用して日付パラメータを管理
-  const dayParamHook = useDayParam((watch('numberOfDays') || 1) - 1);
+  const dayParamHook = useDayParam((numberOfDays || 1) - 1);
+
+  // 旅程全体に関する情報の折りたたみ
+  // selectedDay が変わったときにレンダリング中に state を更新する (React 推奨パターン)
+  const [isBasicInfoOpen, setIsBasicInfoOpen] = useState(
+    dayParamHook.selectedDay === 0,
+  );
+  const [prevSelectedDay, setPrevSelectedDay] = useState(
+    dayParamHook.selectedDay,
+  );
+  if (prevSelectedDay !== dayParamHook.selectedDay) {
+    setPrevSelectedDay(dayParamHook.selectedDay);
+    setIsBasicInfoOpen(dayParamHook.selectedDay === 0);
+  }
 
   // アクティビティ操作フック
   const {
@@ -99,20 +115,25 @@ export function ItineraryForm({
     formModified,
   });
 
+  // 日切り替え後に目次のアクティビティクリックでハッシュ指定された要素へスクロール
   useEffect(() => {
-    // 1日目表示時は基本情報を展開、それ以外では折りたたむ
-    setIsBasicInfoOpen(dayParamHook.selectedDay === 0);
+    const hash = window.location.hash;
+    if (!hash) return;
+    const el = document.getElementById(hash.slice(1));
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
   }, [dayParamHook.selectedDay]);
 
   // DayPlanFormをレンダリングする関数
   const renderDayPlanForm = (day: any, index: number) => {
-    const numberOfDays = watch('numberOfDays') || 0;
     return (
       <DayPlanForm
         key={index}
         day={day}
         dayIndex={index}
-        daysCount={numberOfDays}
+        daysCount={numberOfDays || 0}
         addActivity={addActivity}
         insertActivity={insertActivity}
         removeActivity={removeActivity}
@@ -152,13 +173,13 @@ export function ItineraryForm({
                 {/* 日程詳細のヘッダーとDayPaginationコンポーネント */}
                 {/* dayPlansが存在しない場合でもDayPaginationを表示 */}
                 <DayPagination
-                  dayPlans={watch('dayPlans')}
+                  dayPlans={dayPlans}
                   onDayChange={dayParamHook.handleDayChange}
                   currentPage={dayParamHook.selectedDay + 1}
                   renderDayPlan={(dayPlan, index) => (
                     <>
                       {/* 各ページの上部に現在の日数表示を追加 */}
-                      {renderPaginationHeader(index, watch)}
+                      {renderPaginationHeader(index, numberOfDays || 0)}
                       {renderDayPlanForm(dayPlan, index)}
                     </>
                   )}

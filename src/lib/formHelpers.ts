@@ -1,6 +1,4 @@
 import React from 'react';
-import { UseFormWatch } from 'react-hook-form';
-import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { H3 } from '@/components/common/Typography';
 
 // エラーメッセージを表示用に整形する関数
@@ -48,9 +46,8 @@ export const getErrorsForDisplay = (errors: any): Record<string, string> => {
 // ページネーションヘッダーをレンダリングする関数
 export const renderPaginationHeader = (
   currentIndex: number,
-  watch: UseFormWatch<ClientItineraryInput>,
+  numberOfDays: number,
 ): React.ReactElement => {
-  const numberOfDays = watch('numberOfDays') || 0;
   return React.createElement(
     'div',
     { className: 'flex justify-between items-center mb-2' },

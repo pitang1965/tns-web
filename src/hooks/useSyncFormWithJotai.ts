@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 import { useWatch } from 'react-hook-form';
 
@@ -15,6 +15,7 @@ export function useSyncFormWithJotai(
 ) {
   // Jotaiの状態を取得（更新用）
   const [, setAtomValue] = useAtom(atomToSync);
+  const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // react-hook-formのwatchを使用してフォームの値の変更を監視
   const formValues = useWatch({
@@ -43,13 +44,18 @@ export function useSyncFormWithJotai(
     };
   };
 
-  // フォームの値が変更されたらJotaiの状態を更新
+  // フォームの値が変更されたらJotaiの状態を更新 (300msデバウンス)
   useEffect(() => {
     if (formValues) {
-      // メタデータ形式に変換してからアトムを更新
-      const metadataValues = convertToMetadataFormat(formValues);
-      setAtomValue(metadataValues);
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      syncTimerRef.current = setTimeout(() => {
+        const metadataValues = convertToMetadataFormat(formValues);
+        setAtomValue(metadataValues);
+      }, 300);
     }
+    return () => {
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
   }, [formValues, setAtomValue]);
 
   // 初期データがある場合は、初回レンダリング時にJotaiの状態も初期化

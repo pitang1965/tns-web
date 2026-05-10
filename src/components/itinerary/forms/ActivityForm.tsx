@@ -1,7 +1,7 @@
 'use client';
 
 import { PlaceForm } from './PlaceForm';
-import { FieldErrors, useFormContext } from 'react-hook-form';
+import { FieldErrors, useFormContext, useWatch } from 'react-hook-form';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { ActivityControls } from './ActivityControls.tsx';
 import { useActivityTime } from '@/hooks/useActivityTime';
@@ -57,12 +57,13 @@ export function ActivityForm({
     dayIndex,
     activityIndex,
   );
-  const { watch } = useFormContext<ClientItineraryInput>();
+  const { control } = useFormContext<ClientItineraryInput>();
 
   // URL値を監視
-  const urlValue = watch(
-    `dayPlans.${dayIndex}.activities.${activityIndex}.url`,
-  );
+  const urlValue = useWatch({
+    control,
+    name: `dayPlans.${dayIndex}.activities.${activityIndex}.url`,
+  });
 
   // アクティビティのタイトル表示を生成
   const activityHeader = total

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -70,6 +70,15 @@ export function useItineraryForm({
     handleSubmit,
   } = methods;
 
+  const startDateValue = useWatch({
+    control: methods.control,
+    name: 'startDate',
+  });
+  const numberOfDaysValue = useWatch({
+    control: methods.control,
+    name: 'numberOfDays',
+  });
+
   // Jotaiとの同期
   useSyncFormWithJotai(methods, itineraryMetadataAtom, initialData);
 
@@ -84,9 +93,7 @@ export function useItineraryForm({
 
   // 日付の監視と dayPlans の自動生成
   useEffect(() => {
-    const startDate = watch('startDate');
-    const numberOfDays = watch('numberOfDays');
-    const dayCount = numberOfDays || 0;
+    const dayCount = numberOfDaysValue || 0;
 
     trigger(['startDate', 'numberOfDays']);
 
@@ -101,8 +108,8 @@ export function useItineraryForm({
         currentDayPlan?.activities ?? fallbackDayPlan?.activities ?? [];
       const notes = currentDayPlan?.notes ?? fallbackDayPlan?.notes ?? '';
 
-      if (startDate) {
-        const currentDate = new Date(startDate);
+      if (startDateValue) {
+        const currentDate = new Date(startDateValue);
         currentDate.setDate(currentDate.getDate() + index);
         return {
           dayIndex: index,
@@ -121,8 +128,8 @@ export function useItineraryForm({
 
     setValue('dayPlans', newDayPlans);
   }, [
-    watch('startDate'),
-    watch('numberOfDays'),
+    startDateValue,
+    numberOfDaysValue,
     setValue,
     initialData,
     trigger,

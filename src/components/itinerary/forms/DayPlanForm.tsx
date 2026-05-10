@@ -270,7 +270,7 @@ export function DayPlanForm({
 
       <div className="space-y-4">
         {day.activities?.map((activity, activityIndex) => (
-          <div key={activity.id}>
+          <div key={activity.id} id={`activity-${dayIndex}-${activityIndex}`}>
             {/* アクティビティ間の挿入ボタン */}
             <div className="group/insert flex items-center gap-2 -mt-2 mb-2">
               <div className="flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors" />
