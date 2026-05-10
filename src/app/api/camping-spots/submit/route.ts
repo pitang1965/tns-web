@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
+import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
 import mailerSend from '@/lib/mailersend';
 import { logger } from '@/lib/logger';
@@ -19,9 +20,83 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     });
 
-    // Check for duplicates:
-    // 1. Same name (same prefecture) OR same URL → reject if within 200m, or if coords missing
-    // 2. Different name/URL but very close (10m) → reject
+    // Check for duplicates against existing approved camping spots (CampingSpot collection)
+    type SpotLean = { name: string; coordinates: [number, number] };
+
+    // 1a. Same name OR same URL → reject if within 200m
+    const spotNameOrUrlConditions: Record<string, unknown>[] = [
+      { name: validatedData.name },
+    ];
+    if (validatedData.url) {
+      spotNameOrUrlConditions.push({ url: validatedData.url });
+    }
+
+    const existingSpotMatch = await CampingSpot.findOne({
+      $or: spotNameOrUrlConditions,
+    }).lean<SpotLean>();
+
+    if (existingSpotMatch) {
+      if (validatedData.coordinates && existingSpotMatch.coordinates) {
+        const distance = calculateDistance(
+          validatedData.coordinates[1],
+          validatedData.coordinates[0],
+          existingSpotMatch.coordinates[1],
+          existingSpotMatch.coordinates[0],
+        );
+        if (distance <= 200) {
+          return NextResponse.json(
+            {
+              error: '同名またはURLが同じスポットが近くに既に登録されています',
+              details: `既存スポット: ${existingSpotMatch.name} (${Math.round(distance)}m先)`,
+            },
+            { status: 400 },
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            error: '同名またはURLが同じスポットが既に登録されています',
+            details: `既存スポット: ${existingSpotMatch.name}`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    // 1b. Any name/URL → reject if within 10m of an existing approved spot
+    if (validatedData.coordinates) {
+      const veryNearbySpot = await CampingSpot.findOne({
+        coordinates: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: validatedData.coordinates,
+            },
+            $maxDistance: 10,
+          },
+        },
+      }).lean<SpotLean>();
+
+      if (veryNearbySpot) {
+        const distance = calculateDistance(
+          validatedData.coordinates[1],
+          validatedData.coordinates[0],
+          veryNearbySpot.coordinates[1],
+          veryNearbySpot.coordinates[0],
+        );
+        return NextResponse.json(
+          {
+            error: '非常に近い場所に既存のスポットが登録されています',
+            details: `既存スポット: ${veryNearbySpot.name} (${Math.round(distance)}m先)`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+
+    // Check for duplicates against pending/approved submissions (CampingSpotSubmission collection)
+    // 2a. Same name (same prefecture) OR same URL → reject if within 200m, or if coords missing
+    // 2b. Different name/URL but very close (10m) → reject
 
     // Build OR conditions: always check name+prefecture, add URL check if provided
     const nameOrUrlConditions: Record<string, unknown>[] = [
