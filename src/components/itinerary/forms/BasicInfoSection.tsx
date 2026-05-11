@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { useFormContext, Controller } from 'react-hook-form';
+import { useFormContext, Controller, useWatch } from 'react-hook-form';
 import { H3, SmallText } from '@/components/common/Typography';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +11,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 type BasicInfoSectionProps = {
   isOpen: boolean;
@@ -28,13 +28,39 @@ export function BasicInfoSection({
     control,
   } = useFormContext();
 
+  const [title, startDate, numberOfDays] = useWatch({
+    control,
+    name: ['title', 'startDate', 'numberOfDays'],
+  });
+
+  const summaryParts: string[] = [];
+  if (title) summaryParts.push(title);
+  if (startDate) summaryParts.push(`${startDate}〜`);
+  if (numberOfDays) summaryParts.push(`${numberOfDays}日間`);
+  const summary = summaryParts.join(' · ');
+
   return (
     <div className="border rounded-lg p-4 space-y-4">
       <Collapsible open={isOpen} onOpenChange={onOpenChange} className="mb-4">
         <CollapsibleTrigger className="flex items-center justify-between w-full p-2 border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600">
-          <H3>旅程基本情報</H3>
-          <span className="text-gray-500 dark:text-gray-400">
-            {isOpen ? '▲' : '▼'}
+          <div className="flex flex-col items-start gap-1 min-w-0">
+            <H3>旅程基本情報</H3>
+            {!isOpen && summary && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">
+                {summary}
+              </p>
+            )}
+          </div>
+          <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1 shrink-0 ml-2 text-xs">
+            {isOpen ? (
+              <>
+                閉じる <ChevronUp size={16} />
+              </>
+            ) : (
+              <>
+                詳細を表示 <ChevronDown size={16} />
+              </>
+            )}
           </span>
         </CollapsibleTrigger>
         <CollapsibleContent>
