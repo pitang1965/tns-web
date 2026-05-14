@@ -17,7 +17,7 @@ export function useRouteLayer({
     return activities
       .map((a) => `${a.id}-${a.latitude}-${a.longitude}`)
       .join(',');
-  }, [JSON.stringify(activities)]);
+  }, [activities]);
 
   // ルートライン（アクティビティ間の線）を追加する関数
   const addRouteLines = useCallback(() => {
