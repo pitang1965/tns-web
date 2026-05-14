@@ -6,15 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is "車旅のしおり" (Travel Itinerary), a Next.js-based web application for creating and managing travel itineraries with maps integration. The app supports multi-day trip planning with Google Maps/Mapbox integration and social sharing features.
 
-## Development Commands
-
-```bash
-# Development
-npm run dev          # Start development server on http://localhost:3000
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-
 # Database initialization
 npm run init-db      # Initialize MongoDB database with sample data
 ```
@@ -63,68 +54,11 @@ npm run init-db      # Initialize MongoDB database with sample data
 
 ## Architecture
 
-### Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **UI**: React 19, Radix UI components, Tailwind CSS
-- **State Management**: Jotai for global state
-- **Forms**: React Hook Form with Zod validation
-- **Database**: MongoDB with Mongoose ODM
-- **Maps**: Mapbox GL (primary) and React Leaflet
-- **Authentication**: Auth0
-- **Monitoring**: Sentry for error tracking
-
-### Key Directory Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages and API routes
-│   ├── actions/           # Server actions for CRUD operations
-│   ├── api/               # API route handlers
-│   └── itineraries/       # Itinerary-related pages
-├── components/            # React components
-│   ├── auth/             # Authentication components
-│   ├── common/           # Shared components (Maps, ThemeProvider)
-│   ├── itinerary/        # Itinerary-specific components
-│   ├── layout/           # Layout components (Header, Footer)
-│   └── ui/               # shadcn/ui components
-├── data/                 # Data layer
-│   ├── schemas/          # Zod validation schemas
-│   ├── store/            # Jotai atoms
-│   └── validators/       # Form validators
-├── hooks/                # Custom React hooks
-└── lib/                  # Utility functions and configurations
-```
-
-### Data Models
-
-The application uses Zod schemas for type-safe data validation:
-
-- **Itinerary**: Main travel plan with multiple day plans
-- **DayPlan**: Activities for a specific day
-- **Activity**: Individual activity with location, time, and notes
-- **Place**: Location data with coordinates and address
-
-Key schemas are defined in `src/data/schemas/` with separate client/server variants to handle MongoDB ObjectId conversion.
-
-### State Management
-
-- **Jotai**: Used for form state and itinerary metadata (`src/data/store/itineraryAtoms.ts`)
-- **React Hook Form**: Form state management with Zod validation
-- Server state is managed through Next.js server actions
-
 ### Authentication & Authorization
 
 - Auth0 integration for user authentication
 - User context provided by `@auth0/nextjs-auth0/client`
 - Protected routes and API endpoints check authentication status
-
-### Maps Integration
-
-- **Primary**: Mapbox GL for interactive maps
-- **Fallback**: React Leaflet for simpler map requirements
-- Maps display daily routes and individual activity locations
-- Coordinate data can be imported from Google Maps URLs or direct coordinates
 
 ### Environment Variables
 
@@ -201,12 +135,6 @@ interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 ```
 
-**Why `type` over `interface`:**
-1. **Consistency**: Using `type` throughout the codebase reduces cognitive load
-2. **Flexibility**: `type` supports union types, intersections, and mapped types
-3. **Modern Practice**: TypeScript community increasingly prefers `type` for general use
-4. **Clarity**: The `= {` syntax makes it clear you're defining a type alias
-
 ### UI Component Guidelines
 
 **shadcn/ui Components:**
@@ -266,16 +194,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Common Emoji Prefixes:**
-- 🐛 バグ修正 (Bug fix)
-- ✨ 新機能 (New feature)
-- 🔒 セキュリティ (Security)
-- ⬆️ 依存関係の更新 (Dependency updates)
-- 🔀 マージ (Merge)
-- 🥅 エラー処理の改善 (Error handling)
-- 🎨 スタイル・UI改善 (Style/UI improvements)
-- ♻️ リファクタリング (Refactoring)
-- 📝 ドキュメント (Documentation)
-- 🚀 パフォーマンス改善 (Performance)
+- 🐛 バグ修正
+- ✨ 新機能
+- 🔒 セキュリティ
+- ⬆️ 依存関係の更新
+- 🔀 マージ
+- 🥅 エラー処理の改善
+- 🎨 スタイル・UI改善
+- ♻️ リファクタリング
+- 📝 ドキュメント
+- 🚀 パフォーマンス改善
 
 **Example Commit Message:**
 
