@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /**
@@ -15,24 +15,10 @@ export function useDayParam(maxDays: number = 0) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // URLのクエリパラメータから日付を取得（URLは1ベース、内部では0ベース）
+  // URLのクエリパラメータから直接導出（stateを使わず余分なレンダリングを回避）
   const dayParam = searchParams.get('day');
-  // URLから1を引いて内部の0ベースに変換
-  const initialDay = dayParam ? Math.max(parseInt(dayParam, 10) - 1, 0) : 0;
-  const [selectedDay, setSelectedDay] = useState(initialDay);
-
-  // URLのday変更時に選択日を更新
-  useEffect(() => {
-    if (dayParam) {
-      const dayNumber = parseInt(dayParam, 10);
-      if (!isNaN(dayNumber) && dayNumber >= 1) {
-        // URLは1ベース、内部では0ベース
-        setSelectedDay(dayNumber - 1);
-      }
-    } else {
-      setSelectedDay(0);
-    }
-  }, [dayParam]);
+  const parsed = dayParam ? parseInt(dayParam, 10) : 1;
+  const selectedDay = isNaN(parsed) || parsed < 1 ? 0 : parsed - 1;
 
   // 選択日が範囲外の場合、最終日に自動クランプ
   useEffect(() => {
