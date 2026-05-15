@@ -13,6 +13,8 @@ export type SavedShachuHakuFilters = {
   lng_span?: number;
   aspect_ratio?: number;
   zoom?: number; // Fallback when bounds are not available
+  sortField?: 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
 };
 
 /**

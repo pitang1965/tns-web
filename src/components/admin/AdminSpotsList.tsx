@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Edit } from 'lucide-react';
+import { ArrowDown, ArrowUp, Edit } from 'lucide-react';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -37,7 +37,11 @@ type AdminSpotsListProps = {
   clientFilters: ClientSideFilterValues;
   searchTerm?: string;
   typeFilter?: string;
-  allSpotIds?: string[]; // All filtered spot IDs for navigation
+  allSpotIds?: string[];
+  sortField?: 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+  onSortFieldChange?: (field: 'createdAt' | 'updatedAt') => void;
+  onSortOrderChange?: (order: 'asc' | 'desc') => void;
 };
 
 export function AdminSpotsList({
@@ -51,6 +55,10 @@ export function AdminSpotsList({
   searchTerm = '',
   typeFilter = 'all',
   allSpotIds,
+  sortField = 'createdAt',
+  sortOrder = 'desc',
+  onSortFieldChange,
+  onSortOrderChange,
 }: AdminSpotsListProps) {
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);
@@ -93,6 +101,40 @@ export function AdminSpotsList({
                 total,
               )}件を表示`}
         </CardTitle>
+        <div className="flex flex-wrap items-center gap-2 mt-2">
+          <span className="text-sm text-muted-foreground">並び順:</span>
+          <Button
+            variant={sortField === 'createdAt' ? 'secondary' : 'outline'}
+            size="sm"
+            className="cursor-pointer"
+            onClick={() => onSortFieldChange?.('createdAt')}
+          >
+            作成日時
+          </Button>
+          <Button
+            variant={sortField === 'updatedAt' ? 'secondary' : 'outline'}
+            size="sm"
+            className="cursor-pointer"
+            onClick={() => onSortFieldChange?.('updatedAt')}
+          >
+            更新日時
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer flex items-center gap-1"
+            onClick={() =>
+              onSortOrderChange?.(sortOrder === 'desc' ? 'asc' : 'desc')
+            }
+          >
+            {sortOrder === 'desc' ? (
+              <ArrowDown className="w-3.5 h-3.5" />
+            ) : (
+              <ArrowUp className="w-3.5 h-3.5" />
+            )}
+            {sortOrder === 'desc' ? '新しい順' : '古い順'}
+          </Button>
+        </div>
         {activeFilterDescriptions.length > 0 && (
           <div className="text-sm text-muted-foreground space-y-1 mt-2">
             {activeFilterDescriptions.map((desc, index) => (
@@ -111,11 +153,17 @@ export function AdminSpotsList({
                   <p className="text-gray-600 dark:text-gray-300">
                     {spot.address}
                   </p>
-                  {spot.updatedAt && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      {formatDate(spot.updatedAt.toString())}更新
-                    </p>
-                  )}
+                  {sortField === 'createdAt'
+                    ? spot.createdAt && (
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          {formatDate(spot.createdAt.toString())}作成
+                        </p>
+                      )
+                    : spot.updatedAt && (
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          {formatDate(spot.updatedAt.toString())}更新
+                        </p>
+                      )}
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {spot.isOvernightProhibited && (
                       <Badge className="bg-red-600 hover:bg-red-700 text-white">

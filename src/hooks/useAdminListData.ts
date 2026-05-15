@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  MutableRefObject,
-} from 'react';
+import { useState, useEffect, useCallback, useRef, RefObject } from 'react';
 import {
   getCampingSpotsWithPagination,
   getCampingSpotIdsOnly,
@@ -47,7 +41,9 @@ type UseAdminListDataParams = {
   /**
    * Ref to track if initial data load is complete (from map bounds loader)
    */
-  initialLoadDoneRef?: MutableRefObject<boolean>;
+  initialLoadDoneRef?: RefObject<boolean>;
+  sortField?: 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
 };
 
 type UseAdminListDataReturn = {
@@ -74,7 +70,7 @@ type UseAdminListDataReturn = {
   /**
    * Internal ref for tracking last loaded filters (exposed for special cases)
    */
-  lastListFiltersRef: MutableRefObject<string | null>;
+  lastListFiltersRef: RefObject<string | null>;
   /**
    * All filtered spot IDs (for navigation across all pages)
    */
@@ -120,6 +116,8 @@ export function useAdminListData({
   pageSize = 20,
   toast,
   initialLoadDoneRef,
+  sortField = 'createdAt',
+  sortOrder = 'desc',
 }: UseAdminListDataParams): UseAdminListDataReturn {
   const [listData, setListData] = useState<ListData | null>(null);
   const [listLoading, setListLoading] = useState(false);
@@ -132,7 +130,7 @@ export function useAdminListData({
   // Reset page to 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, typeFilter]);
+  }, [searchTerm, typeFilter, sortField, sortOrder]);
 
   // Refresh list data with current filters
   const refreshListData = useCallback(async () => {
@@ -140,6 +138,8 @@ export function useAdminListData({
       searchTerm: searchTerm || undefined,
       prefecture: undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
+      sortField,
+      sortOrder,
     };
 
     try {
@@ -172,6 +172,8 @@ export function useAdminListData({
     pageSize,
     toast,
     initialLoadDoneRef,
+    sortField,
+    sortOrder,
   ]);
 
   // Refresh all spot IDs with current filters
@@ -200,6 +202,8 @@ export function useAdminListData({
       searchTerm: searchTerm || undefined,
       prefecture: undefined,
       type: typeFilter !== 'all' ? typeFilter : undefined,
+      sortField,
+      sortOrder,
     };
 
     // Create a stable string representation of filters for comparison
@@ -208,6 +212,8 @@ export function useAdminListData({
       prefecture: filters.prefecture,
       type: filters.type,
       page: currentPage,
+      sortField,
+      sortOrder,
     });
 
     // Skip if we already initiated a request with the same filters
@@ -238,7 +244,16 @@ export function useAdminListData({
         });
         setListLoading(false);
       });
-  }, [activeTab, currentPage, searchTerm, typeFilter, pageSize, toast]);
+  }, [
+    activeTab,
+    currentPage,
+    searchTerm,
+    typeFilter,
+    pageSize,
+    toast,
+    sortField,
+    sortOrder,
+  ]);
 
   // Auto-load all spot IDs when switching to list tab or when filters change
   useEffect(() => {

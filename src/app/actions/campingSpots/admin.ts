@@ -154,6 +154,8 @@ export async function getCampingSpotsWithPagination(
     prefecture?: string;
     type?: string;
     bounds?: { north: number; south: number; east: number; west: number };
+    sortField?: 'createdAt' | 'updatedAt';
+    sortOrder?: 'asc' | 'desc';
   },
 ) {
   await checkAdminAuth();
@@ -186,10 +188,12 @@ export async function getCampingSpotsWithPagination(
   }
 
   const skip = (page - 1) * limit;
+  const sortField = options?.sortField ?? 'createdAt';
+  const sortDirection = options?.sortOrder === 'asc' ? 1 : -1;
 
   const [spots, total] = await Promise.all([
     CampingSpot.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ [sortField]: sortDirection })
       .skip(skip)
       .limit(limit)
       .lean(),

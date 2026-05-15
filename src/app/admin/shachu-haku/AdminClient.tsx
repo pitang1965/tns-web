@@ -84,6 +84,10 @@ export default function AdminClient() {
     setTypeFilter,
     clientFilters,
     setClientFilters,
+    sortField,
+    setSortField,
+    sortOrder,
+    setSortOrder,
     activeTab,
     setActiveTab,
     mapZoom,
@@ -169,6 +173,8 @@ export default function AdminClient() {
     pageSize: 20,
     toast,
     initialLoadDoneRef,
+    sortField,
+    sortOrder,
   });
 
   // Wrapper for handleBoundsChange that saves mapBoundsRef and savedBounds
@@ -235,6 +241,8 @@ export default function AdminClient() {
       tab: activeTab === 'list' ? 'list' : null,
       q: searchTerm || null,
       type: typeFilter !== 'all' ? typeFilter : null,
+      sort: sortField !== 'createdAt' ? sortField : null,
+      order: sortOrder !== 'desc' ? sortOrder : null,
     },
     basePath: '/admin/shachu-haku',
   });
@@ -597,6 +605,16 @@ export default function AdminClient() {
                 onPageChange={setCurrentPage}
                 clientFilters={clientFilters}
                 allSpotIds={allSpotIds}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSortFieldChange={(field) => {
+                  setSortField(field);
+                  setCurrentPage(1);
+                }}
+                onSortOrderChange={(order) => {
+                  setSortOrder(order);
+                  setCurrentPage(1);
+                }}
               />
             )}
           </div>

@@ -54,6 +54,19 @@ export const useShachuHakuFilters = ({
     return savedFilters?.typeFilter || 'all';
   });
 
+  // Sort state for list view (used by admin page)
+  const [sortField, setSortField] = useState<'createdAt' | 'updatedAt'>(() => {
+    const urlParam = searchParams.get('sort');
+    if (urlParam === 'createdAt' || urlParam === 'updatedAt') return urlParam;
+    return savedFilters?.sortField ?? 'createdAt';
+  });
+
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
+    const urlParam = searchParams.get('order');
+    if (urlParam === 'asc' || urlParam === 'desc') return urlParam;
+    return savedFilters?.sortOrder ?? 'desc';
+  });
+
   // Client-side filters state
   const [clientFilters, setClientFilters] = useState<ClientSideFilterValues>(
     () => {
@@ -248,6 +261,8 @@ export const useShachuHakuFilters = ({
       lng_span: lngSpan,
       aspect_ratio: aspectRatio,
       zoom: !savedBounds ? mapZoom : undefined,
+      sortField,
+      sortOrder,
     });
   }, [
     searchTerm,
@@ -257,6 +272,8 @@ export const useShachuHakuFilters = ({
     mapZoom,
     mapCenter,
     savedBounds,
+    sortField,
+    sortOrder,
   ]);
 
   // Handle reset all filters
@@ -274,6 +291,8 @@ export const useShachuHakuFilters = ({
       maxElevation: null,
     });
     setActiveTab('map');
+    setSortField('createdAt');
+    setSortOrder('desc');
 
     // Reset map to default location (Tokyo)
     setMapCenter([139.6917, 35.6895]);
@@ -297,6 +316,12 @@ export const useShachuHakuFilters = ({
     setTypeFilter,
     clientFilters,
     setClientFilters,
+
+    // Sort states
+    sortField,
+    setSortField,
+    sortOrder,
+    setSortOrder,
 
     // Tab state
     activeTab,
