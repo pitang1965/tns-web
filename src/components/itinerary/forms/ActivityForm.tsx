@@ -71,7 +71,7 @@ export function ActivityForm({
     : `アクティビティ ${activityIndex + 1}`;
 
   return (
-    <div className="space-y-2 p-4 border border-border rounded-lg bg-muted/30 dark:bg-muted/20">
+    <div className="space-y-2 p-3 border border-border rounded-lg bg-muted/30 dark:bg-muted/20">
       <div className="flex justify-between items-center">
         <h4 className="font-medium">{activityHeader}</h4>
         <ActivityControls
@@ -90,22 +90,58 @@ export function ActivityForm({
         />
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label
-            htmlFor="title"
-            className="after:content-['*'] after:ml-0.5 after:text-red-500"
-          >
-            タイトル
-          </Label>
-          <Input
-            id="title"
-            {...getFieldRegister('title')}
-            placeholder="例: 出発、休憩、散策、昼食、宿泊地到着、入浴"
-          />
-          {getFieldError('title') && (
-            <SmallText>{getFieldError('title')}</SmallText>
-          )}
+      <div className="space-y-3">
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label
+              htmlFor="title"
+              className="after:content-['*'] after:ml-0.5 after:text-red-500"
+            >
+              タイトル
+            </Label>
+            <Input
+              id="title"
+              {...getFieldRegister('title')}
+              placeholder="例: 出発、休憩、散策、昼食、宿泊地到着、入浴"
+            />
+            {getFieldError('title') && (
+              <SmallText>{getFieldError('title')}</SmallText>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <Label>URL</Label>
+            <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+              <InputGroupAddon className="border-r-0">
+                <Link className="h-4 w-4" />
+              </InputGroupAddon>
+              <InputGroupInput
+                type="url"
+                className="border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                {...getFieldRegister('url')}
+                placeholder="https://example.com"
+              />
+              <InputGroupAddon align="inline-end" className="border-l-0 pr-2">
+                <InputGroupButton
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  disabled={!urlValue}
+                  onClick={() =>
+                    urlValue &&
+                    window.open(urlValue, '_blank', 'noopener,noreferrer')
+                  }
+                  title="新しいタブで開く"
+                  className="h-8 w-8"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+            {getFieldError('url') && (
+              <SmallText>{getFieldError('url')}</SmallText>
+            )}
+          </div>
         </div>
 
         <PlaceForm
@@ -114,15 +150,15 @@ export function ActivityForm({
           basePath={basePath}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
             <Label>開始時間</Label>
             <Input type="time" {...getFieldRegister('startTime')} />
             {getFieldError('startTime') && (
               <SmallText>{getFieldError('startTime')}</SmallText>
             )}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label>終了時間</Label>
             <Input type="time" {...getFieldRegister('endTime')} />
             {getFieldError('endTime') && (
@@ -131,17 +167,18 @@ export function ActivityForm({
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Label>説明</Label>
           <Textarea
             {...getFieldRegister('description')}
             placeholder="詳細な説明"
+            rows={4}
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Label>予算</Label>
-          <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+          <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0 max-w-48">
             <InputGroupAddon className="border-r-0">
               <InputGroupText>¥</InputGroupText>
             </InputGroupAddon>
@@ -162,40 +199,6 @@ export function ActivityForm({
           </InputGroup>
           {getFieldError('cost') && (
             <SmallText>{getFieldError('cost')}</SmallText>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label>URL</Label>
-          <InputGroup className="has-[[data-slot=input-group-control]:focus-visible]:ring-0">
-            <InputGroupAddon className="border-r-0">
-              <Link className="h-4 w-4" />
-            </InputGroupAddon>
-            <InputGroupInput
-              type="url"
-              className="border-l-0 border-r-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              {...getFieldRegister('url')}
-              placeholder="https://example.com"
-            />
-            <InputGroupAddon align="inline-end" className="border-l-0 pr-2">
-              <InputGroupButton
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                disabled={!urlValue}
-                onClick={() =>
-                  urlValue &&
-                  window.open(urlValue, '_blank', 'noopener,noreferrer')
-                }
-                title="新しいタブで開く"
-                className="h-8 w-8"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
-          {getFieldError('url') && (
-            <SmallText>{getFieldError('url')}</SmallText>
           )}
         </div>
       </div>

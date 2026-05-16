@@ -47,52 +47,54 @@ export function PlaceForm({
   );
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>場所の名称</Label>
-        <Input
-          {...register(`${basePath}.place.name` as Path<ClientItineraryInput>)}
-          placeholder="場所の名前を入力"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label>場所のタイプ</Label>
-          {isHomeType && (
-            <span className="text-xs text-muted-foreground">
-              旅程を公開しても、自宅の座標や住所は公開されません
-            </span>
-          )}
+    <div className="space-y-3">
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <Label>場所の名称</Label>
+          <Input
+            {...register(`${basePath}.place.name` as Path<ClientItineraryInput>)}
+            placeholder="場所の名前を入力"
+          />
         </div>
-        <Select
-          value={String(
-            watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '',
-          )}
-          onValueChange={(value) => {
-            setValue(
-              `${basePath}.place.type` as Path<ClientItineraryInput>,
-              value,
-              {
-                shouldValidate: true,
-              },
-            );
-          }}
-        >
-          <SelectTrigger className="cursor-pointer">
-            <SelectValue placeholder="タイプを選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(PLACE_TYPES).map(([value, label]) => (
-              <SelectItem key={value} value={value} className="cursor-pointer">
-                {String(label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Label>場所のタイプ</Label>
+            {isHomeType && (
+              <span className="text-xs text-muted-foreground">
+                自宅の座標・住所は非公開
+              </span>
+            )}
+          </div>
+          <Select
+            value={String(
+              watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '',
+            )}
+            onValueChange={(value) => {
+              setValue(
+                `${basePath}.place.type` as Path<ClientItineraryInput>,
+                value,
+                {
+                  shouldValidate: true,
+                },
+              );
+            }}
+          >
+            <SelectTrigger className="cursor-pointer">
+              <SelectValue placeholder="タイプを選択" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(PLACE_TYPES).map(([value, label]) => (
+                <SelectItem key={value} value={value} className="cursor-pointer">
+                  {String(label)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label>住所</Label>
         <Input
           {...register(
