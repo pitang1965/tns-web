@@ -13,6 +13,8 @@ import {
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { PLACE_TYPES, PlaceType } from '@/constants/placeTypes';
 import { CoordinateInput } from '@/components/itinerary/forms/CoordinateInput';
+import { useAutoSetPlaceType } from '@/hooks/useAutoSetPlaceType';
+import { useToast } from '@/components/ui/use-toast';
 
 type PlaceFormProps = {
   dayIndex: number;
@@ -26,11 +28,23 @@ export function PlaceForm({
   basePath,
 }: PlaceFormProps) {
   const { register, setValue, watch } = useFormContext<ClientItineraryInput>();
+  const { toast } = useToast();
 
+  const nameValue = watch(
+    `${basePath}.place.name` as Path<ClientItineraryInput>,
+  ) as string | undefined;
   const selectedType = watch(
     `${basePath}.place.type` as Path<ClientItineraryInput>,
   ) as PlaceType | undefined;
   const isHomeType = selectedType === 'HOME';
+
+  useAutoSetPlaceType(
+    nameValue,
+    selectedType,
+    setValue,
+    `${basePath}.place.type`,
+    toast,
+  );
 
   return (
     <div className="space-y-4">
