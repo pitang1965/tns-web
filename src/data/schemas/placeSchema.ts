@@ -18,7 +18,7 @@ export const placeSchema = z.object({
     'BATHING_FACILITY', // 入浴施設
     'COIN_LAUNDRY', // コインランドリ
     'OTHER', // その他
-  ]),
+  ]).default('ATTRACTION'),
   address: z.string().nullable(), // 住所（任意のテキスト）
   location: locationSchema.nullable(),
 });
