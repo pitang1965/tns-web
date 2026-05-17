@@ -38,7 +38,7 @@ export function useActivityOperations({
           url: null,
         },
       ],
-      { shouldValidate: true, shouldDirty: true },
+      { shouldDirty: true },
     );
   };
 
@@ -65,7 +65,6 @@ export function useActivityOperations({
       url: null,
     });
     setValue(`dayPlans.${dayIndex}.activities`, newActivities, {
-      shouldValidate: true,
       shouldDirty: true,
     });
   };
