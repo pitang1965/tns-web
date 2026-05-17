@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, startTransition } from 'react';
+import { useState, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Plus, PlusCircle, Map, Clock, Tent, Navigation } from 'lucide-react';
@@ -276,7 +276,7 @@ export function DayPlanForm({
               <div className="flex-1 border-t border-muted-foreground/20 group-hover/insert:border-muted-foreground/40 transition-colors" />
               <button
                 type="button"
-                onClick={() => startTransition(() => insertActivity(dayIndex, activityIndex))}
+                onClick={() => insertActivity(dayIndex, activityIndex)}
                 className="opacity-30 group-hover/insert:opacity-100 focus-visible:opacity-100 flex items-center justify-center h-6 w-6 rounded-full border border-muted-foreground/30 bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer"
                 title="ここにアクティビティを挿入"
               >
@@ -318,7 +318,7 @@ export function DayPlanForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => startTransition(() => addActivity(dayIndex))}
+            onClick={() => addActivity(dayIndex)}
             className="flex-1 cursor-pointer"
           >
             <PlusCircle className="h-4 w-4 mr-2" />

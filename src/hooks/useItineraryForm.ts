@@ -176,6 +176,14 @@ export function useItineraryForm({
     }
   };
 
+  const onInvalid = () => {
+    toast({
+      title: '入力内容を確認してください',
+      description: '全ての日程を確認し、必須項目（タイトルなど）が入力されているかご確認ください。',
+      variant: 'destructive',
+    });
+  };
+
   // ボタンハンドラー
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -187,7 +195,7 @@ export function useItineraryForm({
         console.log('更新ボタンがクリックされました。データ:', data);
         setFormModified(false);
         await handleFormSubmit(data);
-      })();
+      }, onInvalid)();
     } finally {
       setIsSaving(false);
     }
@@ -203,7 +211,7 @@ export function useItineraryForm({
         setFormModified(false);
         console.log('作成ボタンがクリックされました。データ:', data);
         await handleFormSubmit(data);
-      })();
+      }, onInvalid)();
     } finally {
       setIsSaving(false);
     }
