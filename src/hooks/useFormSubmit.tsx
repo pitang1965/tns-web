@@ -190,7 +190,14 @@ export function useFormSubmit({
           if (result.code === 'DUPLICATE') {
             toast({
               title: '重複エラー',
-              description: <p className="font-semibold">{result.error}</p>,
+              description: (
+                <div>
+                  <p className="font-semibold">{result.error}</p>
+                  {result.hint && (
+                    <p className="mt-1 text-sm opacity-90">{result.hint}</p>
+                  )}
+                </div>
+              ),
               variant: 'destructive',
               duration: 10000,
             });

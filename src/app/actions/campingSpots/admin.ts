@@ -338,6 +338,9 @@ export async function createCampingSpot(data: FormData) {
         success: false as const,
         code: 'DUPLICATE' as const,
         error: `同名またはURLが同じスポットが200m以内に既に登録されています: ${spot.name} (${Math.round(distance)}m先)`,
+        hint: validatedData.url
+          ? '隣接する駐車場など同じURLを共有するスポットを登録する場合は、URLを省略して保存後、編集画面でURLを追加してください。'
+          : undefined,
       };
     }
   }
@@ -366,6 +369,7 @@ export async function createCampingSpot(data: FormData) {
       success: false as const,
       code: 'DUPLICATE' as const,
       error: `非常に近い場所に既存のスポットがあります: ${spot.name} (${Math.round(distance)}m先)`,
+      hint: undefined,
     };
   }
 
