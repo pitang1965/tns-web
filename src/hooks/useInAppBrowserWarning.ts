@@ -1,39 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-/**
- * アプリ内ブラウザを検出し、警告バナーの表示状態を管理するカスタムフック
- *
- * @returns {Object} 警告バナーの状態と制御関数
- * @returns {boolean} showWarning - バナーを表示するかどうか
- * @returns {() => void} handleDismiss - バナーを閉じる関数
- */
 export function useInAppBrowserWarning() {
-  const [showWarning, setShowWarning] = useState(false);
-
-  useEffect(() => {
-    // アプリ内ブラウザ警告の表示判定
+  const [showWarning, setShowWarning] = useState(() => {
+    if (typeof window === 'undefined') return false;
     try {
       const dismissedDate = localStorage.getItem(
         'inAppBrowserWarningDismissed',
       );
-      const today = new Date().toDateString();
-
-      // 今日既に閉じている場合はスキップ
-      if (dismissedDate === today) return;
-
+      if (dismissedDate === new Date().toDateString()) return false;
       const userAgent = navigator.userAgent || navigator.vendor;
-      const isInAppBrowser =
-        /Twitter|TwitterAndroid|FBAN|FBAV|Instagram|Line|FB_IAB|KAKAOTALK/i.test(
-          userAgent,
-        );
-
-      if (isInAppBrowser) {
-        setShowWarning(true);
-      }
-    } catch (error) {
-      console.error('Failed to check in-app browser:', error);
+      return /Twitter|TwitterAndroid|FBAN|FBAV|Instagram|Line|FB_IAB|KAKAOTALK/i.test(
+        userAgent,
+      );
+    } catch {
+      return false;
     }
-  }, []);
+  });
 
   const handleDismiss = () => {
     setShowWarning(false);

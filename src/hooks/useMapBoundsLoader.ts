@@ -255,7 +255,8 @@ export function useMapBoundsLoader({
         boundsTimeoutRef.current = setTimeout(executeLoad, debounceTime);
       }
     },
-    [], // Empty deps - all functions used inside are from refs or props that don't change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [], // props are accessed via filtersRef; stable by design
   );
 
   // Cleanup function
@@ -289,7 +290,8 @@ export function useMapBoundsLoader({
       loadSpotsWithAbort(bounds, requestFilters);
       lastLoadedBoundsRef.current = bounds; // Update after loading
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // loadSpotsWithAbort is accessed via closure over stable refs
 
   return {
     handleBoundsChange,

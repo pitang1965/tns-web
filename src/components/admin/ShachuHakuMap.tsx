@@ -41,6 +41,30 @@ type ShachuHakuMapProps = {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
+const FACILITY_CONFIGS = [
+  {
+    key: 'nearbyToiletCoordinates' as const,
+    distKey: 'distanceToToilet' as const,
+    emoji: '🚻',
+    label: 'トイレ',
+    color: '#8b5cf6',
+  },
+  {
+    key: 'nearbyConvenienceCoordinates' as const,
+    distKey: 'distanceToConvenience' as const,
+    emoji: '🏪',
+    label: 'コンビニ',
+    color: '#10b981',
+  },
+  {
+    key: 'nearbyBathCoordinates' as const,
+    distKey: 'distanceToBath' as const,
+    emoji: '♨️',
+    label: '入浴施設',
+    color: '#f59e0b',
+  },
+] as const;
+
 export default function ShachuHakuMap({
   spots,
   onSpotSelect,
@@ -73,30 +97,6 @@ export default function ShachuHakuMap({
     typeof coords[1] === 'number' &&
     !isNaN(coords[0]) &&
     !isNaN(coords[1]);
-
-  const FACILITY_CONFIGS = [
-    {
-      key: 'nearbyToiletCoordinates' as const,
-      distKey: 'distanceToToilet' as const,
-      emoji: '🚻',
-      label: 'トイレ',
-      color: '#8b5cf6',
-    },
-    {
-      key: 'nearbyConvenienceCoordinates' as const,
-      distKey: 'distanceToConvenience' as const,
-      emoji: '🏪',
-      label: 'コンビニ',
-      color: '#10b981',
-    },
-    {
-      key: 'nearbyBathCoordinates' as const,
-      distKey: 'distanceToBath' as const,
-      emoji: '♨️',
-      label: '入浴施設',
-      color: '#f59e0b',
-    },
-  ] as const;
 
   const showFacilityMarkers = useCallback(
     (spot: CampingSpotWithId) => {

@@ -380,10 +380,9 @@ export default function ShachuHakuClient() {
     setSelectedSpot(spot);
   };
 
-  const handleNavigateToSpotDetail = (spotId: string) => {
-    // 個別ページに遷移（一覧表示からの遷移を示すパラメータを追加）
+  const handleNavigateToSpotDetail = useCallback((spotId: string) => {
     router.push(`/shachu-haku/${spotId}?from=list`);
-  };
+  }, [router]);
 
   const handleTabChange = (tab: 'map' | 'list') => {
     startTransition(() => {
@@ -457,7 +456,7 @@ export default function ShachuHakuClient() {
         className={isLandscape ? 'h-full' : 'max-h-[60vh]'}
       />
     );
-  }, [selectedSpot, isLandscape]);
+  }, [selectedSpot, isLandscape, handleNavigateToSpotDetail]);
 
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6">

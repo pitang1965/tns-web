@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MapPin } from 'lucide-react';
 import { formatDistance } from '@/lib/formatDistance';
@@ -32,6 +32,89 @@ type FacilityData = {
   distance?: number;
 };
 
+function getTypeLabel(type: string) {
+  switch (type) {
+    case 'camping':
+      return '車中泊スポット';
+    case 'toilet':
+      return 'トイレ';
+    case 'convenience':
+      return 'コンビニ';
+    case 'bath':
+      return '入浴施設';
+    default:
+      return '施設';
+  }
+}
+
+function getMarkerStyle(type: string, zoom: number) {
+  const isDetailedView = zoom >= 9;
+  const baseSizeMultiplier = isDetailedView ? 1 : 0.7;
+
+  switch (type) {
+    case 'camping':
+      return {
+        color: '#e74c3c',
+        icon: '🛏️',
+        size: Math.round(24 * baseSizeMultiplier),
+        borderWidth: isDetailedView ? 2 : 1.5,
+      };
+    case 'toilet':
+      return {
+        color: '#3498db',
+        icon: '🚻',
+        size: Math.round(20 * baseSizeMultiplier),
+        borderWidth: isDetailedView ? 2 : 1.5,
+      };
+    case 'convenience':
+      return {
+        color: '#2ecc71',
+        icon: '🏪',
+        size: Math.round(20 * baseSizeMultiplier),
+        borderWidth: isDetailedView ? 2 : 1.5,
+      };
+    case 'bath':
+      return {
+        color: '#f39c12',
+        icon: '♨️',
+        size: Math.round(20 * baseSizeMultiplier),
+        borderWidth: isDetailedView ? 2 : 1.5,
+      };
+    default:
+      return {
+        color: '#95a5a6',
+        icon: '📍',
+        size: Math.round(20 * baseSizeMultiplier),
+        borderWidth: isDetailedView ? 2 : 1.5,
+      };
+  }
+}
+
+function createFacilityPopupHTML(facility: FacilityData, zoom: number): string {
+  const style = getMarkerStyle(facility.type, zoom);
+
+  return `
+    <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
+      <div class="flex items-center gap-2 mb-2">
+        <span style="font-size: 20px;">${style.icon}</span>
+        <h3 class="font-semibold text-gray-900">${getTypeLabel(facility.type)}</h3>
+      </div>
+      ${
+        facility.type === 'camping'
+          ? `<div class="text-sm text-gray-600">${facility.name}</div>`
+          : ''
+      }
+      ${
+        facility.distance
+          ? `<div class="text-sm text-gray-600">
+              車中泊スポットから約 <strong>${formatDistance(facility.distance)}</strong>
+            </div>`
+          : ''
+      }
+    </div>
+  `;
+}
+
 export function FacilitiesMap({ watch }: FacilitiesMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
@@ -61,13 +144,12 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     return undefined;
   };
 
-  // 現在開いているポップアップを閉じる
-  const closeCurrentPopup = () => {
+  const closeCurrentPopup = useCallback(() => {
     if (currentPopupRef.current) {
       currentPopupRef.current.remove();
       currentPopupRef.current = null;
     }
-  };
+  }, []);
 
   // Hide/show markers during map movement
   const hideMarkers = () => {
@@ -84,53 +166,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     });
   };
 
-  const getMarkerStyle = (type: string, zoom: number) => {
-    // Determine marker size based on zoom level
-    // Zoom level 9 or higher (市町村レベル): show larger markers
-    const isDetailedView = zoom >= 9;
-    const baseSizeMultiplier = isDetailedView ? 1 : 0.7;
-
-    switch (type) {
-      case 'camping':
-        return {
-          color: '#e74c3c',
-          icon: '🛏️',
-          size: Math.round(24 * baseSizeMultiplier),
-          borderWidth: isDetailedView ? 2 : 1.5,
-        };
-      case 'toilet':
-        return {
-          color: '#3498db',
-          icon: '🚻',
-          size: Math.round(20 * baseSizeMultiplier),
-          borderWidth: isDetailedView ? 2 : 1.5,
-        };
-      case 'convenience':
-        return {
-          color: '#2ecc71',
-          icon: '🏪',
-          size: Math.round(20 * baseSizeMultiplier),
-          borderWidth: isDetailedView ? 2 : 1.5,
-        };
-      case 'bath':
-        return {
-          color: '#f39c12',
-          icon: '♨️',
-          size: Math.round(20 * baseSizeMultiplier),
-          borderWidth: isDetailedView ? 2 : 1.5,
-        };
-      default:
-        return {
-          color: '#95a5a6',
-          icon: '📍',
-          size: Math.round(20 * baseSizeMultiplier),
-          borderWidth: isDetailedView ? 2 : 1.5,
-        };
-    }
-  };
-
-  const clearMarkers = () => {
-    // 現在のポップアップを閉じる
+  const clearMarkers = useCallback(() => {
     closeCurrentPopup();
     markersRef.current.forEach((marker) => {
       try {
@@ -140,9 +176,9 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
       }
     });
     markersRef.current = [];
-  };
+  }, [closeCurrentPopup]);
 
-  const addMarker = (facility: FacilityData, zoom: number) => {
+  const addMarker = useCallback((facility: FacilityData, zoom: number) => {
     if (!mapInstance.current) return;
 
     const style = getMarkerStyle(facility.type, zoom);
@@ -183,54 +219,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     });
 
     markersRef.current.push(marker);
-  };
-
-  const createFacilityPopupHTML = (
-    facility: FacilityData,
-    zoom: number,
-  ): string => {
-    const style = getMarkerStyle(facility.type, zoom);
-
-    return `
-      <div class="p-3 bg-white text-gray-900 rounded-lg shadow-lg" style="width: 200px;">
-        <div class="flex items-center gap-2 mb-2">
-          <span style="font-size: 20px;">${style.icon}</span>
-          <h3 class="font-semibold text-gray-900">${getTypeLabel(
-            facility.type,
-          )}</h3>
-        </div>
-        ${
-          facility.type === 'camping'
-            ? `<div class="text-sm text-gray-600">${facility.name}</div>`
-            : ''
-        }
-        ${
-          facility.distance
-            ? `<div class="text-sm text-gray-600">
-                車中泊スポットから約 <strong>${formatDistance(
-                  facility.distance,
-                )}</strong>
-              </div>`
-            : ''
-        }
-      </div>
-    `;
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'camping':
-        return '車中泊スポット';
-      case 'toilet':
-        return 'トイレ';
-      case 'convenience':
-        return 'コンビニ';
-      case 'bath':
-        return '入浴施設';
-      default:
-        return '施設';
-    }
-  };
+  }, [closeCurrentPopup]);
 
   // 座標情報を持つ施設を取得
   // フォームの値を監視（個別のwatch呼び出しで即座の更新を実現）
@@ -488,7 +477,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
         styleElement.remove();
       }
     };
-  }, []);
+  }, [clearMarkers]);
 
   // マーカーの更新（ズームレベル変更時も含む）
   useEffect(() => {
@@ -507,7 +496,7 @@ export function FacilitiesMap({ watch }: FacilitiesMapProps) {
     }, 50);
 
     return () => clearTimeout(timeoutId);
-  }, [facilities, mapLoaded, currentZoom]);
+  }, [facilities, mapLoaded, currentZoom, clearMarkers, addMarker]);
 
   // 全ての施設が見えるようにマップを調整（施設変更時のみ、ズーム時は除外）
   useEffect(() => {

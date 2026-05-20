@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
@@ -54,7 +54,7 @@ export default function SubmissionsAdminPage() {
     return { pending, approved, rejected, total: submissions.length };
   }, [submissions]);
 
-  const loadSubmissions = async () => {
+  const loadSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getCampingSpotSubmissions();
@@ -69,7 +69,7 @@ export default function SubmissionsAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -85,7 +85,7 @@ export default function SubmissionsAdminPage() {
         loadSubmissions();
       }
     }
-  }, [isAdmin, user, isLoading]);
+  }, [isAdmin, user, isLoading, loadSubmissions]);
 
   const handleRefresh = () => {
     loadSubmissions();

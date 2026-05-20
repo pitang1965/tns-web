@@ -83,6 +83,8 @@ export function useUrlSync({
   const lastUrlRef = useRef<string>('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const paramsKey = JSON.stringify(params);
+
   useEffect(() => {
     // 初回マウント時はスキップ（URLパラメータを保持）
     if (isInitialMountRef.current) {
@@ -96,11 +98,11 @@ export function useUrlSync({
     }
 
     // デバウンス処理
+    const currentParams = JSON.parse(paramsKey) as Record<string, ParamValue>;
     const updateUrl = () => {
       const urlParams = new URLSearchParams();
 
-      // パラメータを追加（値が有効な場合のみ）
-      Object.entries(params).forEach(([key, value]) => {
+      Object.entries(currentParams).forEach(([key, value]) => {
         if (value !== null && value !== undefined && value !== '') {
           urlParams.set(key, String(value));
         }
@@ -132,12 +134,5 @@ export function useUrlSync({
         clearTimeout(timeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // paramsオブジェクト全体を監視（中身が変わったら再実行）
-    JSON.stringify(params),
-    basePath,
-    debounceMs,
-    enableDuplicateCheck,
-  ]);
+  }, [paramsKey, basePath, debounceMs, enableDuplicateCheck, router]);
 }

@@ -36,7 +36,6 @@ type ToastFunction = (options: {
 export function useAutoSetSpotType(
   nameValue: string | undefined,
   typeValue: string | undefined,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: (name: any, value: any, options?: any) => void,
   toast: ToastFunction,
   options?: UseAutoSetSpotTypeOptions,
