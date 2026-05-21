@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm lint *)"
+      "Bash(pnpm lint *)",
+      "mcp__context7-project__resolve-library-id",
+      "mcp__context7-project__query-docs"
     ]
   }
 }
