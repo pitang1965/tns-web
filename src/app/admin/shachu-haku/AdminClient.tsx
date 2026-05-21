@@ -143,7 +143,8 @@ export default function AdminClient() {
     cleanup: cleanupMapBoundsLoader,
     reloadIfNeeded,
     initialLoadDoneRef,
-    lastLoadedBoundsRef,
+    markBoundsAsLoaded,
+    hasBoundsBeenLoaded,
   } = useMapBoundsLoader({
     loadSpots: getCampingSpotsByBounds,
     setLoading,
@@ -163,7 +164,7 @@ export default function AdminClient() {
     listLoading,
     setCurrentPage,
     refreshListData,
-    lastListFiltersRef,
+    clearFiltersCache,
     allSpotIds,
     refreshAllSpotIds,
   } = useAdminListData({
@@ -185,8 +186,8 @@ export default function AdminClient() {
 
       // If data is already loaded (from list view) and lastLoadedBoundsRef is null,
       // set it to current bounds to prevent unnecessary API call
-      if (initialLoadDoneRef.current && !lastLoadedBoundsRef.current) {
-        lastLoadedBoundsRef.current = bounds;
+      if (initialLoadDoneRef.current && !hasBoundsBeenLoaded()) {
+        markBoundsAsLoaded(bounds);
         // Don't call handleBoundsChange since we already have data
         return;
       }
@@ -195,8 +196,9 @@ export default function AdminClient() {
     },
     [
       handleBoundsChange,
+      hasBoundsBeenLoaded,
       initialLoadDoneRef,
-      lastLoadedBoundsRef,
+      markBoundsAsLoaded,
       setSavedBounds,
     ],
   );
@@ -212,7 +214,7 @@ export default function AdminClient() {
       // If data is already loaded (from list view), update lastLoadedBoundsRef
       // to prevent unnecessary API calls when map initializes
       if (initialLoadDoneRef.current && mapBoundsRef.current) {
-        lastLoadedBoundsRef.current = mapBoundsRef.current;
+        markBoundsAsLoaded(mapBoundsRef.current);
       }
       // Map component will initialize itself and call handleBoundsChange automatically
     } else if (activeTab === 'map') {
@@ -225,7 +227,7 @@ export default function AdminClient() {
     activeTab,
     reloadIfNeeded,
     initialLoadDoneRef,
-    lastLoadedBoundsRef,
+    markBoundsAsLoaded,
   ]);
 
   // Cleanup on unmount
@@ -287,7 +289,7 @@ export default function AdminClient() {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
-      lastListFiltersRef.current = null;
+      clearFiltersCache();
       // Manually trigger data reload for list view
       refreshListData();
       // Refresh all spot IDs for navigation
@@ -309,7 +311,7 @@ export default function AdminClient() {
     // Reload spots based on current tab
     if (activeTab === 'list') {
       // Clear the last filters ref to force re-fetch
-      lastListFiltersRef.current = null;
+      clearFiltersCache();
       // Manually trigger data reload for list view
       refreshListData();
       // Refresh all spot IDs for navigation

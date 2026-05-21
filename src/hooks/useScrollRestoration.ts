@@ -31,31 +31,29 @@ import { useEffect, RefObject } from 'react';
 export function useScrollRestoration(
   containerRef: RefObject<HTMLElement | null>,
   storageKey: string,
-  dependencies: any[] = [],
+  dependencies: unknown[] = [],
 ) {
+  'use no memo';
+  const depsKey = JSON.stringify(dependencies);
+
   // スクロール位置の復元
   useEffect(() => {
     const savedScroll = sessionStorage.getItem(storageKey);
     const scrollPos = savedScroll ? parseInt(savedScroll, 10) : 0;
 
-    // 保存されたスクロール位置があり、コンテナが存在する場合のみ復元
-    if (containerRef.current && scrollPos > 0) {
-      console.log('🔄 Restoring scroll to:', scrollPos);
-
-      // DOMの更新を待ってからスクロール位置を復元
+    const container = containerRef.current;
+    if (container && scrollPos > 0) {
       requestAnimationFrame(() => {
         setTimeout(() => {
-          if (containerRef.current) {
-            containerRef.current.scrollTop = scrollPos;
-            console.log('✅ Scroll restored');
-            // 復元後は保存済みの位置情報をクリア
+          const el = containerRef.current;
+          if (el) {
+            el.scrollTop = scrollPos;
             sessionStorage.removeItem(storageKey);
           }
         }, 100);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, dependencies);
+  }, [storageKey, containerRef, depsKey]);
 
   /**
    * 現在のスクロール位置をsessionStorageに保存

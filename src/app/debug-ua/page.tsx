@@ -1,86 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-/**
- * User Agentとアプリ内ブラウザ検出のデバッグページ
- */
+const PATTERNS = [
+  { name: 'Twitter', regex: /Twitter/i },
+  { name: 'TwitterAndroid', regex: /TwitterAndroid/i },
+  { name: 'FBAN', regex: /FBAN/i },
+  { name: 'FBAV', regex: /FBAV/i },
+  { name: 'Instagram', regex: /Instagram/i },
+  { name: 'Line', regex: /Line/i },
+  { name: 'FB_IAB', regex: /FB_IAB/i },
+];
+
 export default function DebugUserAgentPage() {
-  const [isMounted, setIsMounted] = useState(false);
-  const [userAgent, setUserAgent] = useState('');
-  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
-  const [matchedPattern, setMatchedPattern] = useState<string[]>([]);
-  const [localStorageValue, setLocalStorageValue] = useState('');
-  const [today, setToday] = useState('');
+  const [userAgent] = useState(() =>
+    typeof window !== 'undefined' ? (navigator.userAgent || navigator.vendor) : '',
+  );
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMounted(true);
+  const [today] = useState(() =>
+    typeof window !== 'undefined' ? new Date().toDateString() : '',
+  );
 
-    const ua = navigator.userAgent || navigator.vendor;
-    setUserAgent(ua);
-
-    // 今日の日付を取得
-    const todayDate = new Date().toDateString();
-    setToday(todayDate);
-
-    // LocalStorageの値を確認
+  const [localStorageValue, setLocalStorageValue] = useState(() => {
+    if (typeof window === 'undefined') return '';
     try {
-      const dismissed = localStorage.getItem('inAppBrowserWarningDismissed');
-      setLocalStorageValue(dismissed || 'null');
-    } catch (error) {
-      setLocalStorageValue('Error accessing localStorage');
+      return localStorage.getItem('inAppBrowserWarningDismissed') || 'null';
+    } catch {
+      return 'Error accessing localStorage';
     }
+  });
 
-    // 各パターンをテスト
-    const patterns = [
-      { name: 'Twitter', regex: /Twitter/i },
-      { name: 'TwitterAndroid', regex: /TwitterAndroid/i },
-      { name: 'FBAN', regex: /FBAN/i },
-      { name: 'FBAV', regex: /FBAV/i },
-      { name: 'Instagram', regex: /Instagram/i },
-      { name: 'Line', regex: /Line/i },
-      { name: 'FB_IAB', regex: /FB_IAB/i },
-    ];
-
-    const matched: string[] = [];
-    let detected = false;
-
-    patterns.forEach((pattern) => {
-      if (pattern.regex.test(ua)) {
-        matched.push(pattern.name);
-        detected = true;
-      }
-    });
-
-    setIsInAppBrowser(detected);
-    setMatchedPattern(matched);
-  }, []);
+  const matchedPattern = PATTERNS.filter((p) => p.regex.test(userAgent)).map((p) => p.name);
+  const isInAppBrowser = matchedPattern.length > 0;
 
   const handleClearLocalStorage = () => {
     try {
       localStorage.removeItem('inAppBrowserWarningDismissed');
       setLocalStorageValue('null');
       alert('LocalStorageをクリアしました。ページをリロードしてください。');
-    } catch (error) {
+    } catch {
       alert('LocalStorageのクリアに失敗しました');
     }
   };
 
-  // SSR時のHydrationエラーを防ぐため、マウント前は読み込み中を表示
-  if (!isMounted) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-2xl font-bold mb-6">User Agent デバッグページ</h1>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div suppressHydrationWarning className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-2xl font-bold mb-6">User Agent デバッグページ</h1>
 
       <div className="space-y-6">

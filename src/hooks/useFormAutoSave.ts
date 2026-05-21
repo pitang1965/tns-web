@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { UseFormWatch, UseFormReset, UseFormSetValue } from 'react-hook-form';
 import { ShachuHakuFormData } from '@/components/admin/validationSchemas';
 import { AUTO_SAVE_KEY, DEFAULT_FORM_VALUES } from '@/constants/formDefaults';
@@ -26,9 +26,13 @@ export function useFormAutoSave({
   checkHasFormInput: () => boolean;
   resetToDefault: () => void;
 } {
+  const hasRestoredRef = useRef(false);
+
   // LocalStorageからの復元ロジック（初回マウント時のみ）
   useEffect(() => {
-    // 編集モードでは復元しない
+    if (hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
+
     if (isEdit) return;
 
     try {
@@ -36,10 +40,8 @@ export function useFormAutoSave({
       if (savedData) {
         const parsedData = JSON.parse(savedData);
 
-        // データが有効な場合は復元
         reset(parsedData);
 
-        // 復元後に明示的にSelectフィールドの値を設定
         setTimeout(() => {
           if (parsedData.type !== undefined) {
             setValue('type', parsedData.type, { shouldValidate: true });
@@ -59,8 +61,7 @@ export function useFormAutoSave({
     } catch (error) {
       console.error('Failed to restore form data from localStorage:', error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 初回マウント時のみ実行
+  }, [isEdit, reset, setValue, toast]);
 
   // フォームの値が変更されたときに自動保存（新規作成モードのみ）
   useEffect(() => {
@@ -93,27 +94,18 @@ export function useFormAutoSave({
     }
   }, [watch, isEdit]);
 
-  /**
-   * LocalStorageから下書きデータをクリア
-   */
-  const clearStorage = () => {
+  const clearStorage = useCallback(() => {
     localStorage.removeItem(AUTO_SAVE_KEY);
-  };
+  }, []);
 
-  /**
-   * フォームに入力があるかチェック
-   */
-  const checkHasFormInput = () => {
+  const checkHasFormInput = useCallback(() => {
     const formValues = watch();
     return hasFormInput(formValues);
-  };
+  }, [watch]);
 
-  /**
-   * フォームをデフォルト値にリセット
-   */
-  const resetToDefault = () => {
+  const resetToDefault = useCallback(() => {
     reset(DEFAULT_FORM_VALUES);
-  };
+  }, [reset]);
 
   return {
     clearStorage,

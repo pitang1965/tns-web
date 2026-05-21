@@ -68,9 +68,9 @@ type UseAdminListDataReturn = {
    */
   refreshListData: () => Promise<void>;
   /**
-   * Internal ref for tracking last loaded filters (exposed for special cases)
+   * Clear the filters cache to force re-fetch on next render
    */
-  lastListFiltersRef: RefObject<string | null>;
+  clearFiltersCache: () => void;
   /**
    * All filtered spot IDs (for navigation across all pages)
    */
@@ -264,13 +264,17 @@ export function useAdminListData({
     refreshAllSpotIds();
   }, [activeTab, searchTerm, typeFilter, refreshAllSpotIds]);
 
+  const clearFiltersCache = useCallback(() => {
+    lastListFiltersRef.current = null;
+  }, []);
+
   return {
     listData,
     listLoading,
     currentPage,
     setCurrentPage,
     refreshListData,
-    lastListFiltersRef,
+    clearFiltersCache,
     allSpotIds,
     refreshAllSpotIds,
   };

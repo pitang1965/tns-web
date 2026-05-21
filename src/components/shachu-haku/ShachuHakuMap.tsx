@@ -50,6 +50,51 @@ type ShachuHakuMapProps = {
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
+function getMarkerColor(spot: CampingSpotWithId): string {
+  if (spot.isOvernightProhibited) return '#dc2626'; // red-600
+  const rating = calculateSecurityLevel(spot);
+  return getMarkerColorByRating(rating);
+}
+
+function createPopupHTML(spot: CampingSpotWithId, isReadonly: boolean): string {
+  return `
+      <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
+        ${spot.isOvernightProhibited ? '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:6px 8px;margin-bottom:8px;color:#991b1b;font-size:12px;font-weight:700;">⛔ 車中泊禁止スポット</div>' : ''}
+        <h3 class="font-semibold text-lg mb-2 text-gray-900 wrap-break-word">${
+          spot.name
+        }</h3>
+        <div class="space-y-1 text-sm text-gray-700">
+          <div><strong class="text-gray-900">種別:</strong> ${
+            CampingSpotTypeLabels[spot.type]
+          }</div>
+          <div class="flex justify-between items-center">
+            <span><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(
+              spot,
+            )}/5 🔒</span>
+            <span><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(
+              spot,
+            )}/5 🔇</span>
+          </div>
+          <div><strong class="text-gray-900">料金:</strong> ${
+            spot.pricing.isFree
+              ? '無料'
+              : spot.pricing.pricePerNight
+                ? `¥${spot.pricing.pricePerNight}/泊`
+                : '有料：？円/泊'
+          }</div>
+          <div class="mt-3 pt-2 border-t border-gray-200">
+            <button
+              onclick="window.location.href='/shachu-haku/${spot._id}'"
+              class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
+            >
+              もっと見る
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+}
+
 const isValidCoords = (coords: unknown): coords is [number, number] =>
   Array.isArray(coords) &&
   coords.length === 2 &&
@@ -96,6 +141,7 @@ export default function ShachuHakuMap({
   isLandscape = false,
   activatedSpotId,
 }: ShachuHakuMapProps) {
+  'use no memo';
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -458,7 +504,6 @@ export default function ShachuHakuMap({
         styleElement.remove();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty deps - only run on mount/unmount
 
   // Update markers when spots change or zoom level changes
@@ -620,7 +665,6 @@ export default function ShachuHakuMap({
       east,
       west,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only run on initial map load
 
   // Track last applied initialBounds to prevent infinite loop while allowing prefecture jumps
@@ -693,54 +737,6 @@ export default function ShachuHakuMap({
       }
     }
   }, [initialCenter, initialZoom, initialBounds, mapLoaded]);
-
-  const getMarkerColor = (spot: CampingSpotWithId): string => {
-    if (spot.isOvernightProhibited) return '#dc2626'; // red-600
-    const rating = calculateSecurityLevel(spot);
-    return getMarkerColorByRating(rating);
-  };
-
-  const createPopupHTML = (
-    spot: CampingSpotWithId,
-    isReadonly: boolean,
-  ): string => {
-    return `
-      <div class="bg-white text-gray-900 rounded-lg shadow-lg" style="width: clamp(250px, 40vw, 300px); padding: 12px 12px 12px 44px;">
-        ${spot.isOvernightProhibited ? '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:6px 8px;margin-bottom:8px;color:#991b1b;font-size:12px;font-weight:700;">⛔ 車中泊禁止スポット</div>' : ''}
-        <h3 class="font-semibold text-lg mb-2 text-gray-900 wrap-break-word">${
-          spot.name
-        }</h3>
-        <div class="space-y-1 text-sm text-gray-700">
-          <div><strong class="text-gray-900">種別:</strong> ${
-            CampingSpotTypeLabels[spot.type]
-          }</div>
-          <div class="flex justify-between items-center">
-            <span><strong class="text-gray-900">治安:</strong> ${calculateSecurityLevel(
-              spot,
-            )}/5 🔒</span>
-            <span><strong class="text-gray-900">静けさ:</strong> ${calculateQuietnessLevel(
-              spot,
-            )}/5 🔇</span>
-          </div>
-          <div><strong class="text-gray-900">料金:</strong> ${
-            spot.pricing.isFree
-              ? '無料'
-              : spot.pricing.pricePerNight
-                ? `¥${spot.pricing.pricePerNight}/泊`
-                : '有料：？円/泊'
-          }</div>
-          <div class="mt-3 pt-2 border-t border-gray-200">
-            <button
-              onclick="window.location.href='/shachu-haku/${spot._id}'"
-              class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded text-sm font-medium transition-colors cursor-pointer"
-            >
-              もっと見る
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  };
 
   if (!MAPBOX_TOKEN) {
     return (

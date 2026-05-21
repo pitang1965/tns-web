@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 type RecentUrl = {
   url: string;
@@ -10,7 +10,16 @@ const STORAGE_KEY = 'recent-urls';
 const MAX_RECENT_URLS = 5;
 
 export function useRecentUrls() {
-  const [recentUrls, setRecentUrls] = useState<RecentUrl[]>([]);
+  const [recentUrls, setRecentUrls] = useState<RecentUrl[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return JSON.parse(stored) as RecentUrl[];
+      return [];
+    } catch {
+      return [];
+    }
+  });
 
   // 履歴をローカルストレージに保存
   const saveToStorage = useCallback((urls: RecentUrl[]) => {
@@ -18,20 +27,6 @@ export function useRecentUrls() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(urls));
     } catch (error) {
       console.error('Failed to save recent URLs:', error);
-    }
-  }, []);
-
-  // ローカルストレージから履歴を読み込み
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as RecentUrl[];
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setRecentUrls(parsed);
-      }
-    } catch (error) {
-      console.error('Failed to load recent URLs:', error);
     }
   }, []);
 

@@ -164,8 +164,7 @@ export default function ShachuHakuForm({
       // type は defaultValues の undefined のまま（useAutoSetSpotTypeが動作できるように）
     }
     // 新規作成（ボタンクリック）の場合は、useFormAutoSaveフックで自動的に復元される
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spot]);
+  }, [spot, clearStorage, reset, setValue]);
 
   // フォームの値が変更されたときの自動保存は、useFormAutoSaveフックで処理される
 

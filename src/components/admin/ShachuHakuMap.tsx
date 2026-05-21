@@ -65,6 +65,12 @@ const FACILITY_CONFIGS = [
   },
 ] as const;
 
+function getMarkerColor(spot: CampingSpotWithId): string {
+  if (spot.isOvernightProhibited) return '#dc2626'; // red-600
+  const rating = calculateSecurityLevel(spot);
+  return getMarkerColorByRating(rating);
+}
+
 export default function ShachuHakuMap({
   spots,
   onSpotSelect,
@@ -75,6 +81,7 @@ export default function ShachuHakuMap({
   initialBounds,
   activatedSpotId,
 }: ShachuHakuMapProps) {
+  'use no memo';
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -418,7 +425,6 @@ export default function ShachuHakuMap({
         styleElement.remove();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty deps - only run on mount/unmount
 
   // Update markers when spots change or zoom level changes
@@ -546,7 +552,6 @@ export default function ShachuHakuMap({
     });
 
     // After initial load, only respond to user interactions
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLoaded]); // Only run on initial map load
 
   // Track last applied initialBounds to prevent infinite loop while allowing prefecture jumps
@@ -619,12 +624,6 @@ export default function ShachuHakuMap({
       }
     }
   }, [initialCenter, initialZoom, initialBounds, mapLoaded]);
-
-  const getMarkerColor = (spot: CampingSpotWithId): string => {
-    if (spot.isOvernightProhibited) return '#dc2626'; // red-600
-    const rating = calculateSecurityLevel(spot);
-    return getMarkerColorByRating(rating);
-  };
 
   if (!MAPBOX_TOKEN) {
     return (

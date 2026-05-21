@@ -13,6 +13,31 @@ type Bounds = {
   west: number;
 };
 
+function boundsHaveChanged(oldBounds: Bounds | null, newBounds: Bounds): boolean {
+  if (!oldBounds) return true;
+  const latDiff =
+    Math.abs(newBounds.north - oldBounds.north) +
+    Math.abs(newBounds.south - oldBounds.south);
+  const lngDiff =
+    Math.abs(newBounds.east - oldBounds.east) +
+    Math.abs(newBounds.west - oldBounds.west);
+  const latRange = newBounds.north - newBounds.south;
+  const lngRange = newBounds.east - newBounds.west;
+  const threshold = 0.05;
+  return latDiff / latRange > threshold || lngDiff / lngRange > threshold;
+}
+
+function isZoomIn(oldBounds: Bounds | null, newBounds: Bounds): boolean {
+  if (!oldBounds) return false;
+  const epsilon = 0.0001;
+  return (
+    newBounds.north <= oldBounds.north + epsilon &&
+    newBounds.south >= oldBounds.south - epsilon &&
+    newBounds.east <= oldBounds.east + epsilon &&
+    newBounds.west >= oldBounds.west - epsilon
+  );
+}
+
 type Filters = {
   searchTerm?: string;
   prefecture?: string;
@@ -64,6 +89,7 @@ export function useMapBoundsLoader({
   onLoadSuccess,
   onBoundsTooWide,
 }: UseMapBoundsLoaderOptions) {
+  'use no memo';
   const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastLoadedBoundsRef = useRef<Bounds | null>(null);
@@ -74,46 +100,8 @@ export function useMapBoundsLoader({
   // Update filters ref when filters change
   filtersRef.current = filters;
 
-  // Helper function to check if bounds have significantly changed
-  const boundsHaveChanged = (
-    oldBounds: Bounds | null,
-    newBounds: Bounds,
-  ): boolean => {
-    if (!oldBounds) return true;
-
-    // Calculate the difference as a percentage of the current view
-    const latDiff =
-      Math.abs(newBounds.north - oldBounds.north) +
-      Math.abs(newBounds.south - oldBounds.south);
-    const lngDiff =
-      Math.abs(newBounds.east - oldBounds.east) +
-      Math.abs(newBounds.west - oldBounds.west);
-
-    const latRange = newBounds.north - newBounds.south;
-    const lngRange = newBounds.east - newBounds.west;
-
-    // Only reload if bounds changed by more than 5% of current view
-    const threshold = 0.05;
-    return latDiff / latRange > threshold || lngDiff / lngRange > threshold;
-  };
-
-  // Helper function to check if new bounds are completely within old bounds (zoom in)
-  const isZoomIn = (oldBounds: Bounds | null, newBounds: Bounds): boolean => {
-    if (!oldBounds) return false;
-
-    // Check if new bounds are completely within old bounds
-    // Add small epsilon to account for floating point precision
-    const epsilon = 0.0001;
-    return (
-      newBounds.north <= oldBounds.north + epsilon &&
-      newBounds.south >= oldBounds.south - epsilon &&
-      newBounds.east <= oldBounds.east + epsilon &&
-      newBounds.west >= oldBounds.west - epsilon
-    );
-  };
-
   // Load spots with abort controller support
-  const loadSpotsWithAbort = async (
+  const loadSpotsWithAbort = useCallback(async (
     bounds: Bounds,
     requestFilters: Filters,
   ) => {
@@ -174,7 +162,7 @@ export function useMapBoundsLoader({
         setLoading(false);
       }
     }
-  };
+  }, [loadSpots, setLoading, setSpots, setTotalCount, toast, onLoadSuccess]);
 
   // Handle bounds change with debounce
   const handleBoundsChange = useCallback(
@@ -255,8 +243,7 @@ export function useMapBoundsLoader({
         boundsTimeoutRef.current = setTimeout(executeLoad, debounceTime);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [], // props are accessed via filtersRef; stable by design
+    [loadSpotsWithAbort, onBoundsTooWide, setSpots, setTotalCount, setLoading],
   );
 
   // Cleanup function
@@ -290,14 +277,23 @@ export function useMapBoundsLoader({
       loadSpotsWithAbort(bounds, requestFilters);
       lastLoadedBoundsRef.current = bounds; // Update after loading
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // loadSpotsWithAbort is accessed via closure over stable refs
+  }, [loadSpotsWithAbort]);
+
+  const markBoundsAsLoaded = useCallback((bounds: Bounds) => {
+    lastLoadedBoundsRef.current = bounds;
+  }, []);
+
+  const hasBoundsBeenLoaded = useCallback(
+    () => lastLoadedBoundsRef.current !== null,
+    [],
+  );
 
   return {
     handleBoundsChange,
     cleanup,
     reloadIfNeeded,
     initialLoadDoneRef,
-    lastLoadedBoundsRef,
+    markBoundsAsLoaded,
+    hasBoundsBeenLoaded,
   };
 }

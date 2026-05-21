@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ReadonlyURLSearchParams } from 'next/navigation';
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
 import {
@@ -17,14 +17,10 @@ export const useShachuHakuFilters = ({
   onResetComplete,
 }: UseShachuHakuFiltersOptions) => {
   // Load saved filters once during initialization (only if no URL params)
-  const savedFilters = useMemo(() => {
-    // URLパラメータが存在する場合はローカルストレージを使わない
-    if (searchParams.toString()) {
-      return null;
-    }
+  const [savedFilters] = useState(() => {
+    if (searchParams.toString()) return null;
     return loadFiltersFromLocalStorage();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // Note: searchParams is intentionally omitted to only load once
+  });
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<'map' | 'list'>(() => {
