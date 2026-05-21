@@ -1,14 +1,15 @@
 'use client';
 
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+
 import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 import { DayPlan } from '@/data/schemas/itinerarySchema';
 
 type DayPaginationProps = {
@@ -199,33 +200,45 @@ export const DayPagination: React.FC<DayPaginationProps> = ({
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious
+          <PaginationLink
+            aria-label="前の日に移動"
+            size="default"
+            className={cn(
+              'gap-1 px-2.5 sm:pl-2.5',
+              currentPage === 1
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer',
+            )}
             onClick={(e) => {
               e.preventDefault();
               goToPreviousPage();
             }}
-            className={
-              currentPage === 1
-                ? 'pointer-events-none opacity-50'
-                : 'cursor-pointer'
-            }
-          />
+          >
+            <ChevronLeftIcon />
+            <span className="hidden sm:block">前へ</span>
+          </PaginationLink>
         </PaginationItem>
 
         {generatePaginationLinks()}
 
         <PaginationItem>
-          <PaginationNext
+          <PaginationLink
+            aria-label="次の日に移動"
+            size="default"
+            className={cn(
+              'gap-1 px-2.5 sm:pr-2.5',
+              currentPage === actualTotalDays
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer',
+            )}
             onClick={(e) => {
               e.preventDefault();
               goToNextPage();
             }}
-            className={
-              currentPage === actualTotalDays
-                ? 'pointer-events-none opacity-50'
-                : 'cursor-pointer'
-            }
-          />
+          >
+            <span className="hidden sm:block">次へ</span>
+            <ChevronRightIcon />
+          </PaginationLink>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
