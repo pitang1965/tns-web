@@ -43,6 +43,7 @@ export function DayPlanForm({
   moveToPreviousDay,
   moveToNextDay,
 }: DayPlanFormProps) {
+  'use memo';
   const [showFullMap, setShowFullMap] = useState(false);
   const [showCampingSpotDialog, setShowCampingSpotDialog] = useState(false);
   const {

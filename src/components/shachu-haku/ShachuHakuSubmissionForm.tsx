@@ -105,6 +105,7 @@ type ShachuHakuSubmissionFormProps = {
 export default function ShachuHakuSubmissionForm({
   onSuccess,
 }: ShachuHakuSubmissionFormProps) {
+  'use memo';
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);

@@ -23,6 +23,7 @@ const SubmissionEditForm = dynamic(
 );
 
 export default function SubmissionsAdminPage() {
+  'use memo';
   const { user, isLoading } = useUser();
   const { toast } = useToast();
 
