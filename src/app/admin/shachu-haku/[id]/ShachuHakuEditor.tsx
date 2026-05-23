@@ -23,6 +23,7 @@ const ShachuHakuForm = dynamic(
 );
 
 export default function ShachuHakuEditor() {
+  'use no memo';
   const { user, isLoading } = useUser();
   const { toast } = useToast();
   const router = useRouter();
