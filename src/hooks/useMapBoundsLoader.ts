@@ -89,7 +89,7 @@ export function useMapBoundsLoader({
   onLoadSuccess,
   onBoundsTooWide,
 }: UseMapBoundsLoaderOptions) {
-  'use no memo';
+  'use memo';
   const boundsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastLoadedBoundsRef = useRef<Bounds | null>(null);
