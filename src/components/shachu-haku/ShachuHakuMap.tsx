@@ -151,16 +151,28 @@ export default function ShachuHakuMap({
   const currentZoomRef = useRef<number>(9); // Use ref instead of state to avoid re-renders
   const [markerUpdateTrigger, setMarkerUpdateTrigger] = useState(0); // Trigger marker updates
   const isUserInteractionRef = useRef(false); // Track if user is interacting
+  const activatedSpotRef = useRef<CampingSpotWithId | null>(null);
 
-  const clearFacilityMarkers = useCallback(() => {
+  const removeFacilityMarkersDOM = useCallback(() => {
     facilityMarkersRef.current.forEach((marker) => marker.remove());
     facilityMarkersRef.current = [];
   }, []);
 
+  const clearFacilityMarkers = useCallback(() => {
+    removeFacilityMarkersDOM();
+    activatedSpotRef.current = null;
+  }, [removeFacilityMarkersDOM]);
+
   const showFacilityMarkers = useCallback(
     (spot: CampingSpotWithId) => {
       if (!map.current) return;
-      clearFacilityMarkers();
+      removeFacilityMarkersDOM();
+      activatedSpotRef.current = spot;
+
+      const isDetailed = currentZoomRef.current >= 9;
+      const markerSize = isDetailed ? 24 : 14;
+      const borderWidth = isDetailed ? 3 : 2;
+      const fontSize = isDetailed ? 14 : 8;
 
       FACILITY_CONFIGS.forEach(({ key, distKey, emoji, color }) => {
         const coords = spot[key];
@@ -169,15 +181,15 @@ export default function ShachuHakuMap({
         const el = document.createElement('div');
         el.className = 'facility-marker';
         el.style.cssText = `
-        width: 28px;
-        height: 28px;
+        width: ${markerSize}px;
+        height: ${markerSize}px;
         background-color: ${color};
-        border: 3px solid white;
+        border: ${borderWidth}px solid white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
+        font-size: ${fontSize}px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         cursor: default;
         pointer-events: none;
@@ -198,7 +210,7 @@ export default function ShachuHakuMap({
         facilityMarkersRef.current.push(marker);
       });
     },
-    [clearFacilityMarkers],
+    [removeFacilityMarkersDOM],
   );
 
   // Hide/show markers during map movement
@@ -397,14 +409,14 @@ export default function ShachuHakuMap({
       isUserInteractionRef.current = true; // User is interacting
       setIsMapMoving(true);
       hideMarkers();
-      clearFacilityMarkers();
+      removeFacilityMarkersDOM();
     });
 
     map.current.on('zoomstart', () => {
       isUserInteractionRef.current = true; // User is interacting
       setIsMapMoving(true);
       hideMarkers();
-      clearFacilityMarkers();
+      removeFacilityMarkersDOM();
     });
 
     map.current.on('moveend', () => {
@@ -464,6 +476,10 @@ export default function ShachuHakuMap({
         if (crossedThreshold) {
           // Trigger marker update by updating a separate state
           updateMarkersForZoom();
+          // Re-render facility markers at new size if a spot is selected
+          if (activatedSpotRef.current) {
+            showFacilityMarkers(activatedSpotRef.current);
+          }
         }
 
         // Notify parent of zoom change (if user initiated)
