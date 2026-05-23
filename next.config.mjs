@@ -313,7 +313,9 @@ const withPWA = withPWAInit({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactCompiler: true,
+  reactCompiler: {
+    compilationMode: 'annotation',
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '4mb',
