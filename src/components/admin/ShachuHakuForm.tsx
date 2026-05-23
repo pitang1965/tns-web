@@ -77,6 +77,7 @@ export default function ShachuHakuForm({
   navigationData,
   onNavigate,
 }: ShachuHakuFormProps) {
+  'use no memo';
   const { toast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
