@@ -51,6 +51,7 @@ const ShachuHakuMap = dynamic(
 );
 
 export default function ShachuHakuClient() {
+  'use memo';
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();

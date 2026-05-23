@@ -141,7 +141,7 @@ export default function ShachuHakuMap({
   isLandscape = false,
   activatedSpotId,
 }: ShachuHakuMapProps) {
-  'use no memo';
+  'use memo';
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);

@@ -50,6 +50,7 @@ export function AddShachuHakuSpotDialog({
   onOpenChange,
   onAdd,
 }: AddShachuHakuSpotDialogProps) {
+  'use memo';
   const [step, setStep] = useState<Step>('location');
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
