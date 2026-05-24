@@ -278,57 +278,55 @@ ${spot.notes ?? 'なし'} → `;
         slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DETAIL_TOP ?? ''}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* メイン情報 */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                施設マップ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityMap spot={spot} showTitle={false} showLegend={true} />
-            </CardContent>
-          </Card>
+      {/* 施設マップ（全幅） */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            施設マップ
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FacilityMap spot={spot} showTitle={false} showLegend={true} />
+        </CardContent>
+      </Card>
 
-          <div className="flex gap-3 flex-wrap">
-            <AdLink
-              href="https://amzn.to/48vDnfQ"
-              label="ポータブル電源セール"
-              shortLabel="ポタ電セール"
-            />
-            <AdLink
-              href="https://amzn.to/4tTWIzU"
-              label="走行充電器"
-              shortLabel="走行充電器"
-            />
-          </div>
+      {/* 情報カード（常に偶数の4枚を2列グリッド） */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SpotBasicInfoCard spot={spot} />
+        <SpotFacilitiesCard spot={spot} />
+        <SpotSecurityCard spot={spot} />
+        <SpotNightNoiseCard spot={spot} />
+      </div>
 
-          {spot.notes && (
-            <Card>
-              <CardHeader>
-                <CardTitle>詳細・備考</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                  {spot.notes}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+      {/* 可変コンテンツ（全幅） */}
+      <SpotAmenitiesCard spot={spot} />
+      <SpotRestrictionsCard spot={spot} />
 
-        {/* サイドバー */}
-        <div className="space-y-6">
-          <SpotBasicInfoCard spot={spot} />
-          <SpotFacilitiesCard spot={spot} />
-          <SpotSecurityCard spot={spot} />
-          <SpotNightNoiseCard spot={spot} />
-          <SpotAmenitiesCard spot={spot} />
-          <SpotRestrictionsCard spot={spot} />
-        </div>
+      {spot.notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle>詳細・備考</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              {spot.notes}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="flex gap-3 flex-wrap">
+        <AdLink
+          href="https://amzn.to/48vDnfQ"
+          label="ポータブル電源セール"
+          shortLabel="ポタ電セール"
+        />
+        <AdLink
+          href="https://amzn.to/4tTWIzU"
+          label="走行充電器"
+          shortLabel="走行充電器"
+        />
       </div>
 
       <AdSenseUnit
