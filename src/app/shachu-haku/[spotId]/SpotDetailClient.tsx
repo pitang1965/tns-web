@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { AdLink } from '@/components/shachu-haku/AdLink';
+import { AdSenseUnit } from '@/components/layout/AdSenseUnit';
 import { SpotBasicInfoCard } from '@/components/shachu-haku/SpotBasicInfoCard';
 import { SpotFacilitiesCard } from '@/components/shachu-haku/SpotFacilitiesCard';
 import { SpotSecurityCard } from '@/components/shachu-haku/SpotSecurityCard';
@@ -273,6 +274,10 @@ ${spot.notes ?? 'なし'} → `;
         )}
       </div>
 
+      <AdSenseUnit
+        slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DETAIL_TOP ?? ''}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* メイン情報 */}
         <div className="lg:col-span-2 space-y-6">
@@ -325,6 +330,10 @@ ${spot.notes ?? 'なし'} → `;
           <SpotRestrictionsCard spot={spot} />
         </div>
       </div>
+
+      <AdSenseUnit
+        slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_DETAIL_BOTTOM ?? ''}
+      />
 
       {/* 情報修正依頼カード */}
       <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700">
