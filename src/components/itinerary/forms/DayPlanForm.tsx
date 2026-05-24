@@ -2,7 +2,16 @@
 import { useState, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Plus, PlusCircle, Map, Clock, Tent, Navigation } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Plus,
+  PlusCircle,
+  Map,
+  Clock,
+  Tent,
+  Navigation,
+  MapPin,
+} from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { ActivityOrderList } from './ActivityOrderList';
 import { H3 } from '@/components/common/Typography';
@@ -18,9 +27,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { AddShachuHakuSpotDialog } from '../AddShachuHakuSpotDialog';
+import { DayRouteNavigationButton } from '../DayRouteNavigationButton';
+import { useLocationRouting } from '@/hooks/useLocationRouting';
 
 type DayPlanFormProps = {
   day: { date: string | null; activities: any[]; notes?: string };
@@ -163,7 +184,7 @@ export function DayPlanForm({
     const activities = watchedActivities || [];
 
     const result = activities
-      .map((activity: any, originalIndex: number) => {
+      .map((activity: any, originalIndex: number): ActivityLocation | null => {
         // 位置情報がない場合はnullを返す
         const lat = activity?.place?.location?.latitude;
         const lon = activity?.place?.location?.longitude;
@@ -184,6 +205,7 @@ export function DayPlanForm({
           title: activity.title || `アクティビティ ${originalIndex + 1}`,
           latitude: lat,
           longitude: lon,
+          type: activity?.place?.type as string | undefined,
         };
       })
       .filter((activity): activity is ActivityLocation => activity !== null);
@@ -191,15 +213,30 @@ export function DayPlanForm({
     return result;
   }, [watchedActivities]);
 
-  // 位置情報が設定されているアクティビティが2つ以上ある場合にのみ地図を表示
-  const shouldShowMap = activitiesWithLocation.length >= 2;
+  const shouldShowMap = activitiesWithLocation.length >= 1;
+  const shouldShowRouteButton = activitiesWithLocation.length >= 1;
+
+  const {
+    includeCurrentLocation,
+    setIncludeCurrentLocation,
+    showLocationAlert,
+    setShowLocationAlert,
+    shouldShowLocationCheckbox,
+    shouldShowLocationPermissionButton,
+    mapActivities,
+    currentLocation,
+    loading,
+    error,
+    requestLocation,
+    clearError,
+  } = useLocationRouting(activitiesWithLocation);
 
   return (
     <div className="border rounded-lg p-4 space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-2">
         <H3>{dayDisplay}</H3>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 items-start">
           {/* 時間順並び替えボタン - アクティビティが2つ以上ある場合のみ表示 */}
           {totalActivities >= 2 && (
             <Button
@@ -214,17 +251,65 @@ export function DayPlanForm({
             </Button>
           )}
 
-          {/* 位置情報を持つアクティビティが2つ以上ある場合のみボタンを表示 */}
+          {/* 現在地を含めるチェックボックス + 全体ルート検索ボタン（常に同一行） */}
+          {(shouldShowLocationCheckbox || shouldShowRouteButton) && (
+            <div className="flex items-center gap-2">
+              {shouldShowLocationCheckbox && (
+                <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer select-none">
+                  <Checkbox
+                    checked={includeCurrentLocation}
+                    onCheckedChange={(checked) =>
+                      setIncludeCurrentLocation(checked === true)
+                    }
+                  />
+                  現在地を含める
+                </label>
+              )}
+              {shouldShowRouteButton && (
+                <DayRouteNavigationButton
+                  activities={watchedActivities}
+                  currentLocation={
+                    includeCurrentLocation && currentLocation
+                      ? currentLocation
+                      : undefined
+                  }
+                />
+              )}
+            </div>
+          )}
+
+          {/* ルートマップボタン */}
           {shouldShowMap && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowFullMap(true)}
               className="flex items-center gap-1 cursor-pointer"
+              type="button"
             >
               <Map className="h-4 w-4" />
               <span>ルートマップ</span>
             </Button>
+          )}
+
+          {/* 位置情報許可ボタン */}
+          {shouldShowLocationPermissionButton && (
+            <div className="flex flex-col items-start gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowLocationAlert(true)}
+                disabled={loading}
+                className="flex items-center gap-1 cursor-pointer"
+              >
+                <MapPin className="h-4 w-4" />
+                <span>{loading ? '取得中...' : '位置情報を許可'}</span>
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                現在位置からのルート検索が利用できます
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -233,7 +318,7 @@ export function DayPlanForm({
       {shouldShowMap && (
         <div className="mb-4">
           <DailyRouteMap
-            activities={activitiesWithLocation}
+            activities={mapActivities}
             compact={true}
             onExpandClick={() => setShowFullMap(true)}
           />
@@ -353,13 +438,59 @@ export function DayPlanForm({
           </DialogHeader>
           <div className="h-[70vh] w-full">
             <DailyRouteMap
-              activities={activitiesWithLocation}
+              activities={mapActivities}
               compact={false}
               initialZoom={13}
             />
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 位置情報許可のAlertDialog */}
+      <AlertDialog open={showLocationAlert} onOpenChange={setShowLocationAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>位置情報の許可</AlertDialogTitle>
+            <AlertDialogDescription>
+              位置情報を許可すると、現在位置からのルート検索が利用できます。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>キャンセル</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLocationAlert(false);
+                requestLocation();
+              }}
+            >
+              位置情報を許可する
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 位置情報エラーのAlertDialog */}
+      <AlertDialog
+        open={!!error}
+        onOpenChange={(open) => {
+          if (!open) clearError();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>位置情報を取得できませんでした</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">{error}</span>
+              <span className="block text-sm">
+                位置情報がブロックされている場合は、ブラウザのアドレスバー左側のアイコンから設定を変更してください。
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={clearError}>閉じる</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

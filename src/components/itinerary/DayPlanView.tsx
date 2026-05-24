@@ -28,10 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  useCurrentLocation,
-  calculateDistance,
-} from '@/hooks/useCurrentLocation';
+import { useLocationRouting } from '@/hooks/useLocationRouting';
 
 type DayPlan = ServerItineraryDocument['dayPlans'][number];
 
@@ -41,21 +38,8 @@ type DayPlanProps = {
   isOwner?: boolean;
 };
 
-// 自宅と現在地が近いと判断する距離（メートル）
-const HOME_PROXIMITY_THRESHOLD = 50;
-
 export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
   const [showFullMap, setShowFullMap] = useState(false);
-  const [showLocationAlert, setShowLocationAlert] = useState(false);
-  const [includeCurrentLocation, setIncludeCurrentLocation] = useState(false);
-  const {
-    currentLocation,
-    permissionGranted,
-    loading,
-    error,
-    requestLocation,
-    clearError,
-  } = useCurrentLocation();
 
   // 日付表示の生成
   const dayDisplay = day.date
@@ -104,70 +88,25 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
     return result;
   }, [day.activities, hasActivities, isOwner]);
 
-  // 現在地を含めたルート用アクティビティを計算
-  const routeActivitiesWithCurrentLocation: ActivityLocation[] = useMemo(() => {
-    if (!currentLocation || activitiesWithLocation.length === 0) {
-      return activitiesWithLocation;
-    }
+  const {
+    includeCurrentLocation,
+    setIncludeCurrentLocation,
+    showLocationAlert,
+    setShowLocationAlert,
+    shouldShowLocationCheckbox,
+    shouldShowLocationPermissionButton,
+    mapActivities,
+    currentLocation,
+    loading,
+    error,
+    requestLocation,
+    clearError,
+  } = useLocationRouting(activitiesWithLocation);
 
-    let routeActivities = [...activitiesWithLocation];
-
-    // 最初のアクティビティが自宅タイプで、現在地から50m以内ならスキップ
-    if (routeActivities.length > 0) {
-      const firstActivity = routeActivities[0];
-      if (firstActivity.type === 'HOME') {
-        const distance = calculateDistance(
-          currentLocation.latitude,
-          currentLocation.longitude,
-          firstActivity.latitude,
-          firstActivity.longitude,
-        );
-        if (distance <= HOME_PROXIMITY_THRESHOLD) {
-          routeActivities = routeActivities.slice(1);
-        }
-      }
-    }
-
-    // 現在地を先頭に追加
-    const currentLocationActivity: ActivityLocation = {
-      id: 'current-location',
-      order: 0,
-      title: '現在地',
-      latitude: currentLocation.latitude,
-      longitude: currentLocation.longitude,
-      isCurrentLocation: true,
-    };
-
-    return [currentLocationActivity, ...routeActivities];
-  }, [currentLocation, activitiesWithLocation]);
-
-  // アクティビティが1つ以上ある場合にマップを表示（位置情報不要）
   const shouldShowMap = activitiesWithLocation.length >= 1;
-
-  // チェックボックスの表示条件（位置情報取得済みのときのみ）
-  const shouldShowLocationCheckbox =
-    permissionGranted &&
-    !!currentLocation &&
-    activitiesWithLocation.length >= 1;
-
-  // マップに渡すアクティビティ（チェックボックスで切り替え）
-  const mapActivities =
-    includeCurrentLocation && currentLocation
-      ? routeActivitiesWithCurrentLocation
-      : activitiesWithLocation;
-
-  // 位置情報許可ボタンを表示するかどうか（マップが表示されていて位置情報がない場合）
-  const shouldShowLocationPermissionButton =
-    !permissionGranted && activitiesWithLocation.length >= 1;
 
   // メモが存在するかチェック
   const hasNotes = day.notes && day.notes.trim().length > 0;
-
-  // 位置情報許可のハンドラー
-  const handleRequestLocation = () => {
-    setShowLocationAlert(false);
-    requestLocation();
-  };
 
   return (
     <div className="mb-6 bg-background text-foreground p-4 rounded-lg">
@@ -299,7 +238,12 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>キャンセル</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRequestLocation}>
+            <AlertDialogAction
+              onClick={() => {
+                setShowLocationAlert(false);
+                requestLocation();
+              }}
+            >
               位置情報を許可する
             </AlertDialogAction>
           </AlertDialogFooter>
