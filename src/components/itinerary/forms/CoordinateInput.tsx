@@ -73,6 +73,7 @@ export function CoordinateInput({
     setValue(latPath, lat);
     setValue(lonPath, lng);
     trigger([latPath, lonPath]);
+    setShowMap(false);
   };
 
   return (
@@ -151,7 +152,7 @@ export function CoordinateInput({
             />
             <Button
               type="button"
-              variant="outline"
+              variant={showMap ? 'default' : 'outline'}
               onClick={() => setShowMap(!showMap)}
               className="flex-1 cursor-pointer"
             >
