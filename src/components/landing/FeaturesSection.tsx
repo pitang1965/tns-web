@@ -37,7 +37,7 @@ const features = [
     icon: Map,
     title: '地図連携',
     description:
-      '各アクティビティに地図情報を紐づけて視覚的に管理。Google Mapsから座標を簡単インポート。',
+      '各アクティビティに地図情報を紐づけて視覚的に管理。地名・施設名で検索して地図をジャンプ。Google Mapsから座標も簡単インポート。',
     link: '/itineraries/new',
   },
   {
