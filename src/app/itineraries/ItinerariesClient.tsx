@@ -1,5 +1,6 @@
 'use client';
 
+import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,6 +9,32 @@ import { H1, LargeText } from '@/components/common/Typography';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { ItineraryItem } from '@/components/itinerary/ItineraryItem';
 import { PublicItineraryItem } from '@/components/itinerary/PublicItineraryItem';
+
+const TAB_STORAGE_KEY = 'itineraries-active-tab';
+
+type TabValue = 'public' | 'mine';
+
+// Module-level listener set so same-window writes also trigger re-renders
+const tabListeners = new Set<() => void>();
+
+function subscribeToTab(callback: () => void) {
+  tabListeners.add(callback);
+  return () => { tabListeners.delete(callback); };
+}
+
+function getTabSnapshot(): TabValue | null {
+  const saved = localStorage.getItem(TAB_STORAGE_KEY);
+  return saved === 'mine' || saved === 'public' ? saved : null;
+}
+
+function getTabServerSnapshot(): null {
+  return null;
+}
+
+function persistTab(tab: TabValue): void {
+  localStorage.setItem(TAB_STORAGE_KEY, tab);
+  tabListeners.forEach((fn) => fn());
+}
 
 type Props = {
   publicItineraries: ClientItineraryDocument[];
@@ -21,6 +48,16 @@ export function ItinerariesClient({
   isAuthenticated,
 }: Props) {
   const router = useRouter();
+  const savedTab = useSyncExternalStore(
+    subscribeToTab,
+    getTabSnapshot,
+    getTabServerSnapshot
+  );
+  const activeTab: TabValue = savedTab ?? (isAuthenticated ? 'mine' : 'public');
+
+  const handleTabChange = (value: string) => {
+    persistTab(value as TabValue);
+  };
 
   const handleCreateNew = () => {
     router.push('/itineraries/new');
@@ -33,7 +70,7 @@ export function ItinerariesClient({
         みんなの旅程を探索したり、自分の旅程を管理できます。
       </LargeText>
 
-      <Tabs defaultValue={isAuthenticated ? 'mine' : 'public'} className="mt-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
         <TabsList>
           <TabsTrigger value="public">みんなの旅程</TabsTrigger>
           <TabsTrigger value="mine">自分の旅程</TabsTrigger>
