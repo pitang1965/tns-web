@@ -1,14 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)",
-      "Bash(npm run build:*)",
       "WebFetch(domain:syachuhaku.fxtec.info)",
-      "Bash(npm run dev:*)",
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\app/**)",
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\src\\components\\layout/**)",
       "Read(/C:\\Users\\pitan\\dev\\nextjs\\tns-web\\.claude/**)",
-      "Bash(npx shadcn@latest add:*)",
       "mcp__mongodb-readonly__list-collections",
       "mcp__mongodb-readonly__aggregate",
       "Bash(cat:*)",
@@ -22,10 +18,12 @@
       "mcp__mongodb-readonly__count",
       "WebFetch(domain:pagespeed.web.dev)",
       "WebFetch(domain:www.googleapis.com)",
-      "Bash(ANALYZE=true npm run build:*)",
       "Bash(dir:*)",
       "Bash(git status:*)",
-      "Bash(pnpm --version)"
+      "Bash(pnpm --version)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\pitan\\\\dev\\\\nextjs\\\\tns-web\" -Recurse -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Format-Table FullName)"
     ]
   },
   "enableAllProjectMcpServers": true,
