@@ -382,7 +382,7 @@ export default function ShachuHakuClient() {
   };
 
   const handleNavigateToSpotDetail = useCallback((spotId: string) => {
-    router.push(`/shachu-haku/${spotId}?from=list`);
+    router.push(`/shachu-haku/${spotId}`);
   }, [router]);
 
   const handleTabChange = (tab: 'map' | 'list') => {

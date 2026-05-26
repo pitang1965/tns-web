@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { formatDate } from '@/lib/date';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
@@ -67,11 +67,8 @@ type SpotDetailClientProps = {
 
 export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
   const { toast } = useToast();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
   const { addUrl } = useRecentUrls();
-  const isFromList = searchParams.get('from') === 'list';
-
   // 閲覧履歴に追加
   useEffect(() => {
     if (spot && spot.name) {
@@ -173,10 +170,10 @@ ${spot.notes ?? 'なし'} → `;
       {/* ヘッダー */}
       <div className="space-y-4">
         <div>
-          <Link href={isFromList ? '/shachu-haku?tab=list' : '/shachu-haku'}>
+          <Link href="/shachu-haku">
             <Button variant="outline" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {isFromList ? '一覧に戻る' : '地図に戻る'}
+              戻る
             </Button>
           </Link>
         </div>
