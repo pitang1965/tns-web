@@ -5,6 +5,10 @@ import { FieldErrors, useFormContext, useWatch } from 'react-hook-form';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { ActivityControls } from './ActivityControls.tsx';
 import { useActivityTime } from '@/hooks/useActivityTime';
+import {
+  hasValidLocation,
+  openActivityRoute,
+} from '@/components/itinerary/ActivityRouteButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -65,6 +69,24 @@ export function ActivityForm({
     name: `dayPlans.${dayIndex}.activities.${activityIndex}.url`,
   });
 
+  // その日のアクティビティを監視してルート情報を計算
+  const allDayActivities = useWatch({
+    control,
+    name: `dayPlans.${dayIndex}.activities`,
+  });
+
+  const currentActivity = allDayActivities?.[activityIndex];
+  const remainingActivities = allDayActivities
+    ? allDayActivities.slice(activityIndex + 1).filter(hasValidLocation)
+    : [];
+  const hasRemainingRoute =
+    !!currentActivity &&
+    hasValidLocation(currentActivity) &&
+    remainingActivities.length > 0;
+  const handleOpenRemainingRoute = hasRemainingRoute
+    ? () => openActivityRoute(currentActivity, remainingActivities)
+    : undefined;
+
   // アクティビティのタイトル表示を生成
   const activityHeader = total
     ? `アクティビティ ${activityIndex + 1}/${total}`
@@ -87,6 +109,8 @@ export function ActivityForm({
           isPreviousDayAvailable={isPreviousDayAvailable}
           isNextDayAvailable={isNextDayAvailable}
           onShiftSubsequentActivities={handleShiftSubsequentActivities}
+          hasRemainingRoute={hasRemainingRoute}
+          onOpenRemainingRoute={handleOpenRemainingRoute}
         />
       </div>
 

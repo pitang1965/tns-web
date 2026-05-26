@@ -123,7 +123,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
                   setIncludeCurrentLocation(checked)
                 }
               />
-              現在地を含める
+              現在地から出発
             </label>
           )}
 
@@ -204,6 +204,7 @@ export function DayPlanView({ day, dayIndex, isOwner = false }: DayPlanProps) {
               allActivities={day.activities}
               isOwner={isOwner}
               dayIndex={dayIndex}
+              gpsLocation={currentLocation ?? undefined}
             />
           ))}
         </ul>

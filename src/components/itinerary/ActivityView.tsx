@@ -1,7 +1,13 @@
+import { useState } from 'react';
 import { ServerItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { PlaceView } from './PlaceView';
 import { TimeRangeDisplay } from '@/components/common/TimeRangeDisplay';
 import { H3, Text } from '@/components/common/Typography';
+import {
+  ActivityRouteButton,
+  hasValidLocation,
+} from './ActivityRouteButton';
+import { Checkbox } from '@/components/ui/checkbox';
 
 type ActivityType =
   ServerItineraryDocument['dayPlans'][number]['activities'][number];
@@ -14,6 +20,7 @@ type ActivityProps = {
   allActivities?: ActivityType[];
   isOwner?: boolean; // 所有者かどうか（自宅の座標・住所表示制御用）
   dayIndex?: number; // 目次からのスクロールターゲット用
+  gpsLocation?: { latitude: number; longitude: number }; // 生のGPS座標（マップに影響しない）
 };
 
 export const ActivityView: React.FC<ActivityProps> = ({
@@ -23,7 +30,9 @@ export const ActivityView: React.FC<ActivityProps> = ({
   allActivities,
   isOwner = false,
   dayIndex,
+  gpsLocation,
 }) => {
+  const [includeCurrentLocation, setIncludeCurrentLocation] = useState(false);
   // indexとtotalが両方提供された場合のみ、番号表示を追加
   const titlePrefix =
     index !== undefined && total !== undefined ? `${index + 1}/${total}: ` : '';
@@ -32,6 +41,15 @@ export const ActivityView: React.FC<ActivityProps> = ({
     dayIndex !== undefined && index !== undefined
       ? `activity-${dayIndex}-${index}`
       : undefined;
+
+  const remainingActivities =
+    index !== undefined && allActivities
+      ? allActivities.slice(index + 1).filter(hasValidLocation)
+      : [];
+  const showRouteButton =
+    hasValidLocation(activity) && remainingActivities.length > 0;
+  const effectiveLocation =
+    includeCurrentLocation && gpsLocation ? gpsLocation : undefined;
 
   return (
     <li id={elementId} className="bg-card text-card-foreground p-3 rounded shadow-md dark:shadow-slate-500/50">
@@ -66,6 +84,26 @@ export const ActivityView: React.FC<ActivityProps> = ({
         isOwner={isOwner}
       />
       {activity.description && <Text>{activity.description}</Text>}
+      {showRouteButton && (
+        <div className="mt-2 flex items-center justify-end gap-2 flex-wrap">
+          {gpsLocation && (
+            <label className="flex items-center gap-1.5 text-sm text-muted-foreground cursor-pointer select-none">
+              <Checkbox
+                checked={includeCurrentLocation}
+                onCheckedChange={(checked) =>
+                  setIncludeCurrentLocation(!!checked)
+                }
+              />
+              現在地から出発
+            </label>
+          )}
+          <ActivityRouteButton
+            activity={activity}
+            remainingActivities={remainingActivities}
+            currentLocation={effectiveLocation}
+          />
+        </div>
+      )}
     </li>
   );
 };

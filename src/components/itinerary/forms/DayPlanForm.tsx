@@ -262,7 +262,7 @@ export function DayPlanForm({
                       setIncludeCurrentLocation(checked === true)
                     }
                   />
-                  現在地を含める
+                  現在地から出発
                 </label>
               )}
               {shouldShowRouteButton && (

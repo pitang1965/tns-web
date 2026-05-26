@@ -30,6 +30,8 @@ type ActivityControlsProps = {
     activityIndex: number,
     minutes: number,
   ) => void;
+  hasRemainingRoute?: boolean;
+  onOpenRemainingRoute?: () => void;
 };
 
 export function ActivityControls({
@@ -45,6 +47,8 @@ export function ActivityControls({
   isPreviousDayAvailable = false,
   isNextDayAvailable = false,
   onShiftSubsequentActivities,
+  hasRemainingRoute = false,
+  onOpenRemainingRoute,
 }: ActivityControlsProps) {
   const [isTimeShiftDialogOpen, setIsTimeShiftDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -171,6 +175,14 @@ export function ActivityControls({
                 className="cursor-pointer"
               >
                 翌日の先頭に移動
+              </DropdownMenuItem>
+            )}
+            {hasRemainingRoute && onOpenRemainingRoute && (
+              <DropdownMenuItem
+                onClick={onOpenRemainingRoute}
+                className="cursor-pointer"
+              >
+                ここから最後までのルート検索
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
