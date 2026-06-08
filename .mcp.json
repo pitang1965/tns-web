@@ -7,10 +7,6 @@
         "next-devtools-mcp@latest"
       ]
     },
-    "Sentry": {
-      "type": "http",
-      "url": "https://mcp.sentry.dev/mcp"
-    },
     "mongodb-readonly": {
       "type": "stdio",
       "command": "cmd",
