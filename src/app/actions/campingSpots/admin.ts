@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import mongoose from 'mongoose';
 import CampingSpot from '@/lib/models/CampingSpot';
 import {
   CampingSpotSchema,
@@ -259,6 +260,9 @@ export async function getCampingSpotById(id: string) {
     // Validate input
     if (!id || typeof id !== 'string' || id.trim() === '') {
       throw new Error('Invalid spot ID provided');
+    }
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error(`Camping spot not found for ID: ${id}`);
     }
 
     // Ensure database connection with timeout
