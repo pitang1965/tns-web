@@ -15,6 +15,8 @@ import { PLACE_TYPES, PlaceType } from '@/constants/placeTypes';
 import { CoordinateInput } from '@/components/itinerary/forms/CoordinateInput';
 import { useAutoSetPlaceType } from '@/hooks/useAutoSetPlaceType';
 import { useToast } from '@/components/ui/use-toast';
+import { PlaceNameAutocomplete } from '@/components/itinerary/forms/PlaceNameAutocomplete';
+import { SmallText } from '@/components/common/Typography';
 
 type PlaceFormProps = {
   dayIndex: number;
@@ -48,15 +50,41 @@ export function PlaceForm({
 
   return (
     <div className="space-y-3">
-      <div className="grid sm:grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <Label>場所の名称</Label>
-          <Input
-            {...register(`${basePath}.place.name` as Path<ClientItineraryInput>)}
-            placeholder="場所の名前を入力"
-          />
-        </div>
+      <div className="space-y-1">
+        <Label>場所（検索）</Label>
+        <PlaceNameAutocomplete
+          value={nameValue ?? ''}
+          onChange={(val) =>
+            setValue(
+              `${basePath}.place.name` as Path<ClientItineraryInput>,
+              val,
+            )
+          }
+          onPlaceSelect={({ name, address, latitude, longitude }) => {
+            setValue(
+              `${basePath}.place.name` as Path<ClientItineraryInput>,
+              name,
+            );
+            setValue(
+              `${basePath}.place.address` as Path<ClientItineraryInput>,
+              address,
+            );
+            setValue(
+              `${basePath}.place.location.latitude` as Path<ClientItineraryInput>,
+              latitude,
+            );
+            setValue(
+              `${basePath}.place.location.longitude` as Path<ClientItineraryInput>,
+              longitude,
+            );
+          }}
+        />
+        <SmallText className="text-muted-foreground">
+          駐車場・観光地・施設など、車を停める・立ち寄る具体的な場所
+        </SmallText>
+      </div>
 
+      <div className="grid sm:grid-cols-2 gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Label>場所のタイプ</Label>
@@ -92,16 +120,16 @@ export function PlaceForm({
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      <div className="space-y-1">
-        <Label>住所</Label>
-        <Input
-          {...register(
-            `${basePath}.place.address` as Path<ClientItineraryInput>,
-          )}
-          placeholder="例: 東京都渋谷区恵比寿南1-2-3"
-        />
+        <div className="space-y-1">
+          <Label>住所</Label>
+          <Input
+            {...register(
+              `${basePath}.place.address` as Path<ClientItineraryInput>,
+            )}
+            placeholder="例: 東京都渋谷区恵比寿南1-2-3"
+          />
+        </div>
       </div>
 
       <CoordinateInput

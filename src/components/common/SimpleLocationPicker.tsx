@@ -192,7 +192,7 @@ export default function SimpleLocationPicker({
       setSearchQuery(suggestion.name);
       try {
         const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
-        const url = `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestion.mapbox_id}?session_token=${sessionToken.current}&access_token=${token}`;
+        const url = `https://api.mapbox.com/search/searchbox/v1/retrieve/${suggestion.mapbox_id}?language=ja&session_token=${sessionToken.current}&access_token=${token}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Retrieve API error');
         const data = await response.json();
@@ -284,7 +284,7 @@ export default function SimpleLocationPicker({
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder="地名・施設名で検索"
+              placeholder="地名・施設名で地図を移動"
               className="flex-1 px-2 py-2 text-sm bg-transparent outline-none dark:text-white placeholder-gray-400"
             />
             {searchQuery && (
