@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import CampingSpot from '@/lib/models/CampingSpot';
+import ItineraryModel from '@/lib/models/Itinerary';
 import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
 
@@ -65,12 +66,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // 車中泊スポットページの動的URL
     await ensureDbConnection();
 
-    const campingSpots = await CampingSpot.find({}, { _id: 1, updatedAt: 1 })
-      .sort({ updatedAt: -1 })
-      .lean();
+    const [campingSpots, publicItineraries] = await Promise.all([
+      CampingSpot.find({}, { _id: 1, updatedAt: 1 })
+        .sort({ updatedAt: -1 })
+        .lean<{ _id: unknown; updatedAt?: Date }[]>(),
+      ItineraryModel.find({ isPublic: true }, { _id: 1, updatedAt: 1 })
+        .sort({ updatedAt: -1 })
+        .lean<{ _id: unknown; updatedAt?: Date }[]>(),
+    ]);
 
     const campingSpotPages: MetadataRoute.Sitemap = campingSpots.map(
       (spot) => ({
@@ -81,12 +86,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     );
 
-    return [...staticPages, ...campingSpotPages];
+    const itineraryPages: MetadataRoute.Sitemap = publicItineraries.map(
+      (itinerary) => ({
+        url: `${BASE_URL}/itineraries/${itinerary._id}`,
+        lastModified: new Date(itinerary.updatedAt || Date.now()),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      }),
+    );
+
+    return [...staticPages, ...campingSpotPages, ...itineraryPages];
   } catch (error) {
     logger.error(
       error instanceof Error ? error : new Error('Error generating sitemap'),
     );
-    // エラー時は静的ページのみ返す
     return staticPages;
   }
 }
