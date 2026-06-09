@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+import ItineraryModel from '@/lib/models/Itinerary';
+import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
 import {
   ServerItineraryDocument,
   toClientItinerary,
 } from '@/data/schemas/itinerarySchema';
 
-// ObjectIdの検証関数
 function isValidObjectId(id: string): boolean {
-  return ObjectId.isValid(id);
+  return mongoose.Types.ObjectId.isValid(id);
 }
 
 export async function GET(
@@ -19,7 +19,6 @@ export async function GET(
   try {
     const { id } = await params;
 
-    // ObjectId の検証
     if (!isValidObjectId(id)) {
       return NextResponse.json(
         { error: 'Invalid itinerary ID' },
@@ -27,10 +26,8 @@ export async function GET(
       );
     }
 
-    const db = await getDb();
-    const itinerary = await db
-      .collection('itineraries')
-      .findOne({ _id: new ObjectId(id as string) });
+    await ensureDbConnection();
+    const itinerary = await ItineraryModel.findById(id).lean<ServerItineraryDocument>();
 
     if (!itinerary) {
       return NextResponse.json(
@@ -39,12 +36,7 @@ export async function GET(
       );
     }
 
-    // 型アサーションを使用して正しい型に変換
-    const typedItinerary = itinerary as unknown as ServerItineraryDocument;
-
-    // ServerItineraryDocumentからClientItineraryDocumentへ変換
-    const clientItinerary = toClientItinerary(typedItinerary);
-
+    const clientItinerary = toClientItinerary(itinerary);
     return NextResponse.json(clientItinerary);
   } catch (error) {
     logger.error(

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+import ItineraryModel from '@/lib/models/Itinerary';
+import { ensureDbConnection } from '@/lib/database';
 
 function isValidObjectId(id: string): boolean {
-  return ObjectId.isValid(id);
+  return mongoose.Types.ObjectId.isValid(id);
 }
 
 // updatedAt のみを返す軽量エンドポイント
@@ -22,13 +23,10 @@ export async function GET(
       );
     }
 
-    const db = await getDb();
-    const result = await db
-      .collection('itineraries')
-      .findOne(
-        { _id: new ObjectId(id) },
-        { projection: { updatedAt: 1, _id: 0 } },
-      );
+    await ensureDbConnection();
+    const result = await ItineraryModel.findById(id)
+      .select('updatedAt')
+      .lean<{ updatedAt: Date }>();
 
     if (!result) {
       return NextResponse.json(

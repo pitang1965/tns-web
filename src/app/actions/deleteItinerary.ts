@@ -1,8 +1,9 @@
 'use server';
 
 import { auth0 } from '@/lib/auth0';
-import { ObjectId } from 'mongodb';
-import { getDb } from '@/lib/mongodb';
+import mongoose from 'mongoose';
+import ItineraryModel from '@/lib/models/Itinerary';
+import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
 
 export async function deleteItinerary(id: string) {
@@ -12,10 +13,14 @@ export async function deleteItinerary(id: string) {
   }
 
   try {
-    const db = await getDb();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return { success: false, message: 'Invalid itinerary ID' };
+    }
 
-    const result = await db.collection('itineraries').deleteOne({
-      _id: new ObjectId(id),
+    await ensureDbConnection();
+
+    const result = await ItineraryModel.deleteOne({
+      _id: id,
       'owner.id': session.user.sub,
     });
 
