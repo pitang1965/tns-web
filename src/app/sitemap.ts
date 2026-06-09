@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import CampingSpot from '@/lib/models/CampingSpot';
 import { ensureDbConnection } from '@/lib/database';
+import { getDb } from '@/lib/mongodb';
 import { logger } from '@/lib/logger';
 
 const BASE_URL = 'https://tabi.over40web.club';
@@ -81,7 +82,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     );
 
-    return [...staticPages, ...campingSpotPages];
+    const db = await getDb();
+    const publicItineraries = await db
+      .collection('itineraries')
+      .find({ isPublic: true }, { projection: { _id: 1, updatedAt: 1 } })
+      .sort({ updatedAt: -1 })
+      .toArray();
+
+    const itineraryPages: MetadataRoute.Sitemap = publicItineraries.map(
+      (itinerary) => ({
+        url: `${BASE_URL}/itineraries/${itinerary._id}`,
+        lastModified: new Date(itinerary.updatedAt || Date.now()),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      }),
+    );
+
+    return [...staticPages, ...campingSpotPages, ...itineraryPages];
   } catch (error) {
     logger.error(
       error instanceof Error ? error : new Error('Error generating sitemap'),
