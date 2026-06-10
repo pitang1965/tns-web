@@ -19,6 +19,29 @@ async function getAuthenticatedUser() {
   return session.user;
 }
 
+/**
+ * 旅程の閲覧アクセス可否を判定する（サーバー側の認可ガード）
+ * - 公開旅程は誰でも閲覧可
+ * - 非公開旅程は所有者、または共有相手のみ閲覧可
+ *
+ * クライアント側の useItineraryAccess は表示制御のみで認可の役割は持たないため、
+ * データを返す前に必ずこの関数でガードすること。
+ */
+export function canAccessItinerary(
+  itinerary: {
+    isPublic?: boolean;
+    owner?: { id?: string } | null;
+    sharedWith?: ({ id?: string } | null | undefined)[] | null;
+  },
+  userSub: string | null | undefined,
+): boolean {
+  if (itinerary.isPublic) return true;
+  if (!userSub) return false;
+  if (itinerary.owner?.id && itinerary.owner.id === userSub) return true;
+  if (itinerary.sharedWith?.some((u) => u?.id === userSub)) return true;
+  return false;
+}
+
 export async function createItinerary(
   newItinerary: ClientItineraryInput,
 ): Promise<ClientItineraryDocument> {
@@ -99,6 +122,12 @@ export async function getItineraryById(
       return null;
     }
 
+    // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
+    const session = await auth0.getSession();
+    if (!canAccessItinerary(itinerary, session?.user?.sub)) {
+      return null;
+    }
+
     console.log(`Itinerary found: ${itinerary.title}`);
     return toClientItinerary(itinerary);
   } catch (error) {
@@ -157,6 +186,12 @@ export async function getItineraryWithDay(
     }
 
     const itineraryData = result[0];
+
+    // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
+    const session = await auth0.getSession();
+    if (!canAccessItinerary(itineraryData, session?.user?.sub)) {
+      return null;
+    }
 
     const metadata = {
       id: itineraryData._id.toString(),

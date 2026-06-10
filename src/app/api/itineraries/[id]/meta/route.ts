@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import ItineraryModel from '@/lib/models/Itinerary';
 import { ensureDbConnection } from '@/lib/database';
+import { auth0 } from '@/lib/auth0';
+import { canAccessItinerary } from '@/lib/itineraries';
 
 function isValidObjectId(id: string): boolean {
   return mongoose.Types.ObjectId.isValid(id);
@@ -25,10 +27,25 @@ export async function GET(
 
     await ensureDbConnection();
     const result = await ItineraryModel.findById(id)
-      .select('updatedAt')
-      .lean<{ updatedAt: Date }>();
+      .select('updatedAt isPublic owner sharedWith')
+      .lean<{
+        updatedAt: Date;
+        isPublic?: boolean;
+        owner?: { id?: string };
+        sharedWith?: { id?: string }[];
+      }>();
 
     if (!result) {
+      return NextResponse.json(
+        { error: 'Itinerary not found' },
+        { status: 404 },
+      );
+    }
+
+    // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
+    // 存在の有無を漏らさないため、権限がない場合も 404 を返す
+    const session = await auth0.getSession();
+    if (!canAccessItinerary(result, session?.user?.sub)) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
         { status: 404 },
