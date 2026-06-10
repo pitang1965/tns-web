@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShareButtons } from './ShareButtons';
-import { Search, RotateCcw, Copy, Check } from 'lucide-react';
+import { ChevronRight, RotateCcw, Copy, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type DiagnosisResultProps = {
@@ -21,6 +21,11 @@ type DiagnosisResultProps = {
 };
 
 const RANK_ICONS = ['', '1', '2', '3'];
+
+const SPOT_TYPE_EXTRA_PARAMS: Record<string, string> = {
+  parking_lot: '&q=立体駐車場',
+  convenience_store: '&lat=35.1763856&lng=140.2512053&lng_span=3.2284454',
+};
 
 export function DiagnosisResultView({
   result,
@@ -32,10 +37,6 @@ export function DiagnosisResultView({
 
   // 除外されていないおすすめスポットをフィルタリング
   const visibleRecommendations = recommendations.filter((r) => !r.excluded);
-
-  // 検索ページへのリンク（上位のスポットタイプでフィルタリング）
-  const topTypes = visibleRecommendations.slice(0, 3).map((r) => r.type);
-  const searchUrl = `/shachu-haku?type=${topTypes[0] || ''}`;
 
   // デバッグ用: 回答と結果をクリップボードにコピー
   const handleCopyDebugInfo = async () => {
@@ -82,7 +83,7 @@ export function DiagnosisResultView({
     <div className="mx-auto w-full max-w-lg space-y-6">
       {/* ペルソナ結果 */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5 pb-4 text-center">
+        <CardHeader className="bg-linear-to-br from-primary/10 to-primary/5 pb-4 text-center">
           <p className="text-sm text-muted-foreground">
             あなたの車中泊スタイルは...
           </p>
@@ -105,10 +106,11 @@ export function DiagnosisResultView({
         </CardHeader>
         <CardContent className="space-y-3">
           {visibleRecommendations.map((recommendation, index) => (
-            <div
+            <Link
               key={recommendation.type}
+              href={`/shachu-haku?type=${recommendation.type}${SPOT_TYPE_EXTRA_PARAMS[recommendation.type] ?? ''}`}
               className={cn(
-                'flex items-start gap-3 rounded-lg border p-3',
+                'flex items-center gap-3 rounded-lg border p-3 transition-opacity hover:opacity-75',
                 index === 0 &&
                   'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
                 index === 1 && 'border-gray-300 bg-gray-50 dark:bg-gray-800/50',
@@ -137,7 +139,8 @@ export function DiagnosisResultView({
                   ))}
                 </div>
               </div>
-            </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            </Link>
           ))}
 
           {result.excludedSpots.length > 0 && (
@@ -150,13 +153,6 @@ export function DiagnosisResultView({
 
       {/* アクションボタン */}
       <div className="space-y-4">
-        <Button asChild size="lg" className="w-full gap-2">
-          <Link href={searchUrl}>
-            <Search className="h-4 w-4" />
-            おすすめスポットを探す
-          </Link>
-        </Button>
-
         <ShareButtons persona={persona} />
 
         <div className="flex items-center justify-center gap-2">
