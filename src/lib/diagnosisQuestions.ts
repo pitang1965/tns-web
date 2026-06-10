@@ -69,17 +69,17 @@ export const DIAGNOSIS_QUESTIONS: QuestionDefinition[] = [
       {
         value: 'required',
         label: '必要',
-        description: 'ポータブル電源では足りない',
+        description: 'エアコン・冷蔵庫など大電力機器を使う',
       },
       {
         value: 'nice_to_have',
         label: 'あれば嬉しい',
-        description: 'ポータブル電源も併用',
+        description: 'ポータブル電源でも対応できるが外部電源があると楽',
       },
       {
         value: 'not_needed',
         label: '不要',
-        description: 'ポータブル電源で十分',
+        description: 'モバイルバッテリーで十分、または電力不要',
       },
     ],
   },
@@ -216,7 +216,7 @@ export const DIAGNOSIS_QUESTIONS: QuestionDefinition[] = [
       {
         value: 'managed',
         label: '管理されている場所がいい',
-        description: 'スタッフや警備がいると安心',
+        description: '管理人や監視カメラ、ゲート等があると安心',
       },
       {
         value: 'quiet_preferred',
