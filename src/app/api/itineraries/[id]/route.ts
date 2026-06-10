@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import ItineraryModel from '@/lib/models/Itinerary';
 import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
+import { auth0 } from '@/lib/auth0';
+import { canAccessItinerary } from '@/lib/itineraries';
 import {
   ServerItineraryDocument,
   toClientItinerary,
@@ -30,6 +32,16 @@ export async function GET(
     const itinerary = await ItineraryModel.findById(id).lean<ServerItineraryDocument>();
 
     if (!itinerary) {
+      return NextResponse.json(
+        { error: 'Itinerary not found' },
+        { status: 404 },
+      );
+    }
+
+    // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
+    // 存在の有無を漏らさないため、権限がない場合も 404 を返す
+    const session = await auth0.getSession();
+    if (!canAccessItinerary(itinerary, session?.user?.sub)) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
         { status: 404 },
