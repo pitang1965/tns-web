@@ -415,6 +415,9 @@ export default function ShachuHakuMap({
     map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
     return () => {
+      // load イベント前にアンマウントされた場合でも console.warn を確実に復元する
+      // （load ハンドラ内の復元は冪等なので二重呼び出しでも問題ない）
+      restoreConsoleWarn();
       if (map.current) {
         map.current.remove();
         map.current = null;
