@@ -69,7 +69,7 @@ export default function AdminClient() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
 
   // Use custom hook for filter persistence
   const {
@@ -360,7 +360,7 @@ export default function AdminClient() {
     }
   };
 
-  if (isLoading || !user) {
+  if (isLoading || adminLoading || !user) {
     // For loading states, return null and let Suspense handle it
     return null;
   }

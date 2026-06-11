@@ -27,7 +27,7 @@ export default function SubmissionsAdminPage() {
   'use memo';
   const { user, isLoading } = useUser();
   const { toast } = useToast();
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
 
   const [submissions, setSubmissions] = useState<CampingSpotSubmissionWithId[]>(
     [],
@@ -114,7 +114,7 @@ export default function SubmissionsAdminPage() {
     console.log('handleEditSuccess: Toast displayed');
   };
 
-  if (isLoading) {
+  if (isLoading || adminLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">

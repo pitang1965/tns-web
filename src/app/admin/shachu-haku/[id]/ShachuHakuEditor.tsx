@@ -31,7 +31,7 @@ export default function ShachuHakuEditor() {
   const params = useParams();
   const pathname = usePathname();
   const { addUrl } = useRecentUrls();
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin, isLoading: adminLoading } = useAdminStatus();
   const id = params?.id as string;
 
   const [spot, setSpot] = useState<CampingSpotWithId | null>(null);
@@ -116,7 +116,7 @@ export default function ShachuHakuEditor() {
     router.push(`/admin/shachu-haku/${spotId}`);
   };
 
-  if (isLoading || !user) {
+  if (isLoading || adminLoading || !user) {
     // Let Suspense handle loading
     return null;
   }
