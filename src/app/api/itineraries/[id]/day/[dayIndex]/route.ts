@@ -58,9 +58,6 @@ export async function GET(
     }
 
     const totalDays = itinerary.dayPlans?.length || 0;
-    console.log(
-      `Total days in itinerary: ${totalDays}, requested day: ${dayIndexNum}`,
-    );
 
     if (totalDays === 0) {
       return NextResponse.json(
@@ -143,7 +140,6 @@ export async function GET(
     }
 
     const itineraryData = result[0];
-    console.log(`Selected day data found: ${!!itineraryData.selectedDay}`);
 
     if (itineraryData.selectedDay === null) {
       return NextResponse.json(

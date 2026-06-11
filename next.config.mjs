@@ -21,9 +21,9 @@ const withPWA = withPWAInit({
         cacheName: 'mapbox-static-assets',
         expiration: {
           maxEntries: 300,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
-        }
-      }
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30日
+        },
+      },
     },
     // Mapboxベクトルタイル
     {
@@ -33,9 +33,9 @@ const withPWA = withPWAInit({
         cacheName: 'mapbox-tiles',
         expiration: {
           maxEntries: 500,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
-        }
-      }
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30日
+        },
+      },
     },
     // Mapboxラスタータイル（画像タイル）
     {
@@ -45,9 +45,9 @@ const withPWA = withPWAInit({
         cacheName: 'mapbox-raster-tiles',
         expiration: {
           maxEntries: 500,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30日
-        }
-      }
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30日
+        },
+      },
     },
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
@@ -56,9 +56,9 @@ const withPWA = withPWAInit({
         cacheName: 'google-fonts-webfonts',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 365 * 24 * 60 * 60 // 1年
-        }
-      }
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1年
+        },
+      },
     },
     {
       urlPattern: /^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,
@@ -67,9 +67,9 @@ const withPWA = withPWAInit({
         cacheName: 'google-fonts-stylesheets',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 7 * 24 * 60 * 60 // 1週間
-        }
-      }
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 1週間
+        },
+      },
     },
     {
       urlPattern: /\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,
@@ -78,9 +78,9 @@ const withPWA = withPWAInit({
         cacheName: 'static-font-assets',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 7 * 24 * 60 * 60 // 1週間
-        }
-      }
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 1週間
+        },
+      },
     },
     {
       urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
@@ -89,9 +89,9 @@ const withPWA = withPWAInit({
         cacheName: 'static-image-assets',
         expiration: {
           maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 24時間
+        },
+      },
     },
     {
       urlPattern: /\/_next\/image\?url=.+$/i,
@@ -100,9 +100,9 @@ const withPWA = withPWAInit({
         cacheName: 'next-image',
         expiration: {
           maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 24時間
+        },
+      },
     },
     {
       urlPattern: /\.(?:mp3|wav|ogg)$/i,
@@ -112,9 +112,9 @@ const withPWA = withPWAInit({
         cacheName: 'static-audio-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 24時間
+        },
+      },
     },
     {
       urlPattern: /\.(?:mp4)$/i,
@@ -124,9 +124,9 @@ const withPWA = withPWAInit({
         cacheName: 'static-video-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 24時間
+        },
+      },
     },
     {
       // Next.jsの静的JSファイル（ハッシュ付き）は長期キャッシュOK
@@ -136,9 +136,9 @@ const withPWA = withPWAInit({
         cacheName: 'next-static-js-assets',
         expiration: {
           maxEntries: 64,
-          maxAgeSeconds: 365 * 24 * 60 * 60 // 1年（ハッシュが変わるため安全）
-        }
-      }
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1年（ハッシュが変わるため安全）
+        },
+      },
     },
     {
       // その他のJSファイルは短期キャッシュ
@@ -148,10 +148,10 @@ const withPWA = withPWAInit({
         cacheName: 'static-js-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 60 * 60 // 1時間（デプロイ後に更新されるように）
+          maxAgeSeconds: 60 * 60, // 1時間（デプロイ後に更新されるように）
         },
-        networkTimeoutSeconds: 5
-      }
+        networkTimeoutSeconds: 5,
+      },
     },
     {
       // Next.jsの静的CSSファイル（ハッシュ付き）は長期キャッシュOK
@@ -161,9 +161,9 @@ const withPWA = withPWAInit({
         cacheName: 'next-static-css-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 365 * 24 * 60 * 60 // 1年（ハッシュが変わるため安全）
-        }
-      }
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1年（ハッシュが変わるため安全）
+        },
+      },
     },
     {
       // その他のCSSファイルは短期キャッシュ
@@ -173,10 +173,10 @@ const withPWA = withPWAInit({
         cacheName: 'static-style-assets',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 60 * 60 // 1時間
+          maxAgeSeconds: 60 * 60, // 1時間
         },
-        networkTimeoutSeconds: 5
-      }
+        networkTimeoutSeconds: 5,
+      },
     },
     {
       // 車中泊スポット一覧・地図データ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
@@ -186,9 +186,9 @@ const withPWA = withPWAInit({
         cacheName: 'shachu-haku-list-data',
         expiration: {
           maxEntries: 500,
-          maxAgeSeconds: 30 * 60 // 30分
-        }
-      }
+          maxAgeSeconds: 30 * 60, // 30分
+        },
+      },
     },
     {
       // 車中泊スポット詳細データ - StaleWhileRevalidate
@@ -198,9 +198,9 @@ const withPWA = withPWAInit({
         cacheName: 'shachu-haku-detail-data',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 30 * 60 // 30分
-        }
-      }
+          maxAgeSeconds: 30 * 60, // 30分
+        },
+      },
     },
     {
       // 旅程一覧データ - StaleWhileRevalidate（即座に表示、バックグラウンド更新）
@@ -210,9 +210,9 @@ const withPWA = withPWAInit({
         cacheName: 'itinerary-list-data',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 24 * 60 * 60 // 1日
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 1日
+        },
+      },
     },
     {
       // 旅程詳細データ - StaleWhileRevalidate（1日キャッシュ）
@@ -222,9 +222,9 @@ const withPWA = withPWAInit({
         cacheName: 'itinerary-detail-data',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 24 * 60 * 60 // 1日
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 1日
+        },
+      },
     },
     {
       // その他のNext.jsデータ - NetworkFirst（既存の動作維持）
@@ -234,10 +234,10 @@ const withPWA = withPWAInit({
         cacheName: 'next-data',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 60 // 1分のみ（頻繁に更新される可能性があるため）
+          maxAgeSeconds: 60, // 1分のみ（頻繁に更新される可能性があるため）
         },
-        networkTimeoutSeconds: 5
-      }
+        networkTimeoutSeconds: 5,
+      },
     },
     {
       // 車中泊スポット一覧API - StaleWhileRevalidate
@@ -248,9 +248,9 @@ const withPWA = withPWAInit({
         cacheName: 'shachu-haku-list-api',
         expiration: {
           maxEntries: 500,
-          maxAgeSeconds: 30 * 60 // 30分
-        }
-      }
+          maxAgeSeconds: 30 * 60, // 30分
+        },
+      },
     },
     {
       // その他の車中泊スポットAPI - StaleWhileRevalidate
@@ -261,9 +261,9 @@ const withPWA = withPWAInit({
         cacheName: 'shachu-haku-detail-api',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 30 * 60 // 30分
-        }
-      }
+          maxAgeSeconds: 30 * 60, // 30分
+        },
+      },
     },
     {
       // 旅程API - StaleWhileRevalidate（1日キャッシュ）
@@ -274,9 +274,9 @@ const withPWA = withPWAInit({
         cacheName: 'itinerary-api',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 24 * 60 * 60 // 1日
-        }
-      }
+          maxAgeSeconds: 24 * 60 * 60, // 1日
+        },
+      },
     },
     {
       // その他のAPI - NetworkFirst（既存の動作維持）
@@ -287,10 +287,10 @@ const withPWA = withPWAInit({
         cacheName: 'apis',
         expiration: {
           maxEntries: 16,
-          maxAgeSeconds: 5 * 60 // 5分（APIは新鮮なデータを返すべき）
+          maxAgeSeconds: 5 * 60, // 5分（APIは新鮮なデータを返すべき）
         },
-        networkTimeoutSeconds: 10 // 10秒でタイムアウト後、キャッシュを使用
-      }
+        networkTimeoutSeconds: 10, // 10秒でタイムアウト後、キャッシュを使用
+      },
     },
     {
       // HTMLページはネットワーク優先でキャッシュ（オフライン対応）
@@ -303,12 +303,12 @@ const withPWA = withPWAInit({
         cacheName: 'pages',
         expiration: {
           maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60 // 24時間（オフライン時にアプリシェルを提供するため）
+          maxAgeSeconds: 24 * 60 * 60, // 24時間（オフライン時にアプリシェルを提供するため）
         },
-        networkTimeoutSeconds: 5
-      }
-    }
-  ]
+        networkTimeoutSeconds: 5,
+      },
+    },
+  ],
 });
 
 /** @type {import('next').NextConfig} */
@@ -322,6 +322,23 @@ const nextConfig = {
     },
   },
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // クリックジャッキング対策
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // MIMEスニッフィング対策
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // リファラーポリシー
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // 不要なブラウザ機能を制限（位置情報はMapbox使用のため除外）
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=()' },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {

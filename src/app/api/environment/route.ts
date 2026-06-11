@@ -1,36 +1,14 @@
 import { NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
+// NODE_ENV をそのまま返す。DB URI の内容を返すと DB 命名規則が漏洩するため変更。
 export async function GET() {
-  try {
-    // APP_MONGODB_URIを優先（MCPサーバーによるMONGODB_URI上書きの影響を受けないため）
-    const mongoUri =
-      process.env.APP_MONGODB_URI || process.env.MONGODB_URI || '';
-
-    // データベース名を抽出して環境を判定
-    let environment: 'development' | 'production' | 'unknown' = 'unknown';
-
-    if (mongoUri.includes('itinerary_db_dev')) {
-      environment = 'development';
-    } else if (mongoUri.includes('itinerary_db')) {
-      environment = 'production';
-    }
-
-    return NextResponse.json(
-      { environment },
-      {
-        headers: {
-          'Cache-Control': 'no-store',
-        },
-      },
-    );
-  } catch (error) {
-    logger.error(
-      error instanceof Error ? error : new Error('Error in /api/environment'),
-    );
-    // エラー時は unknown を返す
-    return NextResponse.json({ environment: 'unknown' }, { status: 200 });
-  }
+  return NextResponse.json(
+    {
+      environment:
+        process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
 }
