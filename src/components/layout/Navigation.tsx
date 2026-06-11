@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { isAdmin } from '@/lib/userUtils';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 const activeClassNames =
   'underline decoration-1 underline-offset-4 decoration-current';
@@ -37,14 +37,12 @@ const NavLink = ({ href, children }: NavLinkProps) => {
 };
 
 export function Navigation() {
-  const { user, isLoading } = useUser();
+  const { isLoading } = useUser();
+  const { isAdmin: userIsAdmin } = useAdminStatus();
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
-
-  // Check if user is admin
-  const userIsAdmin = isAdmin(user);
 
   return (
     <div className="flex items-center space-x-4">

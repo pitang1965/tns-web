@@ -4,6 +4,7 @@ import { Crown, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { User } from '@auth0/nextjs-auth0/types';
 import { getPremiumMemberType, getPremiumMemberLabel } from '@/lib/userUtils';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 type PremiumBadgeProps = {
   user: User | null | undefined;
@@ -16,8 +17,9 @@ export default function PremiumBadge({
   variant = 'default',
   showIcon = true,
 }: PremiumBadgeProps) {
-  const memberType = getPremiumMemberType(user);
-  const label = getPremiumMemberLabel(user);
+  const { isAdmin } = useAdminStatus();
+  const memberType = getPremiumMemberType(user, isAdmin);
+  const label = getPremiumMemberLabel(user, isAdmin);
 
   if (!label) {
     return null;

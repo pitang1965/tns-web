@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
@@ -30,14 +31,8 @@ export default function ShachuHakuEditor() {
   const params = useParams();
   const pathname = usePathname();
   const { addUrl } = useRecentUrls();
+  const { isAdmin } = useAdminStatus();
   const id = params?.id as string;
-
-  // Check if user is admin
-  const isAdmin =
-    user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email);
 
   const [spot, setSpot] = useState<CampingSpotWithId | null>(null);
   const [loading, setLoading] = useState(true);

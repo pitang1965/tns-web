@@ -18,25 +18,13 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export function BurgerMenu() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { user } = useUser();
-
-  // Check if user is admin
-  // Safe access to environment variable for client-side rendering
-  const adminEmails =
-    typeof window !== 'undefined'
-      ? process.env.NEXT_PUBLIC_ADMIN_EMAILS
-      : undefined;
-
-  const isAdmin =
-    user?.email &&
-    adminEmails
-      ?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email);
+  const { isAdmin } = useAdminStatus();
 
   const handleItemClick = (
     e: React.MouseEvent<HTMLAnchorElement>,

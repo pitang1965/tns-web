@@ -7,6 +7,7 @@ import { AlertCircle, CheckCircle, Crown, Infinity } from 'lucide-react';
 import type { User } from '@auth0/nextjs-auth0/types';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 type ItineraryLimitStatusProps = {
   user: User | null | undefined;
@@ -17,7 +18,8 @@ export default function ItineraryLimitStatus({
   user,
   itineraries,
 }: ItineraryLimitStatusProps) {
-  const status = getItineraryLimitStatus(user, itineraries);
+  const { isAdmin } = useAdminStatus();
+  const status = getItineraryLimitStatus(user, itineraries, isAdmin);
 
   if (status.isPremium) {
     return (

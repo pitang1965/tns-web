@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -26,13 +27,7 @@ export default function SubmissionsAdminPage() {
   'use memo';
   const { user, isLoading } = useUser();
   const { toast } = useToast();
-
-  // Check if user is admin
-  const isAdmin =
-    user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email);
+  const { isAdmin } = useAdminStatus();
 
   const [submissions, setSubmissions] = useState<CampingSpotSubmissionWithId[]>(
     [],

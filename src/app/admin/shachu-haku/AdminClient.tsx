@@ -8,6 +8,7 @@ import {
   startTransition,
 } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useToast } from '@/components/ui/use-toast';
@@ -68,13 +69,7 @@ export default function AdminClient() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Check if user is admin
-  const isAdmin =
-    user?.email &&
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email);
+  const { isAdmin } = useAdminStatus();
 
   // Use custom hook for filter persistence
   const {
@@ -115,7 +110,7 @@ export default function AdminClient() {
 
   // Use custom hooks
   const { pendingCount: pendingSubmissionsCount } = usePendingSubmissions({
-    isAdmin: !!isAdmin,
+    isAdmin,
   });
 
   const {

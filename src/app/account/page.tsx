@@ -6,11 +6,8 @@ import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { H1, LargeText } from '@/components/common/Typography';
 import PremiumBadge from '@/components/common/PremiumBadge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  isPremiumMember,
-  getPremiumMemberLabel,
-  isAdmin,
-} from '@/lib/userUtils';
+import { isPremiumMember, getPremiumMemberLabel } from '@/lib/userUtils';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 type UserInfoProps = {
   label: string;
@@ -27,11 +24,12 @@ function UserInfo({ label, value }: UserInfoProps) {
 
 export default withPageAuthRequired(function Account() {
   const { user, error, isLoading } = useUser();
+  const { isAdmin } = useAdminStatus();
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div>{error.message}</div>;
   if (!user) return <div>ユーザー情報が取得できませんでした</div>;
 
-  const premiumLabel = getPremiumMemberLabel(user);
+  const premiumLabel = getPremiumMemberLabel(user, isAdmin);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -72,7 +70,7 @@ export default withPageAuthRequired(function Account() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {isPremiumMember(user)
+              {isPremiumMember(user, isAdmin)
                 ? 'プレミアム会員特典'
                 : 'プレミアム会員になると'}
             </CardTitle>
@@ -82,12 +80,16 @@ export default withPageAuthRequired(function Account() {
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                    isPremiumMember(user, isAdmin)
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
                   }`}
                 ></div>
                 <span
                   className={
-                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                    isPremiumMember(user, isAdmin)
+                      ? ''
+                      : 'text-muted-foreground'
                   }
                 >
                   旅程作成数無制限（一般会員は10個まで）
@@ -96,12 +98,16 @@ export default withPageAuthRequired(function Account() {
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                    isPremiumMember(user, isAdmin)
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
                   }`}
                 ></div>
                 <span
                   className={
-                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                    isPremiumMember(user, isAdmin)
+                      ? ''
+                      : 'text-muted-foreground'
                   }
                 >
                   広告非表示
@@ -110,12 +116,16 @@ export default withPageAuthRequired(function Account() {
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                    isPremiumMember(user, isAdmin)
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
                   }`}
                 ></div>
                 <span
                   className={
-                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                    isPremiumMember(user, isAdmin)
+                      ? ''
+                      : 'text-muted-foreground'
                   }
                 >
                   優先サポート
@@ -124,19 +134,23 @@ export default withPageAuthRequired(function Account() {
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    isPremiumMember(user) ? 'bg-green-500' : 'bg-gray-300'
+                    isPremiumMember(user, isAdmin)
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
                   }`}
                 ></div>
                 <span
                   className={
-                    isPremiumMember(user) ? '' : 'text-muted-foreground'
+                    isPremiumMember(user, isAdmin)
+                      ? ''
+                      : 'text-muted-foreground'
                   }
                 >
                   新機能の先行利用
                 </span>
               </div>
             </div>
-            {!isPremiumMember(user) && (
+            {!isPremiumMember(user, isAdmin) && (
               <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
                 <p className="text-sm text-amber-800">
                   プレミアム会員へのアップグレード機能は近日公開予定です
@@ -147,7 +161,7 @@ export default withPageAuthRequired(function Account() {
         </Card>
 
         {/* Admin Status Card */}
-        {isAdmin(user) && (
+        {isAdmin && (
           <Card>
             <CardHeader>
               <CardTitle>管理者権限</CardTitle>
