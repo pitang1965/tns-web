@@ -2,9 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { contactFormSchema } from '@/data/schemas/contactSchema';
 import mailerSend from '@/lib/mailersend';
 import { logger } from '@/lib/logger';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+
+// 未認証エンドポイントのため、メール爆撃・クォータ枯渇対策として
+// IPごとに10分間で3回までに制限
+const RATE_LIMIT = 3;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rateLimitResult = checkRateLimit({
+      key: `contact:${ip}`,
+      limit: RATE_LIMIT,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+    });
+
+    if (!rateLimitResult.allowed) {
+      logger.warn('[お問い合わせ] レート制限超過', { ip });
+      return NextResponse.json(
+        {
+          error:
+            '送信回数の上限に達しました。しばらく時間をおいて再度お試しください。',
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateLimitResult.retryAfterSeconds),
+          },
+        },
+      );
+    }
+
     const body = await request.json();
 
     const validatedData = contactFormSchema.parse(body);

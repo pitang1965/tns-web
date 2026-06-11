@@ -6,9 +6,38 @@ import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
 import mailerSend from '@/lib/mailersend';
 import { logger } from '@/lib/logger';
 import { calculateDistance } from '@/lib/utils/distance';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+
+// 未認証エンドポイントのため、スパム投稿・管理者宛メール爆撃対策として
+// IPごとに10分間で5回までに制限
+const RATE_LIMIT = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rateLimitResult = checkRateLimit({
+      key: `camping-spot-submit:${ip}`,
+      limit: RATE_LIMIT,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+    });
+
+    if (!rateLimitResult.allowed) {
+      logger.warn('[車中泊スポット投稿] レート制限超過', { ip });
+      return NextResponse.json(
+        {
+          error:
+            '投稿回数の上限に達しました。しばらく時間をおいて再度お試しください。',
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(rateLimitResult.retryAfterSeconds),
+          },
+        },
+      );
+    }
+
     await ensureDbConnection();
 
     const body = await request.json();
