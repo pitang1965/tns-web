@@ -1,5 +1,16 @@
 import { logger } from '@/lib/logger';
 
+// ユーザー入力をメールHTMLに埋め込む前のエスケープ。
+// 未エスケープだと管理者宛メールに任意のHTML(偽リンク等)を注入できてしまう
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 type EmailData = {
   to: string;
   subject: string;
@@ -54,7 +65,8 @@ export class MailerSendClient {
         ],
         subject: emailData.subject,
         text: emailData.text,
-        html: emailData.html || emailData.text.replace(/\n/g, '<br>'),
+        html:
+          emailData.html || escapeHtml(emailData.text).replace(/\n/g, '<br>'),
       };
 
       const response = await fetch(`${this.baseUrl}/email`, {
@@ -146,11 +158,11 @@ export class MailerSendClient {
   }): Promise<MailerSendResponse> {
     const emailHtml = `
       <h2>新しいお問い合わせ</h2>
-      <p><strong>お名前:</strong> ${data.name}</p>
-      <p><strong>メールアドレス:</strong> ${data.email}</p>
-      <p><strong>件名:</strong> ${data.subject}</p>
+      <p><strong>お名前:</strong> ${escapeHtml(data.name)}</p>
+      <p><strong>メールアドレス:</strong> ${escapeHtml(data.email)}</p>
+      <p><strong>件名:</strong> ${escapeHtml(data.subject)}</p>
       <p><strong>メッセージ:</strong></p>
-      <p>${data.message.replace(/\n/g, '<br>')}</p>
+      <p>${escapeHtml(data.message).replace(/\n/g, '<br>')}</p>
       <hr>
       <p><small>このメールは車旅のしおりのお問い合わせフォームから送信されました。</small></p>
     `;
@@ -198,23 +210,23 @@ ${data.message}
 
     const emailHtml = `
       <h2>新しい車中泊スポット投稿</h2>
-      <p><strong>スポット名:</strong> ${data.name}</p>
-      <p><strong>都道府県:</strong> ${data.prefecture}</p>
-      <p><strong>住所:</strong> ${data.address || '未入力'}</p>
-      <p><strong>スポットタイプ:</strong> ${
-        typeLabels[data.type] || data.type
-      }</p>
+      <p><strong>スポット名:</strong> ${escapeHtml(data.name)}</p>
+      <p><strong>都道府県:</strong> ${escapeHtml(data.prefecture)}</p>
+      <p><strong>住所:</strong> ${escapeHtml(data.address || '未入力')}</p>
+      <p><strong>スポットタイプ:</strong> ${escapeHtml(
+        typeLabels[data.type] || data.type,
+      )}</p>
       ${
         data.submitterName
-          ? `<p><strong>投稿者名:</strong> ${data.submitterName}</p>`
+          ? `<p><strong>投稿者名:</strong> ${escapeHtml(data.submitterName)}</p>`
           : ''
       }
       ${
         data.submitterEmail
-          ? `<p><strong>投稿者メール:</strong> ${data.submitterEmail}</p>`
+          ? `<p><strong>投稿者メール:</strong> ${escapeHtml(data.submitterEmail)}</p>`
           : ''
       }
-      <p><strong>投稿ID:</strong> ${data.submissionId}</p>
+      <p><strong>投稿ID:</strong> ${escapeHtml(data.submissionId)}</p>
       <hr>
       <p><small>このメールは車旅のしおりの車中泊スポット投稿フォームから送信されました。</small></p>
     `;
@@ -276,9 +288,9 @@ ${data.submitterEmail ? `投稿者メール: ${data.submitterEmail}` : ''}
 
     const emailHtml = `
       <h2>新しいユーザー登録</h2>
-      <p><strong>ユーザーID:</strong> ${data.userId}</p>
-      <p><strong>ユーザー名:</strong> ${data.userName}</p>
-      <p><strong>メールアドレス:</strong> ${data.userEmail}</p>
+      <p><strong>ユーザーID:</strong> ${escapeHtml(data.userId)}</p>
+      <p><strong>ユーザー名:</strong> ${escapeHtml(data.userName)}</p>
+      <p><strong>メールアドレス:</strong> ${escapeHtml(data.userEmail)}</p>
       ${
         data.createdAt
           ? `<p><strong>登録日時:</strong> ${new Date(
