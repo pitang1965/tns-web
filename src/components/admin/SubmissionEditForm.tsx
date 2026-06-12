@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { X, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import {
   CampingSpotSubmissionWithId,
   CampingSpotType,
@@ -288,7 +289,7 @@ export default function SubmissionEditForm({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
         <CardHeader>
-          <div className="flex items-start justify-between gap-2">
+          <AdminPageHeader className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <CardTitle>投稿の編集と承認</CardTitle>
               <SpotSearchButtons
@@ -304,7 +305,7 @@ export default function SubmissionEditForm({
             >
               <X className="w-4 h-4" />
             </Button>
-          </div>
+          </AdminPageHeader>
         </CardHeader>
         <CardContent>
           <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">

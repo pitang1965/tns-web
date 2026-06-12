@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { getCampingSpotById } from '../../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { LoadingState } from '@/components/common/LoadingState';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 
@@ -168,7 +169,7 @@ export default function ShachuHakuEditor() {
     <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
       <div className="flex flex-col gap-4">
         {/* Header section - responsive layout */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <AdminPageHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link href="/admin/shachu-haku">
               <Button variant="outline" size="sm">
@@ -222,7 +223,7 @@ export default function ShachuHakuEditor() {
               </Link>
             </div>
           )}
-        </div>
+        </AdminPageHeader>
       </div>
 
       <ShachuHakuForm

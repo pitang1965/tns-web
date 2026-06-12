@@ -27,6 +27,7 @@ import {
 } from '../../actions/campingSpots/csv';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { AdminSpotsList } from '@/components/admin/AdminSpotsList';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
 import { useShachuHakuFilters } from '@/hooks/useShachuHakuFilters';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
@@ -382,7 +383,7 @@ export default function AdminClient() {
   return (
     <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
       <div className="space-y-4">
-        <div className="flex justify-between items-center bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg px-4 py-3">
+        <AdminPageHeader className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">車中泊スポット管理</h1>
           <div className="flex gap-2">
             <Link href="/admin/submissions">
@@ -429,7 +430,7 @@ export default function AdminClient() {
               新規追加
             </Button>
           </div>
-        </div>
+        </AdminPageHeader>
         <Button
           onClick={() => openForm()}
           disabled={loading}

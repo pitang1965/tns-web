@@ -12,6 +12,7 @@ import { RefreshCw, Clock, CheckCircle, XCircle, Users } from 'lucide-react';
 import { CampingSpotSubmissionWithId } from '@/data/schemas/campingSpot';
 import { getCampingSpotSubmissions } from '../../../app/actions/campingSpotSubmissions';
 import SubmissionReviewCard from '@/components/admin/SubmissionReviewCard';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { LoadingState } from '@/components/common/LoadingState';
 import { celebrateSubmission } from '@/lib/confetti';
 
@@ -153,7 +154,7 @@ export default function SubmissionsAdminPage() {
 
   return (
     <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
-      <div className="flex justify-between items-center">
+      <AdminPageHeader className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">投稿管理</h1>
         <Button
           onClick={handleRefresh}
@@ -166,7 +167,7 @@ export default function SubmissionsAdminPage() {
           />
           更新
         </Button>
-      </div>
+      </AdminPageHeader>
 
       {/* Stats Cards - Hidden on mobile */}
       <div className="hidden md:grid grid-cols-1 md:grid-cols-4 gap-4">

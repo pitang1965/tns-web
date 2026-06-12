@@ -25,7 +25,8 @@
       "Bash(Select-Object -First 20)",
       "Bash(Format-Table FullName)",
       "Bash(Get-ChildItem *)",
-      "Skill(gsd-explore)"
+      "Skill(gsd-explore)",
+      "PowerShell(npx tsc --noEmit)"
     ]
   },
   "enableAllProjectMcpServers": true,

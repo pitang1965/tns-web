@@ -5,7 +5,8 @@ import { auth0 } from '@/lib/auth0';
 import { isAdmin } from '@/lib/userUtils';
 import { getAllItineraries } from '@/lib/itineraries';
 import { AdminItineraryList } from '@/components/admin/AdminItineraryList';
-import { H1, LargeText } from '@/components/common/Typography';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { LargeText } from '@/components/common/Typography';
 
 export const metadata: Metadata = {
   title: '旅程管理 | 車旅のしおり',
@@ -40,9 +41,11 @@ export default async function AdminItinerariesPage() {
   const itinerariesPromise = getAllItineraries();
 
   return (
-    <main className="flex flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24 bg-background text-foreground">
+    <main className="container mx-auto px-6 py-6 space-y-6 min-h-screen bg-background text-foreground">
       <section>
-        <H1>旅程管理</H1>
+        <AdminPageHeader className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">旅程管理</h1>
+        </AdminPageHeader>
         <LargeText>
           全ての旅程を確認できます。各旅程の詳細を表示するには、「見る」ボタンをクリックしてください。
         </LargeText>
