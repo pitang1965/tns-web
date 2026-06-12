@@ -21,20 +21,33 @@ export type CSVImportError = {
 
 export type CSVImportResult = {
   success: number;
+  updated: number;
   errors: CSVImportError[];
   totalRows: number;
   processedCount: number;
 };
 
+export type CSVImportOptions = {
+  updateExisting?: boolean;
+};
+
 export async function importCampingSpotsFromCSV(
   csvData: string,
+  options?: CSVImportOptions,
 ): Promise<CSVImportResult> {
+  const updateExisting = options?.updateExisting ?? false;
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
   const rows = parseCSV(csvData.trim());
   if (rows.length === 0) {
-    return { success: 0, errors: [], totalRows: 0, processedCount: 0 };
+    return {
+      success: 0,
+      updated: 0,
+      errors: [],
+      totalRows: 0,
+      processedCount: 0,
+    };
   }
 
   const headers = rows[0];
@@ -45,6 +58,7 @@ export async function importCampingSpotsFromCSV(
 
   const results: CSVImportResult = {
     success: 0,
+    updated: 0,
     errors: [],
     totalRows,
     processedCount: 0,
@@ -87,8 +101,6 @@ export async function importCampingSpotsFromCSV(
         campingSpotData = csvRowToCampingSpot(validatedCSVData);
       }
 
-      campingSpotData.submittedBy = user.email;
-
       // Check for duplicates with improved logic:
       // - If name matches exactly: reject if within 100m (likely duplicate submission)
       // - If name differs: reject only if within 10m (likely same location but different facility)
@@ -125,6 +137,32 @@ export async function importCampingSpotsFromCSV(
       });
 
       if (duplicateSpot) {
+        if (updateExisting) {
+          // Overwrite the existing spot with CSV data.
+          // submittedBy is intentionally excluded to preserve the original submitter.
+          // Fields absent from the CSV ($unset) are cleared because the CSV is
+          // treated as the source of truth in update mode.
+          const setOps: Record<string, unknown> = {};
+          const unsetOps: Record<string, 1> = {};
+          for (const [key, value] of Object.entries(campingSpotData)) {
+            if (value === undefined) {
+              unsetOps[key] = 1;
+            } else {
+              setOps[key] = value;
+            }
+          }
+          await CampingSpot.updateOne(
+            { _id: duplicateSpot._id },
+            {
+              $set: setOps,
+              ...(Object.keys(unsetOps).length > 0 ? { $unset: unsetOps } : {}),
+            },
+            { runValidators: true },
+          );
+          results.updated++;
+          continue;
+        }
+
         const distance = calculateDistance(
           campingSpotData.coordinates[1],
           campingSpotData.coordinates[0],
@@ -140,6 +178,7 @@ export async function importCampingSpotsFromCSV(
       }
 
       // Save the spot
+      campingSpotData.submittedBy = user.email;
       const newSpot = new CampingSpot(campingSpotData);
       await newSpot.save();
 
@@ -159,7 +198,7 @@ export async function importCampingSpotsFromCSV(
   }
 
   console.log(
-    `[CSV Import] Done: ${results.success} success, ${results.errors.length} errors out of ${totalRows}`,
+    `[CSV Import] Done: ${results.success} created, ${results.updated} updated, ${results.errors.length} errors out of ${totalRows}`,
   );
 
   revalidatePath('/admin/shachu-haku');

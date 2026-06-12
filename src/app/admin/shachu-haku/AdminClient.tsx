@@ -318,7 +318,7 @@ export default function AdminClient() {
     }
     toast({
       title: 'インポート完了',
-      description: `${result.success}件の車中泊スポットをインポートしました`,
+      description: `新規追加${result.success}件、更新${result.updated}件の車中泊スポットをインポートしました`,
     });
     if (result.errors.length > 0) {
       toast({

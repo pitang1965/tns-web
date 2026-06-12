@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   importCampingSpotsFromCSV,
@@ -32,6 +33,7 @@ export default function CSVImportDialog({
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
+  const [updateExisting, setUpdateExisting] = useState(false);
   const [result, setResult] = useState<CSVImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,11 +64,13 @@ export default function CSVImportDialog({
       setImporting(true);
 
       const csvText = await file.text();
-      const importResult = await importCampingSpotsFromCSV(csvText);
+      const importResult = await importCampingSpotsFromCSV(csvText, {
+        updateExisting,
+      });
 
       setResult(importResult);
 
-      if (importResult.success > 0) {
+      if (importResult.success > 0 || importResult.updated > 0) {
         onSuccess(importResult);
       } else {
         toast({
@@ -128,6 +132,10 @@ export default function CSVImportDialog({
               <p>
                 • 重複チェック: 100m以内の既存スポットは重複として扱われます
               </p>
+              <p>
+                •
+                上書きモードを有効にすると、重複スポットはスキップせずCSVの内容で更新されます
+              </p>
             </div>
             <div className="mt-3">
               <Button
@@ -140,6 +148,26 @@ export default function CSVImportDialog({
                 テンプレートをダウンロード
               </Button>
             </div>
+          </div>
+
+          {/* Import Options */}
+          <div className="border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <Checkbox
+                checked={updateExisting}
+                onCheckedChange={setUpdateExisting}
+                disabled={importing}
+                className="mt-0.5"
+              />
+              <div>
+                <span className="font-medium text-amber-800 dark:text-amber-200">
+                  既存スポットを更新する（上書きモード）
+                </span>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  重複と判定された既存スポット（同名で100m以内、または別名で10m以内）をCSVの内容で上書きします。CSVに値がない項目はクリアされます。
+                </p>
+              </div>
+            </label>
           </div>
 
           {/* File Upload */}
@@ -166,7 +194,7 @@ export default function CSVImportDialog({
               </Button>
             </div>
 
-            {file && (
+            {file && !result && (
               <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-green-600" />
@@ -194,7 +222,7 @@ export default function CSVImportDialog({
               <div className="text-sm text-gray-500 text-right">
                 {result.totalRows}件中 {result.processedCount}件処理
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className="bg-green-50 border-green-200">
                   <CardContent className="p-4 flex items-center gap-3">
                     <CheckCircle className="w-8 h-8 text-green-600" />
@@ -202,7 +230,18 @@ export default function CSVImportDialog({
                       <div className="text-2xl font-bold text-green-800">
                         {result.success}
                       </div>
-                      <div className="text-sm text-green-600">成功</div>
+                      <div className="text-sm text-green-600">新規追加</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <CheckCircle className="w-8 h-8 text-blue-600" />
+                    <div>
+                      <div className="text-2xl font-bold text-blue-800">
+                        {result.updated}
+                      </div>
+                      <div className="text-sm text-blue-600">更新</div>
                     </div>
                   </CardContent>
                 </Card>
