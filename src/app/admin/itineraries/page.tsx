@@ -5,6 +5,7 @@ import { auth0 } from '@/lib/auth0';
 import { isAdmin } from '@/lib/userUtils';
 import { getAllItineraries } from '@/lib/itineraries';
 import { AdminItineraryList } from '@/components/admin/AdminItineraryList';
+import { AdminItineraryCSVControls } from '@/components/admin/AdminItineraryCSVControls';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { LargeText } from '@/components/common/Typography';
 
@@ -45,6 +46,7 @@ export default async function AdminItinerariesPage() {
       <section>
         <AdminPageHeader className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">旅程管理</h1>
+          <AdminItineraryCSVControls />
         </AdminPageHeader>
         <LargeText>
           全ての旅程を確認できます。各旅程の詳細を表示するには、「見る」ボタンをクリックしてください。
