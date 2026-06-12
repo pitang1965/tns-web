@@ -10,14 +10,19 @@ type PremiumBadgeProps = {
   user: User | null | undefined;
   variant?: 'default' | 'large';
   showIcon?: boolean;
+  // サーバーコンポーネントから渡す管理者フラグ。指定するとクライアント側フェッチを待たずに
+  // 正しいバッジを初回描画できる(「一般会員」の一瞬表示を防ぐ)
+  isAdminHint?: boolean;
 };
 
 export default function PremiumBadge({
   user,
   variant = 'default',
   showIcon = true,
+  isAdminHint,
 }: PremiumBadgeProps) {
-  const { isAdmin } = useAdminStatus();
+  const { isAdmin: fetchedIsAdmin } = useAdminStatus();
+  const isAdmin = isAdminHint ?? fetchedIsAdmin;
   const memberType = getPremiumMemberType(user, isAdmin);
   const label = getPremiumMemberLabel(user, isAdmin);
 

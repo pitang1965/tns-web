@@ -7,18 +7,20 @@ import { AlertCircle, CheckCircle, Crown, Infinity } from 'lucide-react';
 import type { User } from '@auth0/nextjs-auth0/types';
 import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
-import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 type ItineraryLimitStatusProps = {
   user: User | null | undefined;
   itineraries: ClientItineraryDocument[];
+  // サーバーコンポーネントで判定した管理者フラグ。
+  // クライアント側フェッチ待ちによる「制限到達」の一瞬表示を防ぐため必須で受け取る
+  isAdmin: boolean;
 };
 
 export default function ItineraryLimitStatus({
   user,
   itineraries,
+  isAdmin,
 }: ItineraryLimitStatusProps) {
-  const { isAdmin } = useAdminStatus();
   const status = getItineraryLimitStatus(user, itineraries, isAdmin);
 
   if (status.isPremium) {
@@ -32,7 +34,7 @@ export default function ItineraryLimitStatus({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 text-white">
+            <Badge className="bg-linear-to-r from-amber-400 to-amber-600 text-white">
               <Infinity size={12} className="mr-1" />
               無制限
             </Badge>
