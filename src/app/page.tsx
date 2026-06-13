@@ -46,13 +46,26 @@ async function getFeaturedSpots() {
   }
 }
 
+async function getSpotCount() {
+  try {
+    await ensureDbConnection();
+    return await CampingSpot.countDocuments({});
+  } catch (error) {
+    console.error('Failed to count camping spots:', error);
+    return 0;
+  }
+}
+
 export default async function Home() {
   const session = await auth0.getSession();
 
   if (session?.user) {
     return <LoggedInHome userName={session.user.name || 'ゲスト'} />;
   } else {
-    const initialSpots = await getFeaturedSpots();
-    return <PublicHome initialSpots={initialSpots} />;
+    const [initialSpots, spotCount] = await Promise.all([
+      getFeaturedSpots(),
+      getSpotCount(),
+    ]);
+    return <PublicHome initialSpots={initialSpots} spotCount={spotCount} />;
   }
 }

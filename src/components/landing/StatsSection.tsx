@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { H2, LargeText } from '@/components/common/Typography';
-import { MapPin, FileText, Users } from 'lucide-react';
+import { H2, LargeText, Text } from '@/components/common/Typography';
+import { MapPin, FileText } from 'lucide-react';
 
 type Stats = {
   campingSpots: number;
@@ -115,7 +115,10 @@ export default function StatsSection() {
       className="py-16 px-6 bg-white dark:bg-gray-900"
     >
       <div className="max-w-6xl mx-auto">
-        <H2 className="text-center mb-12">実績・統計</H2>
+        <H2 className="text-center mb-4">数字で見る車旅のしおり</H2>
+        <Text className="text-center text-gray-600 dark:text-gray-400 mb-12">
+          掲載スポットも公開旅程も、日々増えています。
+        </Text>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
           {statItems.map((item, index) => {
             const Icon = item.icon;

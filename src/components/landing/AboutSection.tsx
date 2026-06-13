@@ -11,16 +11,14 @@ export default function AboutSection() {
 
         <div className="space-y-6 mb-12">
           <Text className="text-center text-lg text-gray-700 dark:text-gray-300">
-            旅行計画の作成から実施までをサポートするウェブアプリケーションです。
-            <br />
-            Google Maps
-            連携により効率的な旅程管理を実現し、カーナビゲーション（Android
-            Auto・Apple CarPlay）との連携を前提に設計されています。
+            車中泊の旅、行き先選びから当日のナビまで「車旅のしおり」におまかせ。
+            全国の車中泊スポットを、トイレ・入浴施設・安全性・静けさといった「泊まる人目線」の情報つきで検索できます。
           </Text>
 
           <Text className="text-center text-lg text-gray-700 dark:text-gray-300">
-            全国の車中泊スポット情報（トイレ・入浴施設、安全性、静けさなど）を地図で検索でき、気になるスポットは旅程に直接追加可能。
-            ユーザー投稿機能により、コミュニティで情報を共有できます。
+            気になったスポットはワンタップで旅程に追加。
+            当日は Android Auto・Apple CarPlay
+            でそのままナビへ。みんなのスポット投稿で、情報は日々増えていきます。
           </Text>
         </div>
 

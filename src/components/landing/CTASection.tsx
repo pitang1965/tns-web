@@ -10,7 +10,7 @@ export default function CTASection() {
       <div className="max-w-5xl mx-auto text-center">
         <H2 className="text-white mb-6">今すぐ始めよう</H2>
         <LargeText className="text-white/90 mb-10">
-          車中泊スポットを探したり、旅程を作成したり、あなたの旅をサポートします。
+          登録不要で、まずは全国の車中泊スポットを地図で探せます。
         </LargeText>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap">
           <Link
@@ -18,6 +18,7 @@ export default function CTASection() {
             className="group inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105"
           >
             車中泊マップを見る
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             href="/itineraries"
@@ -25,14 +26,16 @@ export default function CTASection() {
           >
             旅程一覧を見る
           </Link>
+        </div>
+        <p className="mt-8 text-white/80">
+          旅程を保存するなら
           <a
             href="/auth/login"
-            className="group inline-flex items-center gap-2 bg-linear-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105"
+            className="ml-1 font-semibold text-white underline underline-offset-4 hover:text-blue-100 transition-colors"
           >
             ログイン / 新規登録
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </a>
-        </div>
+        </p>
       </div>
     </section>
   );
