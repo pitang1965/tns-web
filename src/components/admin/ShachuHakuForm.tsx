@@ -42,7 +42,7 @@ import { PricingFields } from './PricingFields';
 import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
 import { NearbyFacilityFields } from './NearbyFacilityFields';
 import { FacilitiesMap } from './FacilitiesMap';
-import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { MissingFieldsConfirmDialog } from './MissingFieldsConfirmDialog';
 import { CloseConfirmDialog } from './CloseConfirmDialog';
 import { SpotSearchButtons } from './SpotSearchButtons';
@@ -80,12 +80,16 @@ export default function ShachuHakuForm({
   navigationData,
   onNavigate,
 }: ShachuHakuFormProps) {
+  // React Compilerのメモ化がreact-hook-formのreset()後の再レンダリングを抑制し、
+  // 編集画面でフォーム値が空になるため opt-out（50c4ceb）。現在はwatch()の検出で
+  // Compilerが自動スキップするため「unused」と判定されるが、watch()が削除されても
+  // バグが再発しないよう明示的に維持する。
+  // eslint-disable-next-line react-compiler/react-compiler
   'use no memo';
   const { toast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCloseConfirmDialog, setShowCloseConfirmDialog] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [missingFields, setMissingFields] = useState<MissingFields>({
     empty: [],
     unchecked: [],
@@ -193,7 +197,6 @@ export default function ShachuHakuForm({
     if (!spot?._id) return;
 
     try {
-      setDeleteLoading(true);
       await deleteCampingSpot(spot._id);
 
       // スポット削除成功後にキャッシュをクリア
@@ -211,8 +214,6 @@ export default function ShachuHakuForm({
         description: 'スポットの削除に失敗しました',
         variant: 'destructive',
       });
-    } finally {
-      setDeleteLoading(false);
     }
   };
 
@@ -385,7 +386,7 @@ export default function ShachuHakuForm({
                 type="button"
                 variant="destructive"
                 onClick={() => setShowDeleteConfirm(true)}
-                disabled={deleteLoading || loading}
+                disabled={loading}
                 className="cursor-pointer"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
@@ -405,14 +406,15 @@ export default function ShachuHakuForm({
         </CardFooter>
       </Card>
 
-      {showDeleteConfirm && (
-        <DeleteConfirmDialog
-          spot={spot}
-          loading={deleteLoading}
-          onConfirm={handleDelete}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
+      <ConfirmationDialog
+        isOpen={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="削除確認"
+        description={`「${spot?.name}」を削除しますか？この操作は取り消せません。`}
+        confirmLabel="削除"
+        variant="destructive"
+        onConfirm={handleDelete}
+      />
 
       {/* 未入力項目確認ダイアログ */}
       <MissingFieldsConfirmDialog
