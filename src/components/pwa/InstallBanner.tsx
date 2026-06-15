@@ -100,6 +100,7 @@ export function InstallBanner() {
   const [dismissed, setDismissed] = useState(false);
   const [canPromptAndroid, setCanPromptAndroid] = useState(false);
   const [armed, setArmed] = useState(false);
+  const [bottomOffset, setBottomOffset] = useState(0);
 
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
@@ -153,7 +154,20 @@ export function InstallBanner() {
     }
   }, [visible, platform]);
 
+  // 下部固定タブメニュー（モバイル限定）の上に重ねて表示する（重なり防止）
+  useEffect(() => {
+    if (!visible) return;
+    const measure = () => {
+      const tabbar = document.querySelector<HTMLElement>('[data-tabbar]');
+      setBottomOffset(tabbar?.offsetHeight ?? 0);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [visible, pathname]);
+
   // 表示中はバナー高さ分の余白を追加し、最下部の広告・フッターを覆わない（ADR-0002）
+  // タブメニュー分の余白はFooterのpb-20で確保済みのため、ここではバナー高さのみ加算する
   useEffect(() => {
     if (!visible) return;
     const height = bannerRef.current?.offsetHeight ?? 0;
@@ -162,7 +176,7 @@ export function InstallBanner() {
     return () => {
       document.body.style.paddingBottom = previous;
     };
-  }, [visible, platform]);
+  }, [visible, platform, bottomOffset]);
 
   const suppress = useCallback(() => {
     try {
@@ -204,8 +218,8 @@ export function InstallBanner() {
       ref={bannerRef}
       role="dialog"
       aria-label="アプリのインストール案内"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background shadow-lg"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed inset-x-0 z-40 border-t border-border bg-background shadow-lg"
+      style={{ bottom: bottomOffset }}
     >
       <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-3">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
