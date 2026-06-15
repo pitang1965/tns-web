@@ -12,6 +12,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
 import { WebsiteJsonLd } from '@/components/seo/JsonLd';
+import { InstallBanner } from '@/components/pwa/InstallBanner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -118,6 +119,7 @@ export default function RootLayout({
                   </main>
                   <Footer />
                 </div>
+                <InstallBanner />
               </EnvironmentWrapper>
             </ThemeProvider>
           </Auth0Provider>
