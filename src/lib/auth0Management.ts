@@ -108,6 +108,38 @@ export class Auth0ManagementClient {
     }
   }
 
+  /**
+   * Auth0ユーザーを完全削除する（退会処理）
+   * M2Mアプリに `delete:users` スコープが必要。
+   */
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      const token = await this.getManagementToken();
+
+      const response = await fetch(
+        `https://${this.domain}/api/v2/users/${encodeURIComponent(userId)}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      // 204 No Content が成功。既に存在しない場合(404)も冪等に成功扱い。
+      if (!response.ok && response.status !== 404) {
+        throw new Error(`Failed to delete user: ${response.status}`);
+      }
+    } catch (error) {
+      logger.error(
+        error instanceof Error
+          ? error
+          : new Error(`Error deleting Auth0 user: ${userId}`),
+      );
+      throw error;
+    }
+  }
+
   private async getUserCountSince(token: string, since: Date): Promise<number> {
     try {
       const query = `created_at:[${since.toISOString()} TO *]`;

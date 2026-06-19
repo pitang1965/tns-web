@@ -336,6 +336,47 @@ ${userStatsText}
       html: emailHtml,
     });
   }
+
+  async sendAccountDeletionNotification(data: {
+    userId: string;
+    userEmail: string;
+    userName: string;
+    adminEmail: string;
+    deletedItineraryCount: number;
+  }): Promise<MailerSendResponse> {
+    const deletedAt = new Date().toLocaleString('ja-JP');
+
+    const emailHtml = `
+      <h2>ユーザー退会</h2>
+      <p><strong>ユーザーID:</strong> ${escapeHtml(data.userId)}</p>
+      <p><strong>ユーザー名:</strong> ${escapeHtml(data.userName)}</p>
+      <p><strong>メールアドレス:</strong> ${escapeHtml(data.userEmail)}</p>
+      <p><strong>削除した旅程数:</strong> ${data.deletedItineraryCount}件</p>
+      <p><strong>退会日時:</strong> ${deletedAt}</p>
+      <hr>
+      <p><small>このメールは車旅のしおりのユーザー退会時に自動送信されました。</small></p>
+    `;
+
+    const emailText = `
+ユーザー退会
+
+ユーザーID: ${data.userId}
+ユーザー名: ${data.userName}
+メールアドレス: ${data.userEmail}
+削除した旅程数: ${data.deletedItineraryCount}件
+退会日時: ${deletedAt}
+
+---
+このメールは車旅のしおりのユーザー退会時に自動送信されました。
+    `;
+
+    return this.sendEmail({
+      to: data.adminEmail,
+      subject: `【ユーザー退会】${data.userName}`,
+      text: emailText,
+      html: emailHtml,
+    });
+  }
 }
 
 const mailerSend = new MailerSendClient(

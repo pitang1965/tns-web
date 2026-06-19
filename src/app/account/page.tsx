@@ -2,6 +2,7 @@
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import { DeleteAccountSection } from '@/components/auth/DeleteAccountSection';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { H1, LargeText } from '@/components/common/Typography';
 import PremiumBadge from '@/components/common/PremiumBadge';
@@ -191,6 +192,9 @@ export default withPageAuthRequired(function Account() {
             <LogoutButton />
           </CardContent>
         </Card>
+
+        {/* Danger Zone - 退会 */}
+        <DeleteAccountSection />
       </div>
     </div>
   );

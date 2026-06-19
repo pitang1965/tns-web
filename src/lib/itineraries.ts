@@ -259,6 +259,32 @@ export async function updateItinerary(
   }
 }
 
+/**
+ * 退会処理用：指定ユーザーに紐づく旅程データを完全に削除する。
+ * - 所有旅程（公開・非公開を問わず）を全削除
+ * - 他ユーザーの旅程の共有相手(sharedWith)から当該ユーザーを除去
+ *
+ * @returns 削除した所有旅程の件数
+ */
+export async function deleteAllItinerariesForUser(
+  auth0Id: string,
+): Promise<number> {
+  await ensureDbConnection();
+
+  // 所有旅程を全削除
+  const deleteResult = await ItineraryModel.deleteMany({
+    'owner.id': auth0Id,
+  });
+
+  // 他人の旅程の共有相手から自分を除去
+  await ItineraryModel.updateMany(
+    { 'sharedWith.id': auth0Id },
+    { $pull: { sharedWith: { id: auth0Id } } },
+  );
+
+  return deleteResult.deletedCount ?? 0;
+}
+
 export async function getAllItineraries(): Promise<ClientItineraryDocument[]> {
   await ensureDbConnection();
 
