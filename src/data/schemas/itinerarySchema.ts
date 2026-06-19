@@ -59,6 +59,20 @@ export type ClientItineraryInput = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >;
 
+// 公開旅程一覧用の型。作成者は匿名ハンドルのみを持ち、本名・メールアドレス・
+// owner.id・sharedWith はクライアントへ送らない（生PIIの漏洩を防ぐ）。
+// 詳細は docs/adr/0003-public-creator-handle.md を参照。
+export type PublicCreator = {
+  handle: string;
+};
+
+export type PublicItinerarySummary = Omit<
+  ClientItineraryDocument,
+  'owner' | 'sharedWith'
+> & {
+  owner: PublicCreator;
+};
+
 // Helper function - サーバー側でのみ使用
 export function toClientItinerary(
   doc: ServerItineraryDocument,

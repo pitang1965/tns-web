@@ -7,8 +7,10 @@ import {
   ServerItineraryInsertDocument,
   ClientItineraryDocument,
   ClientItineraryInput,
+  PublicItinerarySummary,
   toClientItinerary,
 } from '@/data/schemas/itinerarySchema';
+import { getCreatorHandle } from '@/lib/creatorHandle';
 import { auth0 } from '@/lib/auth0';
 
 async function getAuthenticatedUser() {
@@ -83,7 +85,7 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
 }
 
 export async function getPublicItineraries(): Promise<
-  ClientItineraryDocument[]
+  PublicItinerarySummary[]
 > {
   try {
     await ensureDbConnection();
@@ -92,7 +94,14 @@ export async function getPublicItineraries(): Promise<
       .sort({ updatedAt: -1 })
       .lean<ServerItineraryDocument[]>();
 
-    return itineraries.map(toClientItinerary);
+    // 公開ページの payload に生PII（本名・メール・owner.id）を載せないため、
+    // 作成者はサーバー側で匿名ハンドルに変換し、owner と sharedWith を除去する。
+    return itineraries.map((doc) => {
+      const handle = getCreatorHandle(doc.owner?.id);
+      const { owner: _owner, sharedWith: _sharedWith, ...rest } =
+        toClientItinerary(doc);
+      return { ...rest, owner: { handle } };
+    });
   } catch (error) {
     logger.error(
       error instanceof Error

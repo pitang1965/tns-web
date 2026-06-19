@@ -6,7 +6,10 @@ import { Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { H1, LargeText } from '@/components/common/Typography';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import {
+  ClientItineraryDocument,
+  PublicItinerarySummary,
+} from '@/data/schemas/itinerarySchema';
 import { ItineraryItem } from '@/components/itinerary/ItineraryItem';
 import { PublicItineraryItem } from '@/components/itinerary/PublicItineraryItem';
 
@@ -37,7 +40,7 @@ function persistTab(tab: TabValue): void {
 }
 
 type Props = {
-  publicItineraries: ClientItineraryDocument[];
+  publicItineraries: PublicItinerarySummary[];
   myItineraries: ClientItineraryDocument[] | null;
   isAuthenticated: boolean;
 };

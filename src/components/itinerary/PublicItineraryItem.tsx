@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { PublicItinerarySummary } from '@/data/schemas/itinerarySchema';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,52 +15,17 @@ import {
 import { formatItineraryDuration } from '@/lib/date';
 
 type Props = {
-  itinerary: ClientItineraryDocument;
+  itinerary: PublicItinerarySummary;
 };
 
 export const PublicItineraryItem: React.FC<Props> = ({ itinerary }) => {
-  const displayCreator = (owner: { name?: string; email?: string }): string => {
-    // メールアドレスかどうかを判定する関数
-    const isEmail = (text: string): boolean => {
-      // 簡易的なメールアドレス判定（@を含む）
-      return text.includes('@') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
-    };
-
-    // メールアドレスをマスクする関数
-    const maskEmail = (email: string): string => {
-      const username = email.split('@')[0];
-      return (
-        username.substring(0, 2) +
-        '*'.repeat(Math.max(username.length - 2, 3)) +
-        '@***'
-      );
-    };
-
-    // 名前があり、メールアドレスでない場合はそのまま表示
-    if (owner.name && !isEmail(owner.name)) {
-      return owner.name;
-    }
-
-    // 名前がメールアドレス形式の場合はマスク
-    if (owner.name && isEmail(owner.name)) {
-      return maskEmail(owner.name);
-    }
-
-    // 名前がなく、メールアドレスがある場合はメールアドレスをマスク
-    if (owner.email) {
-      return maskEmail(owner.email);
-    }
-
-    return '名無しさん';
-  };
-
   return (
     <Card className="flex flex-col h-full interactive-card">
       <CardHeader>
         <CardTitle className="line-clamp-2">{itinerary.title}</CardTitle>
         {itinerary.owner && (
           <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            作成者: {displayCreator(itinerary.owner)}
+            作成: {itinerary.owner.handle}
           </span>
         )}
       </CardHeader>

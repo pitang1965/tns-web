@@ -1,12 +1,12 @@
 'use client';
 
 import { use } from 'react';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { PublicItinerarySummary } from '@/data/schemas/itinerarySchema';
 import { PublicItineraryItem } from '@/components/itinerary/PublicItineraryItem';
 import { LargeText } from '@/components/common/Typography';
 
 type Props = {
-  itinerariesPromise: Promise<ClientItineraryDocument[]>;
+  itinerariesPromise: Promise<PublicItinerarySummary[]>;
   limit?: number; // 表示する最大数を指定するためのオプションプロパティ
 };
 
@@ -16,9 +16,6 @@ export const PublicItineraryList: React.FC<Props> = ({
 }) => {
   const itineraries = use(itinerariesPromise);
 
-  if (itineraries.length > 0 && itineraries[0].owner) {
-    console.log('Owner data:', itineraries[0].owner);
-  }
   // 指定された上限数までアイテムを制限
   const limitedItineraries = itineraries.slice(0, limit);
 

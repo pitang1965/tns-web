@@ -146,6 +146,11 @@ export function BasicInfoSection({
               <span className="text-sm text-gray-500">公開</span>
             </div>
           </div>
+          <SmallText className="text-gray-500">
+            公開すると、ログインしていない人を含め誰でもこの旅程を閲覧できます。
+            作成者はプライバシー保護のため、本名やメールアドレスではなく匿名の
+            ニックネーム（例：旅人コッコ🐓さん）で表示されます。
+          </SmallText>
         </CollapsibleContent>
       </Collapsible>
     </div>
