@@ -16,9 +16,11 @@ import {
   MapPin,
   Users,
   Sparkles,
+  Bell,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { UpdatesUnreadDot } from '@/components/updates/UpdatesUnreadDot';
 
 export function BurgerMenu() {
   const [open, setOpen] = useState(false);
@@ -171,6 +173,17 @@ export function BurgerMenu() {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <Link
+            href="/updates"
+            className="flex items-center"
+            onClick={(e) => handleItemClick(e, '/updates')}
+          >
+            <Bell className="mr-1" />
+            更新情報
+            <UpdatesUnreadDot className="ml-1.5" />
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <Link
             href="/account"

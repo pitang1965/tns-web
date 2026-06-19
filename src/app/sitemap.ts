@@ -3,6 +3,7 @@ import CampingSpot from '@/lib/models/CampingSpot';
 import ItineraryModel from '@/lib/models/Itinerary';
 import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
+import { latestUpdateDate } from '@/data/updateNotes';
 
 const BASE_URL = 'https://tabi.over40web.club';
 
@@ -43,6 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/help`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/updates`,
+      lastModified: latestUpdateDate ? new Date(latestUpdateDate) : new Date(),
+      changeFrequency: 'weekly',
       priority: 0.5,
     },
     {

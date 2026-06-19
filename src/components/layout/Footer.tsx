@@ -11,6 +11,12 @@ export function Footer() {
       {/* フッターリンク */}
       <div className="flex flex-wrap gap-4 mb-2 text-sm text-muted-foreground">
         <Link
+          href="/updates"
+          className="underline underline-offset-4 hover:text-foreground transition-colors"
+        >
+          更新情報
+        </Link>
+        <Link
           href="/privacy"
           className="underline underline-offset-4 hover:text-foreground transition-colors"
         >

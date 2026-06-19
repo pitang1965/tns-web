@@ -6,6 +6,7 @@ import { isAdmin } from '@/lib/userUtils';
 import UserStats from '@/components/common/UserStats';
 import QuickActions from '@/components/common/QuickActions';
 import RecentViews from '@/components/common/RecentViews';
+import UpdatesCard from '@/components/updates/UpdatesCard';
 import PremiumBadge from '@/components/common/PremiumBadge';
 import ItineraryLimitStatus from '@/components/common/ItineraryLimitStatus';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
@@ -43,6 +44,7 @@ async function DashboardContent() {
           itineraries={itineraries}
           isAdmin={userIsAdmin}
         />
+        <UpdatesCard />
         <RecentViews />
       </div>
     </>

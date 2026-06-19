@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { UpdatesUnreadDot } from '@/components/updates/UpdatesUnreadDot';
 
 const activeClassNames =
   'underline decoration-1 underline-offset-4 decoration-current';
@@ -49,6 +50,7 @@ export function Navigation() {
       <NavLink href="/">
         <Info className="mr-1" />
         情報
+        <UpdatesUnreadDot className="ml-1" />
       </NavLink>
       {userIsAdmin ? (
         <DropdownMenu modal={false}>
