@@ -11,6 +11,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/updates',
   },
+  openGraph: {
+    title: '更新情報 | 車旅のしおり',
+    description: '車旅のしおりの新着情報。新機能・不具合修正・変更点をお知らせします。',
+    images: [
+      {
+        url: 'https://tabi.over40web.club/touge.webp', // 1200×628のOGP用画像
+        width: 1200,
+        height: 628,
+        alt: '車旅のしおりアプリ - 旅行計画作成ツール',
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
 };
 
 export default function UpdatesPage() {
