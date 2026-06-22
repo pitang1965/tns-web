@@ -9,6 +9,7 @@ import RecentViews from '@/components/common/RecentViews';
 import UpdatesCard from '@/components/updates/UpdatesCard';
 import PremiumBadge from '@/components/common/PremiumBadge';
 import ItineraryLimitStatus from '@/components/common/ItineraryLimitStatus';
+import { DashboardSections } from '@/components/common/DashboardSections';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 
 type LoggedInHomeProps = {
@@ -37,16 +38,19 @@ async function DashboardContent() {
       <UserStats itineraries={itineraries} />
 
       {/* Main Content - Single Column */}
-      <div className="space-y-6">
-        <QuickActions />
-        <ItineraryLimitStatus
-          user={session?.user}
-          itineraries={itineraries}
-          isAdmin={userIsAdmin}
-        />
-        <UpdatesCard />
-        <RecentViews />
-      </div>
+      {/* 未読の更新があるときだけ UpdatesCard を先頭へ昇格させる（DashboardSections） */}
+      <DashboardSections
+        quickActions={<QuickActions />}
+        itineraryLimit={
+          <ItineraryLimitStatus
+            user={session?.user}
+            itineraries={itineraries}
+            isAdmin={userIsAdmin}
+          />
+        }
+        updates={<UpdatesCard />}
+        recentViews={<RecentViews />}
+      />
     </>
   );
 }

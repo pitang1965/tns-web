@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 import { latestUpdateDate } from '@/data/updateNotes';
 
 const STORAGE_KEY = 'updatesLastReadDate';
@@ -18,6 +18,9 @@ function readLastReadDate(): string | null {
 function emitChange() {
   listeners.forEach((listener) => listener());
 }
+
+// クライアント描画判定用の no-op サブスクライブ（購読不要。参照を安定させる）。
+const noopSubscribe = () => () => {};
 
 function subscribe(callback: () => void): () => void {
   listeners.add(callback);
@@ -66,4 +69,49 @@ export function useUnreadUpdates() {
   }, []);
 
   return { hasUnread, markAllRead };
+}
+
+/**
+ * 「昇格＋New!」演出用のフック。
+ *
+ * マウント時（UpdatesReadMarker の markAllRead が走る前）に最終既読日付を
+ * 一度だけスナップショットし、その値を基準に演出を駆動する。これにより
+ * localStorage が既読化された後も値が変わらず、ページを離れるまで演出を保持できる。
+ *
+ * - hasNewSinceLastVisit: 前回より新しい更新があるか（カードの先頭昇格・見出しのNew!に使う）。
+ * - isNewGroup(date): その日付グループが前回既読より新しいか（グループ見出しのNew!に使う）。
+ *
+ * 既読記録のない初回ユーザー（snapshot=null）は演出対象外とする
+ * （ADR-0004: 初回ユーザーはナビの未読ドットのみ表示し、過剰演出はしない）。
+ * ハイドレーション不一致を避けるため、マウント完了までは演出なし（false）を返す。
+ */
+export function useUpdatesHighlight() {
+  // 初回レンダー時（=effect が走る前）に一度だけ既読日付を捕捉する。
+  // useState の遅延初期化なら値が固定され、render 中の参照も正当（ref は不可）。
+  const [snapshotReadDate] = useState<string | null>(() =>
+    typeof window === 'undefined' ? null : readLastReadDate(),
+  );
+
+  // サーバー/ハイドレーション初回は false、クライアント描画後に true。
+  // useSyncExternalStore はこの差分をハイドレーション不一致なしに扱え、
+  // useEffect 内での setState（カスケード再描画）も避けられる。
+  const isClient = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
+
+  const hasNewSinceLastVisit =
+    isClient &&
+    latestUpdateDate !== null &&
+    snapshotReadDate !== null &&
+    latestUpdateDate > snapshotReadDate;
+
+  const isNewGroup = useCallback(
+    (date: string) =>
+      isClient && snapshotReadDate !== null && date > snapshotReadDate,
+    [isClient, snapshotReadDate],
+  );
+
+  return { hasNewSinceLastVisit, isNewGroup };
 }

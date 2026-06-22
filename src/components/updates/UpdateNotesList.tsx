@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Sparkles, Bug, Settings2, ArrowRight, LucideIcon } from 'lucide-react';
 import {
@@ -6,6 +8,8 @@ import {
   type UpdateCategory,
   type UpdateEntry,
 } from '@/data/updateNotes';
+import { useUpdatesHighlight } from '@/hooks/useUnreadUpdates';
+import { NewLabel } from '@/components/updates/NewLabel';
 
 type CategoryMeta = {
   icon: LucideIcon;
@@ -40,9 +44,15 @@ function formatJaDate(date: string): string {
 type UpdateNotesListProps = {
   /** 表示する日付グループ数の上限（省略時は全件） */
   limit?: number;
+  /** 新着の日付グループ見出しに New! を表示するか（既定: true） */
+  highlightNew?: boolean;
 };
 
-export function UpdateNotesList({ limit }: UpdateNotesListProps) {
+export function UpdateNotesList({
+  limit,
+  highlightNew = true,
+}: UpdateNotesListProps) {
+  const { isNewGroup } = useUpdatesHighlight();
   const entries: UpdateEntry[] =
     typeof limit === 'number' ? updateNotes.slice(0, limit) : updateNotes;
 
@@ -58,8 +68,9 @@ export function UpdateNotesList({ limit }: UpdateNotesListProps) {
     <div className="space-y-6">
       {entries.map((entry) => (
         <section key={entry.date}>
-          <h3 className="mb-3 text-sm font-semibold text-muted-foreground">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
             {formatJaDate(entry.date)}
+            {highlightNew && isNewGroup(entry.date) && <NewLabel />}
           </h3>
           <ul className="space-y-3">
             {entry.items.map((item, index) => {
