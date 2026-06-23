@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useDiagnosis } from '@/hooks/useDiagnosis';
+import { capture } from '@/lib/analytics';
 import { DiagnosisForm } from './DiagnosisForm';
 import { DiagnosisResultView } from './DiagnosisResult';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -24,6 +26,13 @@ export default function DiagnosisClient() {
     goToPrevious,
     reset,
   } = useDiagnosis();
+
+  // 診断完了を計測（ペルソナ確定時に1回）
+  useEffect(() => {
+    if (isComplete && result) {
+      capture('diagnosis_completed', { persona: result.persona.id });
+    }
+  }, [isComplete, result?.persona.id]);
 
   // スタート画面
   if (isIntro) {

@@ -13,6 +13,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { EnvironmentWrapper } from '@/components/layout/EnvironmentWrapper';
 import { WebsiteJsonLd } from '@/components/seo/JsonLd';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
+import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -75,22 +76,6 @@ export default function RootLayout({
         <WebsiteJsonLd />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-              `}
-            </Script>
-          </>
-        )}
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <Script
             async
@@ -101,27 +86,29 @@ export default function RootLayout({
         )}
         <ErrorBoundary>
           <Auth0Provider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <EnvironmentWrapper>
-                <div className="flex flex-col min-h-screen bg-background text-foreground">
-                  <Header />
-                  {/* 固定ヘッダー用のスペーサー */}
-                  <div className="h-12" />
-                  <AdSense />
-                  <main className="flex-1 relative">
-                    <div className="pb-16">{children}</div>
-                    <Toaster />
-                  </main>
-                  <Footer />
-                </div>
-                <InstallBanner />
-              </EnvironmentWrapper>
-            </ThemeProvider>
+            <PostHogProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <EnvironmentWrapper>
+                  <div className="flex flex-col min-h-screen bg-background text-foreground">
+                    <Header />
+                    {/* 固定ヘッダー用のスペーサー */}
+                    <div className="h-12" />
+                    <AdSense />
+                    <main className="flex-1 relative">
+                      <div className="pb-16">{children}</div>
+                      <Toaster />
+                    </main>
+                    <Footer />
+                  </div>
+                  <InstallBanner />
+                </EnvironmentWrapper>
+              </ThemeProvider>
+            </PostHogProvider>
           </Auth0Provider>
         </ErrorBoundary>
       </body>

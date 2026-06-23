@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Download, Share, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsClient } from '@/hooks/useIsClient';
+import { capture } from '@/lib/analytics';
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -13,20 +14,18 @@ type BeforeInstallPromptEvent = Event & {
 
 type Platform = 'android' | 'ios-safari';
 
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
+type PwaBannerEvent =
+  | 'pwa_banner_shown'
+  | 'pwa_banner_dismissed'
+  | 'pwa_banner_install_clicked'
+  | 'pwa_banner_app_installed';
 
 const DISMISS_KEY = 'pwaInstallBannerDismissedAt';
 const SUPPRESS_MS = 7 * 24 * 60 * 60 * 1000; // 却下後7日間は再表示しない
 const DWELL_MS = 5000; // 対象ページで5秒滞在してから表示
 
-function trackEvent(event: string, platform: Platform | 'unknown') {
-  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', event, { pwa_platform: platform });
-  }
+function trackEvent(event: PwaBannerEvent, platform: Platform | 'unknown') {
+  capture(event, { pwa_platform: platform });
 }
 
 // 既にインストール済み（スタンドアロン起動）かどうか

@@ -2,6 +2,7 @@
 
 import { Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { capture } from '@/lib/analytics';
 
 type Location = { latitude: number; longitude: number };
 
@@ -44,6 +45,11 @@ export function openActivityRoute(
         ...remainingActivities.map(formatActivity),
       ]
     : [formatActivity(activity), ...remainingActivities.map(formatActivity)];
+
+  capture('mid_trip_route_search', {
+    remaining_count: remainingActivities.length,
+    has_current_location: Boolean(currentLocation),
+  });
 
   const url = `https://www.google.com/maps/dir/${waypoints.join('/')}?travelmode=driving`;
 

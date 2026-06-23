@@ -3,6 +3,7 @@
 import { auth0 } from '@/lib/auth0';
 import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
+import { deletePostHogPerson } from '@/lib/posthogServer';
 import mailerSend from '@/lib/mailersend';
 import { logger } from '@/lib/logger';
 
@@ -48,7 +49,8 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
       );
       return {
         success: false,
-        error: '旅程データの削除に失敗しました。時間をおいて再度お試しください。',
+        error:
+          '旅程データの削除に失敗しました。時間をおいて再度お試しください。',
       };
     }
 
@@ -69,7 +71,10 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
       };
     }
 
-    // 3. 管理者へ退会通知（ベストエフォート）
+    // 3. PostHog の person を削除（ベストエフォート / プライバシーポリシー§7）
+    await deletePostHogPerson(userId);
+
+    // 4. 管理者へ退会通知（ベストエフォート）
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
       try {
@@ -103,7 +108,9 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     return { success: true };
   } catch (error) {
     logger.error(
-      error instanceof Error ? error : new Error('Error in deleteAccountAction'),
+      error instanceof Error
+        ? error
+        : new Error('Error in deleteAccountAction'),
     );
     return {
       success: false,

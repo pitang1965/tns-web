@@ -59,7 +59,8 @@ export default function PrivacyPage() {
           当サービスでは、以下の第三者サービスを利用しています：
         </p>
         <ul className="list-disc pl-6 mb-6">
-          <li>Google Analytics（アクセス解析）</li>
+          <li>PostHog（アクセス解析）</li>
+          <li>Google AdSense（広告配信）</li>
           <li>Auth0（認証サービス）</li>
           <li>Mapbox（地図サービス）</li>
           <li>MongoDB Atlas（データベースサービス）</li>
@@ -108,7 +109,7 @@ export default function PrivacyPage() {
         <p className="text-sm text-gray-600 mt-8">
           制定日: 2025年9月23日
           <br />
-          最終更新日: 2026年6月19日
+          最終更新日: 2026年6月23日
         </p>
       </div>
     </div>

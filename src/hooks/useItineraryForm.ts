@@ -10,6 +10,7 @@ import {
 } from '@/data/schemas/itinerarySchema';
 import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
 import { itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
+import { capture } from '@/lib/analytics';
 
 const DEFAULT_ITINERARY = {
   title: '',
@@ -155,6 +156,13 @@ export function useItineraryForm({
           variant: 'default',
         });
 
+        if (isCreating) {
+          capture('itinerary_created');
+        } else if (values.isPublic && !initialData?.isPublic) {
+          // 非公開→公開への切り替え時のみ計測
+          capture('itinerary_published');
+        }
+
         if (isCreating && result.id) {
           router.push(`/itineraries/${result.id}/edit`);
         }
@@ -181,29 +189,49 @@ export function useItineraryForm({
 
     // dayPlans のエラーを解析して分かりやすいメッセージに変換
     if (errors.dayPlans) {
-      Object.entries(errors.dayPlans).forEach(([dayIdx, dayError]: [string, any]) => {
-        const day = Number(dayIdx) + 1;
-        if (dayError?.activities) {
-          Object.entries(dayError.activities).forEach(([actIdx, actError]: [string, any]) => {
-            const act = Number(actIdx) + 1;
-            const field = actError?.title ? 'タイトル' : actError?.url ? 'URL' : actError?.place?.location?.latitude ? '座標' : '入力値';
-            messages.push(`${day}日目 アクティビティ${act}: ${field}に問題があります`);
-          });
-        }
-      });
+      Object.entries(errors.dayPlans).forEach(
+        ([dayIdx, dayError]: [string, any]) => {
+          const day = Number(dayIdx) + 1;
+          if (dayError?.activities) {
+            Object.entries(dayError.activities).forEach(
+              ([actIdx, actError]: [string, any]) => {
+                const act = Number(actIdx) + 1;
+                const field = actError?.title
+                  ? 'タイトル'
+                  : actError?.url
+                    ? 'URL'
+                    : actError?.place?.location?.latitude
+                      ? '座標'
+                      : '入力値';
+                messages.push(
+                  `${day}日目 アクティビティ${act}: ${field}に問題があります`,
+                );
+              },
+            );
+          }
+        },
+      );
     }
 
     // dayPlans 以外のトップレベルエラー
     Object.keys(errors).forEach((key) => {
       if (key !== 'dayPlans') {
-        const label: Record<string, string> = { title: 'タイトル', numberOfDays: '日数', startDate: '開始日', owner: '所有者情報' };
+        const label: Record<string, string> = {
+          title: 'タイトル',
+          numberOfDays: '日数',
+          startDate: '開始日',
+          owner: '所有者情報',
+        };
         messages.push(`「${label[key] ?? key}」に問題があります`);
       }
     });
 
     toast({
       title: '入力内容を確認してください',
-      description: messages.length > 0 ? messages.join('\n') : '必須項目が入力されているかご確認ください。',
+      description:
+        messages.length > 0
+          ? messages.join('\n')
+          : '必須項目が入力されているかご確認ください。',
       variant: 'destructive',
     });
   };

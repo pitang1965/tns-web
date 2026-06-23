@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { formatDate } from '@/lib/date';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
+import { capture } from '@/lib/analytics';
 import {
   ArrowLeft,
   Share2,
@@ -75,6 +76,16 @@ export default function SpotDetailClient({ spot }: SpotDetailClientProps) {
       addUrl(pathname, spot.name);
     }
   }, [spot, pathname, addUrl]);
+
+  // 車中泊スポット閲覧を計測（スポットごとに1回）
+  useEffect(() => {
+    if (!spot?._id) return;
+    capture('camping_spot_viewed', {
+      spot_id: spot._id,
+      spot_type: spot.type,
+      prefecture: spot.prefecture,
+    });
+  }, [spot?._id, spot?.type, spot?.prefecture]);
 
   const handleShare = async () => {
     const url = window.location.href;

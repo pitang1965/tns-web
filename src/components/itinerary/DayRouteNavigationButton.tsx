@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { z } from 'zod';
 import { activitySchema } from '@/data/schemas/activitySchema';
 import { calculateDistance } from '@/hooks/useCurrentLocation';
+import { capture } from '@/lib/analytics';
 
 type Activity = z.infer<typeof activitySchema>;
 
@@ -103,6 +104,11 @@ export const DayRouteNavigationButton: React.FC<
           ...routeActivities.map(formatActivity),
         ]
       : routeActivities.map(formatActivity);
+
+    capture('full_day_route_search', {
+      activity_count: routeActivities.length,
+      has_current_location: Boolean(currentLocation),
+    });
 
     // Google Maps の directions URL を構築
     let url = `https://www.google.com/maps/dir/${waypoints.join('/')}`;

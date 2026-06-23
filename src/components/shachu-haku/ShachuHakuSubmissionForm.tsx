@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
+import { capture } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LoadingState } from '@/components/common/LoadingState';
@@ -203,6 +204,10 @@ export default function ShachuHakuSubmissionForm({
       }
 
       // 投稿成功！くす玉のような紙吹雪でお祝い
+      capture('camping_spot_submitted', {
+        spot_type: data.type,
+        prefecture: data.prefecture,
+      });
       celebrateSubmission();
       playCelebrationSound(audioCtx);
 
