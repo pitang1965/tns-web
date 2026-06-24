@@ -32,7 +32,7 @@ GA を**完全に PostHog へ置き換える**。詳細は以下。
 1. **GA 撤去**：`src/app/layout.tsx` の gtag スクリプトと `NEXT_PUBLIC_GA_ID` を削除し、計測を1本化する。
 2. **PostHog Cloud・同アカウント・新 Project**：別プロジェクトで使用中の PostHog 組織を再利用し、本アプリ用に独立した Project（別 API キー）を作る。リージョンは既存組織を踏襲する。セルフホストは採用しない（運用負荷が見合わない）。
 3. **ユーザー識別は Auth0 `sub` のみ・PII なし**：ログイン時に `identify(sub)`、ログアウト時に `reset()`。email・氏名は PostHog に送らない。`person_profiles: 'identified_only'` とし、匿名訪問者ごとの person 生成を抑える。
-4. **収集粒度はオートキャプチャ（ページビュー/クリック）＋ 名付きドメインイベント**。名付きイベントは CONTEXT.md の概念に対応：`itinerary_created` / `itinerary_published` / `full_day_route_search` / `mid_trip_route_search` / `camping_spot_viewed` / `diagnosis_completed`(+`persona`) / `camping_spot_submitted`、および移行する `pwa_banner_*` の4種。App Router ではクライアント遷移で `$pageview` が自動発火しないため、`usePathname` の変化で手動 capture する。
+4. **収集粒度はオートキャプチャ（ページビュー/クリック）＋ 名付きドメインイベント**。名付きイベントは CONTEXT.md の概念に対応：`itinerary_created` / `itinerary_published` / `full_day_route_search` / `mid_trip_route_search` / `camping_spot_viewed` / `diagnosis_completed`(+`persona`) / `camping_spot_submitted` / `spot_search`(+`source` / `query`)、および移行する `pwa_banner_*` の4種。App Router ではクライアント遷移で `$pageview` が自動発火しないため、`usePathname` の変化で手動 capture する。
 5. **セッションリプレイは OFF**（当面）。
 6. **本番のみ初期化＋自分を除外**：`AdSense.tsx` と同様の `isDev` ゲートで本番のみ PostHog を初期化する。加えて、`sub` で識別しているため、自分の `sub`／管理画面を除外するコホートを作り、「自分以外のユニークユーザー」をそのまま見られるようにする。
 7. **退会（アカウント削除）連携**：プライバシーポリシー§7の「直ちに完全に削除」を守るため、退会処理に `sub` 指定の PostHog person 削除を追加する。
@@ -56,3 +56,14 @@ GA を**完全に PostHog へ置き換える**。詳細は以下。
 - 「本番のみ初期化」と「自分を除外するコホート」は、**自分以外のユニークユーザーを正しく数えるための装置**である。安易に外すと、自分の dev / 本番操作が混じり「自分以外」の数が汚れる。
 - `identify` に email・氏名を載せないのは PII 回避のための意図的な制約である。便利だからと PII を person プロパティに入れると、プライバシーポリシーへの開示追記と退会時の確実な削除が必要になる。変更時は本 ADR を参照すること。
 - 計測ツールを変えた場合、プライバシーポリシー§5の第三者サービス記載（現在「Google Analytics」）の更新が必要。
+
+## 追記：[[キーワード検索]]の計測（`spot_search`）
+
+「どのようなキーワードでスポットが検索されているか」を知るため、名付きイベント `spot_search` を追加する（CONTEXT.md「[[キーワード検索]]」に対応）。決定の内訳：
+
+- **専用イベントで計測する**：キーワードは既存の `$pageview`（`$current_url` に `?q=` を含む）でも部分的に取れるが、URL 文字列のパースは集計が面倒でノイズが多い。`query` プロパティを持つ名付きイベントの方が PostHog で即集計できる。
+- **両サーフェスで発火し `source` で区別する**：トップページ（ログイン前）のヒーロー検索＝`source: 'hero'`、車中泊スポット一覧の絞り込み確定＝`source: 'filter'`。
+- **「ユーザーの意図」で発火する（state ではなく）**：フォーム送信／明示的な検索確定の瞬間に capture する。これによりヒーロー検索→`/shachu-haku?q=` リダイレクトでの二重カウントと、共有リンク（`?q=`）を開いただけの流入での誤計上を回避する。
+- **プロパティは `query` + `source` のみ**。`result_count`（0件ヒット＝コンテンツ欠落の検知）は有用だがヒーロー側は遷移前で取得不可・filter 側も非同期になるため、当面は見送る。
+- **追加の PII 対応はしない**：キーワードは既に pageview URL に含まれ新規データカテゴリではなく、スポット検索語は地名中心で低リスク。`person_profiles: 'identified_only'` によりログイン前の検索は person に紐付かない。
+- **検証は本番デプロイ後の Live Events で行う**：本 ADR の「本番のみ初期化」を維持するため、ローカルでは発火しない。

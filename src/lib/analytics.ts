@@ -13,6 +13,7 @@ export type AnalyticsEvent =
   | 'full_day_route_search' // 全体ルート検索
   | 'mid_trip_route_search' // 途中からのルート検索
   | 'camping_spot_viewed' // 車中泊スポット詳細の閲覧
+  | 'spot_search' // スポットのキーワード検索（query / source を伴う）
   | 'diagnosis_completed' // 診断の完了
   | 'camping_spot_submitted' // スポット投稿
   | 'pwa_banner_shown'

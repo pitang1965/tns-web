@@ -33,6 +33,7 @@ import {
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
 import { useExplicitSearch } from '@/hooks/useExplicitSearch';
+import { capture } from '@/lib/analytics';
 
 type ShachuHakuFiltersProps = {
   searchTerm: string;
@@ -128,9 +129,26 @@ export default function ShachuHakuFilters({
     inputRef,
     submit: handleSearchSubmit,
     clear: handleSearchClear,
-    handleKeyDown: handleSearchKeyDown,
     isDirty: isSearchDirty,
   } = useExplicitSearch(searchTerm, onSearchTermChange);
+
+  // 検索の確定（Enter / ボタン）で計測する。クリアや未変更の再送信では送らない。
+  const handleSearchSubmitWithTracking = () => {
+    const trimmed = inputValue.trim();
+    if (trimmed && isSearchDirty) {
+      capture('spot_search', { query: trimmed, source: 'filter' });
+    }
+    handleSearchSubmit();
+  };
+
+  const handleSearchKeyDownWithTracking = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearchSubmitWithTracking();
+    }
+  };
 
   // Count active filters
   const countActiveFilters = () => {
@@ -288,7 +306,7 @@ export default function ShachuHakuFilters({
                         placeholder="キーワードで絞り込み..."
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleSearchKeyDown}
+                        onKeyDown={handleSearchKeyDownWithTracking}
                         className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
                       />
                       {inputValue && (
@@ -302,7 +320,7 @@ export default function ShachuHakuFilters({
                       )}
                     </div>
                     <Button
-                      onClick={handleSearchSubmit}
+                      onClick={handleSearchSubmitWithTracking}
                       size="sm"
                       className="h-9 px-3 cursor-pointer"
                       disabled={!isSearchDirty}
@@ -428,7 +446,7 @@ export default function ShachuHakuFilters({
                     placeholder="キーワードで絞り込み..."
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
+                    onKeyDown={handleSearchKeyDownWithTracking}
                     className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
                   />
                   {inputValue && (
@@ -442,7 +460,7 @@ export default function ShachuHakuFilters({
                   )}
                 </div>
                 <Button
-                  onClick={handleSearchSubmit}
+                  onClick={handleSearchSubmitWithTracking}
                   size="sm"
                   className="h-9 px-3 cursor-pointer"
                   disabled={inputValue.trim() === searchTerm}

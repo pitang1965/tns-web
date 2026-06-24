@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+import { capture } from '@/lib/analytics';
 
 // ヒーローの検索UIは HeroPreview（マップ読み込み前）と HeroMapSection の
 // 両方で表示するため共通化する。表示が切り替わっても見た目が変わらないようにする狙いもある。
@@ -29,7 +30,12 @@ export default function HeroSearchForm() {
   };
 
   const goToSearch = (query: string) => {
-    goToShachuHaku(query.trim() ? { q: query.trim() } : {});
+    const trimmed = query.trim();
+    if (trimmed) {
+      // 遷移前に発火する（リダイレクト先での URL 初期化では二重計上しない）
+      capture('spot_search', { query: trimmed, source: 'hero' });
+    }
+    goToShachuHaku(trimmed ? { q: trimmed } : {});
   };
 
   return (
