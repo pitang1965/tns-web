@@ -5,8 +5,11 @@ type ItineraryMetadata = {
   title: string;
   description: string;
   isPublic: boolean;
-  owner: { id: string; name: string; email: string };
-  sharedWith?: { id: string; name: string; email: string }[];
+  // 生PII（owner/sharedWith）はクライアントへ渡さず、サーバー側で算出した
+  // 所有者・共有判定の boolean のみを受け取る。詳細は
+  // docs/adr/0003-public-creator-handle.md（残課題S2）を参照。
+  isOwner: boolean;
+  isSharedWith: boolean;
   totalDays: number;
   createdAt?: string;
   updatedAt?: string;
@@ -33,13 +36,13 @@ export const useItineraryAccess = ({
   }
 
   const isPublic = metadata.isPublic;
-  const isOwner = user && metadata.owner && user.sub === metadata.owner.id;
-  const isSharedWithUser =
-    user &&
-    metadata.sharedWith &&
-    metadata.sharedWith.some((sharedUser) => sharedUser.id === user.sub);
+  // サーバー側で算出済みの boolean を使用する。ただしキャッシュ（IndexedDB）の
+  // 値はキャッシュ時点のセッションに基づくため、ログアウト後に所有者UIが
+  // 誤表示されないよう、現在ログイン中である場合のみ true とみなす。
+  const isOwner = Boolean(user) && Boolean(metadata.isOwner);
+  const isSharedWithUser = Boolean(user) && Boolean(metadata.isSharedWith);
 
-  const hasAccess = isPublic || Boolean(isOwner) || Boolean(isSharedWithUser);
+  const hasAccess = isPublic || isOwner || isSharedWithUser;
   const needsLogin = !hasAccess && !user;
 
   return {

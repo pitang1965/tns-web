@@ -6,8 +6,10 @@ type ItineraryMetadata = {
   title: string;
   description: string;
   isPublic: boolean;
-  owner: { id: string; name: string; email: string };
-  sharedWith?: { id: string; name: string; email: string }[];
+  // 生PII（owner/sharedWith）はサーバーから渡さず、所有者・共有判定の
+  // boolean のみを受け取る。docs/adr/0003-public-creator-handle.md（S2）参照。
+  isOwner: boolean;
+  isSharedWith: boolean;
   totalDays: number;
   createdAt?: string;
   updatedAt?: string;

@@ -1,12 +1,16 @@
 import { openDB, IDBPDatabase } from 'idb';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { DetailItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 const DB_NAME = 'tns-itinerary-cache';
 const STORE_NAME = 'itineraries';
-const DB_VERSION = 1;
+// v2: 旧バージョンは owner の生PII（name/email/id）と sharedWith を
+// キャッシュしていた。詳細ページの payload から生PIIを除去した変更
+// （docs/adr/0003-public-creator-handle.md S2）に伴い、既存ユーザーの
+// ブラウザに残る旧キャッシュを purge するためストアを作り直す。
+const DB_VERSION = 2;
 
 type CacheEntry = {
-  data: ClientItineraryDocument;
+  data: DetailItineraryDocument;
   cachedAt: number;
 };
 
@@ -16,9 +20,11 @@ function getDB(): Promise<IDBPDatabase> {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME);
+        // 旧ストアが存在する場合は削除して作り直す（生PII入りキャッシュを破棄）
+        if (db.objectStoreNames.contains(STORE_NAME)) {
+          db.deleteObjectStore(STORE_NAME);
         }
+        db.createObjectStore(STORE_NAME);
       },
     });
   }
@@ -27,7 +33,7 @@ function getDB(): Promise<IDBPDatabase> {
 
 export async function getCachedItinerary(
   id: string,
-): Promise<ClientItineraryDocument | null> {
+): Promise<DetailItineraryDocument | null> {
   try {
     const db = await getDB();
     const entry = (await db.get(STORE_NAME, id)) as CacheEntry | undefined;
@@ -49,7 +55,7 @@ export async function getCachedUpdatedAt(id: string): Promise<string | null> {
 
 export async function setCachedItinerary(
   id: string,
-  data: ClientItineraryDocument,
+  data: DetailItineraryDocument,
 ): Promise<void> {
   try {
     const db = await getDB();
@@ -70,7 +76,7 @@ export async function deleteCachedItinerary(id: string): Promise<void> {
 }
 
 export async function getAllCachedItineraries(): Promise<
-  ClientItineraryDocument[]
+  DetailItineraryDocument[]
 > {
   try {
     const db = await getDB();

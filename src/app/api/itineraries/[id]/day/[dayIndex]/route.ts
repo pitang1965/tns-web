@@ -57,6 +57,14 @@ export async function GET(
       );
     }
 
+    // 生PII（owner.name/email/id）と sharedWith を payload に載せないため、
+    // 所有者・共有判定はサーバー側で算出し boolean として渡す。
+    const userSub = session?.user?.sub;
+    const isOwner = Boolean(userSub && itinerary.owner?.id === userSub);
+    const isSharedWith = Boolean(
+      userSub && itinerary.sharedWith?.some((u) => u?.id === userSub),
+    );
+
     const totalDays = itinerary.dayPlans?.length || 0;
 
     if (totalDays === 0) {
@@ -94,8 +102,6 @@ export async function GET(
           title: 1,
           description: 1,
           isPublic: 1,
-          owner: 1,
-          sharedWith: 1,
           createdAt: 1,
           updatedAt: 1,
           totalDays: { $size: '$dayPlans' },
@@ -161,8 +167,8 @@ export async function GET(
         title: itineraryData.title,
         description: itineraryData.description,
         isPublic: itineraryData.isPublic,
-        owner: itineraryData.owner,
-        sharedWith: itineraryData.sharedWith,
+        isOwner,
+        isSharedWith,
         totalDays: itineraryData.totalDays,
         createdAt: itineraryData.createdAt,
         updatedAt: itineraryData.updatedAt,

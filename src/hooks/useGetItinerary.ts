@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
+import { DetailItineraryDocument } from '@/data/schemas/itinerarySchema';
 import {
   getCachedItinerary,
   getCachedUpdatedAt,
@@ -7,14 +7,14 @@ import {
 } from '@/lib/itineraryCache';
 
 type UseGetItineraryResult = {
-  itinerary: ClientItineraryDocument | undefined;
+  itinerary: DetailItineraryDocument | undefined;
   loading: boolean;
   error: string | null;
 };
 
 export const useGetItinerary = (id: string): UseGetItineraryResult => {
   const [itinerary, setItinerary] = useState<
-    ClientItineraryDocument | undefined
+    DetailItineraryDocument | undefined
   >();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,7 @@ export const useGetItinerary = (id: string): UseGetItineraryResult => {
 async function fetchFull(
   id: string,
   cancelled: boolean,
-  setItinerary: (v: ClientItineraryDocument) => void,
+  setItinerary: (v: DetailItineraryDocument) => void,
   setLoading: (v: boolean) => void,
   setError: (v: string | null) => void,
 ) {
@@ -87,7 +87,7 @@ async function fetchFull(
       }
       return;
     }
-    const data: ClientItineraryDocument = await res.json();
+    const data: DetailItineraryDocument = await res.json();
     await setCachedItinerary(id, data);
     if (!cancelled) {
       setItinerary(data);

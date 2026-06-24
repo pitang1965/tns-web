@@ -73,6 +73,32 @@ export type PublicItinerarySummary = Omit<
   owner: PublicCreator;
 };
 
+// 詳細ページ用の型。生PII（owner.name/email/id）と sharedWith をクライアントへ
+// 送らず、サーバー側で算出した所有者・共有判定の boolean のみを渡す。
+// 詳細は docs/adr/0003-public-creator-handle.md（残課題S2）を参照。
+export type DetailItineraryDocument = Omit<
+  ClientItineraryDocument,
+  'owner' | 'sharedWith'
+> & {
+  isOwner: boolean;
+  isSharedWith: boolean;
+};
+
+// ServerItineraryDocument から詳細ページ用の payload を生成する。
+// owner と sharedWith を除去し、リクエスト元ユーザーから見た所有者・共有判定を
+// boolean として埋め込む。サーバー側でのみ使用すること。
+export function toDetailItinerary(
+  doc: ServerItineraryDocument,
+  userSub: string | null | undefined,
+): DetailItineraryDocument {
+  const { owner, sharedWith, ...rest } = toClientItinerary(doc);
+  const isOwner = Boolean(userSub && owner?.id === userSub);
+  const isSharedWith = Boolean(
+    userSub && sharedWith?.some((u) => u?.id === userSub),
+  );
+  return { ...rest, isOwner, isSharedWith };
+}
+
 // Helper function - サーバー側でのみ使用
 export function toClientItinerary(
   doc: ServerItineraryDocument,

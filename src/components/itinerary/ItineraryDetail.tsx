@@ -20,7 +20,7 @@ import { useItineraryAccess } from '@/hooks/useItineraryAccess';
 import { useItineraryActions } from '@/hooks/useItineraryActions';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import {
-  ClientItineraryDocument,
+  DetailItineraryDocument,
   DayPlan,
 } from '@/data/schemas/itinerarySchema';
 
@@ -28,14 +28,14 @@ type ItineraryDetailProps = {
   id: string;
 };
 
-function toMetadata(itinerary: ClientItineraryDocument) {
+function toMetadata(itinerary: DetailItineraryDocument) {
   return {
     id: itinerary.id!,
     title: itinerary.title,
     description: itinerary.description,
     isPublic: itinerary.isPublic,
-    owner: itinerary.owner,
-    sharedWith: itinerary.sharedWith,
+    isOwner: itinerary.isOwner,
+    isSharedWith: itinerary.isSharedWith,
     totalDays: itinerary.dayPlans.length,
     createdAt: itinerary.createdAt,
     updatedAt: itinerary.updatedAt,

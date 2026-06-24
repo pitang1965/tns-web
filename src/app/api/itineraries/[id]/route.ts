@@ -7,7 +7,7 @@ import { auth0 } from '@/lib/auth0';
 import { canAccessItinerary } from '@/lib/itineraries';
 import {
   ServerItineraryDocument,
-  toClientItinerary,
+  toDetailItinerary,
 } from '@/data/schemas/itinerarySchema';
 
 function isValidObjectId(id: string): boolean {
@@ -48,8 +48,10 @@ export async function GET(
       );
     }
 
-    const clientItinerary = toClientItinerary(itinerary);
-    return NextResponse.json(clientItinerary);
+    // 生PII（owner.name/email/id）と sharedWith を payload から除去し、
+    // サーバー側で算出した所有者・共有判定の boolean のみを返す。
+    const detailItinerary = toDetailItinerary(itinerary, session?.user?.sub);
+    return NextResponse.json(detailItinerary);
   } catch (error) {
     logger.error(
       error instanceof Error ? error : new Error('Error fetching itinerary'),

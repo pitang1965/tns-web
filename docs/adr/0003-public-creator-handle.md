@@ -48,8 +48,12 @@
 ## 適用範囲と残課題
 
 - 本ADRの対象は**公開旅程一覧（`PublicItineraryItem`）のみ**（スコープS1）。
-- **詳細ページの payload リークは未対応の残課題**。`ItineraryDetail` は作成者ラベルを表示しないが、`useItineraryAccess` が `owner.id` / `sharedWith[].id` をクライアントで使って所有者・共有判定をしているため、`owner`（name/email を含む）が payload に載る。公開旅程の詳細をのぞけば他人でも作者のメールを読める状態は残る。
-- 詳細ページを塞ぐには、isOwner / アクセス判定をサーバー側で行い boolean として渡す形へ作り替える必要があり、IndexedDB キャッシュや day API まで波及する。リスクが異なるため**別タスク（S2）として分離**する。
+- **詳細ページの payload リーク（スコープS2）は対応済み**。当初は `useItineraryAccess` が `owner.id` / `sharedWith[].id` をクライアントで使って所有者・共有判定をしていたため、`owner`（name/email を含む）と `sharedWith` が詳細ページの payload に載っていた。
+  - **解決方法**：所有者・共有判定をサーバー側で算出し、`isOwner` / `isSharedWith` の boolean のみをクライアントへ渡す形へ作り替えた。`owner` と `sharedWith` は詳細ページの payload から完全に除去した。
+  - **対象経路**：`GET /api/itineraries/[id]`（`toDetailItinerary()` で生成）と `GET /api/itineraries/[id]/day/[dayIndex]`。両者は元々サーバー側で `canAccessItinerary` による認可ガード（不許可は404）を行っていたため、判定材料の生PIIをクライアントへ送る必要がなかった。
+  - **型**：`DetailItineraryDocument`（`owner` / `sharedWith` を除き `isOwner` / `isSharedWith` を持つ）を新設。`useGetItinerary` / `useGetItineraryDay` / `useItineraryAccess` / `ItineraryDetail` がこれを消費する。
+  - **キャッシュ purge**：IndexedDB キャッシュ（`itineraryCache.ts`）の `DB_VERSION` を 2 に上げ、upgrade 時に旧ストアを作り直すことで、既存ユーザーのブラウザに残る生PII入りキャッシュを破棄する。
+  - **stale cache 対策**：キャッシュされた `isOwner` はキャッシュ時点のセッションに基づくため、`useItineraryAccess` で「現在ログイン中である場合のみ true」とガードし、ログアウト後に所有者UIが誤表示されないようにした（実際の変更操作はサーバー側で owner.id により別途ガードされる）。
 
 ## 注意
 
