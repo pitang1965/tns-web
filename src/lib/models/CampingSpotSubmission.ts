@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { CampingSpotSubmission as CampingSpotSubmissionType } from '@/data/schemas/campingSpot';
 
 export interface ICampingSpotSubmission
-  extends CampingSpotSubmissionType, Document {
+  extends CampingSpotSubmissionType, Document<string> {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
