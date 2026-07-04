@@ -217,6 +217,17 @@
     transition: transform 75ms;
   }
 
+  /* AdSense が広告を配信しなかった場合(unfilled)は空枠を畳んで
+     黒い帯・白い矩形が残らないようにする(Google公式推奨の対応) */
+  ins.adsbygoogle[data-ad-status='unfilled'] {
+    display: none !important;
+  }
+
+  /* ヘッダー広告はコンテナの border-b と padding も含めて丸ごと非表示にする */
+  .header-ad-container:has(ins.adsbygoogle[data-ad-status='unfilled']) {
+    display: none;
+  }
+
   /* カード型コンポーネントのホバー・押下フィードバック */
   .interactive-card {
     transition: all 200ms;

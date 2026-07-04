@@ -1,7 +1,6 @@
 'use client';
 
-import Script from 'next/script';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { isPremiumMember } from '@/lib/userUtils';
@@ -9,6 +8,7 @@ import { useOrientation } from '@/hooks/useOrientation';
 import { NafudaAd } from './NafudaAd';
 
 export function AdSense() {
+  const adRef = useRef<HTMLModElement>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useUser();
@@ -42,6 +42,22 @@ export function AdSense() {
 
   const isDev = process.env.NODE_ENV === 'development';
 
+  // <ins> がマウント/再マウントされるたびに広告リクエストを送る。
+  // 以前は next/script のインラインスクリプトで push していたが、同一 id の
+  // スクリプトは再実行されないため、nafuda広告→AdSense の切替後などに
+  // 広告リクエストが送られず空枠が残る問題があった。
+  // data-adsbygoogle-status のガードがあるため毎レンダー実行しても二重pushにはならない。
+  useEffect(() => {
+    if (isDev) return;
+    const ins = adRef.current;
+    if (!ins || ins.getAttribute('data-adsbygoogle-status')) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch {
+      // Silently ignore AdSense errors
+    }
+  });
+
   // 共通の非表示条件（管理画面・プレミアム会員・モバイル横向き）。nafuda広告にも適用する。
   if (isAdminPage || isPremium || isMobileLandscape) {
     return null;
@@ -69,7 +85,7 @@ export function AdSense() {
 
   return (
     <div
-      className={`w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
+      className={`header-ad-container w-full bg-background border-b border-gray-200 dark:border-gray-700 ${isTopPage ? 'hidden md:block' : ''}`}
     >
       {isDev ? (
         <div className="flex justify-center py-1">
@@ -84,37 +100,22 @@ export function AdSense() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="flex justify-center py-1">
-            <ins
-              className="adsbygoogle"
-              style={{
-                display: 'inline-block',
-                width: isMobile ? '320px' : '728px',
-                height: isMobile ? '100px' : '90px',
-              }}
-              data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
-              data-ad-slot={isMobile ? '9582885398' : '8653673455'}
-              data-full-width-responsive="false"
-            />
-          </div>
-          <Script id="adsense-push-header" strategy="lazyOnload">
-            {`
-              try {
-                if (typeof window !== 'undefined' && window.adsbygoogle) {
-                  const ads = document.querySelectorAll('.adsbygoogle');
-                  ads.forEach((ad) => {
-                    if (!ad.getAttribute('data-adsbygoogle-status')) {
-                      (adsbygoogle = window.adsbygoogle || []).push({});
-                    }
-                  });
-                }
-              } catch (err) {
-                // Silently ignore AdSense errors
-              }
-            `}
-          </Script>
-        </>
+        <div className="flex justify-center py-1">
+          {/* key でモバイル/PC切替時に <ins> を再マウントし、新しいスロットで push し直す */}
+          <ins
+            key={isMobile ? 'mobile' : 'desktop'}
+            ref={adRef}
+            className="adsbygoogle"
+            style={{
+              display: 'inline-block',
+              width: isMobile ? '320px' : '728px',
+              height: isMobile ? '100px' : '90px',
+            }}
+            data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+            data-ad-slot={isMobile ? '9582885398' : '8653673455'}
+            data-full-width-responsive="false"
+          />
+        </div>
       )}
     </div>
   );
