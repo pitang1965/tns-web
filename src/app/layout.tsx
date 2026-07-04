@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import Script from 'next/script';
 import './globals.css';
 import { Inter } from 'next/font/google';
@@ -98,7 +99,10 @@ export default function RootLayout({
                     <Header />
                     {/* 固定ヘッダー用のスペーサー */}
                     <div className="h-12" />
-                    <AdSense />
+                    {/* AdSense は useSearchParams を使うため Suspense 境界が必要 */}
+                    <Suspense fallback={null}>
+                      <AdSense />
+                    </Suspense>
                     <main className="flex-1 relative">
                       <div className="pb-16">{children}</div>
                       <Toaster />

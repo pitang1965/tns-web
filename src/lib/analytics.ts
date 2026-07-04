@@ -16,6 +16,8 @@ export type AnalyticsEvent =
   | 'spot_search' // スポットのキーワード検索（query / source を伴う）
   | 'diagnosis_completed' // 診断の完了
   | 'camping_spot_submitted' // スポット投稿
+  | 'nafuda_ad_impression' // nafuda広告の表示（nafuda対象検索で上部広告枠に表示）
+  | 'nafuda_ad_click' // nafuda広告のクリック
   | 'pwa_banner_shown'
   | 'pwa_banner_dismissed'
   | 'pwa_banner_install_clicked'
