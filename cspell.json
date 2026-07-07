@@ -1,5 +1,8 @@
 {
   "ignorePaths": [
     "**/pnpm-lock.yaml"
+  ],
+  "words": [
+    "maxage"
   ]
 }
