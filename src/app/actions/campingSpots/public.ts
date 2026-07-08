@@ -87,7 +87,7 @@ export async function getPublicCampingSpotsByBounds(
   options?: {
     searchTerm?: string;
     prefecture?: string;
-    type?: string;
+    type?: string[];
   },
 ) {
   await ensureDbConnection();
@@ -133,8 +133,8 @@ export async function getPublicCampingSpotsByBounds(
     query.prefecture = options.prefecture;
   }
 
-  if (options?.type && options.type !== 'all') {
-    query.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    query.type = { $in: options.type };
   }
 
   const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
@@ -149,7 +149,7 @@ export async function getPublicCampingSpotsWithPagination(
   options?: {
     searchTerm?: string;
     prefecture?: string;
-    type?: string;
+    type?: string[];
     bounds?: { north: number; south: number; east: number; west: number };
   },
 ) {
@@ -179,8 +179,8 @@ export async function getPublicCampingSpotsWithPagination(
     query.prefecture = options.prefecture;
   }
 
-  if (options?.type && options.type !== 'all') {
-    query.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    query.type = { $in: options.type };
   }
 
   // Add bounds filter if provided (skip if too wide)

@@ -1,10 +1,12 @@
 import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
+import { parseSpotTypes } from '@/lib/spotTypeFilter';
 
 const STORAGE_KEY = 'shachu-haku-filters';
 
 export type SavedShachuHakuFilters = {
   searchTerm: string;
-  typeFilter: string;
+  // 複数選択（空配列＝全種別）。旧形式の単一文字列は読み込み時に配列へ移行する。
+  typeFilter: string[];
   clientFilters: ClientSideFilterValues;
   activeTab: 'map' | 'list';
   // Map display info in URL-compatible format
@@ -51,7 +53,6 @@ export const loadFiltersFromLocalStorage =
       // Validate the structure
       if (
         typeof parsed.searchTerm !== 'string' ||
-        typeof parsed.typeFilter !== 'string' ||
         typeof parsed.activeTab !== 'string' ||
         typeof parsed.lat !== 'number' ||
         typeof parsed.lng !== 'number'
@@ -60,7 +61,12 @@ export const loadFiltersFromLocalStorage =
         return null;
       }
 
-      return parsed as SavedShachuHakuFilters;
+      // 旧形式（typeFilter が単一文字列 'all'/種別キー）を配列へ移行して読み込む。
+      // 保存済みの地図位置・タブ等はそのまま維持する。
+      return {
+        ...parsed,
+        typeFilter: parseSpotTypes(parsed.typeFilter),
+      } as SavedShachuHakuFilters;
     } catch (error) {
       console.error('Failed to load filters from localStorage:', error);
       return null;

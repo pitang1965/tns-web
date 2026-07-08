@@ -22,7 +22,7 @@ type ShachuHakuSpotsListProps = {
   onPageChange: (page: number) => void;
   clientFilters: ClientSideFilterValues;
   searchTerm?: string;
-  typeFilter?: string;
+  typeFilter?: string[];
 };
 
 export function ShachuHakuSpotsList({
@@ -35,7 +35,7 @@ export function ShachuHakuSpotsList({
   onPageChange,
   clientFilters,
   searchTerm = '',
-  typeFilter = 'all',
+  typeFilter = [],
 }: ShachuHakuSpotsListProps) {
   // Apply client-side filters
   const filteredSpots = filterSpotsClientSide(spots, clientFilters);

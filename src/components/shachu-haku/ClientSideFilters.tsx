@@ -18,6 +18,7 @@ export type ClientSideFilterValues = {
   minQuietnessLevel: number;
   maxToiletDistance: number | null;
   maxConvenienceDistance: number | null;
+  maxBathDistance: number | null;
   minElevation: number | null;
   maxElevation: number | null;
 };
@@ -38,6 +39,7 @@ export default function ClientSideFilters({
       minQuietnessLevel: 0,
       maxToiletDistance: null,
       maxConvenienceDistance: null,
+      maxBathDistance: null,
       minElevation: null,
       maxElevation: null,
     });
@@ -49,6 +51,7 @@ export default function ClientSideFilters({
     filters.minQuietnessLevel > 0,
     filters.maxToiletDistance !== null,
     filters.maxConvenienceDistance !== null,
+    filters.maxBathDistance !== null,
     filters.minElevation !== null,
     filters.maxElevation !== null,
   ].filter(Boolean).length;
@@ -178,6 +181,29 @@ export default function ClientSideFilters({
             <DropdownMenuRadioItem value="100">100m以内</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="200">200m以内</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="300">300m以内</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </div>
+
+        <DropdownMenuSeparator />
+
+        {/* 入浴施設までの距離 */}
+        <div className="px-2 py-2">
+          <p className="text-sm font-medium mb-2">入浴施設までの距離</p>
+          <DropdownMenuRadioGroup
+            value={filters.maxBathDistance?.toString() || 'all'}
+            onValueChange={(value) =>
+              onFiltersChange({
+                ...filters,
+                maxBathDistance: value === 'all' ? null : parseInt(value),
+              })
+            }
+          >
+            <DropdownMenuRadioItem value="all">すべて</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="200">200m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="500">500m以内</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="1000">
+              1000m以内
+            </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </div>
 

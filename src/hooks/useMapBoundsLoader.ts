@@ -41,7 +41,7 @@ function isZoomIn(oldBounds: Bounds | null, newBounds: Bounds): boolean {
 type Filters = {
   searchTerm?: string;
   prefecture?: string;
-  type?: string;
+  type?: string[];
 };
 
 type UseMapBoundsLoaderOptions = {
@@ -62,7 +62,7 @@ type UseMapBoundsLoaderOptions = {
   filters: {
     searchTerm: string;
     prefectureFilter: string;
-    typeFilter: string;
+    typeFilter: string[];
   };
   onLoadSuccess?: (
     data: CampingSpotWithId[],
@@ -222,7 +222,7 @@ export function useMapBoundsLoader({
               ? filtersRef.current.prefectureFilter
               : undefined,
           type:
-            filtersRef.current.typeFilter !== 'all'
+            filtersRef.current.typeFilter.length > 0
               ? filtersRef.current.typeFilter
               : undefined,
         };
@@ -269,7 +269,7 @@ export function useMapBoundsLoader({
             ? filtersRef.current.prefectureFilter
             : undefined,
         type:
-          filtersRef.current.typeFilter !== 'all'
+          filtersRef.current.typeFilter.length > 0
             ? filtersRef.current.typeFilter
             : undefined,
       };

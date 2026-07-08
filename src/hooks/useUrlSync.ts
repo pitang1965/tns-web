@@ -48,7 +48,7 @@ type UrlSyncOptions = {
  *   params: {
  *     tab: activeTab === 'list' ? 'list' : null,
  *     q: searchTerm,
- *     type: typeFilter !== 'all' ? typeFilter : null,
+ *     type: serializeSpotTypes(typeFilter), // 複数選択→カンマ区切り or null
  *   },
  *   basePath: '/admin/shachu-haku',
  * });
@@ -58,7 +58,7 @@ type UrlSyncOptions = {
  *   params: {
  *     tab: activeTab === 'list' ? 'list' : null,
  *     q: searchTerm,
- *     type: typeFilter !== 'all' ? typeFilter : null,
+ *     type: serializeSpotTypes(typeFilter), // 複数選択→カンマ区切り or null
  *     pricing: clientFilters.pricingFilter !== 'all' ? clientFilters.pricingFilter : null,
  *     min_security: clientFilters.minSecurityLevel > 0 ? clientFilters.minSecurityLevel : null,
  *     lat: savedBounds ? ((savedBounds.north + savedBounds.south) / 2).toFixed(7) : mapCenter[1].toFixed(6),

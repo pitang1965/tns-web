@@ -91,7 +91,7 @@ export async function getCampingSpotsByBounds(
   options?: {
     searchTerm?: string;
     prefecture?: string;
-    type?: string;
+    type?: string[];
   },
 ) {
   await checkAdminAuth();
@@ -116,8 +116,8 @@ export async function getCampingSpotsByBounds(
     query.prefecture = options.prefecture;
   }
 
-  if (options?.type && options.type !== 'all') {
-    query.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    query.type = { $in: options.type };
   }
 
   // Get total count without bounds filter for "全○○件中" display
@@ -131,8 +131,8 @@ export async function getCampingSpotsByBounds(
   if (options?.prefecture && options.prefecture !== 'all') {
     totalQuery.prefecture = options.prefecture;
   }
-  if (options?.type && options.type !== 'all') {
-    totalQuery.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    totalQuery.type = { $in: options.type };
   }
 
   const [spots, total] = await Promise.all([
@@ -153,7 +153,7 @@ export async function getCampingSpotsWithPagination(
   options?: {
     searchTerm?: string;
     prefecture?: string;
-    type?: string;
+    type?: string[];
     bounds?: { north: number; south: number; east: number; west: number };
     sortField?: 'createdAt' | 'updatedAt';
     sortOrder?: 'asc' | 'desc';
@@ -172,8 +172,8 @@ export async function getCampingSpotsWithPagination(
     query.prefecture = options.prefecture;
   }
 
-  if (options?.type && options.type !== 'all') {
-    query.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    query.type = { $in: options.type };
   }
 
   // Add bounds filter if provided
@@ -213,7 +213,7 @@ export async function getCampingSpotsWithPagination(
 export async function getCampingSpotIdsOnly(options?: {
   searchTerm?: string;
   prefecture?: string;
-  type?: string;
+  type?: string[];
   bounds?: { north: number; south: number; east: number; west: number };
 }) {
   await checkAdminAuth();
@@ -229,8 +229,8 @@ export async function getCampingSpotIdsOnly(options?: {
     query.prefecture = options.prefecture;
   }
 
-  if (options?.type && options.type !== 'all') {
-    query.type = options.type;
+  if (options?.type && options.type.length > 0) {
+    query.type = { $in: options.type };
   }
 
   // Add bounds filter if provided

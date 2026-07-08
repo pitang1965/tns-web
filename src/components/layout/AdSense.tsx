@@ -5,6 +5,10 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { isPremiumMember } from '@/lib/userUtils';
 import { useOrientation } from '@/hooks/useOrientation';
+import {
+  isNafudaSpotSelection,
+  serializeSpotTypes,
+} from '@/lib/spotTypeFilter';
 import { NafudaAd } from './NafudaAd';
 
 export function AdSense() {
@@ -16,13 +20,14 @@ export function AdSense() {
   const isPremium = isPremiumMember(user);
   const isTopPage = pathname === '/';
 
-  // nafuda対象検索: /shachu-haku で種別がRVパーク/オートキャンプ場のとき、
-  // 上部広告枠をAdSenseからnafuda広告に差し替える。詳細はCONTEXT.md参照。
-  const spotType = searchParams.get('type');
+  // nafuda対象検索: /shachu-haku で絞り込まれた種別がRVパーク/オートキャンプ場のみ
+  // （1つ以上、かつ対象外の種別を含まない）のとき、上部広告枠をnafuda広告に差し替える。
+  // 詳細はCONTEXT.md「nafuda対象検索」参照。
+  const typeParam = searchParams.get('type');
   const nafudaSpotType =
-    pathname === '/shachu-haku' &&
-    (spotType === 'rv_park' || spotType === 'auto_campground')
-      ? spotType
+    pathname === '/shachu-haku' && isNafudaSpotSelection(typeParam)
+      ? // 計測用に選択種別を正規化したカンマ区切り文字列（例: 'rv_park,auto_campground'）
+        (serializeSpotTypes(typeParam) ?? '')
       : null;
   const { isLandscape } = useOrientation();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);

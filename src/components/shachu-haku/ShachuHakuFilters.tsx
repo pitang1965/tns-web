@@ -26,10 +26,8 @@ import {
   RotateCcw,
   X,
 } from 'lucide-react';
-import {
-  CampingSpotTypeLabels,
-  PrefectureOptions,
-} from '@/data/schemas/campingSpot';
+import { PrefectureOptions } from '@/data/schemas/campingSpot';
+import { SpotTypeFilter } from './SpotTypeFilter';
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
 import { useExplicitSearch } from '@/hooks/useExplicitSearch';
@@ -38,8 +36,8 @@ import { capture } from '@/lib/analytics';
 type ShachuHakuFiltersProps = {
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
-  typeFilter: string;
-  onTypeFilterChange: (value: string) => void;
+  typeFilter: string[];
+  onTypeFilterChange: (value: string[]) => void;
   onPrefectureJump: (prefecture: string) => void;
   onRegionJump: (region: string) => void;
   onCurrentLocation: () => void;
@@ -121,6 +119,21 @@ export default function ShachuHakuFilters({
               : 200,
         }),
     },
+    {
+      label: '入浴施設200m以内',
+      isActive:
+        clientFilters.maxBathDistance !== null &&
+        clientFilters.maxBathDistance <= 200,
+      onToggle: () =>
+        onClientFiltersChange({
+          ...clientFilters,
+          maxBathDistance:
+            clientFilters.maxBathDistance !== null &&
+            clientFilters.maxBathDistance <= 200
+              ? null
+              : 200,
+        }),
+    },
   ];
 
   const {
@@ -154,12 +167,13 @@ export default function ShachuHakuFilters({
   const countActiveFilters = () => {
     let count = 0;
     if (searchTerm) count++;
-    if (typeFilter !== 'all') count++;
+    if (typeFilter.length > 0) count++;
     if (clientFilters.pricingFilter !== 'all') count++;
     if (clientFilters.minSecurityLevel > 0) count++;
     if (clientFilters.minQuietnessLevel > 0) count++;
     if (clientFilters.maxToiletDistance !== null) count++;
     if (clientFilters.maxConvenienceDistance !== null) count++;
+    if (clientFilters.maxBathDistance !== null) count++;
     if (clientFilters.minElevation !== null) count++;
     if (clientFilters.maxElevation !== null) count++;
     return count;
@@ -328,29 +342,11 @@ export default function ShachuHakuFilters({
                       <Search className="w-4 h-4" />
                     </Button>
                   </div>
-                  <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                    <SelectTrigger
-                      className={`h-9 w-full sm:w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}
-                    >
-                      <SelectValue placeholder="全種別" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all" className="cursor-pointer">
-                        全種別
-                      </SelectItem>
-                      {Object.entries(CampingSpotTypeLabels).map(
-                        ([key, label]) => (
-                          <SelectItem
-                            key={key}
-                            value={key}
-                            className="cursor-pointer"
-                          >
-                            {label}
-                          </SelectItem>
-                        ),
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <SpotTypeFilter
+                    value={typeFilter}
+                    onChange={onTypeFilterChange}
+                    className="w-full sm:w-[220px]"
+                  />
                   <ClientSideFilters
                     filters={clientFilters}
                     onFiltersChange={onClientFiltersChange}
@@ -468,27 +464,11 @@ export default function ShachuHakuFilters({
                   <Search className="w-4 h-4" />
                 </Button>
               </div>
-              <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-                <SelectTrigger
-                  className={`h-9 w-[180px] cursor-pointer ${typeFilter !== 'all' ? 'text-blue-500 dark:text-blue-400 font-medium' : ''}`}
-                >
-                  <SelectValue placeholder="全種別" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="cursor-pointer">
-                    全種別
-                  </SelectItem>
-                  {Object.entries(CampingSpotTypeLabels).map(([key, label]) => (
-                    <SelectItem
-                      key={key}
-                      value={key}
-                      className="cursor-pointer"
-                    >
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SpotTypeFilter
+                value={typeFilter}
+                onChange={onTypeFilterChange}
+                className="w-[220px]"
+              />
               <div className="ml-2">
                 <ClientSideFilters
                   filters={clientFilters}

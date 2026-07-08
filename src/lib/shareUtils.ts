@@ -1,4 +1,5 @@
 import { formatDateWithWeekday } from '@/lib/date';
+import { serializeSpotTypes, spotTypesToLabel } from '@/lib/spotTypeFilter';
 
 // ==================================================
 // 旅程用の共有機能
@@ -120,7 +121,8 @@ export const handleItineraryShare = async (shareData: ShareItineraryData) => {
  */
 export type CampingSpotShareData = {
   searchTerm?: string;
-  typeFilter?: string;
+  // 複数選択（空配列＝全種別）
+  typeFilter?: string[];
   tab?: 'map' | 'list';
   zoom?: number;
   center?: [number, number];
@@ -156,9 +158,10 @@ export const createCampingSpotShareData = (data: CampingSpotShareData) => {
     params.set('q', data.searchTerm);
   }
 
-  // 種別フィルター
-  if (data.typeFilter && data.typeFilter !== 'all') {
-    params.set('type', data.typeFilter);
+  // 種別フィルター（カンマ区切り・正規化順）
+  const typeParam = serializeSpotTypes(data.typeFilter);
+  if (typeParam) {
+    params.set('type', typeParam);
   }
 
   // クライアント側フィルター
@@ -230,19 +233,9 @@ export const createCampingSpotShareData = (data: CampingSpotShareData) => {
     descriptionParts.push(`「${data.searchTerm}」で検索`);
   }
 
-  if (data.typeFilter && data.typeFilter !== 'all') {
-    const typeLabels: Record<string, string> = {
-      roadside_station: '道の駅',
-      sa_pa: 'SA・PA',
-      rv_park: 'RVパーク',
-      convenience_store: 'コンビニ',
-      parking_lot: '駐車場',
-      other: 'その他',
-    };
-    const typeLabel = typeLabels[data.typeFilter];
-    if (typeLabel) {
-      descriptionParts.push(typeLabel);
-    }
+  const typeLabel = spotTypesToLabel(data.typeFilter);
+  if (typeLabel) {
+    descriptionParts.push(typeLabel);
   }
 
   const shareText =

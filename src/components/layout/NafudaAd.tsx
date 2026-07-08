@@ -10,8 +10,9 @@ const NAFUDA_URL =
   'https://nafuda.me/?utm_source=tabi&utm_medium=header_ad&utm_campaign=nafuda';
 
 type NafudaAdProps = {
-  // nafuda対象検索のスポット種別（計測プロパティ用）
-  spotType: 'rv_park' | 'auto_campground';
+  // nafuda対象検索で選択された種別（計測プロパティ用）。
+  // 複数選択のときは正規化したカンマ区切り文字列（例: 'rv_park,auto_campground'）。
+  spotType: string;
 };
 
 /**

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import ShachuHakuClient from './ShachuHakuClient';
-import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
+import { serializeSpotTypes, spotTypesToLabel } from '@/lib/spotTypeFilter';
 import { CampingMapJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
 type Props = {
@@ -17,19 +17,19 @@ export async function generateMetadata({
     resolvedSearchParams.q.trim() !== ''
       ? resolvedSearchParams.q
       : undefined;
-  const type =
-    typeof resolvedSearchParams.type === 'string' &&
-    resolvedSearchParams.type !== 'all'
+  const typeParamRaw =
+    typeof resolvedSearchParams.type === 'string'
       ? resolvedSearchParams.type
       : undefined;
+  // 複数種別（カンマ区切り）に対応。ラベルは「・」連結、URLは正規化したカンマ区切り。
+  const typeLabel = spotTypesToLabel(typeParamRaw);
+  const typeParam = serializeSpotTypes(typeParamRaw);
 
   // Build dynamic title and description
   const titleParts: string[] = [];
   const descriptionParts: string[] = [];
 
-  if (type && type in CampingSpotTypeLabels) {
-    const typeLabel =
-      CampingSpotTypeLabels[type as keyof typeof CampingSpotTypeLabels];
+  if (typeLabel) {
     titleParts.push(typeLabel);
     descriptionParts.push(typeLabel);
   }
@@ -53,7 +53,7 @@ export async function generateMetadata({
 
   // Build URL with current search params for OGP
   const urlParams = new URLSearchParams();
-  if (type) urlParams.set('type', type);
+  if (typeParam) urlParams.set('type', typeParam);
   if (q) urlParams.set('q', q);
 
   const ogUrl = urlParams.toString()

@@ -33,6 +33,7 @@ import {
   getPublicCampingSpotsWithPagination,
 } from '../actions/campingSpots/public';
 import { handleCampingSpotShare } from '@/lib/shareUtils';
+import { serializeSpotTypes } from '@/lib/spotTypeFilter';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { ShachuHakuSpotsList } from '@/components/shachu-haku/ShachuHakuSpotsList';
@@ -152,7 +153,7 @@ export default function ShachuHakuClient() {
         filters?: {
           searchTerm?: string;
           prefecture?: string;
-          type?: string;
+          type?: string[];
           bounds?: { north: number; south: number; east: number; west: number };
         },
       ) => Promise<void>)
@@ -163,7 +164,7 @@ export default function ShachuHakuClient() {
     filters?: {
       searchTerm?: string;
       prefecture?: string;
-      type?: string;
+      type?: string[];
       bounds?: { north: number; south: number; east: number; west: number };
     },
   ) => {
@@ -210,7 +211,7 @@ export default function ShachuHakuClient() {
     params: {
       tab: activeTab === 'list' ? 'list' : null,
       q: searchTerm || null,
-      type: typeFilter !== 'all' ? typeFilter : null,
+      type: serializeSpotTypes(typeFilter),
       pricing:
         clientFilters.pricingFilter !== 'all'
           ? clientFilters.pricingFilter
@@ -230,6 +231,10 @@ export default function ShachuHakuClient() {
       max_convenience_dist:
         clientFilters.maxConvenienceDistance !== null
           ? clientFilters.maxConvenienceDistance
+          : null,
+      max_bath_dist:
+        clientFilters.maxBathDistance !== null
+          ? clientFilters.maxBathDistance
           : null,
       min_elevation:
         clientFilters.minElevation !== null ? clientFilters.minElevation : null,
@@ -278,7 +283,7 @@ export default function ShachuHakuClient() {
 
       const filters = {
         searchTerm: searchTerm || undefined,
-        type: typeFilter !== 'all' ? typeFilter : undefined,
+        type: typeFilter.length > 0 ? typeFilter : undefined,
         bounds,
       };
 

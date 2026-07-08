@@ -36,7 +36,7 @@ type AdminSpotsListProps = {
   onPageChange: (page: number) => void;
   clientFilters: ClientSideFilterValues;
   searchTerm?: string;
-  typeFilter?: string;
+  typeFilter?: string[];
   allSpotIds?: string[];
   sortField?: 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
@@ -53,7 +53,7 @@ export function AdminSpotsList({
   onPageChange,
   clientFilters,
   searchTerm = '',
-  typeFilter = 'all',
+  typeFilter = [],
   allSpotIds,
   sortField = 'createdAt',
   sortOrder = 'desc',

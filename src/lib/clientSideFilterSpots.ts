@@ -57,6 +57,16 @@ export function filterSpotsClientSide(
       }
     }
 
+    // 入浴施設までの距離フィルター
+    if (filters.maxBathDistance !== null) {
+      if (
+        spot.distanceToBath == null ||
+        spot.distanceToBath > filters.maxBathDistance
+      ) {
+        return false;
+      }
+    }
+
     // 標高フィルター (最小値)
     if (filters.minElevation !== null) {
       if (!spot.elevation || spot.elevation < filters.minElevation) {
@@ -87,6 +97,7 @@ export function hasActiveClientFilters(
     filters.minQuietnessLevel > 0 ||
     filters.maxToiletDistance !== null ||
     filters.maxConvenienceDistance !== null ||
+    filters.maxBathDistance !== null ||
     filters.minElevation !== null ||
     filters.maxElevation !== null
   );

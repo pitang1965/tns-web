@@ -30,6 +30,23 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-07-08',
+    items: [
+      {
+        category: 'new',
+        text: '車中泊スポットの検索で、スポットの種別（道の駅・RVパークなど）を複数選択して絞り込めるようにしました。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+      {
+        category: 'new',
+        text: '車中泊スポットの検索に「入浴施設までの距離」での絞り込みを追加しました（クイックフィルタの「入浴施設200m以内」、または詳細フィルターから指定できます）。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-06-19',
     items: [
       {

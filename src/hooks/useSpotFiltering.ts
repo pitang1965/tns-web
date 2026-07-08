@@ -14,7 +14,7 @@ type UseSpotFilteringProps = {
     west: number;
   } | null;
   searchTerm: string;
-  typeFilter: string;
+  typeFilter: string[];
 };
 
 /**

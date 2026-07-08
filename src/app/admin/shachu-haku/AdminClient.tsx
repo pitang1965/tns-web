@@ -38,6 +38,7 @@ import { useAdminSpotForm } from '@/hooks/useAdminSpotForm';
 import { useAdminListData } from '@/hooks/useAdminListData';
 import { downloadCampingSpotsCSV } from '@/lib/csv/campingSpots';
 import { useUrlSync } from '@/hooks/useUrlSync';
+import { serializeSpotTypes } from '@/lib/spotTypeFilter';
 import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 
 // Dynamically import the map component to avoid SSR issues
@@ -238,7 +239,7 @@ export default function AdminClient() {
     params: {
       tab: activeTab === 'list' ? 'list' : null,
       q: searchTerm || null,
-      type: typeFilter !== 'all' ? typeFilter : null,
+      type: serializeSpotTypes(typeFilter),
       sort: sortField !== 'createdAt' ? sortField : null,
       order: sortOrder !== 'desc' ? sortOrder : null,
     },

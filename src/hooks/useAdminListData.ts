@@ -22,9 +22,9 @@ type UseAdminListDataParams = {
    */
   searchTerm: string;
   /**
-   * Type filter (e.g., 'parking', 'roadside', 'all')
+   * Type filters (spot type keys; empty array = all types)
    */
-  typeFilter: string;
+  typeFilter: string[];
   /**
    * Number of items per page
    * @default 20
@@ -137,7 +137,7 @@ export function useAdminListData({
     const filters = {
       searchTerm: searchTerm || undefined,
       prefecture: undefined,
-      type: typeFilter !== 'all' ? typeFilter : undefined,
+      type: typeFilter.length > 0 ? typeFilter : undefined,
       sortField,
       sortOrder,
     };
@@ -180,7 +180,7 @@ export function useAdminListData({
   const refreshAllSpotIds = useCallback(async () => {
     const filters = {
       searchTerm: searchTerm || undefined,
-      type: typeFilter !== 'all' ? typeFilter : undefined,
+      type: typeFilter.length > 0 ? typeFilter : undefined,
     };
 
     try {
@@ -201,7 +201,7 @@ export function useAdminListData({
     const filters = {
       searchTerm: searchTerm || undefined,
       prefecture: undefined,
-      type: typeFilter !== 'all' ? typeFilter : undefined,
+      type: typeFilter.length > 0 ? typeFilter : undefined,
       sortField,
       sortOrder,
     };

@@ -6,6 +6,7 @@ import {
   saveFiltersToLocalStorage,
   clearFiltersFromLocalStorage,
 } from '@/lib/shachuHakuStorage';
+import { parseSpotTypes } from '@/lib/spotTypeFilter';
 
 type UseShachuHakuFiltersOptions = {
   searchParams: ReadonlyURLSearchParams;
@@ -41,13 +42,13 @@ export const useShachuHakuFilters = ({
     return savedFilters?.searchTerm || '';
   });
 
-  // Type filter state
-  const [typeFilter, setTypeFilter] = useState(() => {
-    // URLパラメータから種別フィルターを取得
+  // Type filter state（複数選択。空配列＝全種別）
+  const [typeFilter, setTypeFilter] = useState<string[]>(() => {
+    // URLパラメータから種別フィルターを取得（カンマ区切り、旧単一値も許容）
     const urlParam = searchParams.get('type');
-    if (urlParam !== null) return urlParam;
+    if (urlParam !== null) return parseSpotTypes(urlParam);
     // URLパラメータがない場合、ローカルストレージから復元
-    return savedFilters?.typeFilter || 'all';
+    return savedFilters?.typeFilter ?? [];
   });
 
   // Sort state for list view (used by admin page)
@@ -73,6 +74,7 @@ export const useShachuHakuFilters = ({
         searchParams.get('min_quietness') !== null ||
         searchParams.get('max_toilet_dist') !== null ||
         searchParams.get('max_convenience_dist') !== null ||
+        searchParams.get('max_bath_dist') !== null ||
         searchParams.get('min_elevation') !== null ||
         searchParams.get('max_elevation') !== null;
 
@@ -89,6 +91,9 @@ export const useShachuHakuFilters = ({
             : null,
           maxConvenienceDistance: searchParams.get('max_convenience_dist')
             ? parseInt(searchParams.get('max_convenience_dist')!)
+            : null,
+          maxBathDistance: searchParams.get('max_bath_dist')
+            ? parseInt(searchParams.get('max_bath_dist')!)
             : null,
           minElevation: searchParams.get('min_elevation')
             ? parseInt(searchParams.get('min_elevation')!)
@@ -111,6 +116,7 @@ export const useShachuHakuFilters = ({
         minQuietnessLevel: 0,
         maxToiletDistance: null,
         maxConvenienceDistance: null,
+        maxBathDistance: null,
         minElevation: null,
         maxElevation: null,
       };
@@ -276,13 +282,14 @@ export const useShachuHakuFilters = ({
   const handleResetAll = () => {
     // Reset all filter states to defaults
     setSearchTerm('');
-    setTypeFilter('all');
+    setTypeFilter([]);
     setClientFilters({
       pricingFilter: 'all',
       minSecurityLevel: 0,
       minQuietnessLevel: 0,
       maxToiletDistance: null,
       maxConvenienceDistance: null,
+      maxBathDistance: null,
       minElevation: null,
       maxElevation: null,
     });
