@@ -34,15 +34,19 @@ export function useAdminStatus(): AdminStatusResult {
   const [isLoading, setIsLoading] = useState<boolean>(cachedIsAdmin === null);
 
   useEffect(() => {
-    if (cachedIsAdmin !== null) {
-      setIsAdmin(cachedIsAdmin);
-      setIsLoading(false);
-      return;
-    }
+    // キャッシュ済みなら state は遅延初期化で既に正しい値になっているため、
+    // ここでは非同期の取得結果のみ反映する（同期的な setState は行わない）。
+    // fetchIsAdmin() はキャッシュ済みの場合も解決済み Promise を返すので、
+    // .then のマイクロタスクでレース（初期化後〜effect実行の間にキャッシュ確定）も補正される。
+    let active = true;
     fetchIsAdmin().then((status) => {
+      if (!active) return;
       setIsAdmin(status);
       setIsLoading(false);
     });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return { isAdmin, isLoading };
