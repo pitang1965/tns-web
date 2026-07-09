@@ -14,7 +14,13 @@ export async function proxy(request: NextRequest) {
   // 静かに無効化されるのを防ぐ)。各環境の環境変数に設定が必須。
   //
   // 注意: 埋め込みキーはアプリバイナリから抽出可能なため、本物の認証ではなく
-  // 匿名・野良アクセスを弾くための段差(speed bump)。レート制限と併用すること。
+  // 匿名・野良アクセスを弾くための段差(speed bump)。
+  //
+  // レート制限は設けていない: /api/v1/spots は単一URLで全件を1レスポンスで
+  // 返す全量ダンプのため、1リクエストで全データが入手できる。リクエスト数を
+  // 絞っても流出は防げず効果がない。DBやコストへの負荷は上記CDNキャッシュで
+  // 緩和済み。将来「1件取得」「検索」等の細粒度エンドポイントを追加した際は
+  // レート制限の導入を再検討すること。
   if (request.nextUrl.pathname.startsWith('/api/v1')) {
     const expected = process.env.SPOTS_API_KEY;
 
