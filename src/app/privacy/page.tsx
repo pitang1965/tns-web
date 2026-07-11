@@ -17,6 +17,13 @@ export default function PrivacyPage() {
         <p className="mb-6">
           車旅のしおり（以下「当サービス」）は、ユーザーの個人情報の取り扱いについて、以下のとおりプライバシーポリシーを定めます。
         </p>
+        <p className="mb-6">
+          モバイルアプリ「車中泊スポットマップ」については、
+          <a href="/privacy/app" className="text-primary hover:underline">
+            アプリのプライバシーポリシー
+          </a>
+          をご覧ください。
+        </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">1. 収集する情報</h2>
         <p className="mb-4">
