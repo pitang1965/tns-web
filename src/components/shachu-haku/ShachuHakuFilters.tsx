@@ -198,47 +198,56 @@ export default function ShachuHakuFilters({
   };
 
   return (
-    <Card className="mb-4">
-      <CardContent className="pt-4 pb-4">
+    <Card className="mb-4 border-0 shadow-none rounded-none sm:border sm:shadow-xs sm:rounded-lg">
+      <CardContent className="px-3 py-4 sm:px-6">
         {/* Mobile Layout */}
         <Collapsible
           open={isOpen}
           onOpenChange={setIsOpen}
           className="block 2xl:hidden"
         >
-          {/* Trigger Button */}
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-between h-10 mb-3"
-            >
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  表示範囲・絞り込み設定
-                </span>
-                {activeFiltersCount > 0 && (
-                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white">
-                    {activeFiltersCount}
+          {/* Trigger Button (+ inline reset when filters active) */}
+          <div className="flex items-center gap-2 mb-3">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="flex-1 justify-between h-10">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    表示範囲・絞り込み設定
                   </span>
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-500 text-white">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </div>
+                {isOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
                 )}
-              </div>
-              {isOpen ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
-          </CollapsibleTrigger>
+              </Button>
+            </CollapsibleTrigger>
+            {activeFiltersCount > 0 && (
+              <Button
+                onClick={onResetAll}
+                variant="outline"
+                className="h-10 px-3 text-xs cursor-pointer shrink-0 active:scale-95 transition-transform"
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                リセット
+              </Button>
+            )}
+          </div>
 
           {/* Quick Filter Chips - always visible on mobile */}
-          <div className="flex flex-wrap gap-1.5 mb-2">
+          <div className="flex flex-wrap gap-1 mb-2">
             {quickFilters.map((chip) => (
               <button
                 key={chip.label}
                 type="button"
                 onClick={chip.onToggle}
-                className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
+                className={`flex-shrink-0 h-7 px-2.5 text-xs rounded-full border cursor-pointer transition-colors ${
                   chip.isActive
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-background text-foreground border-input hover:bg-accent'
@@ -342,32 +351,19 @@ export default function ShachuHakuFilters({
                       <Search className="w-4 h-4" />
                     </Button>
                   </div>
-                  <SpotTypeFilter
-                    value={typeFilter}
-                    onChange={onTypeFilterChange}
-                    className="w-full sm:w-[220px]"
-                  />
-                  <ClientSideFilters
-                    filters={clientFilters}
-                    onFiltersChange={onClientFiltersChange}
-                  />
+                  <div className="flex gap-2">
+                    <SpotTypeFilter
+                      value={typeFilter}
+                      onChange={onTypeFilterChange}
+                      className="flex-1 sm:flex-none sm:w-[220px]"
+                    />
+                    <ClientSideFilters
+                      filters={clientFilters}
+                      onFiltersChange={onClientFiltersChange}
+                    />
+                  </div>
                 </div>
               </div>
-
-              {/* Reset All Button */}
-              {activeFiltersCount > 0 && (
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <Button
-                    onClick={onResetAll}
-                    variant="outline"
-                    size="sm"
-                    className="w-full h-8 text-xs cursor-pointer active:scale-95 transition-transform"
-                  >
-                    <RotateCcw className="w-3 h-3 mr-1" />
-                    全ての条件をリセット
-                  </Button>
-                </div>
-              )}
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -423,8 +419,8 @@ export default function ShachuHakuFilters({
             </Select>
           </div>
 
-          {/* Search and Type Filter */}
-          <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          {/* Search, Type Filter and Quick Filter Chips - single row */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
             <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
               絞り込み:
@@ -434,64 +430,49 @@ export default function ShachuHakuFilters({
                 {activeFiltersCount}
               </span>
             )}
-            <div className="flex gap-2 flex-1">
-              <div className="flex gap-1 flex-1 max-w-sm">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="キーワードで絞り込み..."
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleSearchKeyDownWithTracking}
-                    className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
-                  />
-                  {inputValue && (
-                    <button
-                      type="button"
-                      onClick={handleSearchClear}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer"
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </button>
-                  )}
-                </div>
-                <Button
-                  onClick={handleSearchSubmitWithTracking}
-                  size="sm"
-                  className="h-9 px-3 cursor-pointer"
-                  disabled={inputValue.trim() === searchTerm}
-                >
-                  <Search className="w-4 h-4" />
-                </Button>
-              </div>
-              <SpotTypeFilter
-                value={typeFilter}
-                onChange={onTypeFilterChange}
-                className="w-[220px]"
-              />
-              <div className="ml-2">
-                <ClientSideFilters
-                  filters={clientFilters}
-                  onFiltersChange={onClientFiltersChange}
+            <div className="flex gap-1 w-64">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="キーワードで絞り込み..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleSearchKeyDownWithTracking}
+                  className={`pl-9 h-9 ${inputValue ? 'pr-8' : ''}`}
                 />
+                {inputValue && (
+                  <button
+                    type="button"
+                    onClick={handleSearchClear}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer"
+                  >
+                    <X className="h-3 w-3 text-white" />
+                  </button>
+                )}
               </div>
-              {/* Reset All Button */}
-              {activeFiltersCount > 0 && (
-                <Button
-                  onClick={onResetAll}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs cursor-pointer active:scale-95 transition-transform whitespace-nowrap"
-                >
-                  <RotateCcw className="w-3 h-3 mr-1" />
-                  全てリセット
-                </Button>
-              )}
+              <Button
+                onClick={handleSearchSubmitWithTracking}
+                size="sm"
+                className="h-9 px-3 cursor-pointer"
+                disabled={inputValue.trim() === searchTerm}
+              >
+                <Search className="w-4 h-4" />
+              </Button>
             </div>
-          </div>
+            <SpotTypeFilter
+              value={typeFilter}
+              onChange={onTypeFilterChange}
+              className="w-[200px]"
+            />
+            <ClientSideFilters
+              filters={clientFilters}
+              onFiltersChange={onClientFiltersChange}
+            />
 
-          {/* Quick Filter Chips - desktop */}
-          <div className="flex gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700">
+            {/* Divider between search controls and quick chips */}
+            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
+
+            {/* Quick Filter Chips */}
             {quickFilters.map((chip) => (
               <button
                 key={chip.label}
@@ -506,6 +487,19 @@ export default function ShachuHakuFilters({
                 {chip.label}
               </button>
             ))}
+
+            {/* Reset All Button */}
+            {activeFiltersCount > 0 && (
+              <Button
+                onClick={onResetAll}
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs cursor-pointer active:scale-95 transition-transform whitespace-nowrap ml-auto"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                全てリセット
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
