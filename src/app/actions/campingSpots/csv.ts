@@ -7,6 +7,7 @@ import {
   csvJapaneseRowToCampingSpot,
   CampingSpotCSVSchema,
   CampingSpotCSVJapaneseSchema,
+  type CampingSpot as CampingSpotType,
 } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
@@ -81,7 +82,7 @@ export async function importCampingSpotsFromCSV(
 
     try {
       const values = dataRows[i];
-      const rowData: any = {};
+      const rowData: Record<string, string> = {};
 
       headers.forEach((header, index) => {
         const value = values[index] || '';
@@ -89,7 +90,7 @@ export async function importCampingSpotsFromCSV(
       });
 
       // Validate CSV row and convert to CampingSpot format
-      let campingSpotData: any;
+      let campingSpotData: CampingSpotType;
 
       if (isJapaneseHeaders) {
         // Validate with Japanese schema

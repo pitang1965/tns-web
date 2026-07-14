@@ -1,7 +1,9 @@
 import { z } from 'zod';
+// 型のみのインポートのためクライアントバンドルには含まれない
+import type { ObjectId } from 'mongodb';
 
 // MongoDBのObjectId用のスキーマ定義
-export const objectIdSchema = z.custom<any>((val) => {
+export const objectIdSchema = z.custom<string | ObjectId>((val) => {
   // サーバーサイドの場合...
   if (typeof window === 'undefined') {
     try {

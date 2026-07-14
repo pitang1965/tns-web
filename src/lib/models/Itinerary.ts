@@ -31,14 +31,21 @@ const ItinerarySchema = new Schema<IItinerary>(
     description: { type: String, default: '' },
     numberOfDays: { type: Number, required: true },
     startDate: { type: String },
-    dayPlans: { type: [Schema.Types.Mixed] as any, default: [] },
+    // Mongooseの型定義がMixedの配列リテラルを受け付けないため、型のみキャスト（ランタイムは配列のまま）
+    dayPlans: {
+      type: [Schema.Types.Mixed] as unknown as typeof Schema.Types.Mixed,
+      default: [],
+    },
     owner: {
       id: { type: String, required: true },
       name: { type: String, default: '' },
       email: { type: String, required: true },
     },
     isPublic: { type: Boolean, default: false },
-    sharedWith: { type: [Schema.Types.Mixed] as any, default: [] },
+    sharedWith: {
+      type: [Schema.Types.Mixed] as unknown as typeof Schema.Types.Mixed,
+      default: [],
+    },
   },
   { timestamps: true },
 );

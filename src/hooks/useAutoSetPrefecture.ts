@@ -1,4 +1,9 @@
 import { useEffect, useRef } from 'react';
+import type {
+  FieldValues,
+  SetValueConfig,
+  UseFormSetValue,
+} from 'react-hook-form';
 import { PrefectureOptions } from '@/data/schemas/campingSpot';
 
 type UseAutoSetPrefectureOptions = {
@@ -34,10 +39,10 @@ type ToastFunction = (options: {
  * });
  * ```
  */
-export function useAutoSetPrefecture(
+export function useAutoSetPrefecture<TFieldValues extends FieldValues>(
   addressValue: string | undefined,
   prefectureValue: string | undefined,
-  setValue: (name: any, value: any, options?: any) => void,
+  setValue: UseFormSetValue<TFieldValues>,
   toast: ToastFunction,
   options?: UseAutoSetPrefectureOptions,
 ) {
@@ -45,6 +50,13 @@ export function useAutoSetPrefecture(
   const hasShownPostalCodeToastRef = useRef<boolean>(false);
 
   useEffect(() => {
+    // フィールド名・値の型はフォームスキーマごとに異なるため、文字列ベースの呼び出しに局所的に緩める
+    const setFieldValue = setValue as unknown as (
+      name: string,
+      value: string,
+      options?: SetValueConfig,
+    ) => void;
+
     // 自動設定をスキップする場合（編集モードなど）
     if (options?.skipAutoSet) return;
 
@@ -91,7 +103,7 @@ export function useAutoSetPrefecture(
 
       // 住所フィールドから郵便番号を削除
       if (hasPostalCode && cleanedAddress !== addressValue) {
-        setValue('address', cleanedAddress, {
+        setFieldValue('address', cleanedAddress, {
           shouldValidate: true,
           shouldDirty: true,
           shouldTouch: true,
@@ -99,7 +111,7 @@ export function useAutoSetPrefecture(
       }
 
       // 都道府県を設定
-      setValue('prefecture', detectedPrefecture, {
+      setFieldValue('prefecture', detectedPrefecture, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -128,7 +140,7 @@ export function useAutoSetPrefecture(
       // 都道府県が検出されなかった場合でも、郵便番号は削除
       if (hasPostalCode && cleanedAddress !== addressValue) {
         lastProcessedAddressRef.current = addressValue;
-        setValue('address', cleanedAddress, {
+        setFieldValue('address', cleanedAddress, {
           shouldValidate: true,
           shouldDirty: true,
           shouldTouch: true,

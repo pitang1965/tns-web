@@ -8,9 +8,10 @@ import StatsSection from '@/components/landing/StatsSection';
 import SNSSection from '@/components/landing/SNSSection';
 import CTASection from '@/components/landing/CTASection';
 import HeroPreview from '@/components/landing/HeroPreview';
+import type { SpotFeature } from '@/components/landing/HeroMapSection';
 
 type PublicHomeProps = {
-  initialSpots?: any[];
+  initialSpots?: SpotFeature[];
   spotCount?: number;
 };
 
@@ -19,7 +20,7 @@ export default function PublicHome({
   spotCount = 0,
 }: PublicHomeProps) {
   const [MapComponent, setMapComponent] = useState<ComponentType<{
-    initialSpots?: any[];
+    initialSpots?: SpotFeature[];
     spotCount?: number;
   }> | null>(null);
 

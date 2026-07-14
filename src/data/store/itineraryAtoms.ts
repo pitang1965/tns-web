@@ -17,7 +17,7 @@ export type ItineraryMetadata = {
   sharedWith?: { id: string; name: string; email: string }[];
   dayPlans?: {
     date: string | null;
-    activities: any[];
+    activities: unknown[];
     notes?: string;
   }[];
   dayPlanSummaries?: {

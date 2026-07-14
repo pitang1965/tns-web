@@ -20,8 +20,17 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
+export type SpotFeature = {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: [number, number]; // [lng, lat]
+  };
+  properties: Record<string, unknown>;
+};
+
 type HeroMapSectionProps = {
-  initialSpots?: any[];
+  initialSpots?: SpotFeature[];
   spotCount?: number;
 };
 

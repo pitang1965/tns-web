@@ -15,7 +15,8 @@ export const DEFAULT_FORM_VALUES = {
   prefecture: '',
   address: '',
   url: '',
-  type: undefined as any,
+  // ユーザーに明示的な選択を促すため意図的にundefinedで初期化（スキーマ上は必須のため型のみキャスト）
+  type: undefined as unknown as ShachuHakuFormData['type'],
   distanceToToilet: '',
   distanceToBath: '',
   distanceToConvenience: '',
@@ -40,7 +41,8 @@ export const DEFAULT_FORM_VALUES = {
   isOvernightProhibited: false,
   hasRoof: false,
   hasPowerOutlet: false,
-  isFree: undefined as any,
+  // ユーザーに明示的な選択を促すため意図的にundefinedで初期化（スキーマ上は必須のため型のみキャスト）
+  isFree: undefined as unknown as ShachuHakuFormData['isFree'],
   pricePerNight: '',
   priceNote: '',
   capacity: '',

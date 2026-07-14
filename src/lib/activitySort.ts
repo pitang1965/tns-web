@@ -1,7 +1,7 @@
 type Activity = {
   startTime?: string | null;
   endTime?: string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export function sortActivitiesByTime<T extends Activity>(activities: T[]): T[] {

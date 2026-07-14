@@ -127,7 +127,10 @@ export function ItineraryForm({
   }, [dayParamHook.selectedDay]);
 
   // DayPlanFormをレンダリングする関数
-  const renderDayPlanForm = (day: any, index: number) => {
+  const renderDayPlanForm = (
+    day: ClientItineraryInput['dayPlans'][number],
+    index: number,
+  ) => {
     return (
       <DayPlanForm
         key={index}

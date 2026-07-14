@@ -536,7 +536,8 @@ export default function AdminClient() {
                         amenities: [],
                         notes: '',
                         isVerified: false,
-                      } as any);
+                        // 新規作成用の疑似スポット（_id等が無いため完全なCampingSpotWithIdではない）
+                      } as unknown as CampingSpotWithId);
                     }}
                   />
                 </CardContent>

@@ -1,4 +1,9 @@
 import { useEffect, useRef } from 'react';
+import type {
+  FieldValues,
+  SetValueConfig,
+  UseFormSetValue,
+} from 'react-hook-form';
 
 type UseAutoSetPlaceTypeOptions = {
   skipAutoSet?: boolean;
@@ -11,10 +16,10 @@ type ToastFunction = (options: {
   variant?: 'default' | 'destructive';
 }) => void;
 
-export function useAutoSetPlaceType(
+export function useAutoSetPlaceType<TFieldValues extends FieldValues>(
   nameValue: string | undefined,
   typeValue: string | undefined,
-  setValue: (name: any, value: any, options?: any) => void,
+  setValue: UseFormSetValue<TFieldValues>,
   typeFieldPath: string,
   toast: ToastFunction,
   options?: UseAutoSetPlaceTypeOptions,
@@ -34,9 +39,16 @@ export function useAutoSetPlaceType(
     )
       return;
 
+    // フィールドパスは動的な文字列のため、文字列ベースの呼び出しに局所的に緩める
+    const setFieldValue = setValue as unknown as (
+      name: string,
+      value: string,
+      options?: SetValueConfig,
+    ) => void;
+
     const setType = (type: string, description: string) => {
       if (lastAutoSetTypeRef.current === type) return;
-      setValue(typeFieldPath, type, {
+      setFieldValue(typeFieldPath, type, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,

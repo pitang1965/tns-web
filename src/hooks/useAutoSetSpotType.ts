@@ -1,4 +1,9 @@
 import { useEffect, useRef } from 'react';
+import type {
+  FieldValues,
+  SetValueConfig,
+  UseFormSetValue,
+} from 'react-hook-form';
 
 type UseAutoSetSpotTypeOptions = {
   /**
@@ -33,16 +38,23 @@ type ToastFunction = (options: {
  * });
  * ```
  */
-export function useAutoSetSpotType(
+export function useAutoSetSpotType<TFieldValues extends FieldValues>(
   nameValue: string | undefined,
   typeValue: string | undefined,
-  setValue: (name: any, value: any, options?: any) => void,
+  setValue: UseFormSetValue<TFieldValues>,
   toast: ToastFunction,
   options?: UseAutoSetSpotTypeOptions,
 ) {
   const lastAutoSetTypeRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // フィールド名・値の型はフォームスキーマごとに異なるため、文字列ベースの呼び出しに局所的に緩める
+    const setFieldValue = setValue as unknown as (
+      name: string,
+      value: string,
+      options?: SetValueConfig,
+    ) => void;
+
     // 自動設定をスキップする場合（編集モードなど）
     if (options?.skipAutoSet) return;
 
@@ -59,7 +71,7 @@ export function useAutoSetSpotType(
     if (nameValue.includes('コンビニ')) {
       if (lastAutoSetTypeRef.current === 'convenience_store') return;
 
-      setValue('type', 'convenience_store', {
+      setFieldValue('type', 'convenience_store', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -77,7 +89,7 @@ export function useAutoSetSpotType(
     else if (nameValue.includes('道の駅')) {
       if (lastAutoSetTypeRef.current === 'roadside_station') return;
 
-      setValue('type', 'roadside_station', {
+      setFieldValue('type', 'roadside_station', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -95,7 +107,7 @@ export function useAutoSetSpotType(
     else if (nameValue.includes('RVパーク')) {
       if (lastAutoSetTypeRef.current === 'rv_park') return;
 
-      setValue('type', 'rv_park', {
+      setFieldValue('type', 'rv_park', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -113,7 +125,7 @@ export function useAutoSetSpotType(
     else if (nameValue.includes('SA') || nameValue.includes('PA')) {
       if (lastAutoSetTypeRef.current === 'sa_pa') return;
 
-      setValue('type', 'sa_pa', {
+      setFieldValue('type', 'sa_pa', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -131,7 +143,7 @@ export function useAutoSetSpotType(
     else if (nameValue.includes('オートキャンプ')) {
       if (lastAutoSetTypeRef.current === 'auto_campground') return;
 
-      setValue('type', 'auto_campground', {
+      setFieldValue('type', 'auto_campground', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
@@ -153,7 +165,7 @@ export function useAutoSetSpotType(
     ) {
       if (lastAutoSetTypeRef.current === 'parking_lot') return;
 
-      setValue('type', 'parking_lot', {
+      setFieldValue('type', 'parking_lot', {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,

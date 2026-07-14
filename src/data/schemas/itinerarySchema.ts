@@ -126,7 +126,7 @@ export function toClientItinerary(
       idStr =
         typeof _id === 'string'
           ? _id
-          : mongoObjectId && _id instanceof mongoObjectId
+          : _id != null && mongoObjectId && _id instanceof mongoObjectId
             ? _id.toString()
             : String(_id);
     } catch {

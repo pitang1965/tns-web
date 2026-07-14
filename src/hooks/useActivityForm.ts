@@ -1,4 +1,4 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, type FieldPath } from 'react-hook-form';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 
 export const useActivityForm = (dayIndex: number, activityIndex: number) => {
@@ -21,7 +21,7 @@ export const useActivityForm = (dayIndex: number, activityIndex: number) => {
     fieldName: keyof ClientItineraryInput['dayPlans'][number]['activities'][number],
   ) => {
     return register(
-      `dayPlans.${dayIndex}.activities.${activityIndex}.${fieldName}` as any,
+      `dayPlans.${dayIndex}.activities.${activityIndex}.${fieldName}` as FieldPath<ClientItineraryInput>,
     );
   };
 

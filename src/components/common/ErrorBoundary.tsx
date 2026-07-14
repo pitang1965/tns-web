@@ -41,7 +41,7 @@ class ErrorBoundary extends React.Component<
     if (process.env.NODE_ENV !== 'development') {
       logger.error(error, {
         componentStack: errorInfo.componentStack,
-        digest: (error as any).digest, // Server Components error digest
+        digest: (error as Error & { digest?: string }).digest, // Server Components error digest
       });
     }
   }

@@ -148,10 +148,21 @@ export async function getItineraryById(
   }
 }
 
+type ItineraryDayMetadata = {
+  id: string;
+  title?: string;
+  description?: string;
+  isPublic?: boolean;
+  owner?: unknown;
+  sharedWith?: unknown;
+  totalDays?: number;
+  dayPlanSummaries?: { date?: string; notes?: string }[];
+};
+
 export async function getItineraryWithDay(
   id: string,
   dayIndex: number,
-): Promise<{ metadata: any; dayPlan: any } | null> {
+): Promise<{ metadata: ItineraryDayMetadata; dayPlan: unknown } | null> {
   await ensureDbConnection();
 
   try {

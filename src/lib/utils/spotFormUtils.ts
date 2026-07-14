@@ -31,6 +31,12 @@ export function hasFormInput(formValues: ShachuHakuFormData): boolean {
 export function convertSpotToFormValues(
   spot: CampingSpotWithId,
 ): ShachuHakuFormData {
+  // 旧評価システムのフィールドは現行スキーマに存在しないため、レガシーデータ用に型を拡張
+  const legacySpot = spot as CampingSpotWithId & {
+    quietnessLevel?: number;
+    securityLevel?: number;
+    overallRating?: number;
+  };
   return {
     name: spot.name,
     lat: spot.coordinates[1].toString(),
@@ -77,9 +83,9 @@ export function convertSpotToFormValues(
     nightNoiseNearBusyRoad: spot.nightNoise?.nearBusyRoad || false,
     nightNoiseIsQuietArea: spot.nightNoise?.isQuietArea || false,
     // 旧評価システム（段階的廃止予定） - レガシーデータとの互換性のため
-    quietnessLevel: (spot as any).quietnessLevel?.toString() || '',
-    securityLevel: (spot as any).securityLevel?.toString() || '',
-    overallRating: (spot as any).overallRating?.toString() || '',
+    quietnessLevel: legacySpot.quietnessLevel?.toString() || '',
+    securityLevel: legacySpot.securityLevel?.toString() || '',
+    overallRating: legacySpot.overallRating?.toString() || '',
     isOvernightProhibited: spot.isOvernightProhibited || false,
     hasRoof: spot.hasRoof,
     hasPowerOutlet: spot.hasPowerOutlet,

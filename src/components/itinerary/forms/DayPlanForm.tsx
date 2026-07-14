@@ -43,8 +43,11 @@ import { AddShachuHakuSpotDialog } from '../AddShachuHakuSpotDialog';
 import { DayRouteNavigationButton } from '../DayRouteNavigationButton';
 import { useLocationRouting } from '@/hooks/useLocationRouting';
 
+type DayPlanActivity =
+  ClientItineraryInput['dayPlans'][number]['activities'][number];
+
 type DayPlanFormProps = {
-  day: { date: string | null; activities: any[]; notes?: string };
+  day: { date: string | null; activities: DayPlanActivity[]; notes?: string };
   dayIndex: number;
   daysCount: number;
   addActivity: (dayIndex: number) => void;
@@ -110,7 +113,7 @@ export function DayPlanForm({
     });
   };
 
-  const handleAddCampingSpot = (newActivities: any[]) => {
+  const handleAddCampingSpot = (newActivities: DayPlanActivity[]) => {
     const activities = watch(`dayPlans.${dayIndex}.activities`) || [];
     setValue(
       `dayPlans.${dayIndex}.activities`,
@@ -184,7 +187,7 @@ export function DayPlanForm({
     const activities = watchedActivities || [];
 
     const result = activities
-      .map((activity: any, originalIndex: number): ActivityLocation | null => {
+      .map((activity, originalIndex): ActivityLocation | null => {
         // 位置情報がない場合はnullを返す
         const lat = activity?.place?.location?.latitude;
         const lon = activity?.place?.location?.longitude;
@@ -329,7 +332,7 @@ export function DayPlanForm({
       {totalActivities > 0 && (
         <div className="mb-4 p-3 border border-border/50 rounded-lg bg-muted/10">
           <ActivityOrderList
-            activities={watchedActivities.map((activity: any) => ({
+            activities={watchedActivities.map((activity) => ({
               id: activity.id,
               title: activity.title,
             }))}

@@ -61,7 +61,7 @@ export function isAndroidWebView(): boolean {
  */
 export function safePostMessage(
   targetWindow: Window,
-  message: any,
+  message: unknown,
   origin: string = '*',
 ): boolean {
   if (typeof window === 'undefined') return false;

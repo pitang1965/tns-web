@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,6 +11,17 @@ import {
 import { useSyncFormWithJotai } from '@/hooks/useSyncFormWithJotai';
 import { itineraryMetadataAtom } from '@/data/store/itineraryAtoms';
 import { capture } from '@/lib/analytics';
+
+// onInvalidでエラー構造を辿るための簡易型（react-hook-formのFieldErrorsは深いネストの型解決が複雑なため）
+type ActivityFieldError = {
+  title?: unknown;
+  url?: unknown;
+  place?: { location?: { latitude?: unknown } };
+};
+
+type DayPlanFieldError = {
+  activities?: Record<string, ActivityFieldError | undefined>;
+};
 
 const DEFAULT_ITINERARY = {
   title: '',
@@ -184,17 +195,21 @@ export function useItineraryForm({
     }
   };
 
-  const onInvalid = (errors: Record<string, any>) => {
+  const onInvalid = (errors: FieldErrors<ClientItineraryInput>) => {
     const messages: string[] = [];
 
     // dayPlans のエラーを解析して分かりやすいメッセージに変換
     if (errors.dayPlans) {
-      Object.entries(errors.dayPlans).forEach(
-        ([dayIdx, dayError]: [string, any]) => {
+      const dayPlanErrors = errors.dayPlans as unknown as Record<
+        string,
+        DayPlanFieldError | undefined
+      >;
+      Object.entries(dayPlanErrors).forEach(
+        ([dayIdx, dayError]) => {
           const day = Number(dayIdx) + 1;
           if (dayError?.activities) {
             Object.entries(dayError.activities).forEach(
-              ([actIdx, actError]: [string, any]) => {
+              ([actIdx, actError]) => {
                 const act = Number(actIdx) + 1;
                 const field = actError?.title
                   ? 'タイトル'

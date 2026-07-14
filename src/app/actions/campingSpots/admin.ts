@@ -296,7 +296,7 @@ export async function createCampingSpot(data: FormData) {
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
-  const formObject: Record<string, any> = {};
+  const formObject: Record<string, FormDataEntryValue> = {};
   data.forEach((value, key) => {
     formObject[key] = value;
   });
@@ -385,7 +385,7 @@ export async function createCampingSpot(data: FormData) {
   // Handle nested pricing object
   if (cleanData.pricing) {
     const cleanPricing = Object.fromEntries(
-      Object.entries(cleanData.pricing as any).filter(
+      Object.entries(cleanData.pricing as Record<string, unknown>).filter(
         ([key, value]) => value !== undefined,
       ),
     );
@@ -416,7 +416,7 @@ export async function updateCampingSpot(id: string, data: FormData) {
   const user = await checkAdminAuth();
   await ensureDbConnection();
 
-  const formObject: Record<string, any> = {};
+  const formObject: Record<string, FormDataEntryValue> = {};
   data.forEach((value, key) => {
     formObject[key] = value;
   });
