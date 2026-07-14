@@ -247,7 +247,7 @@ export default function ShachuHakuFilters({
                 key={chip.label}
                 type="button"
                 onClick={chip.onToggle}
-                className={`flex-shrink-0 h-7 px-2.5 text-xs rounded-full border cursor-pointer transition-colors ${
+                className={`shrink-0 h-7 px-2.5 text-xs rounded-full border cursor-pointer transition-colors ${
                   chip.isActive
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-background text-foreground border-input hover:bg-accent'
@@ -294,7 +294,7 @@ export default function ShachuHakuFilters({
                   ))}
 
                   <Select onValueChange={handlePrefectureJump}>
-                    <SelectTrigger className="w-[120px] h-7 text-xs cursor-pointer">
+                    <SelectTrigger className="w-30 h-7 text-xs cursor-pointer">
                       <SelectValue placeholder="都道府県..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -355,7 +355,7 @@ export default function ShachuHakuFilters({
                     <SpotTypeFilter
                       value={typeFilter}
                       onChange={onTypeFilterChange}
-                      className="flex-1 sm:flex-none sm:w-[220px]"
+                      className="flex-1 sm:flex-none sm:w-55"
                     />
                     <ClientSideFilters
                       filters={clientFilters}
@@ -402,7 +402,7 @@ export default function ShachuHakuFilters({
             </div>
 
             <Select onValueChange={onPrefectureJump}>
-              <SelectTrigger className="w-[120px] h-7 text-xs cursor-pointer">
+              <SelectTrigger className="w-30 h-7 text-xs cursor-pointer">
                 <SelectValue placeholder="都道府県..." />
               </SelectTrigger>
               <SelectContent>
@@ -462,7 +462,7 @@ export default function ShachuHakuFilters({
             <SpotTypeFilter
               value={typeFilter}
               onChange={onTypeFilterChange}
-              className="w-[200px]"
+              className="w-50"
             />
             <ClientSideFilters
               filters={clientFilters}
@@ -478,7 +478,7 @@ export default function ShachuHakuFilters({
                 key={chip.label}
                 type="button"
                 onClick={chip.onToggle}
-                className={`flex-shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
+                className={`shrink-0 h-7 px-3 text-xs rounded-full border cursor-pointer transition-colors ${
                   chip.isActive
                     ? 'bg-blue-500 text-white border-blue-500'
                     : 'bg-background text-foreground border-input hover:bg-accent'
