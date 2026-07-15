@@ -36,6 +36,7 @@ import {
   ShachuHakuFormCreateSchema,
   ShachuHakuFormEditSchema,
   ShachuHakuFormData,
+  ShachuHakuFormInput,
 } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
@@ -124,7 +125,7 @@ export default function ShachuHakuForm({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<ShachuHakuFormData>({
+  } = useForm<ShachuHakuFormInput, unknown, ShachuHakuFormData>({
     resolver: zodResolver(
       isEdit ? ShachuHakuFormEditSchema : ShachuHakuFormCreateSchema,
     ),
@@ -423,7 +424,9 @@ export default function ShachuHakuForm({
         missingFields={missingFields}
         loading={loading}
         onConfirm={() => {
-          const data = watch();
+          // watch() は入力型を返すが、defaultValues により全フィールドが揃った
+          // 状態のため出力型として送信する（submitForm 内でデフォルト前提の処理を行う）。
+          const data = watch() as ShachuHakuFormData;
           submitForm(data);
         }}
         isEdit={isEdit}

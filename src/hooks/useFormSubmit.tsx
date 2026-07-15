@@ -63,7 +63,9 @@ export function useFormSubmit({
       formData.append('lat', data.lat);
       formData.append('lng', data.lng);
       formData.append('prefecture', data.prefecture);
-      formData.append('type', data.type);
+      // type は .optional().refine() でバリデーション後は必ず存在するが、
+      // 型上は string | undefined のためフォールバックでガードする
+      formData.append('type', data.type ?? '');
 
       // Handle optional string fields
       if (data.address && data.address.trim() !== '') {

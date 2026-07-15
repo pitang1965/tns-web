@@ -12,7 +12,7 @@ export const activitySchema = z
     cost: z.number().nullable(),
     url: z
       .union([
-        z.string().url('有効なURLを入力してください'),
+        z.url('有効なURLを入力してください'),
         z.literal(''),
         z.null(),
       ])

@@ -6,9 +6,8 @@ export const contactFormSchema = z.object({
     .min(1, 'お名前を入力してください')
     .max(100, 'お名前は100文字以内で入力してください'),
   email: z
-    .string()
-    .min(1, 'メールアドレスを入力してください')
     .email('有効なメールアドレスを入力してください')
+    .min(1, 'メールアドレスを入力してください')
     .max(255, 'メールアドレスは255文字以内で入力してください'),
   subject: z
     .string()

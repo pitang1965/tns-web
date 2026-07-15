@@ -1,13 +1,13 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { UseFormWatch, UseFormReset, UseFormSetValue } from 'react-hook-form';
-import { ShachuHakuFormData } from '@/components/admin/validationSchemas';
+import { ShachuHakuFormInput } from '@/components/admin/validationSchemas';
 import { AUTO_SAVE_KEY, DEFAULT_FORM_VALUES } from '@/constants/formDefaults';
 import { hasFormInput } from '@/lib/utils/spotFormUtils';
 
 type UseFormAutoSaveProps = {
-  watch: UseFormWatch<ShachuHakuFormData>;
-  reset: UseFormReset<ShachuHakuFormData>;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
+  reset: UseFormReset<ShachuHakuFormInput>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
   isEdit: boolean;
   toast: (props: { title: string; description: string }) => void;
 };

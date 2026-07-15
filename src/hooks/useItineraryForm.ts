@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
+import {
+  useForm,
+  useWatch,
+  type FieldErrors,
+  type Resolver,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -67,8 +72,14 @@ export function useItineraryForm({
       }
     : DEFAULT_ITINERARY;
 
+  // zod 4 + @hookform/resolvers 5 では default 等によりスキーマの入力型と出力型が
+  // 分離する。本フォームはコンポーネントツリー全体でフィールド値の型として出力型
+  // (ClientItineraryInput) を前提としているため、resolver を出力型へキャストして
+  // 既存の型注釈との整合を保つ（defaultValues で全フィールドを与えるため実行時は安全）。
   const methods = useForm<ClientItineraryInput>({
-    resolver: zodResolver(clientItinerarySchema),
+    resolver: zodResolver(
+      clientItinerarySchema,
+    ) as unknown as Resolver<ClientItineraryInput>,
     defaultValues,
     mode: 'onSubmit',
   });

@@ -14,11 +14,11 @@ import {
 } from '@/lib/mapboxIcons';
 import { FacilityLegend, LegendItem } from '@/components/common/FacilityLegend';
 import { UseFormWatch } from 'react-hook-form';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 type FacilitiesMapProps = {
-  watch: UseFormWatch<ShachuHakuFormData>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
 };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;

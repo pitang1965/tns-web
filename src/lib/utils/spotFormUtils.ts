@@ -1,12 +1,15 @@
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
-import { ShachuHakuFormData } from '@/components/admin/validationSchemas';
+import {
+  ShachuHakuFormData,
+  ShachuHakuFormInput,
+} from '@/components/admin/validationSchemas';
 
 /**
  * フォームに入力があるかチェック
  * @param formValues - フォームの値
  * @returns 入力がある場合true
  */
-export function hasFormInput(formValues: ShachuHakuFormData): boolean {
+export function hasFormInput(formValues: ShachuHakuFormInput): boolean {
   return Object.entries(formValues).some(([key, value]) => {
     // 座標フィールドは除外（地図クリックで自動入力されるため）
     if (key === 'lat' || key === 'lng') return false;

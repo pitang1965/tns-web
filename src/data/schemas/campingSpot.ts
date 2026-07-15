@@ -39,12 +39,12 @@ export const CampingSpotSchema = z.object({
       z.number().min(-90).max(90), // latitude
     ],
     {
-      required_error: '座標を指定してください',
+      error: '座標を指定してください',
     },
   ),
   prefecture: z.string().min(1, '都道府県を選択してください').trim(),
   address: z.string().trim().optional(),
-  url: z.string().url('有効なURLを入力してください').trim().optional(),
+  url: z.url('有効なURLを入力してください').trim().optional(),
   type: CampingSpotTypeSchema,
   distanceToToilet: z
     .number()
@@ -74,8 +74,8 @@ export const CampingSpotSchema = z.object({
     .number()
     .min(-10, '標高は-10以上で入力してください')
     .max(3776, '標高は3776以下で入力してください'),
-  security: CampingSpotSecuritySchema.default({}),
-  nightNoise: CampingSpotNightNoiseSchema.default({}),
+  security: CampingSpotSecuritySchema.prefault({}),
+  nightNoise: CampingSpotNightNoiseSchema.prefault({}),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
   pricing: CampingSpotPricingSchema,
@@ -558,7 +558,7 @@ export const CampingSpotSubmissionSchema = z.object({
     .optional(),
   prefecture: z.string().min(1, '都道府県を選択してください').trim(),
   address: z.string().trim().optional(),
-  url: z.string().url('有効なURLを入力してください').trim().optional(),
+  url: z.url('有効なURLを入力してください').trim().optional(),
   type: CampingSpotTypeSchema.default('other'),
   hasRoof: z.boolean().default(false),
   hasPowerOutlet: z.boolean().default(false),
@@ -567,7 +567,6 @@ export const CampingSpotSubmissionSchema = z.object({
   priceNote: z.string().trim().optional(),
   notes: z.string().trim().optional(),
   submitterEmail: z
-    .string()
     .email('有効なメールアドレスを入力してください')
     .optional(),
   submitterName: z.string().trim().optional(),

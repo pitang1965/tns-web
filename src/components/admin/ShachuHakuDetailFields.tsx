@@ -12,14 +12,14 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 import type { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
 type ShachuHakuDetailFieldsProps = {
-  register: UseFormRegister<ShachuHakuFormData>;
-  watch: UseFormWatch<ShachuHakuFormData>;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
-  errors: FieldErrors<ShachuHakuFormData>;
+  register: UseFormRegister<ShachuHakuFormInput>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
+  errors: FieldErrors<ShachuHakuFormInput>;
   spot?: CampingSpotWithId | null;
 };
 

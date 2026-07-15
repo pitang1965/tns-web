@@ -362,4 +362,5 @@ export const ShachuHakuFormEditSchema = ShachuHakuFormCreateSchema;
 export const ShachuHakuFormSchema = ShachuHakuFormCreateSchema;
 
 // フォームデータの型
-export type ShachuHakuFormData = z.infer<typeof ShachuHakuFormCreateSchema>;
+export type ShachuHakuFormInput = z.input<typeof ShachuHakuFormCreateSchema>;
+export type ShachuHakuFormData = z.output<typeof ShachuHakuFormCreateSchema>;

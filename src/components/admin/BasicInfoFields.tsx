@@ -37,7 +37,7 @@ import {
   CampingSpotType,
 } from '@/data/schemas/campingSpot';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 import dynamic from 'next/dynamic';
 
 // Dynamically import map component to avoid SSR issues
@@ -53,10 +53,10 @@ const SimpleLocationPicker = dynamic(
 
 type BasicInfoFieldsProps = {
   spot?: CampingSpotWithId | null;
-  register: UseFormRegister<ShachuHakuFormData>;
-  watch: UseFormWatch<ShachuHakuFormData>;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
-  errors: FieldErrors<ShachuHakuFormData>;
+  register: UseFormRegister<ShachuHakuFormInput>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
+  errors: FieldErrors<ShachuHakuFormInput>;
 };
 
 export function BasicInfoFields({

@@ -76,7 +76,6 @@ const SubmissionFormSchema = z.object({
     .or(z.literal('')),
   prefecture: z.string().min(1, '都道府県を選択してください'),
   url: z
-    .string()
     .url('有効なURLを入力してください')
     .optional()
     .or(z.literal('')),
@@ -88,7 +87,6 @@ const SubmissionFormSchema = z.object({
   notes: z.string().optional(),
   submitterName: z.string().optional(),
   submitterEmail: z
-    .string()
     .email('有効なメールアドレスを入力してください')
     .optional()
     .or(z.literal('')),
@@ -97,7 +95,8 @@ const SubmissionFormSchema = z.object({
   }),
 });
 
-type SubmissionFormData = z.infer<typeof SubmissionFormSchema>;
+type SubmissionFormInput = z.input<typeof SubmissionFormSchema>;
+type SubmissionFormData = z.output<typeof SubmissionFormSchema>;
 
 type ShachuHakuSubmissionFormProps = {
   onSuccess?: () => void;
@@ -112,7 +111,7 @@ export default function ShachuHakuSubmissionForm({
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
-  const form = useForm<SubmissionFormData>({
+  const form = useForm<SubmissionFormInput, unknown, SubmissionFormData>({
     resolver: zodResolver(SubmissionFormSchema),
     defaultValues: {
       name: '',

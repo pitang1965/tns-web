@@ -16,13 +16,13 @@ import {
   InputGroupInput,
   InputGroupText,
 } from '@/components/ui/input-group';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 
 type PricingFieldsProps = {
-  register: UseFormRegister<ShachuHakuFormData>;
-  watch: UseFormWatch<ShachuHakuFormData>;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
-  errors: FieldErrors<ShachuHakuFormData>;
+  register: UseFormRegister<ShachuHakuFormInput>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
+  errors: FieldErrors<ShachuHakuFormInput>;
 };
 
 export function PricingFields({

@@ -5,7 +5,7 @@ import { UseFormSetValue } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Copy, MapPin } from 'lucide-react';
 import { formatDistance } from '@/lib/formatDistance';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 import { useToast } from '@/components/ui/use-toast';
 
 type FacilityType = 'toilet' | 'convenience' | 'bath';
@@ -25,7 +25,7 @@ type NearbySpotWithFacilities = {
 type NearbySpotsSelectorProps = {
   lat: string;
   lng: string;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
 };
 
 const FACILITY_LABELS: Record<FacilityType, string> = {

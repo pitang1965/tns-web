@@ -12,14 +12,14 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Map, Route, Copy, Search } from 'lucide-react';
 import { CoordinatesFromClipboardButton } from '../itinerary/CoordinatesFromClipboardButton';
-import { ShachuHakuFormData } from './validationSchemas';
+import { ShachuHakuFormInput } from './validationSchemas';
 import { NearbySpotsSelector } from './NearbySpotsSelector';
 
 type NearbyFacilityFieldsProps = {
-  register: UseFormRegister<ShachuHakuFormData>;
-  watch: UseFormWatch<ShachuHakuFormData>;
-  setValue: UseFormSetValue<ShachuHakuFormData>;
-  errors: FieldErrors<ShachuHakuFormData>;
+  register: UseFormRegister<ShachuHakuFormInput>;
+  watch: UseFormWatch<ShachuHakuFormInput>;
+  setValue: UseFormSetValue<ShachuHakuFormInput>;
+  errors: FieldErrors<ShachuHakuFormInput>;
 };
 
 export function NearbyFacilityFields({

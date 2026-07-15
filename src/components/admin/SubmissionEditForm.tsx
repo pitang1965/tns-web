@@ -17,6 +17,7 @@ import { approveSubmissionWithoutCreating } from '../../app/actions/campingSpotS
 import {
   ShachuHakuFormEditSchema,
   ShachuHakuFormData,
+  ShachuHakuFormInput,
 } from './validationSchemas';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
@@ -46,7 +47,7 @@ export default function SubmissionEditForm({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<ShachuHakuFormData>({
+  } = useForm<ShachuHakuFormInput, unknown, ShachuHakuFormData>({
     resolver: zodResolver(ShachuHakuFormEditSchema),
     defaultValues: {
       name: '',
@@ -145,7 +146,9 @@ export default function SubmissionEditForm({
       formData.append('lat', data.lat);
       formData.append('lng', data.lng);
       formData.append('prefecture', data.prefecture);
-      formData.append('type', data.type);
+      // type は .optional().refine() でバリデーション後は必ず存在するが、
+      // 型上は string | undefined のためフォールバックでガードする
+      formData.append('type', data.type ?? '');
 
       // Handle optional string fields
       if (data.address && data.address.trim() !== '') {
