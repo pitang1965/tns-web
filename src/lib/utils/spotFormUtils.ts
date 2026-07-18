@@ -27,6 +27,20 @@ export function hasFormInput(formValues: ShachuHakuFormInput): boolean {
 }
 
 /**
+ * type フィールドを FormData に追加する。
+ * type は .optional().refine() のためバリデーション後は必ず存在するが、
+ * 型上は string | undefined なのでフォールバックでガードする。
+ * @param formData - 追加先の FormData
+ * @param type - フォームの type 値
+ */
+export function appendSpotType(
+  formData: FormData,
+  type: string | undefined,
+): void {
+  formData.append('type', type ?? '');
+}
+
+/**
  * CampingSpotをフォーム値に変換
  * @param spot - 車中泊スポットデータ
  * @returns フォーム用のデータ

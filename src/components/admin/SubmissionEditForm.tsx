@@ -19,6 +19,7 @@ import {
   ShachuHakuFormData,
   ShachuHakuFormInput,
 } from './validationSchemas';
+import { appendSpotType } from '@/lib/utils/spotFormUtils';
 import { BasicInfoFields } from './BasicInfoFields';
 import { PricingFields } from './PricingFields';
 import { ShachuHakuDetailFields } from './ShachuHakuDetailFields';
@@ -146,9 +147,7 @@ export default function SubmissionEditForm({
       formData.append('lat', data.lat);
       formData.append('lng', data.lng);
       formData.append('prefecture', data.prefecture);
-      // type は .optional().refine() でバリデーション後は必ず存在するが、
-      // 型上は string | undefined のためフォールバックでガードする
-      formData.append('type', data.type ?? '');
+      appendSpotType(formData, data.type);
 
       // Handle optional string fields
       if (data.address && data.address.trim() !== '') {
