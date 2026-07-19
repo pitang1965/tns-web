@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-07-14',
+    items: [
+      {
+        category: 'other',
+        text: '車中泊マップの絞り込みUIを整理し、特にスマホで見やすく・使いやすくしました。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-07-08',
     items: [
       {
