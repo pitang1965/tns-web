@@ -22,32 +22,33 @@ type EmailData = {
   };
 };
 
-type MailerSendResponse = {
+type ResendResponse = {
   success: boolean;
   message?: string;
   error?: string;
   isConfigError?: boolean;
 };
 
-export class MailerSendClient {
-  private apiToken: string;
-  private baseUrl = 'https://api.mailersend.com/v1';
+// Resendの from は "名前 <email>" の文字列形式。表示名がなければアドレスのみ。
+function formatFrom(from: { email: string; name?: string }): string {
+  return from.name ? `${from.name} <${from.email}>` : from.email;
+}
+
+export class ResendClient {
+  private apiKey: string;
+  private baseUrl = 'https://api.resend.com';
   private defaultFrom: { email: string; name?: string };
 
-  constructor(
-    apiToken: string,
-    defaultFromEmail: string,
-    defaultFromName?: string,
-  ) {
-    this.apiToken = apiToken;
+  constructor(apiKey: string, defaultFromEmail: string, defaultFromName?: string) {
+    this.apiKey = apiKey;
     this.defaultFrom = {
       email: defaultFromEmail,
       name: defaultFromName,
     };
   }
 
-  async sendEmail(emailData: EmailData): Promise<MailerSendResponse> {
-    if (!this.apiToken) {
+  async sendEmail(emailData: EmailData): Promise<ResendResponse> {
+    if (!this.apiKey) {
       return {
         success: false,
         error: 'メール送信サービスのAPIキーが設定されていません',
@@ -57,24 +58,19 @@ export class MailerSendClient {
 
     try {
       const payload = {
-        from: emailData.from || this.defaultFrom,
-        to: [
-          {
-            email: emailData.to,
-          },
-        ],
+        from: formatFrom(emailData.from || this.defaultFrom),
+        to: [emailData.to],
         subject: emailData.subject,
         text: emailData.text,
         html:
           emailData.html || escapeHtml(emailData.text).replace(/\n/g, '<br>'),
       };
 
-      const response = await fetch(`${this.baseUrl}/email`, {
+      const response = await fetch(`${this.baseUrl}/emails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiToken}`,
-          'X-Requested-With': 'XMLHttpRequest',
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify(payload),
       });
@@ -85,9 +81,7 @@ export class MailerSendClient {
 
         if (status === 401 || status === 403) {
           logger.error(
-            new Error(
-              `[MailerSend] 認証エラー (HTTP ${status}): APIキーが無効です`,
-            ),
+            new Error(`[Resend] 認証エラー (HTTP ${status}): APIキーが無効です`),
             { status, to: emailData.to },
           );
           return {
@@ -98,9 +92,9 @@ export class MailerSendClient {
           };
         }
 
-        if (status === 422) {
+        if (status === 400 || status === 422) {
           logger.error(
-            new Error(`[MailerSend] バリデーションエラー (HTTP ${status})`),
+            new Error(`[Resend] バリデーションエラー (HTTP ${status})`),
             { status, to: emailData.to, detail: errorData.message },
           );
           return {
@@ -111,7 +105,7 @@ export class MailerSendClient {
         }
 
         if (status === 429) {
-          logger.warn(`[MailerSend] レート制限 (HTTP ${status})`, {
+          logger.warn(`[Resend] レート制限 (HTTP ${status})`, {
             to: emailData.to,
           });
           return {
@@ -121,10 +115,11 @@ export class MailerSendClient {
           };
         }
 
-        logger.error(
-          new Error(`[MailerSend] メール送信失敗 (HTTP ${status})`),
-          { status, to: emailData.to, detail: errorData.message },
-        );
+        logger.error(new Error(`[Resend] メール送信失敗 (HTTP ${status})`), {
+          status,
+          to: emailData.to,
+          detail: errorData.message,
+        });
         return {
           success: false,
           error: `メール送信に失敗しました (HTTP ${status})`,
@@ -139,7 +134,7 @@ export class MailerSendClient {
       logger.error(
         error instanceof Error
           ? error
-          : new Error('[MailerSend] ネットワークエラー'),
+          : new Error('[Resend] ネットワークエラー'),
         { to: emailData.to },
       );
       return {
@@ -155,7 +150,7 @@ export class MailerSendClient {
     subject: string;
     message: string;
     adminEmail: string;
-  }): Promise<MailerSendResponse> {
+  }): Promise<ResendResponse> {
     const emailHtml = `
       <h2>新しいお問い合わせ</h2>
       <p><strong>お名前:</strong> ${escapeHtml(data.name)}</p>
@@ -198,7 +193,7 @@ ${data.message}
     submitterEmail?: string;
     adminEmail: string;
     submissionId: string;
-  }): Promise<MailerSendResponse> {
+  }): Promise<ResendResponse> {
     const typeLabels: Record<string, string> = {
       roadside_station: '道の駅・◯◯の駅',
       sa_pa: 'SA/PA',
@@ -267,7 +262,7 @@ ${data.submitterEmail ? `投稿者メール: ${data.submitterEmail}` : ''}
       newUsersThisWeek: number;
       newUsersThisMonth: number;
     } | null;
-  }): Promise<MailerSendResponse> {
+  }): Promise<ResendResponse> {
     const userStatsHtml = data.userStats
       ? `
       <h3>📊 ユーザー統計</h3>
@@ -343,7 +338,7 @@ ${userStatsText}
     userName: string;
     adminEmail: string;
     deletedItineraryCount: number;
-  }): Promise<MailerSendResponse> {
+  }): Promise<ResendResponse> {
     const deletedAt = new Date().toLocaleString('ja-JP');
 
     const emailHtml = `
@@ -379,10 +374,10 @@ ${userStatsText}
   }
 }
 
-const mailerSend = new MailerSendClient(
-  process.env.MAILERSEND_API_TOKEN || '',
-  process.env.MAILERSEND_FROM_EMAIL || '',
-  process.env.MAILERSEND_FROM_NAME || '車旅のしおり',
+const resend = new ResendClient(
+  process.env.RESEND_API_KEY || '',
+  process.env.RESEND_FROM_EMAIL || '',
+  process.env.RESEND_FROM_NAME || '車旅のしおり',
 );
 
-export default mailerSend;
+export default resend;

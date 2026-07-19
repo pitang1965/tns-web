@@ -4,7 +4,7 @@ import { auth0 } from '@/lib/auth0';
 import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
 import { deletePostHogPerson } from '@/lib/posthogServer';
-import mailerSend from '@/lib/mailersend';
+import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
 
 type DeleteAccountResult = {
@@ -78,7 +78,7 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
       try {
-        const result = await mailerSend.sendAccountDeletionNotification({
+        const result = await resend.sendAccountDeletionNotification({
           userId,
           userEmail: user.email ?? 'Unknown',
           userName: user.name ?? 'Unknown',

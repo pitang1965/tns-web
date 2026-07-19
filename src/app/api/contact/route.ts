@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contactFormSchema } from '@/data/schemas/contactSchema';
-import mailerSend from '@/lib/mailersend';
+import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await mailerSend.sendContactForm({
+    const result = await resend.sendContactForm({
       name: validatedData.name,
       email: validatedData.email,
       subject: validatedData.subject,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
-import mailerSend from '@/lib/mailersend';
+import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { auth0Management } from '@/lib/auth0Management';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     }
 
     // メール送信を試行（失敗してもWebhookは成功扱い）
-    const result = await mailerSend.sendUserRegistrationNotification({
+    const result = await resend.sendUserRegistrationNotification({
       userId,
       userEmail: email,
       userName: name || 'Unknown',

@@ -3,7 +3,7 @@ import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotSubmissionSchema } from '@/data/schemas/campingSpot';
-import mailerSend from '@/lib/mailersend';
+import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
 import { calculateDistance } from '@/lib/utils/distance';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to admin
     if (process.env.ADMIN_EMAIL) {
-      const result = await mailerSend.sendCampingSpotSubmission({
+      const result = await resend.sendCampingSpotSubmission({
         name: validatedData.name,
         prefecture: validatedData.prefecture,
         address: validatedData.address,
