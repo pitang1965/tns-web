@@ -76,6 +76,6 @@
     "tailwindcss": "^4.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5",
-    "undici-types": "^7.28.0"
+    "undici-types": "^8.0.0"
   }
 }
