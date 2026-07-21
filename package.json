@@ -68,7 +68,7 @@
     "baseline-browser-mapping": "^2.10.40",
     "csstype": "^3.2.3",
     "dotenv": "^17.4.2",
-    "eslint": "^9.39.4",
+    "eslint": "^10.0.0",
     "eslint-config-next": "16.2.10",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "postcss": "^8",
