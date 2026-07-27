@@ -90,48 +90,48 @@ export default function ShachuHakuFilters({
         }),
     },
     {
-      label: 'トイレ200m以内',
+      label: 'トイレ300m以内',
       isActive:
         clientFilters.maxToiletDistance !== null &&
-        clientFilters.maxToiletDistance <= 200,
+        clientFilters.maxToiletDistance <= 300,
       onToggle: () =>
         onClientFiltersChange({
           ...clientFilters,
           maxToiletDistance:
             clientFilters.maxToiletDistance !== null &&
-            clientFilters.maxToiletDistance <= 200
+            clientFilters.maxToiletDistance <= 300
               ? null
-              : 200,
+              : 300,
         }),
     },
     {
-      label: 'コンビニ200m以内',
+      label: 'コンビニ300m以内',
       isActive:
         clientFilters.maxConvenienceDistance !== null &&
-        clientFilters.maxConvenienceDistance <= 200,
+        clientFilters.maxConvenienceDistance <= 300,
       onToggle: () =>
         onClientFiltersChange({
           ...clientFilters,
           maxConvenienceDistance:
             clientFilters.maxConvenienceDistance !== null &&
-            clientFilters.maxConvenienceDistance <= 200
+            clientFilters.maxConvenienceDistance <= 300
               ? null
-              : 200,
+              : 300,
         }),
     },
     {
-      label: '入浴施設200m以内',
+      label: '入浴施設1000m以内',
       isActive:
         clientFilters.maxBathDistance !== null &&
-        clientFilters.maxBathDistance <= 200,
+        clientFilters.maxBathDistance <= 1000,
       onToggle: () =>
         onClientFiltersChange({
           ...clientFilters,
           maxBathDistance:
             clientFilters.maxBathDistance !== null &&
-            clientFilters.maxBathDistance <= 200
+            clientFilters.maxBathDistance <= 1000
               ? null
-              : 200,
+              : 1000,
         }),
     },
   ];

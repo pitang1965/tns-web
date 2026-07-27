@@ -30,6 +30,23 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-07-27',
+    items: [
+      {
+        category: 'other',
+        text: '車中泊マップのクイックフィルタの距離を見直しました。「トイレ300m以内」「コンビニ300m以内」「入浴施設1000m以内」で絞り込めます。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+      {
+        category: 'fix',
+        text: '約100件の車中泊スポットで、トイレまでの距離が未登録だった情報を補完しました（主にRVパークなど施設内にトイレがあるスポット）。これにより、トイレの距離で絞り込んだ際に表示されるようになりました。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-07-14',
     items: [
       {
