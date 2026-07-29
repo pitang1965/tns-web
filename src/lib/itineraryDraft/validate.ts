@@ -14,6 +14,8 @@ import {
 } from './types';
 import { PLACE_TYPES } from './prompt';
 import { geocodePlaceName, GeocodeResult } from './geocode';
+import { buildPolyline, pointToPolylineKm, routeBoundingBox } from './geo';
+import { draftLog } from './debug';
 
 type GeoResolver = (name: string) => Promise<GeocodeResult | null>;
 
@@ -53,6 +55,39 @@ function normalizePlaceType(type: string): PlaceType {
     : 'OTHER';
 }
 
+/**
+ * 場所名からタイプを推定する。編集画面の useAutoSetPlaceType と同じキーワード規則
+ * （順序も一致）を生成時に先取りして適用するための純粋関数。
+ *
+ * 目的: 生成物の type を OTHER/ATTRACTION 以外の具体値にしておくことで、編集画面
+ * ロード時に useAutoSetPlaceType が再発火（shouldValidate 付き setValue）して
+ * 保存がブロックされる問題を防ぐ。キーワードに合致しなければ null を返す。
+ */
+function inferPlaceTypeFromName(name: string): PlaceType | null {
+  if (name.includes('自宅')) return 'HOME';
+  if (name.includes('RVパーク')) return 'PARKING_PAID_RV_PARK';
+  if (name.includes('SA') || name.includes('PA'))
+    return 'PARKING_FREE_SERVICE_AREA';
+  if (name.includes('道の駅')) return 'PARKING_FREE_MICHINOEKI';
+  if (name.includes('コンビニ') || name.includes('スーパー'))
+    return 'CONVENIENCE_SUPERMARKET';
+  if (name.includes('ガソリン') || name.includes('GS')) return 'GAS_STATION';
+  if (name.includes('コインランドリー')) return 'COIN_LAUNDRY';
+  if (
+    name.includes('温泉') ||
+    name.includes('銭湯') ||
+    name.includes('入浴') ||
+    name.includes('風呂')
+  )
+    return 'BATHING_FACILITY';
+  if (name.includes('ホテル') || name.includes('旅館') || name.includes('民宿'))
+    return 'HOTEL';
+  if (name.includes('レストラン') || name.includes('食堂')) return 'RESTAURANT';
+  if (name.includes('駐車場') || name.includes('パーキング'))
+    return 'PARKING_PAID_OTHER';
+  return null;
+}
+
 function dateForDay(startDate: string | undefined, i: number): string | null {
   if (!startDate) return null;
   const d = new Date(startDate);
@@ -87,12 +122,20 @@ async function buildDaytimeActivity(a: LlmActivity, resolveGeo: GeoResolver) {
     }
   }
 
+  const name = a.placeName?.trim() || a.title;
+  // 名前からの推定を優先し（編集画面の自動タイプ設定の再発火を防ぐ）、
+  // 合致しなければ LLM の type を採用する。ただし HOME(自宅) は名前に「自宅」を
+  // 含む場合のみ許可する（出発地が自宅とは限らず、HOMEは座標・住所が非公開扱いになるため）。
+  const type =
+    inferPlaceTypeFromName(name) ??
+    (a.type === 'HOME' ? 'OTHER' : normalizePlaceType(a.type));
+
   return {
     id: randomUUID(),
     title: a.title,
     place: {
-      name: a.placeName?.trim() || a.title,
-      type: normalizePlaceType(a.type),
+      name,
+      type,
       address,
       location,
     },
@@ -152,18 +195,45 @@ export async function buildDraftFromLlm(params: {
 
   const proximity = routeCentroid(input);
 
+  // 経路の折れ線と境界ボックス（誤ジオコーディング対策に使う）
+  const polyline = buildPolyline(
+    input.startLocation.location,
+    input.destinations.map((d) => d.location),
+    input.roundTrip,
+  );
+  const bbox = routeBoundingBox(polyline, 50) ?? undefined;
+  const MAX_OFFROUTE_KM = 100;
+
   // 同一リクエスト内での同名クエリの重複排除（LLMが同じ地名を複数回出すため）
   const geoCache = new Map<string, Promise<GeocodeResult | null>>();
   const resolveGeo: GeoResolver = (name) => {
     let p = geoCache.get(name);
     if (!p) {
-      p = geocodePlaceName(name, proximity);
+      p = geocodePlaceName(name, proximity, bbox).then((geo) => {
+        // 経路から遠すぎる結果は同名施設の誤マッチとみなして棄却
+        // （例: 栃木の「城の湯」を頼んだら熊本の同名施設が返る、を防ぐ）
+        if (
+          geo &&
+          pointToPolylineKm(geo.location, polyline) > MAX_OFFROUTE_KM
+        ) {
+          draftLog('geocode-offroute-rejected', {
+            name,
+            km: Math.round(pointToPolylineKm(geo.location, polyline)),
+          });
+          return null;
+        }
+        return geo;
+      });
       geoCache.set(name, p);
     }
     return p;
   };
 
   const dayPlans = [];
+
+  const asLoc = (p: LatLng) => ({ latitude: p.lat, longitude: p.lng });
+  // その日の出発元。1日目は出発地、以降は前夜の泊地。
+  let departFromLoc: LatLng = input.startLocation.location;
 
   for (let i = 0; i < numberOfDays; i++) {
     const candidates = candidatesByDay[i];
@@ -176,6 +246,20 @@ export async function buildDraftFromLlm(params: {
     > = await Promise.all(
       (llmDay.activities ?? []).map((a) => buildDaytimeActivity(a, resolveGeo)),
     );
+
+    // 出発アクティビティのグラウンディング: その日の先頭が座標なし（「◯◯を出発」等の
+    // 語り）なら、出発元（前夜の泊地 or 出発地）の既知座標を与える。
+    if (activities.length > 0 && activities[0].place.location === null) {
+      activities[0].place.location = asLoc(departFromLoc);
+    }
+
+    // 最終日の帰着: 往復なら最後のアクティビティが座標なしのとき出発地の座標を与える。
+    if (i === numberOfDays - 1 && input.roundTrip && activities.length > 0) {
+      const last = activities[activities.length - 1];
+      if (last.place.location === null) {
+        last.place.location = asLoc(input.startLocation.location);
+      }
+    }
 
     // 泊地の確定（ハルシネーション防止の要）
     if (candidates.length > 0) {
@@ -192,6 +276,8 @@ export async function buildDraftFromLlm(params: {
         );
       }
       activities.push(buildOvernightActivity(spot));
+      // 翌日の出発元をこの夜の泊地にする
+      departFromLoc = spot.location;
     } else if (i < numberOfDays - 1) {
       // 最終日以外で候補ゼロ = 部分成立（ADR-0008 の段階緩和の最後の受け皿）
       notes.push(

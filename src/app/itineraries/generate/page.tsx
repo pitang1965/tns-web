@@ -37,6 +37,26 @@ const DISTANCE_OPTIONS = [100, 150, 200, 250, 300, 400];
 
 type PlaceField = { text: string; place: NamedPlace | null };
 
+// 候補選択の確認表示。選択済みなら住所つきで確定を示し、入力中で未選択なら選択を促す。
+function PlaceSelectionHint({ field }: { field: PlaceField }) {
+  if (field.place) {
+    return (
+      <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+        ✓ {field.place.name}
+        {field.place.address ? `（${field.place.address}）` : ''}
+      </p>
+    );
+  }
+  if (field.text.trim()) {
+    return (
+      <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">
+        候補から場所を選択してください（座標を確定するため）
+      </p>
+    );
+  }
+  return null;
+}
+
 export default function GenerateItineraryPage() {
   const { user, isLoading } = useUser();
   const { isDraftAllowed, isLoading: accessLoading } = useDraftAccess();
@@ -209,6 +229,7 @@ export default function GenerateItineraryPage() {
                 })
               }
             />
+            <PlaceSelectionHint field={start} />
           </div>
 
           <div className="space-y-2">
@@ -232,6 +253,7 @@ export default function GenerateItineraryPage() {
                       })
                     }
                   />
+                  <PlaceSelectionHint field={d} />
                 </div>
                 {destinations.length > 1 && (
                   <Button

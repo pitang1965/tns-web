@@ -96,6 +96,46 @@ export function pointToPolylineKm(p: LatLng, polyline: LatLng[]): number {
   return min;
 }
 
+export type BBox = {
+  minLng: number;
+  minLat: number;
+  maxLng: number;
+  maxLat: number;
+};
+
+/**
+ * 折れ線を囲む境界ボックス（バッファ付き、緯度経度の有効範囲にクランプ）。
+ * ジオコーディングを経路周辺に絞る（Mapbox の bbox 引数）ために使う。
+ */
+export function routeBoundingBox(
+  polyline: LatLng[],
+  bufferKm: number,
+): BBox | null {
+  if (polyline.length === 0) return null;
+
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  for (const p of polyline) {
+    minLat = Math.min(minLat, p.lat);
+    maxLat = Math.max(maxLat, p.lat);
+    minLng = Math.min(minLng, p.lng);
+    maxLng = Math.max(maxLng, p.lng);
+  }
+
+  const latBuf = bufferKm / 111;
+  const midLat = (minLat + maxLat) / 2;
+  const lngBuf = bufferKm / (111 * Math.cos((midLat * Math.PI) / 180));
+
+  return {
+    minLng: Math.max(-180, minLng - lngBuf),
+    minLat: Math.max(-90, minLat - latBuf),
+    maxLng: Math.min(180, maxLng + lngBuf),
+    maxLat: Math.min(90, maxLat + latBuf),
+  };
+}
+
 /**
  * 入力から経路の折れ線（ウェイポイント列）を組み立てる。
  * 往復なら末尾に出発地を追加する。
