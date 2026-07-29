@@ -29,6 +29,35 @@ export function isAdmin(
   );
 }
 
+// 非公開環境変数 ITINERARY_DRAFT_ALLOWED_EMAILS を使用するため、サーバーサイド専用。
+// クライアントでは useDraftAccess() フックで判定すること。
+function getDraftAllowedEmails(): string | undefined {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.ITINERARY_DRAFT_ALLOWED_EMAILS;
+  }
+  return undefined;
+}
+
+/**
+ * AI旅程ドラフト生成を利用できる「限定者」かどうかを判定する（サーバーサイド用）。
+ * 管理者判定(ADMIN_EMAILS)とは別枠の環境変数 ITINERARY_DRAFT_ALLOWED_EMAILS で指定する。
+ * ADR-0009: 初版は限定者のみ。サブスク導入時はここを会員判定へ差し替える。
+ */
+export function isItineraryDraftAllowed(
+  user: User | null | undefined,
+  hint?: boolean,
+): boolean {
+  if (hint !== undefined) return hint;
+  const allowed = getDraftAllowedEmails();
+  return !!(
+    user?.email &&
+    allowed
+      ?.split(',')
+      .map((email) => email.trim())
+      .includes(user.email)
+  );
+}
+
 /**
  * ユーザーがプレミアム会員かどうかを判定する
  * 管理者もプレミアム会員特典を持つ

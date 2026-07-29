@@ -150,6 +150,24 @@ export default withPageAuthRequired(function Account() {
                   新機能の先行利用
                 </span>
               </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isPremiumMember(user, isAdmin)
+                      ? 'bg-green-500'
+                      : 'bg-gray-300'
+                  }`}
+                ></div>
+                <span
+                  className={
+                    isPremiumMember(user, isAdmin)
+                      ? ''
+                      : 'text-muted-foreground'
+                  }
+                >
+                  AI で旅程の下書きを生成（現在は限定者のみ先行提供）
+                </span>
+              </div>
             </div>
             {!isPremiumMember(user, isAdmin) && (
               <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">

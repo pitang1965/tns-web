@@ -20,6 +20,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - **カーナビ連携**: Android Auto・Apple CarPlay 対応。保存した位置情報から Google Maps を起動してルート検索。
 - **簡単共有**: 旅程を SNS（X・LINE・Facebook 等）やメールで簡単に共有できます。
 - **スポット投稿**: あなたが見つけた車中泊スポットを投稿して、他の旅行者と情報を共有しましょう。
+- **AI で旅程の下書き**: 出発地・目的地・泊数・好みから、実在の車中泊スポットを軸にした旅程の下書きを AI が生成（LLM API 活用）。**現在は限定者のみの先行提供**（`ITINERARY_DRAFT_ALLOWED_EMAILS` で指定）で、将来的にはプレミアム会員特典として提供予定です（プレミアム会員機能自体はまだ未提供）。詳細は ADR-0008 / ADR-0009 を参照。
 
 ## 使用例
 
@@ -127,7 +128,12 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 ### 地図
 
 - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`:
-  - Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要。
+  - Mapbox API にアクセスするためのトークン。地図の表示や機能の利用に必要（ブラウザ側で使用）。
+- `MAPBOX_SERVER_TOKEN`（任意・AI旅程ドラフト生成を使う場合は推奨）:
+  - サーバー側のジオコーディング（AI旅程ドラフト生成で観光地名→座標を解決）に使うトークン。
+  - **URL 制限なし**のトークンを指定すること。URL 制限付きの `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` はサーバーからのリクエスト（Origin/Referer なし）が 403 になるため。
+  - 未設定時は `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` にフォールバックするが、URL 制限があると 403 で座標解決に失敗しうる。
+  - 例: `pk.xxxxxxxx...`
 
 ### データベース
 
@@ -185,6 +191,20 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `ADMIN_EMAILS`:
   - 管理者のメールアドレス一覧（サーバーサイド用）。カンマ区切りで複数指定可能。
   - 例: `admin@example.com,admin2@example.com`
+
+### AI旅程ドラフト生成
+
+「AIで下書き」機能（実在の車中泊スポットを軸に旅程ドラフトを生成する機能）で使用する。設計の詳細は `docs/adr/0008-itinerary-draft-generation-architecture.md` および `docs/adr/0009-ai-generation-cost-and-access-policy.md` を参照。
+
+- `ANTHROPIC_API_KEY`（この機能を使う場合は必須）:
+  - Anthropic API のキー。旅程ドラフト生成の LLM 呼び出しに使用（モデルは `claude-haiku-4-5`、1 回あたり約 1〜2 円）。
+  - console.anthropic.com → Settings → API Keys で発行。事前にクレジット購入が必要。**git 追跡ファイルには実値を書かない**。
+  - 例: `sk-ant-xxxxxxxx...`
+- `ITINERARY_DRAFT_ALLOWED_EMAILS`（この機能を使う場合は必須）:
+  - AI 旅程ドラフト生成を利用できる「限定者」のメールアドレス一覧（サーバーサイド用・カンマ区切り）。`ADMIN_EMAILS` とは**別枠**の管理。
+  - 未設定の場合、管理者を含め誰もこの機能を利用できない（ADR-0009 の「初版は限定者のみ」方針）。
+  - 例: `user1@example.com,user2@example.com`
+- ジオコーディングには `MAPBOX_SERVER_TOKEN`（「地図」の項を参照）も使用する。
 
 ### メール送信（Resend）
 

@@ -2,9 +2,10 @@
 
 import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { useDraftAccess } from '@/hooks/useDraftAccess';
 import { H1, LargeText } from '@/components/common/Typography';
 import {
   ClientItineraryDocument,
@@ -51,6 +52,7 @@ export function ItinerariesClient({
   isAuthenticated,
 }: Props) {
   const router = useRouter();
+  const { isDraftAllowed, isLoading: draftAccessLoading } = useDraftAccess();
   const savedTab = useSyncExternalStore(
     subscribeToTab,
     getTabSnapshot,
@@ -98,14 +100,31 @@ export function ItinerariesClient({
         <TabsContent value="mine" className="mt-4">
           {isAuthenticated && myItineraries ? (
             <div className="flex flex-col gap-4">
-              <Button
-                onClick={handleCreateNew}
-                size="sm"
-                className="w-fit cursor-pointer"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                新規作成
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={handleCreateNew}
+                  size="sm"
+                  className="w-fit cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  新規作成
+                </Button>
+                <Button
+                  onClick={() => router.push('/itineraries/generate')}
+                  size="sm"
+                  variant="outline"
+                  disabled={draftAccessLoading || !isDraftAllowed}
+                  title={
+                    isDraftAllowed
+                      ? undefined
+                      : 'この機能は限定者のみ利用できます'
+                  }
+                  className="w-fit cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4 mr-1" />
+                  {isDraftAllowed ? 'AIで下書き' : 'AIで下書き（限定者のみ）'}
+                </Button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {myItineraries.length > 0 ? (
                   myItineraries.map((itinerary) => (

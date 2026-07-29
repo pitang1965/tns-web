@@ -13,6 +13,7 @@
     "init-db": "node --loader ts-node/esm --no-warnings --trace-warnings --trace-uncaught ./src/scripts/initDB.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@auth0/nextjs-auth0": "^4.24.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
