@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-07-31',
+    items: [
+      {
+        category: 'new',
+        text: '出発地・目的地・泊数・好みから、実在の車中泊スポットを軸にした旅程の下書きをAIが作る機能を追加しました。現在は一部の方への先行提供で、順次ご利用いただけるようにしていく予定です。',
+        href: '/itineraries/generate',
+        linkLabel: 'AIで下書き',
+      },
+    ],
+  },
+  {
     date: '2026-07-27',
     items: [
       {

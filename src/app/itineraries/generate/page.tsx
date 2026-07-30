@@ -210,12 +210,17 @@ export default function GenerateItineraryPage() {
   }
 
   if (!hasProgram) {
+    // メール認証を促すケースだけ行動可能な案内を出し、それ以外（メール未提供の
+    // ソーシャルログイン・未付与）は内部理由を見せず前向きな「先行提供中」に統一する。
+    const isVerifyPrompt =
+      accessReason === 'メールアドレスの認証を完了してください';
     return (
       <div className="flex flex-col justify-center items-center h-screen space-y-4">
-        <h1 className="text-2xl font-bold text-red-600">準備中</h1>
+        <h1 className="text-2xl font-bold text-amber-600">準備中</h1>
         <p className="text-gray-600 dark:text-gray-300 text-center max-w-md">
-          {accessReason ??
-            'AIによる旅程ドラフト生成は現在、限定公開中です。'}
+          {isVerifyPrompt
+            ? 'メールアドレスの認証を完了すると、ご利用いただけるようになります。'
+            : 'AIによる旅程ドラフトの生成は、現在一部の方への先行提供中です。順次ご利用いただけるようにしていく予定です。'}
         </p>
       </div>
     );
