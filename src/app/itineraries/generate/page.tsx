@@ -19,7 +19,7 @@ import {
   generateItineraryDraftAction,
   type GenerateDraftResult,
 } from '@/app/actions/generateItineraryDraft';
-import type { NamedPlace } from '@/lib/itineraryDraft/types';
+import type { NamedPlace, DepartureTimeOfDay } from '@/lib/itineraryDraft/types';
 import type { PersonaType } from '@/data/schemas/diagnosisSchema';
 
 const PERSONA_OPTIONS: { value: PersonaType; label: string }[] = [
@@ -34,6 +34,12 @@ const PERSONA_OPTIONS: { value: PersonaType; label: string }[] = [
 ];
 
 const DISTANCE_OPTIONS = [100, 150, 200, 250, 300, 400];
+
+const DEPARTURE_OPTIONS: { value: DepartureTimeOfDay; label: string }[] = [
+  { value: 'morning', label: '朝発' },
+  { value: 'afternoon', label: '午後発' },
+  { value: 'evening', label: '夕方発' },
+];
 
 type PlaceField = { text: string; place: NamedPlace | null };
 
@@ -72,6 +78,8 @@ export default function GenerateItineraryPage() {
   const [carHeightOver, setCarHeightOver] = useState(false);
   const [carLengthOver, setCarLengthOver] = useState(false);
   const [roundTrip, setRoundTrip] = useState(true);
+  const [departureTimeOfDay, setDepartureTimeOfDay] =
+    useState<DepartureTimeOfDay>('afternoon');
   const [startDate, setStartDate] = useState('');
   const [title, setTitle] = useState('');
 
@@ -116,6 +124,7 @@ export default function GenerateItineraryPage() {
         dailyDistanceKm: distanceKm,
         roundTrip,
         persona,
+        departureTimeOfDay,
         carHeightOver21m: carHeightOver || undefined,
         carLengthOver5m: carLengthOver || undefined,
         startDate: startDate || undefined,
@@ -312,6 +321,26 @@ export default function GenerateItineraryPage() {
                 ))}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">初日の出発</label>
+            <select
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={departureTimeOfDay}
+              onChange={(e) =>
+                setDepartureTimeOfDay(e.target.value as DepartureTimeOfDay)
+              }
+            >
+              {DEPARTURE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              渋滞を避ける時間帯の目安です。生成後に各日の時刻はずらせます。
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

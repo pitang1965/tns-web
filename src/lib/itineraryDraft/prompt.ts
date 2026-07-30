@@ -1,4 +1,9 @@
-import { CandidateSpot, GenerateDraftInput, PlaceType } from './types';
+import {
+  CandidateSpot,
+  DepartureTimeOfDay,
+  GenerateDraftInput,
+  PlaceType,
+} from './types';
 import { PERSONAS } from '@/lib/diagnosisScoring';
 
 // placeSchema の type と同期した列挙（tool スキーマとプロンプトで共有）
@@ -18,6 +23,13 @@ export const PLACE_TYPES: PlaceType[] = [
   'COIN_LAUNDRY',
   'OTHER',
 ];
+
+// 初日の出発時間帯の目安（ユーザー選択 → プロンプト誘導）。時刻は目安で、LLMが幅を持って組む。
+const DEPARTURE_GUIDE: Record<DepartureTimeOfDay, string> = {
+  morning: '朝（9時ごろ）',
+  afternoon: '午後（13時ごろ）',
+  evening: '夕方（19時ごろ）',
+};
 
 export function buildSystemPrompt(): string {
   return [
@@ -101,6 +113,7 @@ export function buildUserContent(
     `泊数: ${input.numberOfNights}泊${numberOfDays}日`,
     `1日の走行距離の上限: 約${input.dailyDistanceKm}km（中間日はこれより短くてよい）`,
     `好み（ペルソナ）: ${persona?.name ?? input.persona} — ${persona?.description ?? ''}`,
+    `初日の出発: ${DEPARTURE_GUIDE[input.departureTimeOfDay ?? 'afternoon']}（目安。夕方発なら初日は観光を入れず移動主体に、朝発なら初日から観光を入れてよい）`,
     input.startDate ? `開始日: ${input.startDate}` : '',
     '',
     '## 各日の泊地候補',

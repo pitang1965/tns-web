@@ -18,16 +18,21 @@ export type NamedPlace = {
   address?: string | null;
 };
 
+// 初日の出発時間帯（ユーザー選択・目安）。渋滞回避のため初日の過ごし方を変える。
+// 目安時刻: morning≈9時 / afternoon≈13時 / evening≈19時。生成後は「ずらす機能」で微調整可。
+export type DepartureTimeOfDay = 'morning' | 'afternoon' | 'evening';
+
 // 旅程ドラフト生成の入力（ADR-0008）
 export type GenerateDraftInput = {
   startLocation: NamedPlace; // 出発地（往復なら復路の終点も兼ねる）
   destinations: NamedPlace[]; // 目的地/経由地（順序付き・1件以上）
   numberOfNights: number; // 泊数（1以上）
-  dailyDistanceKm: number; // 1日の走行距離の目安
+  dailyDistanceKm: number; // 1日の走行距離の上限
   roundTrip: boolean; // 往復（既定 true）
   persona: PersonaType; // 車中泊の好み（診断結果または自己申告）
   carHeightOver21m?: boolean; // 車高2.1m超（種別除外に使用）
   carLengthOver5m?: boolean; // 全長5m超（種別除外に使用）
+  departureTimeOfDay?: DepartureTimeOfDay; // 初日の出発時間帯（既定 afternoon）
   startDate?: string; // 開始日（ISO文字列、任意）
   title?: string; // タイトル（任意。未指定ならLLMが命名）
 };
