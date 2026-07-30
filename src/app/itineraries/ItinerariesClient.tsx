@@ -52,7 +52,13 @@ export function ItinerariesClient({
   isAuthenticated,
 }: Props) {
   const router = useRouter();
-  const { isDraftAllowed, isLoading: draftAccessLoading } = useDraftAccess();
+  const {
+    unlimited: draftUnlimited,
+    balance: draftBalance,
+    isLoading: draftAccessLoading,
+  } = useDraftAccess();
+  // 無制限枠、または一度でも付与された人（残高ドキュメントあり）は生成ページを開ける。
+  const canOpenGenerate = draftUnlimited || draftBalance !== null;
   const savedTab = useSyncExternalStore(
     subscribeToTab,
     getTabSnapshot,
@@ -113,16 +119,20 @@ export function ItinerariesClient({
                   onClick={() => router.push('/itineraries/generate')}
                   size="sm"
                   variant="outline"
-                  disabled={draftAccessLoading || !isDraftAllowed}
+                  disabled={draftAccessLoading || !canOpenGenerate}
                   title={
-                    isDraftAllowed
+                    canOpenGenerate
                       ? undefined
-                      : 'この機能は限定者のみ利用できます'
+                      : 'この機能は現在、限定公開中です'
                   }
                   className="w-fit cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 mr-1" />
-                  {isDraftAllowed ? 'AIで下書き' : 'AIで下書き（限定者のみ）'}
+                  {!canOpenGenerate
+                    ? 'AIで下書き（限定公開）'
+                    : draftUnlimited || draftBalance === null
+                      ? 'AIで下書き'
+                      : `AIで下書き（残り${draftBalance}アズキ）`}
                 </Button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

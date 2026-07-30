@@ -1,57 +1,80 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-type DraftAccessResult = {
-  isDraftAllowed: boolean;
+export type DraftAccessState = {
+  /** 今この瞬間に生成できるか（無制限枠 or 残高≥1）。初回スナップショット時点の値。 */
+  allowed: boolean;
+  /** 無制限枠（whitelist）。消費しない。 */
+  unlimited: boolean;
+  /** 残高（アズキ）。null = 一度も付与されていない（＝機能未開放）。無制限枠では null。 */
+  balance: number | null;
+  /** 不許可の理由（メール未認証／限定公開／アズキ不足）。 */
+  reason: string | null;
   isLoading: boolean;
+  /** 生成レスポンス等でクライアント側の残高を即時反映する（サーバ再取得なし）。 */
+  setBalance: (n: number | null) => void;
+  /** サーバから再取得する。 */
+  refresh: () => Promise<void>;
 };
 
-// モジュールレベルのキャッシュ。同一ページセッション内で複数のコンポーネントが
-// useDraftAccess() を呼んでも /api/auth/me へのリクエストは1回のみ。
-let cachedIsDraftAllowed: boolean | null = null;
-let fetchPromise: Promise<boolean> | null = null;
+type AccessPayload = {
+  allowed: boolean;
+  unlimited: boolean;
+  balance: number | null;
+  reason: string | null;
+};
 
-function fetchIsDraftAllowed(): Promise<boolean> {
-  if (cachedIsDraftAllowed !== null) return Promise.resolve(cachedIsDraftAllowed);
-  if (!fetchPromise) {
-    fetchPromise = fetch('/api/auth/me')
-      .then((res) => (res.ok ? res.json() : { isDraftAllowed: false }))
-      .then((data: { isDraftAllowed?: boolean }) => {
-        cachedIsDraftAllowed = data.isDraftAllowed ?? false;
-        return cachedIsDraftAllowed!;
-      })
-      .catch(() => {
-        cachedIsDraftAllowed = false;
-        return false;
-      });
-  }
-  return fetchPromise;
-}
+const ENDPOINT = '/api/itinerary-draft/access';
+const FALLBACK: AccessPayload = {
+  allowed: false,
+  unlimited: false,
+  balance: null,
+  reason: null,
+};
 
 /**
- * AI旅程ドラフト生成の限定者かどうかをクライアントで判定する。
- * サーバー側の ITINERARY_DRAFT_ALLOWED_EMAILS に基づく /api/auth/me の結果を読む。
+ * AI旅程ドラフト生成のアクセス状態（無制限枠か／残高アズキ）をクライアントで取得する（ADR-0010）。
+ * 残高は消費で変動するため、生成後は setBalance で即時反映し、必要なら refresh で再取得する。
  */
-export function useDraftAccess(): DraftAccessResult {
-  const [isDraftAllowed, setIsDraftAllowed] = useState<boolean>(
-    cachedIsDraftAllowed ?? false,
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(
-    cachedIsDraftAllowed === null,
-  );
+export function useDraftAccess(): DraftAccessState {
+  const [state, setState] = useState<AccessPayload | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch(ENDPOINT);
+      const data: AccessPayload = res.ok ? await res.json() : FALLBACK;
+      setState(data);
+    } catch {
+      setState(FALLBACK);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
-    fetchIsDraftAllowed().then((allowed) => {
+    setIsLoading(true);
+    refresh().finally(() => {
       if (!active) return;
-      setIsDraftAllowed(allowed);
-      setIsLoading(false);
     });
     return () => {
       active = false;
     };
+  }, [refresh]);
+
+  const setBalance = useCallback((n: number | null) => {
+    setState((prev) => (prev ? { ...prev, balance: n } : prev));
   }, []);
 
-  return { isDraftAllowed, isLoading };
+  return {
+    allowed: state?.allowed ?? false,
+    unlimited: state?.unlimited ?? false,
+    balance: state?.balance ?? null,
+    reason: state?.reason ?? null,
+    isLoading,
+    setBalance,
+    refresh,
+  };
 }

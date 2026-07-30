@@ -67,8 +67,18 @@ function PlaceSelectionHint({ field }: { field: PlaceField }) {
 
 export default function GenerateItineraryPage() {
   const { user, isLoading } = useUser();
-  const { isDraftAllowed, isLoading: accessLoading } = useDraftAccess();
+  const {
+    unlimited,
+    balance,
+    reason: accessReason,
+    isLoading: accessLoading,
+    setBalance,
+  } = useDraftAccess();
   const router = useRouter();
+  // 無制限枠、または一度でも付与された人（残高ドキュメントあり）はフォームを表示する。
+  const hasProgram = unlimited || balance !== null;
+  // 今この瞬間に生成できるか（無制限枠 or 残高≥1）。
+  const canGenerate = unlimited || (balance !== null && balance >= 1);
 
   const [start, setStart] = useState<PlaceField>({ text: '', place: null });
   const [destinations, setDestinations] = useState<PlaceField[]>([
@@ -133,7 +143,10 @@ export default function GenerateItineraryPage() {
         title: title.trim() || undefined,
       });
       setResult(res);
-      if (!res.success) {
+      if (res.success) {
+        // 生成成功時の最新残高を即時反映（無制限枠は null）。
+        setBalance(res.remaining);
+      } else {
         toast({
           title: res.error,
           description: res.suggestion,
@@ -196,12 +209,13 @@ export default function GenerateItineraryPage() {
     );
   }
 
-  if (!isDraftAllowed) {
+  if (!hasProgram) {
     return (
       <div className="flex flex-col justify-center items-center h-screen space-y-4">
         <h1 className="text-2xl font-bold text-red-600">準備中</h1>
         <p className="text-gray-600 dark:text-gray-300 text-center max-w-md">
-          AIによる旅程ドラフト生成は現在、限定者のみが利用できます。
+          {accessReason ??
+            'AIによる旅程ドラフト生成は現在、限定公開中です。'}
         </p>
       </div>
     );
@@ -217,6 +231,20 @@ export default function GenerateItineraryPage() {
         <p className="text-sm text-muted-foreground mt-1">
           出発地・目的地・泊数・好みから、実在の車中泊スポットを軸にした旅程ドラフトを生成します。
         </p>
+        <div className="mt-2">
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 px-3 py-1 text-sm font-medium">
+            {unlimited ? (
+              '無制限'
+            ) : (
+              <>残り {balance ?? 0} アズキ</>
+            )}
+          </span>
+          {!unlimited && (
+            <span className="ml-2 text-xs text-muted-foreground">
+              1回の生成で1アズキを使います
+            </span>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -406,7 +434,16 @@ export default function GenerateItineraryPage() {
             />
           </div>
 
-          <Button onClick={handleGenerate} disabled={running} className="w-full">
+          {!canGenerate && (
+            <p className="text-sm text-red-600 dark:text-red-400">
+              アズキが不足しています。付与を受けると生成できます。
+            </p>
+          )}
+          <Button
+            onClick={handleGenerate}
+            disabled={running || !canGenerate}
+            className="w-full"
+          >
             <Sparkles className="h-4 w-4 mr-2" />
             {running ? '生成中…（10〜30秒）' : 'この条件で生成する'}
           </Button>
@@ -462,7 +499,7 @@ export default function GenerateItineraryPage() {
               <Button
                 variant="outline"
                 onClick={handleGenerate}
-                disabled={running || saving}
+                disabled={running || saving || !canGenerate}
               >
                 再生成
               </Button>
