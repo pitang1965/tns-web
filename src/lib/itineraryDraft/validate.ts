@@ -14,7 +14,12 @@ import {
 } from './types';
 import { PLACE_TYPES } from './prompt';
 import { geocodePlaceName, GeocodeResult } from './geocode';
-import { buildPolyline, pointToPolylineKm, routeBoundingBox } from './geo';
+import {
+  buildPolyline,
+  haversineKm,
+  pointToPolylineKm,
+  routeBoundingBox,
+} from './geo';
 import { draftLog } from './debug';
 
 type GeoResolver = (name: string) => Promise<GeocodeResult | null>;
@@ -173,6 +178,64 @@ function buildOvernightActivity(spot: CandidateSpot) {
   };
 }
 
+// 出発地の構造アンカー（出発/帰着）を作る（ADR-0008 追記の方式Q）。
+// 身元（名称・座標）は出発地の確定値で作り、時刻のみ引数で受ける
+// （＝身元はコード所有・時刻はLLM由来）。値の形は buildDaytimeActivity と揃える。
+function buildStartAnchor(
+  input: GenerateDraftInput,
+  kind: 'depart' | 'return',
+  startTime: string | null,
+) {
+  const name = input.startLocation.name;
+  return {
+    id: randomUUID(),
+    title: `${kind === 'depart' ? '出発' : '帰着'}: ${name}`,
+    place: {
+      name,
+      type: inferPlaceTypeFromName(name) ?? 'OTHER',
+      address: input.startLocation.address ?? null,
+      location: {
+        latitude: input.startLocation.location.lat,
+        longitude: input.startLocation.location.lng,
+      },
+    },
+    description: null,
+    startTime: startTime ?? null,
+    endTime: null,
+    cost: null,
+  };
+}
+
+// あるアクティビティが「出発地そのもの」を指すか。名称一致（出発地名を含む）または
+// 座標が出発地に近接（〜0.5km）で判定する。出発地はユーザー確定値なので判定が明快で、
+// 近隣の別スポット（温泉など）を巻き込まない。
+function isStartLocationActivity(
+  act: {
+    place: {
+      name: string;
+      location: { latitude: number; longitude: number } | null;
+    };
+  },
+  input: GenerateDraftInput,
+): boolean {
+  const startName = input.startLocation.name.trim();
+  const name = act.place.name?.trim() ?? '';
+  if (startName && name && (name === startName || name.includes(startName))) {
+    return true;
+  }
+  if (act.place.location) {
+    const km = haversineKm(
+      {
+        lat: act.place.location.latitude,
+        lng: act.place.location.longitude,
+      },
+      input.startLocation.location,
+    );
+    if (km < 0.5) return true;
+  }
+  return false;
+}
+
 /**
  * LLM出力を検証し、実在スポットの正データで泊地を確定し、観光地を座標解決して、
  * 最終的に clientItinerarySchema で検証した ClientItineraryInput を組み立てる（三重防御）。
@@ -238,27 +301,56 @@ export async function buildDraftFromLlm(params: {
   for (let i = 0; i < numberOfDays; i++) {
     const candidates = candidatesByDay[i];
     const llmDay = llm.days[i];
+    const isLastDay = i === numberOfDays - 1;
 
     // 日中アクティビティを座標解決しつつ構築（その日の分は並列で解決して短縮）
-    const activities: Array<
+    let activities: Array<
       | Awaited<ReturnType<typeof buildDaytimeActivity>>
       | ReturnType<typeof buildOvernightActivity>
     > = await Promise.all(
       (llmDay.activities ?? []).map((a) => buildDaytimeActivity(a, resolveGeo)),
     );
 
-    // 出発アクティビティのグラウンディング: その日の先頭が座標なし（「◯◯を出発」等の
-    // 語り）なら、出発元（前夜の泊地 or 出発地）の既知座標を与える。
-    if (activities.length > 0 && activities[0].place.location === null) {
+    // 2日目以降の先頭が「◯◯を出発」等で座標なしなら、前夜の泊地座標を与える。
+    if (i > 0 && activities.length > 0 && activities[0].place.location === null) {
       activities[0].place.location = asLoc(departFromLoc);
     }
 
-    // 最終日の帰着: 往復なら最後のアクティビティが座標なしのとき出発地の座標を与える。
-    if (i === numberOfDays - 1 && input.roundTrip && activities.length > 0) {
-      const last = activities[activities.length - 1];
-      if (last.place.location === null) {
-        last.place.location = asLoc(input.startLocation.location);
+    // 構造アンカー（出発地）のコード所有（ADR-0008 追記）。
+    // 「身元（存在・名称・座標）」はコードが確定し、時刻はLLMの表現から継承する。
+    if (i === 0) {
+      // ⓪ 1日目: 先頭に出発アンカーを保証（prepend）。LLMが出発を到着に畳み込んでも立つ。
+      if (
+        activities.length > 0 &&
+        isStartLocationActivity(activities[0], input)
+      ) {
+        // LLMが出発地そのものを先頭に出していれば、時刻を保持して正規化する。
+        activities[0] = buildStartAnchor(
+          input,
+          'depart',
+          activities[0].startTime,
+        );
+      } else {
+        const departTime = activities.length > 0 ? activities[0].startTime : null;
+        activities.unshift(buildStartAnchor(input, 'depart', departTime));
       }
+      // 先頭以外に出発地が重複したら除去（保険）。
+      activities = activities.filter(
+        (a, idx) => idx === 0 || !isStartLocationActivity(a, input),
+      );
+    } else if (isLastDay && input.roundTrip) {
+      // ① 最終日・往復: 末尾に帰着アンカーを保証。LLMの帰着時刻があれば継承する。
+      const last = activities[activities.length - 1];
+      const returnTime =
+        last && isStartLocationActivity(last, input)
+          ? (last.startTime ?? last.endTime ?? null)
+          : null;
+      // 途中・末尾に出た出発地一致を一旦すべて除去し、正規の帰着を末尾に付ける。
+      activities = activities.filter((a) => !isStartLocationActivity(a, input));
+      activities.push(buildStartAnchor(input, 'return', returnTime));
+    } else {
+      // ④ 中日（および片道の最終日）: 途中に出た出発地一致を除去（帰着の早出しリーク対策）。
+      activities = activities.filter((a) => !isStartLocationActivity(a, input));
     }
 
     // 泊地の確定（ハルシネーション防止の要）
@@ -278,7 +370,7 @@ export async function buildDraftFromLlm(params: {
       activities.push(buildOvernightActivity(spot));
       // 翌日の出発元をこの夜の泊地にする
       departFromLoc = spot.location;
-    } else if (i < numberOfDays - 1) {
+    } else if (!isLastDay) {
       // 最終日以外で候補ゼロ = 部分成立（ADR-0008 の段階緩和の最後の受け皿）
       notes.push(
         `${i + 1}日目は条件に合う車中泊スポットが見つかりませんでした。手動で泊地を追加してください。`,
