@@ -35,6 +35,8 @@ const PERSONA_OPTIONS: { value: PersonaType; label: string }[] = [
 
 const DISTANCE_OPTIONS = [100, 150, 200, 250, 300, 400];
 
+const NIGHTS_OPTIONS = Array.from({ length: 14 }, (_, i) => i + 1);
+
 const DEPARTURE_OPTIONS: { value: DepartureTimeOfDay; label: string }[] = [
   { value: 'morning', label: '朝発' },
   { value: 'afternoon', label: '午後発' },
@@ -294,66 +296,41 @@ export default function GenerateItineraryPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+            <Checkbox
+              checked={roundTrip}
+              onCheckedChange={(c) => setRoundTrip(c === true)}
+            />
+            往復（出発地に戻る）
+          </label>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium">泊数*</label>
-              <Input
-                type="number"
-                min={1}
-                max={14}
-                value={nights}
-                onChange={(e) =>
-                  setNights(Math.max(1, Number(e.target.value) || 1))
-                }
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">1日の走行距離の目安</label>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={distanceKm}
-                onChange={(e) => setDistanceKm(Number(e.target.value))}
+                value={nights}
+                onChange={(e) => setNights(Number(e.target.value))}
               >
-                {DISTANCE_OPTIONS.map((km) => (
-                  <option key={km} value={km}>
-                    約{km}km
+                {NIGHTS_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    {n}泊
                   </option>
                 ))}
               </select>
             </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">初日の出発</label>
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={departureTimeOfDay}
-              onChange={(e) =>
-                setDepartureTimeOfDay(e.target.value as DepartureTimeOfDay)
-              }
-            >
-              {DEPARTURE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-muted-foreground">
-              渋滞を避ける時間帯の目安です。生成後に各日の時刻はずらせます。
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">車中泊の好み</label>
+              <label className="text-sm font-medium">初日の出発</label>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={persona}
-                onChange={(e) => setPersona(e.target.value as PersonaType)}
+                value={departureTimeOfDay}
+                onChange={(e) =>
+                  setDepartureTimeOfDay(e.target.value as DepartureTimeOfDay)
+                }
               >
-                {PERSONA_OPTIONS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {p.label}
+                {DEPARTURE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
                   </option>
                 ))}
               </select>
@@ -368,23 +345,42 @@ export default function GenerateItineraryPage() {
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium">タイトル（任意）</label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="未入力ならAIが命名します"
-            />
+          <p className="text-xs text-muted-foreground">
+            初日の出発は渋滞を避ける時間帯の目安です。生成後に各日の時刻はずらせます。
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium">1日の走行距離の目安</label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={distanceKm}
+                onChange={(e) => setDistanceKm(Number(e.target.value))}
+              >
+                {DISTANCE_OPTIONS.map((km) => (
+                  <option key={km} value={km}>
+                    約{km}km
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">車中泊の好み</label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={persona}
+                onChange={(e) => setPersona(e.target.value as PersonaType)}
+              >
+                {PERSONA_OPTIONS.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm">
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <Checkbox
-                checked={roundTrip}
-                onCheckedChange={(c) => setRoundTrip(c === true)}
-              />
-              往復（出発地に戻る）
-            </label>
             <label className="flex items-center gap-1.5 cursor-pointer">
               <Checkbox
                 checked={carHeightOver}
@@ -399,6 +395,15 @@ export default function GenerateItineraryPage() {
               />
               全長5m超
             </label>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">タイトル（任意）</label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="未入力ならAIが命名します"
+            />
           </div>
 
           <Button onClick={handleGenerate} disabled={running} className="w-full">
