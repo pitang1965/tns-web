@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useDraftAccess } from '@/hooks/useDraftAccess';
@@ -96,8 +96,23 @@ export function GenerateItineraryClient() {
   const [title, setTitle] = useState('');
 
   const [running, setRunning] = useState(false);
+  const [elapsedSec, setElapsedSec] = useState(0);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<GenerateDraftResult | null>(null);
+
+  // 生成中の経過秒（残り予測はできないので経過のみ表示。動いている安心感のため）
+  useEffect(() => {
+    if (!running) {
+      setElapsedSec(0);
+      return;
+    }
+    const started = Date.now();
+    setElapsedSec(0);
+    const id = setInterval(() => {
+      setElapsedSec(Math.floor((Date.now() - started) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running]);
 
   const updateDestination = (index: number, patch: Partial<PlaceField>) => {
     setDestinations((prev) =>
@@ -450,7 +465,9 @@ export function GenerateItineraryClient() {
             className="w-full"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            {running ? '生成中…（10〜30秒）' : 'この条件で生成する'}
+            {running
+              ? `生成中… ${elapsedSec}秒（通常10〜30秒ほど）`
+              : 'この条件で生成する'}
           </Button>
         </CardContent>
       </Card>
