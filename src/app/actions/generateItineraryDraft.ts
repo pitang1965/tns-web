@@ -6,7 +6,11 @@ import { logger } from '@/lib/logger';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { GenerateDraftInput } from '@/lib/itineraryDraft/types';
 import { checkDraftAccess } from '@/lib/itineraryDraft/access';
-import { reservePoint, commitConsume, refundPoint } from '@/lib/points/points';
+import {
+  acquireGenerationLock,
+  releaseGenerationLock,
+  consumeOnSuccess,
+} from '@/lib/points/points';
 import { checkFeasibility } from '@/lib/itineraryDraft/feasibility';
 import { buildPolyline } from '@/lib/itineraryDraft/geo';
 import {
@@ -119,20 +123,21 @@ export async function generateItineraryDraftAction(
       email,
     };
 
-    // ADR-0010: 予約方式。LLM 呼び出しの直前に原子的に1減らす（手前の失敗では動かさない）。
-    // 無制限枠（whitelist）は消費しない。成功で確定(commitConsume)、失敗で払い戻し(refundPoint)。
+    // ADR-0010（改訂）: 生成ロック＋成功後デクリメント。無制限枠（whitelist）は消費・ロックしない。
+    // ロックで 1ユーザー1生成に直列化し「残高チェック→消費の時間差に並行投入するずる」を防ぐ。
+    // 消費は成功したときだけ行うので、タイムアウト・クラッシュで途中終了しても残高は減らない。
     const unlimited = access.unlimited === true;
-    let reserved = false;
-    let committed = false;
     let remaining: number | null = unlimited ? null : (access.balance ?? 0);
 
     if (!unlimited) {
-      const r = await reservePoint(email);
-      if (!r.ok) {
-        return { success: false, error: 'アズキが不足しています' };
+      const locked = await acquireGenerationLock(email);
+      if (!locked) {
+        return {
+          success: false,
+          error:
+            '現在この生成を処理中です。完了までしばらくお待ちください。',
+        };
       }
-      reserved = true;
-      remaining = r.balance;
     }
 
     try {
@@ -156,20 +161,10 @@ export async function generateItineraryDraftAction(
             validateMs: Date.now() - tValidate,
             attempt,
           });
-          // 成功。残高は予約時に減算済みなので、ここで committed を立てて払い戻しを止める。
-          // consume の記帳は副次的で、失敗しても生成成功は覆さない（残高は既に正しい）。
-          committed = true;
-          if (reserved) {
-            try {
-              await commitConsume(email);
-            } catch (logErr) {
-              logger.error(
-                logErr instanceof Error
-                  ? logErr
-                  : new Error('消費ログの記帳に失敗'),
-                { email },
-              );
-            }
+          // 成功したときだけ消費する（成功後デクリメント）。ここまで来なければ残高は減らない。
+          if (!unlimited) {
+            const c = await consumeOnSuccess(email);
+            remaining = c.balance;
           }
           return { success: true, draft, notes, remaining };
         } catch (e) {
@@ -190,16 +185,16 @@ export async function generateItineraryDraftAction(
           '旅程ドラフトの生成に失敗しました。条件を変えて再度お試しください。',
       };
     } finally {
-      // 予約したが成功に至らなかった（検証失敗・例外）→ 払い戻し。
-      // クラッシュ時はここに来ないため取りこぼしうる（ADR-0010: 取引ログで手当て）。
-      if (reserved && !committed) {
+      // ロックを解放する（成功・失敗どちらでも）。タイムアウト時のみ漏れうるが、
+      // ロックは残高に影響せず TTL 経過で自動的に奪取できるため、お金は消えない。
+      if (!unlimited) {
         try {
-          await refundPoint(email);
-        } catch (refundErr) {
+          await releaseGenerationLock(email);
+        } catch (unlockErr) {
           logger.error(
-            refundErr instanceof Error
-              ? refundErr
-              : new Error('ポイント払い戻しに失敗'),
+            unlockErr instanceof Error
+              ? unlockErr
+              : new Error('生成ロックの解放に失敗'),
             { email },
           );
         }

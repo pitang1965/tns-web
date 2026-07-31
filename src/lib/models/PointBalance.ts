@@ -11,6 +11,10 @@ export interface IPointBalance extends Document<string> {
   _id: string;
   email: string;
   balance: number;
+  /** 生成ロック（ADR-0010）。生成中は true。同一ユーザーの並行生成＝ずるを防ぐ。 */
+  isGenerating?: boolean;
+  /** ロック取得時刻。TTL 経過で期限切れとみなし奪取できる（解放漏れ対策）。 */
+  generatingStartedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +33,13 @@ const PointBalanceSchema = new Schema<IPointBalance>(
       required: true,
       default: 0,
       min: 0,
+    },
+    isGenerating: {
+      type: Boolean,
+      default: false,
+    },
+    generatingStartedAt: {
+      type: Date,
     },
   },
   {
