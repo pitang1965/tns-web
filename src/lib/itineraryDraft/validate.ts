@@ -267,18 +267,47 @@ export async function buildDraftFromLlm(params: {
   const bbox = routeBoundingBox(polyline, 50) ?? undefined;
   const MAX_OFFROUTE_KM = 100;
 
+  // 空白（全角含む）を除去して小文字化。名称照合に使う。
+  const normName = (s: string) => s.replace(/\s+/g, '').toLowerCase();
+
+  // 既知のウェイポイント（出発地・目的地）はユーザーがフォームで座標を確定済み。
+  // LLMがこれらの名前を日中アクティビティに使ったとき名前を再ジオコーディングすると、
+  // 同名の別地点（例: 千葉「屏風ケ浦」に対し横浜「屏風浦」）を掴む恐れがあるため、
+  // 確定済みの座標をそのまま使う。
+  const knownPlaces = [
+    {
+      key: normName(input.startLocation.name),
+      loc: input.startLocation.location,
+      address: input.startLocation.address ?? null,
+    },
+    ...input.destinations.map((d) => ({
+      key: normName(d.name),
+      loc: d.location,
+      address: d.address ?? null,
+    })),
+  ];
+  const matchKnownPlace = (name: string): GeocodeResult | null => {
+    const n = normName(name);
+    if (n.length < 3) return null;
+    const hit = knownPlaces.find(
+      (k) => k.key.length >= 4 && (n === k.key || n.includes(k.key)),
+    );
+    return hit ? { location: hit.loc, address: hit.address } : null;
+  };
+
   // 同一リクエスト内での同名クエリの重複排除（LLMが同じ地名を複数回出すため）
   const geoCache = new Map<string, Promise<GeocodeResult | null>>();
   const resolveGeo: GeoResolver = (name) => {
     let p = geoCache.get(name);
     if (!p) {
-      p = geocodePlaceName(name, proximity, bbox).then((geo) => {
+      p = (async () => {
+        // 既知のウェイポイントと一致すれば、確定済み座標を使う（同名の誤マッチを防ぐ）
+        const known = matchKnownPlace(name);
+        if (known) return known;
+        const geo = await geocodePlaceName(name, proximity, bbox);
         // 経路から遠すぎる結果は同名施設の誤マッチとみなして棄却
         // （例: 栃木の「城の湯」を頼んだら熊本の同名施設が返る、を防ぐ）
-        if (
-          geo &&
-          pointToPolylineKm(geo.location, polyline) > MAX_OFFROUTE_KM
-        ) {
+        if (geo && pointToPolylineKm(geo.location, polyline) > MAX_OFFROUTE_KM) {
           draftLog('geocode-offroute-rejected', {
             name,
             km: Math.round(pointToPolylineKm(geo.location, polyline)),
@@ -286,7 +315,7 @@ export async function buildDraftFromLlm(params: {
           return null;
         }
         return geo;
-      });
+      })();
       geoCache.set(name, p);
     }
     return p;
@@ -295,8 +324,6 @@ export async function buildDraftFromLlm(params: {
   const dayPlans = [];
 
   const asLoc = (p: LatLng) => ({ latitude: p.lat, longitude: p.lng });
-  // 空白（全角含む）を除去して小文字化。泊地重複の名称照合に使う。
-  const normName = (s: string) => s.replace(/\s+/g, '').toLowerCase();
   // その日の出発元。1日目は出発地、以降は前夜の泊地。
   let departFromLoc: LatLng = input.startLocation.location;
 
