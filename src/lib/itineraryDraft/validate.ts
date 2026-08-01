@@ -295,6 +295,8 @@ export async function buildDraftFromLlm(params: {
   const dayPlans = [];
 
   const asLoc = (p: LatLng) => ({ latitude: p.lat, longitude: p.lng });
+  // 空白（全角含む）を除去して小文字化。泊地重複の名称照合に使う。
+  const normName = (s: string) => s.replace(/\s+/g, '').toLowerCase();
   // その日の出発元。1日目は出発地、以降は前夜の泊地。
   let departFromLoc: LatLng = input.startLocation.location;
 
@@ -367,6 +369,19 @@ export async function buildDraftFromLlm(params: {
           `${i + 1}日目の chosenSpotId "${chosenId}" は候補に存在しません。候補の spotId から選んでください`,
         );
       }
+      // ② 泊地重複の除去（ADR-0008 追記）: 泊地と同じスポットを指す日中アクティビティ
+      // （「◯◯で夜明かし」「◯◯に到着」等）を削除。名称が chosenSpotId のスポット名を
+      // 内包するものが対象（泊地は車中泊エントリだけで表す）。出発/帰着アンカーは
+      // その日の泊地名と一致しないため巻き込まない。
+      const spotKey = normName(spot.name);
+      if (spotKey.length >= 3) {
+        // 前方一致で判定（「◯◯で夜明かし」＝泊地名が先頭／完全一致を捉えつつ、
+        // 「道の駅富士川楽座」のような別スポットの巻き込みを避ける）。
+        activities = activities.filter(
+          (a) => !normName(a.place.name).startsWith(spotKey),
+        );
+      }
+
       activities.push(buildOvernightActivity(spot));
       // 翌日の出発元をこの夜の泊地にする
       departFromLoc = spot.location;
