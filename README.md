@@ -8,6 +8,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 全国の車中泊スポット情報（トイレ・入浴施設、安全性、静けさなど）を地図で検索でき、気になるスポットは旅程に直接追加可能。ユーザー投稿機能により、コミュニティで情報を共有できます。
 
+> 📱 **Android アプリを Google Play で公開中**: [車中泊スポットマップ｜車旅のしおり](https://play.google.com/store/apps/details?id=club.over40web.tabi.spots&hl=ja)（アプリのソースは別リポジトリ [`tns-mobile`](https://github.com/pitang1965/tns-mobile) で管理。詳細は後述の「モバイルアプリ（Android）」を参照）
+
 ![車旅のしおりアプリ画面1](./docs/images/fig1.jpg)
 
 ![車旅のしおりアプリ画面2](./docs/images/fig2.jpg)
@@ -21,6 +23,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - **簡単共有**: 旅程を SNS（X・LINE・Facebook 等）やメールで簡単に共有できます。
 - **スポット投稿**: あなたが見つけた車中泊スポットを投稿して、他の旅行者と情報を共有しましょう。
 - **AI で旅程の下書き**: 出発地・目的地・泊数・好みから、実在の車中泊スポットを軸にした旅程の下書きを AI が生成（LLM API 活用）。**現在は限定者のみの先行提供**（`ITINERARY_DRAFT_ALLOWED_EMAILS` で指定）で、将来的にはプレミアム会員特典として提供予定です（プレミアム会員機能自体はまだ未提供）。詳細は ADR-0008 / ADR-0009 を参照。
+
+## モバイルアプリ（Android）
+
+車中泊スポットを地図で手軽に探せる Android アプリ **「車中泊スポットマップ｜車旅のしおり」** を Google Play で公開しています。
+
+- **ストア**: [Google Play で見る](https://play.google.com/store/apps/details?id=club.over40web.tabi.spots&hl=ja)（パッケージ名: `club.over40web.tabi.spots`）
+- **ソースコード**: 本リポジトリ（`tns-web`）とは**別リポジトリ** [`tns-mobile`](https://github.com/pitang1965/tns-mobile) で管理（Expo / React Native）。
+- **Web との関係**: モバイルアプリは本 Web アプリが提供するモバイル向け公開 API（`/api/v1/*`）を利用して車中泊スポット情報を取得します。API は固定 API キーで保護されており、アプリ側は `EXPO_PUBLIC_SPOTS_API_KEY`、Web 側は `SPOTS_API_KEY` に同じ値を設定します（「モバイルアプリ向け API」の項および ADR-0006 を参照）。
+- **位置づけ**: 段階的なモバイル展開方針のもと、まずは車中泊スポット閲覧を軸にした Android アプリから提供しています。より高度な旅程管理は当面 Web アプリが主体です。
 
 ## 使用例
 
