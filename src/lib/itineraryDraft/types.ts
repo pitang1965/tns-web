@@ -33,6 +33,7 @@ export type GenerateDraftInput = {
   carHeightOver21m?: boolean; // 車高2.1m超（種別除外に使用）
   carLengthOver5m?: boolean; // 全長5m超（種別除外に使用）
   departureTimeOfDay?: DepartureTimeOfDay; // 初日の出発時間帯（既定 afternoon）
+  useExpressways?: boolean; // 高速道路を使う（既定 true）。false で下道中心（時間の目安のみ・距離モデルは不変）
   startDate?: string; // 開始日（ISO文字列、任意）
   title?: string; // タイトル（任意。未指定ならLLMが命名）
 };

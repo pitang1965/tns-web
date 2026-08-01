@@ -90,6 +90,7 @@ export function GenerateItineraryClient() {
   const [carHeightOver, setCarHeightOver] = useState(false);
   const [carLengthOver, setCarLengthOver] = useState(false);
   const [roundTrip, setRoundTrip] = useState(true);
+  const [useExpressways, setUseExpressways] = useState(true);
   const [departureTimeOfDay, setDepartureTimeOfDay] =
     useState<DepartureTimeOfDay>('afternoon');
   const [startDate, setStartDate] = useState('');
@@ -152,6 +153,7 @@ export function GenerateItineraryClient() {
         roundTrip,
         persona,
         departureTimeOfDay,
+        useExpressways,
         carHeightOver21m: carHeightOver || undefined,
         carLengthOver5m: carLengthOver || undefined,
         startDate: startDate || undefined,
@@ -344,13 +346,22 @@ export function GenerateItineraryClient() {
             </Button>
           </div>
 
-          <label className="flex items-center gap-1.5 cursor-pointer text-sm">
-            <Checkbox
-              checked={roundTrip}
-              onCheckedChange={(c) => setRoundTrip(c === true)}
-            />
-            往復（出発地に戻る）
-          </label>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <Checkbox
+                checked={roundTrip}
+                onCheckedChange={(c) => setRoundTrip(c === true)}
+              />
+              往復（出発地に戻る）
+            </label>
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <Checkbox
+                checked={useExpressways}
+                onCheckedChange={(c) => setUseExpressways(c === true)}
+              />
+              高速道路を使う
+            </label>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
