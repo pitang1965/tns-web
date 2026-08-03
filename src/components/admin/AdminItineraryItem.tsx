@@ -15,10 +15,22 @@ import { formatItineraryDuration } from '@/lib/date';
 
 type Props = {
   itinerary: ClientItineraryDocument;
+  currentUserSub: string;
 };
 
-export const AdminItineraryItem: React.FC<Props> = ({ itinerary }) => {
+export const AdminItineraryItem: React.FC<Props> = ({
+  itinerary,
+  currentUserSub,
+}) => {
   const router = useRouter();
+
+  // 詳細取得側の認可ガード canAccessItinerary と同じ条件で閲覧可否を判定する。
+  // 管理者でも他人の非公開旅程は開けない（プライバシー配慮）ため、
+  // 開けないものは「見る」を無効化し、壊れた導線でエラー画面に飛ばさない。
+  const canView =
+    itinerary.isPublic ||
+    itinerary.owner?.id === currentUserSub ||
+    (itinerary.sharedWith?.some((u) => u?.id === currentUserSub) ?? false);
 
   // Format date helper
   const formatDate = (dateString: string | undefined) => {
@@ -69,14 +81,26 @@ export const AdminItineraryItem: React.FC<Props> = ({ itinerary }) => {
         </div>
       </CardContent>
       <CardFooter className="mt-auto">
-        <Button
-          size="sm"
-          variant="secondary"
-          className="w-full cursor-pointer"
-          onClick={() => router.push(`/itineraries/${itinerary.id}`)}
-        >
-          見る
-        </Button>
+        {canView ? (
+          <Button
+            size="sm"
+            variant="secondary"
+            className="w-full cursor-pointer"
+            onClick={() => router.push(`/itineraries/${itinerary.id}`)}
+          >
+            見る
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="secondary"
+            className="w-full"
+            disabled
+            title="非公開のため閲覧できません"
+          >
+            非公開のため閲覧不可
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

@@ -49,7 +49,7 @@ export default async function AdminItinerariesPage() {
           <AdminItineraryCSVControls />
         </AdminPageHeader>
         <LargeText>
-          全ての旅程を確認できます。各旅程の詳細を表示するには、「見る」ボタンをクリックしてください。
+          全ての旅程を一覧で確認できます。詳細を表示するには「見る」ボタンをクリックしてください。ただし、他のユーザーの非公開旅程はプライバシー保護のため詳細を閲覧できません。
         </LargeText>
         <Suspense
           fallback={
@@ -69,7 +69,10 @@ export default async function AdminItinerariesPage() {
             </div>
           }
         >
-          <AdminItineraryList itinerariesPromise={itinerariesPromise} />
+          <AdminItineraryList
+            itinerariesPromise={itinerariesPromise}
+            currentUserSub={session.user.sub}
+          />
         </Suspense>
       </section>
     </main>

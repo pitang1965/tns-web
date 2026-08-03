@@ -7,9 +7,13 @@ import { LargeText } from '@/components/common/Typography';
 
 type Props = {
   itinerariesPromise: Promise<ClientItineraryDocument[]>;
+  currentUserSub: string;
 };
 
-export const AdminItineraryList: React.FC<Props> = ({ itinerariesPromise }) => {
+export const AdminItineraryList: React.FC<Props> = ({
+  itinerariesPromise,
+  currentUserSub,
+}) => {
   const itineraries = use(itinerariesPromise);
 
   return (
@@ -17,7 +21,11 @@ export const AdminItineraryList: React.FC<Props> = ({ itinerariesPromise }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {itineraries.length > 0 ? (
           itineraries.map((itinerary) => (
-            <AdminItineraryItem key={itinerary.id} itinerary={itinerary} />
+            <AdminItineraryItem
+              key={itinerary.id}
+              itinerary={itinerary}
+              currentUserSub={currentUserSub}
+            />
           ))
         ) : (
           <LargeText>旅程はまだありません。</LargeText>
