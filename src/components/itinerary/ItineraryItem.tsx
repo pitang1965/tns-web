@@ -43,9 +43,9 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
               {itinerary.title}
             </CardTitle>
             {itinerary.isPublic ? (
-              <Badge className="flex-shrink-0">公開</Badge>
+              <Badge className="shrink-0">公開</Badge>
             ) : (
-              <Badge variant="outline" className="flex-shrink-0">
+              <Badge variant="outline" className="shrink-0">
                 非公開
               </Badge>
             )}

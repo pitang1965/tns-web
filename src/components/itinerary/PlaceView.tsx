@@ -77,7 +77,7 @@ export const PlaceView: React.FC<PlaceProps> = ({
         ) : (
           <span className="font-medium">{name}</span>
         )}
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <PlaceNavigationButton
             latitude={lat}
             longitude={lng}

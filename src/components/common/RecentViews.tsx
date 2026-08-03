@@ -182,7 +182,7 @@ export default function RecentViews() {
                   href={item.url}
                   className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                 >
-                  <div className="flex items-center gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     {getViewIcon(info)}
                   </div>
                   <div className="min-w-0 flex-1">

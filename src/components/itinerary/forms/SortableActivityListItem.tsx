@@ -42,7 +42,7 @@ export function SortableActivityListItem({
         type="button"
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing flex-shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+        className="cursor-grab active:cursor-grabbing shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
         title="ドラッグして並び替え"
       >
         <Menu className="h-4 w-4" />
@@ -50,7 +50,7 @@ export function SortableActivityListItem({
 
       {/* アクティビティ情報 */}
       <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span className="text-xs font-medium text-muted-foreground w-6 text-right flex-shrink-0">
+        <span className="text-xs font-medium text-muted-foreground w-6 text-right shrink-0">
           {index + 1}.
         </span>
         <span className="text-sm truncate">

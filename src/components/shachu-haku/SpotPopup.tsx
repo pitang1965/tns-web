@@ -45,7 +45,7 @@ export function SpotPopup({
         ✕
       </Button>
       <div className="flex items-start gap-2 mb-2 pr-8">
-        <h3 className="font-semibold text-base leading-tight flex-grow">
+        <h3 className="font-semibold text-base leading-tight grow">
           {spot.name}
         </h3>
         {actionButton}

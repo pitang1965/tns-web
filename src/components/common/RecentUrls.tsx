@@ -73,7 +73,7 @@ export default function RecentUrls() {
                 href={item.url}
                 className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
               >
-                <ExternalLink size={14} className="flex-shrink-0" />
+                <ExternalLink size={14} className="shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">{item.title}</p>
                   <p className="text-xs text-muted-foreground truncate">

@@ -77,7 +77,7 @@ export function SpotBasicInfoCard({ spot }: SpotBasicInfoCardProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm break-all"
             >
-              <ExternalLink className="w-3 h-3 flex-shrink-0" />
+              <ExternalLink className="w-3 h-3 shrink-0" />
               公式サイト・詳細情報
             </a>
           </div>

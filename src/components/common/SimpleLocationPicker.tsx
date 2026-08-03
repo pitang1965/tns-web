@@ -276,9 +276,9 @@ export default function SimpleLocationPicker({
         >
           <div className="flex items-center bg-white dark:bg-gray-800 rounded-md shadow-md border border-gray-200 dark:border-gray-600">
             {isSearching ? (
-              <Loader2 className="w-4 h-4 ml-2 text-gray-400 animate-spin flex-shrink-0" />
+              <Loader2 className="w-4 h-4 ml-2 text-gray-400 animate-spin shrink-0" />
             ) : (
-              <Search className="w-4 h-4 ml-2 text-gray-400 flex-shrink-0" />
+              <Search className="w-4 h-4 ml-2 text-gray-400 shrink-0" />
             )}
             <input
               type="text"
