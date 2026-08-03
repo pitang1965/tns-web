@@ -23,6 +23,7 @@ import {
   DraftRetryableError,
 } from '@/lib/itineraryDraft/validate';
 import { draftLog } from '@/lib/itineraryDraft/debug';
+import { captureServerEvent } from '@/lib/posthogServer';
 
 export type GenerateDraftResult =
   | {
@@ -42,6 +43,11 @@ export type GenerateDraftResult =
 export async function generateItineraryDraftAction(
   input: GenerateDraftInput,
 ): Promise<GenerateDraftResult> {
+  // 例外時にも計測できるよう、outer catch から参照する値は try の外で宣言する。
+  let distinctId: string | null = null;
+  let tStart = Date.now();
+  let baseProps: () => Record<string, unknown> = () => ({});
+
   try {
     const session = await auth0.getSession();
     if (!session?.user?.sub) {
@@ -53,6 +59,24 @@ export async function generateItineraryDraftAction(
     if (!access.allowed) {
       return { success: false, error: access.reason ?? '利用できません' };
     }
+
+    // 計測用（ADR-0005 / ADR-0008）: 生成の成否をサーバーで確実に記録する。
+    // distinct_id はクライアント identify と同じ Auth0 sub。PII は送らない。
+    distinctId = session.user.sub;
+    tStart = Date.now();
+    // 入力の enum/数値のみ（自由入力の地名・住所は含めない）。
+    baseProps = () => ({
+      numberOfNights: input.numberOfNights,
+      dailyDistanceKm: input.dailyDistanceKm,
+      persona: input.persona,
+      destinationsCount: input.destinations?.length ?? 0,
+      roundTrip: input.roundTrip === true,
+      departureTimeOfDay: input.departureTimeOfDay,
+      useExpressways: input.useExpressways === true,
+      carHeightOver21m: input.carHeightOver21m === true,
+      carLengthOver5m: input.carLengthOver5m === true,
+      unlimited: access.unlimited === true,
+    });
 
     // 入力の基本チェック
     if (!input.startLocation?.location) {
@@ -77,6 +101,10 @@ export async function generateItineraryDraftAction(
       roundTrip: input.roundTrip,
     });
     if (!feasibility.feasible) {
+      await captureServerEvent('draft_generate_failed', distinctId, {
+        ...baseProps(),
+        reason: 'infeasible',
+      });
       return {
         success: false,
         error: '指定の泊数・走行距離では実現が難しい行程です',
@@ -132,6 +160,10 @@ export async function generateItineraryDraftAction(
     if (!unlimited) {
       const locked = await acquireGenerationLock(email);
       if (!locked) {
+        await captureServerEvent('draft_generate_failed', distinctId, {
+          ...baseProps(),
+          reason: 'locked',
+        });
         return {
           success: false,
           error:
@@ -166,6 +198,12 @@ export async function generateItineraryDraftAction(
             const c = await consumeOnSuccess(email);
             remaining = c.balance;
           }
+          await captureServerEvent('draft_generate_succeeded', distinctId, {
+            ...baseProps(),
+            durationMs: Date.now() - tStart,
+            notesCount: notes.length,
+            attempt,
+          });
           return { success: true, draft, notes, remaining };
         } catch (e) {
           if (e instanceof DraftRetryableError) {
@@ -178,6 +216,11 @@ export async function generateItineraryDraftAction(
 
       logger.warn('旅程ドラフト生成が検証を通らずに失敗', {
         detail: lastError?.message ?? '',
+      });
+      await captureServerEvent('draft_generate_failed', distinctId, {
+        ...baseProps(),
+        durationMs: Date.now() - tStart,
+        reason: 'validation',
       });
       return {
         success: false,
@@ -206,6 +249,13 @@ export async function generateItineraryDraftAction(
         ? error
         : new Error('Error generating itinerary draft'),
     );
+    if (distinctId) {
+      await captureServerEvent('draft_generate_failed', distinctId, {
+        ...baseProps(),
+        durationMs: Date.now() - tStart,
+        reason: 'exception',
+      });
+    }
     return { success: false, error: '旅程ドラフトの生成に失敗しました' };
   }
 }
