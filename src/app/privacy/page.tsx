@@ -31,6 +31,9 @@ export default function PrivacyPage() {
         </p>
         <ul className="list-disc pl-6 mb-6">
           <li>お名前、メールアドレス</li>
+          <li>
+            ソーシャルログイン（Google、LINE等）をご利用の場合、各サービスから提供されるプロフィール情報（表示名、メールアドレス、プロフィール画像等）
+          </li>
           <li>旅行計画に関する情報</li>
           <li>サービス利用に関するログ情報</li>
           <li>Cookieおよび類似の技術による情報</li>
@@ -69,6 +72,7 @@ export default function PrivacyPage() {
           <li>PostHog（アクセス解析）</li>
           <li>Google AdSense（広告配信）</li>
           <li>Auth0（認証サービス）</li>
+          <li>LINEヤフー株式会社（LINEログインによる認証）</li>
           <li>Mapbox（地図サービス）</li>
           <li>MongoDB Atlas（データベースサービス）</li>
         </ul>
@@ -116,7 +120,7 @@ export default function PrivacyPage() {
         <p className="text-sm text-gray-600 mt-8">
           制定日: 2025年9月23日
           <br />
-          最終更新日: 2026年6月23日
+          最終更新日: 2026年8月4日
         </p>
       </div>
     </div>
