@@ -30,6 +30,15 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-08-04',
+    items: [
+      {
+        category: 'new',
+        text: 'LINEアカウントでログインできるようになりました。ログイン画面で「LINEでログイン」を選べます。',
+      },
+    ],
+  },
+  {
     date: '2026-07-31',
     items: [
       {
