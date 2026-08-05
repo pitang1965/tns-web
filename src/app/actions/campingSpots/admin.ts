@@ -256,15 +256,18 @@ export async function getCampingSpotIdsOnly(options?: {
 }
 
 export async function getCampingSpotById(id: string) {
-  try {
-    // Validate input
-    if (!id || typeof id !== 'string' || id.trim() === '') {
-      throw new Error('Invalid spot ID provided');
-    }
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error(`Camping spot not found for ID: ${id}`);
-    }
+  // Validate ID format before the try block so these expected cases are NOT
+  // reported to Sentry. Invalid IDs never come from in-app links — they are
+  // produced by crawler bots (e.g. "Next.MetadataOutlet") or stale URLs.
+  // Callers still catch the throw and fall back to notFound()/error UI.
+  if (!id || typeof id !== 'string' || id.trim() === '') {
+    throw new Error('Invalid spot ID provided');
+  }
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error(`Camping spot not found for ID: ${id}`);
+  }
 
+  try {
     // Ensure database connection with timeout
     await ensureDbConnection();
 
