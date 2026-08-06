@@ -22,6 +22,7 @@ import {
   XCircle,
   Archive,
   Edit,
+  ChevronRight,
 } from 'lucide-react';
 import {
   CampingSpotSubmissionWithId,
@@ -307,22 +308,58 @@ export default function SubmissionReviewCard({
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-sm text-gray-500 mb-1">場所</h4>
-              <p>{submission.prefecture}</p>
-              {submission.address && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {submission.address}
-                </p>
-              )}
+        <div className="space-y-3">
+          {/* 却下理由（却下時のみ・1行で表示） */}
+          {submission.status === 'rejected' && submission.reviewNotes && (
+            <div
+              className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 dark:border-red-800 dark:bg-red-900/20"
+              title={submission.reviewNotes}
+            >
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+              <p className="truncate text-sm text-red-800 dark:text-red-200">
+                <span className="font-medium">却下理由：</span>
+                {submission.reviewNotes}
+              </p>
+            </div>
+          )}
+
+          {/* 詳細情報（折りたたみ） */}
+          <details className="group rounded-md border">
+            <summary className="flex cursor-pointer select-none list-none items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
+              <ChevronRight className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90" />
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span className="truncate">
+                {submission.prefecture}
+                {submission.address ? ` / ${submission.address}` : ''}
+              </span>
+            </summary>
+            <div className="space-y-2 border-t px-3 py-3 text-sm">
+              {/* 施設情報 */}
+              <div className="flex flex-wrap items-center gap-1">
+                {submission.hasRoof && (
+                  <span className="inline-block rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
+                    屋根あり
+                  </span>
+                )}
+                {submission.hasPowerOutlet && (
+                  <span className="inline-block rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">
+                    電源あり
+                  </span>
+                )}
+                {!submission.isFree && submission.priceNote && (
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {submission.priceNote}
+                  </span>
+                )}
+              </div>
+
+              {/* 参考URL・座標 */}
               {submission.url && (
                 <a
                   href={submission.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  className="block truncate text-blue-600 hover:underline dark:text-blue-400"
                 >
                   参考URL ↗
                 </a>
@@ -333,39 +370,18 @@ export default function SubmissionReviewCard({
                   {submission.coordinates[0].toFixed(6)}
                 </p>
               )}
-            </div>
 
-            <div>
-              <h4 className="font-medium text-sm text-gray-500 mb-1">
-                施設情報
-              </h4>
-              <div className="space-y-1">
-                {submission.hasRoof && (
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">
-                    屋根あり
-                  </span>
-                )}
-                {submission.hasPowerOutlet && (
-                  <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded mr-1">
-                    電源あり
-                  </span>
-                )}
-                {!submission.isFree && submission.priceNote && (
-                  <p className="text-sm text-gray-600">
-                    {submission.priceNote}
-                  </p>
-                )}
-              </div>
+              {/* 備考 */}
+              {submission.notes && (
+                <p className="whitespace-pre-wrap wrap-break-word text-gray-700 dark:text-gray-300">
+                  <span className="font-medium text-gray-500">備考：</span>
+                  {submission.notes}
+                </p>
+              )}
             </div>
-          </div>
+          </details>
 
-          {submission.notes && (
-            <div>
-              <h4 className="font-medium text-sm text-gray-500 mb-1">備考</h4>
-              <p className="text-sm">{submission.notes}</p>
-            </div>
-          )}
-
+          {/* メタ情報（投稿日・投稿者） */}
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-500 pt-2 border-t">
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -385,24 +401,26 @@ export default function SubmissionReviewCard({
             )}
           </div>
 
-          {(submission.reviewedAt || submission.reviewNotes) && (
-            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-              <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">
-                管理者レビュー
-              </h4>
-              {submission.reviewedAt && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(submission.reviewedAt).toISOString().split('T')[0]}{' '}
-                  by {submission.reviewedBy}
-                </p>
-              )}
-              {submission.reviewNotes && (
-                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1 break-words whitespace-pre-wrap">
-                  {submission.reviewNotes}
-                </p>
-              )}
-            </div>
-          )}
+          {/* 管理者レビュー（承認時のメモ。却下理由は上部に表示） */}
+          {submission.status !== 'rejected' &&
+            (submission.reviewedAt || submission.reviewNotes) && (
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-1">
+                  管理者レビュー
+                </h4>
+                {submission.reviewedAt && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(submission.reviewedAt).toISOString().split('T')[0]}{' '}
+                    by {submission.reviewedBy}
+                  </p>
+                )}
+                {submission.reviewNotes && (
+                  <p className="text-sm text-gray-900 dark:text-gray-100 mt-1 wrap-break-word whitespace-pre-wrap">
+                    {submission.reviewNotes}
+                  </p>
+                )}
+              </div>
+            )}
         </div>
       </CardContent>
     </Card>
