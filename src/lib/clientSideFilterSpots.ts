@@ -83,13 +83,14 @@ export function filterSpotsClientSide(
 
     // 車高フィルター
     // - noHeightLimit: 制限なし → 常に表示
-    // - maxVehicleHeight(数値): 自車高未満なら除外（入れない）
+    // - maxVehicleHeight(数値): 自車高「以下」なら除外
+    //   （制限==車高も安全のため除外。「2.3mまで」等の解釈揺れ＋実際の余裕を考慮）
     // - どちらもなし(不明): includeUnknownHeight が false のとき除外
     if (filters.vehicleHeight != null) {
       if (spot.noHeightLimit) {
         // 制限なし → 表示
       } else if (spot.maxVehicleHeight != null) {
-        if (spot.maxVehicleHeight < filters.vehicleHeight) {
+        if (spot.maxVehicleHeight <= filters.vehicleHeight) {
           return false;
         }
       } else if (filters.includeUnknownHeight === false) {

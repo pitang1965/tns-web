@@ -159,6 +159,12 @@ export default function HelpPage() {
                   <span className="ml-2">標高の範囲で絞り込み</span>
                 </div>
                 <div>
+                  <span className="font-semibold">・車高（高さ制限）：</span>
+                  <span className="ml-2">
+                    「車高を設定」から自車の車高（cm）を入力すると、立体駐車場など高さ制限が車高以下のスポットを除外します（同じ高さも安全のため除外）。「高さ制限なし」のスポットは常に表示。高さ情報が不明なスポットを含めるかも選べます。各スポットには「高さ制限なし」「高さ○○cm」「⚠要注意」のバッジが表示されます
+                  </span>
+                </div>
+                <div>
                   <span className="font-semibold">・設備：</span>
                   <span className="ml-2">
                     トイレ、水道、電源などの有無で絞り込み

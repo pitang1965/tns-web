@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-08-12',
+    items: [
+      {
+        category: 'new',
+        text: '車高（高さ制限）で車中泊スポットを絞り込めるようになりました。ハイエースなど背の高い車で、立体駐車場のように高さ制限のあるスポットを避けられます。各スポットには「高さ制限なし」「高さ○○cm」などのバッジも表示されます。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-08-04',
     items: [
       {
