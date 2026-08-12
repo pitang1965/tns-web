@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ReadonlyURLSearchParams } from 'next/navigation';
-import { ClientSideFilterValues } from '@/components/shachu-haku/ClientSideFilters';
+import {
+  ClientSideFilterValues,
+  DEFAULT_CLIENT_FILTERS,
+} from '@/components/shachu-haku/ClientSideFilters';
 import {
   loadFiltersFromLocalStorage,
   saveFiltersToLocalStorage,
@@ -80,6 +83,7 @@ export const useShachuHakuFilters = ({
 
       if (hasUrlParams) {
         return {
+          ...DEFAULT_CLIENT_FILTERS,
           pricingFilter:
             (searchParams.get(
               'pricing',
@@ -105,21 +109,13 @@ export const useShachuHakuFilters = ({
       }
 
       // URLパラメータがない場合、ローカルストレージから復元
+      // （古い保存データに新フィールドが無くてもデフォルトで補完）
       if (savedFilters?.clientFilters) {
-        return savedFilters.clientFilters;
+        return { ...DEFAULT_CLIENT_FILTERS, ...savedFilters.clientFilters };
       }
 
       // デフォルト値
-      return {
-        pricingFilter: 'all',
-        minSecurityLevel: 0,
-        minQuietnessLevel: 0,
-        maxToiletDistance: null,
-        maxConvenienceDistance: null,
-        maxBathDistance: null,
-        minElevation: null,
-        maxElevation: null,
-      };
+      return { ...DEFAULT_CLIENT_FILTERS };
     },
   );
 
@@ -283,16 +279,7 @@ export const useShachuHakuFilters = ({
     // Reset all filter states to defaults
     setSearchTerm('');
     setTypeFilter([]);
-    setClientFilters({
-      pricingFilter: 'all',
-      minSecurityLevel: 0,
-      minQuietnessLevel: 0,
-      maxToiletDistance: null,
-      maxConvenienceDistance: null,
-      maxBathDistance: null,
-      minElevation: null,
-      maxElevation: null,
-    });
+    setClientFilters({ ...DEFAULT_CLIENT_FILTERS });
     setActiveTab('map');
     setSortField('createdAt');
     setSortOrder('desc');

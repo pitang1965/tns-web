@@ -21,6 +21,23 @@ export type ClientSideFilterValues = {
   maxBathDistance: number | null;
   minElevation: number | null;
   maxElevation: number | null;
+  // 自車高(cm)。null=車高フィルタ無効
+  vehicleHeight: number | null;
+  // 高さ不明のスポットを表示に含めるか（既定: 含める）
+  includeUnknownHeight: boolean;
+};
+
+export const DEFAULT_CLIENT_FILTERS: ClientSideFilterValues = {
+  pricingFilter: 'all',
+  minSecurityLevel: 0,
+  minQuietnessLevel: 0,
+  maxToiletDistance: null,
+  maxConvenienceDistance: null,
+  maxBathDistance: null,
+  minElevation: null,
+  maxElevation: null,
+  vehicleHeight: null,
+  includeUnknownHeight: true,
 };
 
 type ClientSideFiltersProps = {
@@ -33,15 +50,11 @@ export default function ClientSideFilters({
   onFiltersChange,
 }: ClientSideFiltersProps) {
   const handleReset = () => {
+    // 車高フィルタは別チップで管理するため、ここでは維持する
     onFiltersChange({
-      pricingFilter: 'all',
-      minSecurityLevel: 0,
-      minQuietnessLevel: 0,
-      maxToiletDistance: null,
-      maxConvenienceDistance: null,
-      maxBathDistance: null,
-      minElevation: null,
-      maxElevation: null,
+      ...DEFAULT_CLIENT_FILTERS,
+      vehicleHeight: filters.vehicleHeight,
+      includeUnknownHeight: filters.includeUnknownHeight,
     });
   };
 

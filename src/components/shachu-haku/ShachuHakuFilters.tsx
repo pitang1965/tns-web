@@ -30,6 +30,7 @@ import { PrefectureOptions } from '@/data/schemas/campingSpot';
 import { SpotTypeFilter } from './SpotTypeFilter';
 import { REGION_COORDINATES } from '@/lib/prefectureCoordinates';
 import ClientSideFilters, { ClientSideFilterValues } from './ClientSideFilters';
+import { VehicleHeightFilter } from './VehicleHeightFilter';
 import { useExplicitSearch } from '@/hooks/useExplicitSearch';
 import { capture } from '@/lib/analytics';
 
@@ -256,6 +257,17 @@ export default function ShachuHakuFilters({
                 {chip.label}
               </button>
             ))}
+            <VehicleHeightFilter
+              vehicleHeight={clientFilters.vehicleHeight}
+              includeUnknownHeight={clientFilters.includeUnknownHeight}
+              onChange={(vehicleHeight, includeUnknownHeight) =>
+                onClientFiltersChange({
+                  ...clientFilters,
+                  vehicleHeight,
+                  includeUnknownHeight,
+                })
+              }
+            />
           </div>
 
           {/* Collapsible Content */}
@@ -487,6 +499,17 @@ export default function ShachuHakuFilters({
                 {chip.label}
               </button>
             ))}
+            <VehicleHeightFilter
+              vehicleHeight={clientFilters.vehicleHeight}
+              includeUnknownHeight={clientFilters.includeUnknownHeight}
+              onChange={(vehicleHeight, includeUnknownHeight) =>
+                onClientFiltersChange({
+                  ...clientFilters,
+                  vehicleHeight,
+                  includeUnknownHeight,
+                })
+              }
+            />
 
             {/* Reset All Button */}
             {activeFiltersCount > 0 && (

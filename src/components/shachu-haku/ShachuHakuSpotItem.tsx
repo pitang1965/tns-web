@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { SpotHeightBadge } from './SpotHeightBadge';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -60,6 +61,11 @@ export function ShachuHakuSpotItem({
                   ? `¥${spot.pricing.pricePerNight}`
                   : '有料：？円'}
             </Badge>
+            <SpotHeightBadge
+              maxVehicleHeight={spot.maxVehicleHeight}
+              noHeightLimit={spot.noHeightLimit}
+              heightLimitCaution={spot.heightLimitCaution}
+            />
             <Badge
               className={`${getRatingColor(
                 calculateSecurityLevel(spot),

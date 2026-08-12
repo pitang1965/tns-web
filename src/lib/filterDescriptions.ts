@@ -76,5 +76,13 @@ export function getActiveFilterDescriptions(
     descriptions.push(`標高：${clientFilters.maxElevation}m未満`);
   }
 
+  if (clientFilters.vehicleHeight != null) {
+    descriptions.push(
+      `車高：${clientFilters.vehicleHeight}cm${
+        clientFilters.includeUnknownHeight ? '' : '（不明なし）'
+      }`,
+    );
+  }
+
   return descriptions;
 }

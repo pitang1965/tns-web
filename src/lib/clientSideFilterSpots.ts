@@ -81,6 +81,22 @@ export function filterSpotsClientSide(
       }
     }
 
+    // 車高フィルター
+    // - noHeightLimit: 制限なし → 常に表示
+    // - maxVehicleHeight(数値): 自車高未満なら除外（入れない）
+    // - どちらもなし(不明): includeUnknownHeight が false のとき除外
+    if (filters.vehicleHeight != null) {
+      if (spot.noHeightLimit) {
+        // 制限なし → 表示
+      } else if (spot.maxVehicleHeight != null) {
+        if (spot.maxVehicleHeight < filters.vehicleHeight) {
+          return false;
+        }
+      } else if (filters.includeUnknownHeight === false) {
+        return false;
+      }
+    }
+
     return true;
   });
 }
@@ -99,6 +115,7 @@ export function hasActiveClientFilters(
     filters.maxConvenienceDistance !== null ||
     filters.maxBathDistance !== null ||
     filters.minElevation !== null ||
-    filters.maxElevation !== null
+    filters.maxElevation !== null ||
+    filters.vehicleHeight != null
   );
 }

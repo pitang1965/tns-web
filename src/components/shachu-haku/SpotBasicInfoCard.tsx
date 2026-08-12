@@ -45,6 +45,23 @@ export function SpotBasicInfoCard({ spot }: SpotBasicInfoCardProps) {
                   : '有料：？円/泊'}
             </div>
           </div>
+          {(spot.noHeightLimit || spot.maxVehicleHeight != null) && (
+            <div>
+              <div className="font-semibold text-gray-900 dark:text-gray-100">
+                全高制限
+              </div>
+              <div className="text-gray-700 dark:text-gray-300">
+                {spot.noHeightLimit
+                  ? '制限なし'
+                  : `${spot.maxVehicleHeight}cm`}
+              </div>
+              {spot.heightLimitCaution && (
+                <div className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                  ⚠ 区画により制限が異なる場合あり
+                </div>
+              )}
+            </div>
+          )}
           {spot.capacity && (
             <div>
               <div className="font-semibold text-gray-900 dark:text-gray-100">

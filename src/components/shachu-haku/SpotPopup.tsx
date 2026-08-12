@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SpotHeightBadge } from './SpotHeightBadge';
 import {
   CampingSpotWithId,
   CampingSpotTypeLabels,
@@ -67,6 +68,12 @@ export function SpotPopup({
                 ? `¥${spot.pricing.pricePerNight}`
                 : '有料：？円'}
           </Badge>
+          <SpotHeightBadge
+            maxVehicleHeight={spot.maxVehicleHeight}
+            noHeightLimit={spot.noHeightLimit}
+            heightLimitCaution={spot.heightLimitCaution}
+            className="text-xs"
+          />
           <Badge
             className={`${getRatingColor(
               calculateSecurityLevel(spot),

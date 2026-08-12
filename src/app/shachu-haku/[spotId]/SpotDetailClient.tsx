@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { SpotHeightBadge } from '@/components/shachu-haku/SpotHeightBadge';
 import { useToast } from '@/components/ui/use-toast';
 import { AdLink } from '@/components/shachu-haku/AdLink';
 import { AdSenseUnit } from '@/components/layout/AdSenseUnit';
@@ -269,6 +270,11 @@ ${spot.notes ?? 'なし'} → `;
               ? `¥${spot.pricing.pricePerNight}`
               : '有料：？円'}
         </Badge>
+        <SpotHeightBadge
+          maxVehicleHeight={spot.maxVehicleHeight}
+          noHeightLimit={spot.noHeightLimit}
+          heightLimitCaution={spot.heightLimitCaution}
+        />
         <Badge className={`${getRatingColor(securityLevel)} text-white`}>
           <Shield className="w-3 h-3 mr-1" />
           治安 {securityLevel}/5
