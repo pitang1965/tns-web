@@ -46,6 +46,9 @@ export interface ICampingSpot extends Document {
   };
   capacity?: number; // number of regular vehicles
   capacityLarge?: number; // number of large vehicles
+  maxVehicleHeight?: number; // 全高制限(cm)。区画があれば最大区画=入れる可能性の上限。値なし=不明
+  noHeightLimit?: boolean; // true=高さ制限なし確定（屋外・「高さ制限なし」）
+  heightLimitCaution?: boolean; // true=高さ要注意（区画差／入口・ゲートの小屋根や梁が低い 等）。noHeightLimitと併用可
   restrictions: string[];
   amenities: string[];
   notes?: string;
@@ -219,6 +222,16 @@ const campingSpotSchema = new Schema<ICampingSpot>(
       type: Number,
       min: 1,
     },
+    maxVehicleHeight: {
+      type: Number,
+      min: 0,
+    },
+    noHeightLimit: {
+      type: Boolean,
+    },
+    heightLimitCaution: {
+      type: Boolean,
+    },
     restrictions: [
       {
         type: String,
@@ -305,6 +318,7 @@ campingSpotSchema.pre('save', function (next) {
 campingSpotSchema.index({ coordinates: '2dsphere' });
 campingSpotSchema.index({ prefecture: 1 });
 campingSpotSchema.index({ type: 1 });
+campingSpotSchema.index({ maxVehicleHeight: 1 });
 campingSpotSchema.index({ 'pricing.isFree': 1 });
 campingSpotSchema.index({ quietnessLevel: 1 });
 campingSpotSchema.index({ securityLevel: 1 });

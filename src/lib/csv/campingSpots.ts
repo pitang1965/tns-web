@@ -46,6 +46,9 @@ export const CAMPING_SPOT_CSV_HEADERS = [
   'amenities',
   'notes',
   'isOvernightProhibited',
+  'maxVehicleHeight',
+  'noHeightLimit',
+  'heightLimitCaution',
 ] as const;
 
 /**
@@ -87,6 +90,9 @@ export const CAMPING_SPOT_CSV_HEADERS_JP = [
   '設備',
   '備考',
   '車中泊禁止',
+  '全高制限(cm)',
+  '全高制限なし',
+  '全高要注意',
 ] as const;
 
 /**
@@ -133,6 +139,9 @@ export function campingSpotToCSVRow(spot: CampingSpotWithId): unknown[] {
     spot.amenities.join(','),
     spot.notes || '',
     spot.isOvernightProhibited ? 'true' : 'false',
+    spot.maxVehicleHeight ?? '',
+    spot.noHeightLimit ? 'true' : '',
+    spot.heightLimitCaution ? 'true' : '',
   ];
 }
 
@@ -227,6 +236,9 @@ export function generateCampingSpotTemplate(): string {
     'トイレ,自販機', // 設備
     '', // 備考 - 任意
     'false', // 車中泊禁止
+    '', // 全高制限(cm) - 任意
+    '', // 全高制限なし - 任意
+    '', // 全高要注意 - 任意
   ];
 
   return [headers.join(','), sampleData.join(',')].join('\n');

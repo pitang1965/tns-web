@@ -89,6 +89,17 @@ export const CampingSpotSchema = z.object({
     .int()
     .min(1, '大型車収容台数は1以上で入力してください')
     .optional(),
+  // 全高制限(cm)。区画がある場合は「入れる可能性のある上限」＝最大区画。値なし=不明
+  maxVehicleHeight: z
+    .number()
+    .int()
+    .min(0, '全高制限は0以上で入力してください')
+    .optional(),
+  // true=高さ制限なし確定（屋外・「高さ制限なし」）。maxVehicleHeightより優先して「入れる側」
+  noHeightLimit: z.boolean().optional(),
+  // true=高さの要注意（区画により制限が異なる／入口・ゲートの小屋根や梁が低い／
+  // 一部がmaxVehicleHeightより低い 等）。noHeightLimit と併用可
+  heightLimitCaution: z.boolean().optional(),
   restrictions: z.array(z.string().trim()).default([]),
   amenities: z.array(z.string().trim()).default([]),
   notes: z.string().trim().optional(),
@@ -293,6 +304,27 @@ export const CampingSpotCSVSchema = z.object({
         message: '大型車収容台数は空欄または1以上の整数で入力してください',
       },
     )
+    .optional()
+    .default(''),
+  maxVehicleHeight: z
+    .string()
+    .refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+      message: '全高制限(cm)は空欄または0以上の数値で入力してください',
+    })
+    .optional()
+    .default(''),
+  noHeightLimit: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '全高制限なしはtrue/false/空欄で入力してください',
+    })
+    .optional()
+    .default(''),
+  heightLimitCaution: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '全高要注意はtrue/false/空欄で入力してください',
+    })
     .optional()
     .default(''),
   restrictions: z.string().trim().optional().default(''),
@@ -512,6 +544,27 @@ export const CampingSpotCSVJapaneseSchema = z.object({
     )
     .optional()
     .default(''),
+  '全高制限(cm)': z
+    .string()
+    .refine((val) => val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+      message: '全高制限(cm)は空欄または0以上の数値で入力してください',
+    })
+    .optional()
+    .default(''),
+  全高制限なし: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '全高制限なしはtrue/false/空欄で入力してください',
+    })
+    .optional()
+    .default(''),
+  全高要注意: z
+    .string()
+    .refine((val) => val === '' || val === 'true' || val === 'false', {
+      message: '全高要注意はtrue/false/空欄で入力してください',
+    })
+    .optional()
+    .default(''),
   制限事項: z.string().trim().optional().default(''),
   設備: z.string().trim().optional().default(''),
   備考: z.string().trim().optional().default(''),
@@ -658,6 +711,13 @@ export function csvRowToCampingSpot(csvRow: CampingSpotCSV): CampingSpot {
     capacityLarge: csvRow.capacityLarge
       ? Number(csvRow.capacityLarge)
       : undefined,
+    maxVehicleHeight:
+      csvRow.maxVehicleHeight !== ''
+        ? Number(csvRow.maxVehicleHeight)
+        : undefined,
+    noHeightLimit: csvRow.noHeightLimit === 'true' ? true : undefined,
+    heightLimitCaution:
+      csvRow.heightLimitCaution === 'true' ? true : undefined,
     restrictions: csvRow.restrictions
       ? csvRow.restrictions
           .split(',')
@@ -731,6 +791,12 @@ export function csvJapaneseRowToCampingSpot(
     capacityLarge: csvRow['大型車収容台数']
       ? Number(csvRow['大型車収容台数'])
       : undefined,
+    maxVehicleHeight:
+      csvRow['全高制限(cm)'] !== ''
+        ? Number(csvRow['全高制限(cm)'])
+        : undefined,
+    noHeightLimit: csvRow['全高制限なし'] === 'true' ? true : undefined,
+    heightLimitCaution: csvRow['全高要注意'] === 'true' ? true : undefined,
     restrictions: csvRow['制限事項']
       ? csvRow['制限事項']
           .split(',')
