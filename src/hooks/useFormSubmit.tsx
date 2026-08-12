@@ -161,6 +161,16 @@ export function useFormSubmit({
       if (data.capacityLarge && data.capacityLarge.trim() !== '') {
         formData.append('capacityLarge', data.capacityLarge);
       }
+
+      // 高さ制限（車中泊車両）
+      if (data.maxVehicleHeight && data.maxVehicleHeight.trim() !== '') {
+        formData.append('maxVehicleHeight', data.maxVehicleHeight);
+      }
+      formData.append('noHeightLimit', data.noHeightLimit.toString());
+      formData.append(
+        'heightLimitCaution',
+        data.heightLimitCaution.toString(),
+      );
       if (data.pricePerNight && data.pricePerNight.trim() !== '') {
         formData.append('pricePerNight', data.pricePerNight);
       }

@@ -450,6 +450,9 @@ export async function updateCampingSpot(id: string, data: FormData) {
     'securityLevel',
     'overallRating',
     'capacity',
+    'maxVehicleHeight',
+    'noHeightLimit',
+    'heightLimitCaution',
     'url',
     'notes',
   ];

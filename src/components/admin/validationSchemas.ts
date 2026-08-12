@@ -207,6 +207,17 @@ export const ShachuHakuFormCreateSchema = z
           !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 1),
         { message: '有効な数値を入力してください（1以上）' },
       ),
+    // 高さ制限（車中泊車両）
+    maxVehicleHeight: z
+      .string()
+      .optional()
+      .refine(
+        (val) =>
+          !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0),
+        { message: '有効な数値を入力してください（0以上）' },
+      ),
+    noHeightLimit: z.boolean().default(false),
+    heightLimitCaution: z.boolean().default(false),
     isOvernightProhibited: z.boolean().default(false),
     restrictions: z.string(),
     amenities: z.string(),

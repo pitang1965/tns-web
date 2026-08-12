@@ -95,6 +95,14 @@ export function convertFormDataToCampingSpot(
       obj.capacityLarge && String(obj.capacityLarge).trim() !== ''
         ? Number(obj.capacityLarge)
         : undefined,
+    // 高さ制限（車中泊車両）
+    maxVehicleHeight:
+      obj.maxVehicleHeight && String(obj.maxVehicleHeight).trim() !== ''
+        ? Number(obj.maxVehicleHeight)
+        : undefined,
+    noHeightLimit: obj.noHeightLimit === 'true' ? true : undefined,
+    heightLimitCaution:
+      obj.heightLimitCaution === 'true' ? true : undefined,
     restrictions: obj.restrictions
       ? String(obj.restrictions)
           .split(',')

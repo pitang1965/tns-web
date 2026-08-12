@@ -47,6 +47,10 @@ export const DEFAULT_FORM_VALUES = {
   priceNote: '',
   capacity: '',
   capacityLarge: '',
+  // 高さ制限（車中泊車両）
+  maxVehicleHeight: '',
+  noHeightLimit: false,
+  heightLimitCaution: false,
   restrictions: '',
   amenities: '',
   notes: '',

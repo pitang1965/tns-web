@@ -111,6 +111,10 @@ export function convertSpotToFormValues(
     priceNote: spot.pricing.priceNote || '',
     capacity: spot.capacity?.toString() || '',
     capacityLarge: spot.capacityLarge?.toString() || '',
+    // 高さ制限（車中泊車両）
+    maxVehicleHeight: spot.maxVehicleHeight?.toString() || '',
+    noHeightLimit: spot.noHeightLimit || false,
+    heightLimitCaution: spot.heightLimitCaution || false,
     restrictions: spot.restrictions.join(', '),
     amenities: spot.amenities.join(', '),
     notes: spot.notes || '',

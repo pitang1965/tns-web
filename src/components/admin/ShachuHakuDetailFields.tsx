@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { useAutoSetVehicleHeight } from '@/hooks/useAutoSetVehicleHeight';
 import { ShachuHakuFormInput } from './validationSchemas';
 import type { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
@@ -30,6 +32,19 @@ export function ShachuHakuDetailFields({
   errors,
   spot,
 }: ShachuHakuDetailFieldsProps) {
+  const { toast } = useToast();
+
+  // 制限事項テキストから高さ制限を「初回のみ」自動設定（住所→都道府県と同じ方式）
+  useAutoSetVehicleHeight(
+    watch('restrictions'),
+    watch('maxVehicleHeight'),
+    watch('noHeightLimit'),
+    watch('heightLimitCaution'),
+    setValue,
+    toast,
+    { skipAutoSet: !!spot?._id }, // 編集モードではスキップ
+  );
+
   const handleCheckElevation = () => {
     const lat = watch('lat');
     const lng = watch('lng');
@@ -210,6 +225,72 @@ export function ShachuHakuDetailFields({
         </div>
       </div>
 
+      {/* 制限事項（＋高さ制限を下に自動反映） */}
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Label htmlFor="restrictions" className="text-lg font-semibold">
+            制限事項
+          </Label>
+          <Input
+            id="restrictions"
+            {...register('restrictions')}
+            placeholder="利用時間等の制限事項を入力（「全高2.3m」等と書くと下の高さ制限に自動反映）"
+          />
+          {errors.restrictions && (
+            <p className="text-sm text-red-500">
+              {errors.restrictions.message}
+            </p>
+          )}
+        </div>
+
+        {/* 高さ制限（車中泊車両）※タイトル省略・制限事項から初回自動設定 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label htmlFor="maxVehicleHeight">高さ制限 (cm)</Label>
+            <Input
+              id="maxVehicleHeight"
+              type="number"
+              min="0"
+              placeholder="例: 230（数値または空欄=不明）"
+              onWheel={(e) => e.currentTarget.blur()}
+              {...register('maxVehicleHeight')}
+            />
+            {errors.maxVehicleHeight && (
+              <p className="text-sm text-red-500">
+                {errors.maxVehicleHeight.message}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="noHeightLimit"
+                checked={watch('noHeightLimit')}
+                onCheckedChange={(checked) =>
+                  setValue('noHeightLimit', !!checked)
+                }
+              />
+              <Label htmlFor="noHeightLimit">高さ制限なし（屋外等）</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="heightLimitCaution"
+                checked={watch('heightLimitCaution')}
+                onCheckedChange={(checked) =>
+                  setValue('heightLimitCaution', !!checked)
+                }
+              />
+              <Label htmlFor="heightLimitCaution">
+                ⚠ 高さ要注意（区画差・梁/ゲート低い等）
+              </Label>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          上の「制限事項」に高さ（例:「全高2.3m」）を書くと、未設定のときに限り高さ制限を自動で推定・設定します（誤りは手修正可）。数値は「入れる可能性のある上限」（区画がある場合は最大区画）。「高さ制限なし」は数値より優先して常に表示。空欄は「不明」として扱われます。
+        </p>
+      </div>
+
       {/* その他情報 */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">その他情報</h3>
@@ -245,20 +326,6 @@ export function ShachuHakuDetailFields({
           />
           {errors.elevation && (
             <p className="text-sm text-red-500">{errors.elevation.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <Label htmlFor="restrictions">制限事項</Label>
-          <Input
-            id="restrictions"
-            {...register('restrictions')}
-            placeholder="全高や利用時間等の制限事項を入力"
-          />
-          {errors.restrictions && (
-            <p className="text-sm text-red-500">
-              {errors.restrictions.message}
-            </p>
           )}
         </div>
 
