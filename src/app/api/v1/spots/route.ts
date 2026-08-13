@@ -20,6 +20,9 @@ type SpotV1 = {
   distanceToToilet?: number; // meters(充足率~55%、欠損前提でUI設計すること)
   distanceToConvenience?: number; // meters
   distanceToBath?: number; // meters
+  maxVehicleHeight?: number; // 全高制限(cm)。値なし=不明。車高フィルタで使用
+  noHeightLimit?: boolean; // true=高さ制限なし確定。maxVehicleHeightより優先
+  heightLimitCaution?: boolean; // true=要注意(区画差・入口の低い梁など)。バッジ表示用
 };
 
 type SpotsV1Response = {
@@ -50,6 +53,9 @@ export async function GET() {
         distanceToToilet: 1,
         distanceToConvenience: 1,
         distanceToBath: 1,
+        maxVehicleHeight: 1,
+        noHeightLimit: 1,
+        heightLimitCaution: 1,
       },
     ).lean<ICampingSpot[]>();
 
@@ -69,6 +75,9 @@ export async function GET() {
         distanceToToilet: spot.distanceToToilet,
         distanceToConvenience: spot.distanceToConvenience,
         distanceToBath: spot.distanceToBath,
+        maxVehicleHeight: spot.maxVehicleHeight,
+        noHeightLimit: spot.noHeightLimit,
+        heightLimitCaution: spot.heightLimitCaution,
       })),
     };
 
