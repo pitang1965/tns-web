@@ -311,6 +311,72 @@ const withPWA = withPWAInit({
   ],
 });
 
+// Auth0テナントのドメイン（例: https://xxx.jp.auth0.com）を環境変数から取得。
+// ログイン時のフォーム送信先（form-action）としてのみCSPに許可する。
+// @auth0/nextjs-auth0 はフルページリダイレクト＋サーバ側トークン交換のため、
+// ブラウザから issuer への fetch も iframe 埋め込みも行わない（connect/frame は不要）。
+const authIssuer = process.env.AUTH0_ISSUER_BASE_URL || '';
+
+// PostHog のホスト。リバースプロキシ利用時は NEXT_PUBLIC_POSTHOG_HOST を尊重する。
+const posthogHost =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
+
+// AdSense が接続・描画・不正検証で使う Google 系オリジン群。
+// 注意: 'https://*.google.com' は apex の google.com にも .adtrafficquality.google
+// にもマッチしないため、それらを明示的に列挙する必要がある。
+const googleAdOrigins = [
+  'https://pagead2.googlesyndication.com',
+  'https://*.googlesyndication.com',
+  'https://*.g.doubleclick.net',
+  'https://*.doubleclick.net',
+  'https://google.com',
+  'https://*.google.com',
+  'https://*.adtrafficquality.google',
+].join(' ');
+
+// Sentry の CSP 違反レポート受信エンドポイント。
+// DSN は instrumentation-client.ts と同一（公開鍵でありシークレットではない）。EUリージョン(.de)。
+// 形式: https://o<org>.ingest.<region>.sentry.io/api/<project>/security/?sentry_key=<publicKey>
+const sentryCspReportUri =
+  'https://o4507994894434304.ingest.de.sentry.io/api/4507994900791376/security/?sentry_key=8eafcbf664887d63e9d88ed235f4626e';
+
+// Content-Security-Policy のディレクティブ。
+// まずは Report-Only で導入し、Sentry に集約される違反レポートを見ながら
+// 穴を塞いだうえで本適用（Content-Security-Policy）へ切り替える方針。
+//
+// 各ソースの根拠:
+// - googleAdOrigins                    : AdSense
+// - posthogHost / us-assets.posthog.com: PostHog アクセス解析（本番のみ動作）
+// - api.mapbox.com / events.mapbox.com : Mapbox のタイル・スタイル・テレメトリ
+// - authIssuer                          : Auth0 ログイン（form-action のみ）
+// - フォントは next/font で自己ホストするため Google Fonts への接続は不要
+// - Sentry はtunnelRoute（/monitoring）経由のため 'self' で足りる
+const cspDirectives = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  // クリックジャッキング対策（X-Frame-Options のCSP版）
+  "frame-ancestors 'self'",
+  `form-action 'self' ${authIssuer}`.trim(),
+  // Next.js のインラインスクリプトと Mapbox GL のWorker生成のため unsafe-inline / unsafe-eval が必要
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleAdOrigins} ${posthogHost} https://us-assets.i.posthog.com https://api.mapbox.com`,
+  "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
+  // 地図タイル・アバター・広告・アフィリエイト画像など多様なため https: を広めに許可
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  // Service Worker（PWA）と Mapbox GL のWorkerが blob: を使う
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins}`,
+  `frame-src 'self' ${googleAdOrigins} https://social-plugins.line.me`,
+  // 本適用時のみ有効（Report-Only では無視される）
+  'upgrade-insecure-requests',
+  // 違反レポートの送信先（report-to は Reporting-Endpoints ヘッダーの csp-endpoint を参照）。
+  // 新しいブラウザは report-to を、古いブラウザは report-uri を使う。
+  `report-uri ${sentryCspReportUri}`,
+  'report-to csp-endpoint',
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactCompiler: {
@@ -335,6 +401,20 @@ const nextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           // 不要なブラウザ機能を制限（位置情報はMapbox使用のため除外）
           { key: 'Permissions-Policy', value: 'camera=(), microphone=()' },
+          // HTTPS強制（HSTS）。まずはincludeSubDomains/preloadなしで tabi.over40web.club 単体に適用。
+          // 他サブドメインへの影響がないと確認できたら includeSubDomains; preload を検討する。
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+          // CSP の report-to が参照するレポート送信先グループの定義（Sentry）。
+          {
+            key: 'Reporting-Endpoints',
+            value: `csp-endpoint="${sentryCspReportUri}"`,
+          },
+          // CSPはまず違反を計測するだけの Report-Only で導入（既存機能をブロックしない）。
+          // 違反レポートは Sentry に集約される。問題ないと確認できたら 'Content-Security-Policy' に切り替える。
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: cspDirectives,
+          },
         ],
       },
     ];
