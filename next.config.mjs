@@ -340,6 +340,19 @@ const googleAdOrigins = [
 const sentryCspReportUri =
   'https://o4507994894434304.ingest.de.sentry.io/api/4507994900791376/security/?sentry_key=8eafcbf664887d63e9d88ed235f4626e';
 
+// Vercel のプレビュー用ツールバー（Live Feedback）は preview/development デプロイにだけ
+// 自動注入され、本番（VERCEL_ENV === 'production'）には読み込まれない。
+// そのため vercel.live 関連の許可はプレビュー時のみ付与し、本番CSPはタイトに保つ。
+// （img-src は 'https:' で広く許可済みのため vercel.live/vercel.com は追加不要）
+const isVercelProd = process.env.VERCEL_ENV === 'production';
+const vercelLiveScript = isVercelProd ? '' : ' https://vercel.live';
+const vercelLiveStyle = isVercelProd ? '' : ' https://vercel.live';
+const vercelLiveFont = isVercelProd ? '' : ' https://vercel.live https://assets.vercel.com';
+const vercelLiveConnect = isVercelProd
+  ? ''
+  : ' https://vercel.live wss://ws-us3.pusher.com https://*.pusher.com';
+const vercelLiveFrame = isVercelProd ? '' : ' https://vercel.live';
+
 // Content-Security-Policy のディレクティブ。
 // まずは Report-Only で導入し、Sentry に集約される違反レポートを見ながら
 // 穴を塞いだうえで本適用（Content-Security-Policy）へ切り替える方針。
@@ -359,16 +372,16 @@ const cspDirectives = [
   "frame-ancestors 'self'",
   `form-action 'self' ${authIssuer}`.trim(),
   // Next.js のインラインスクリプトと Mapbox GL のWorker生成のため unsafe-inline / unsafe-eval が必要
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleAdOrigins} ${posthogHost} https://us-assets.i.posthog.com https://api.mapbox.com`,
-  "style-src 'self' 'unsafe-inline' https://api.mapbox.com",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleAdOrigins} ${posthogHost} https://us-assets.i.posthog.com https://api.mapbox.com${vercelLiveScript}`,
+  `style-src 'self' 'unsafe-inline' https://api.mapbox.com${vercelLiveStyle}`,
   // 地図タイル・アバター・広告・アフィリエイト画像など多様なため https: を広めに許可
   "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
+  `font-src 'self' data:${vercelLiveFont}`,
   // Service Worker（PWA）と Mapbox GL のWorkerが blob: を使う
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins}`,
-  `frame-src 'self' ${googleAdOrigins} https://social-plugins.line.me`,
+  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins}${vercelLiveConnect}`,
+  `frame-src 'self' ${googleAdOrigins} https://social-plugins.line.me${vercelLiveFrame}`,
   // 本適用時のみ有効（Report-Only では無視される）
   'upgrade-insecure-requests',
   // 違反レポートの送信先（report-to は Reporting-Endpoints ヘッダーの csp-endpoint を参照）。
