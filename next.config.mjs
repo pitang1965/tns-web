@@ -332,6 +332,8 @@ const googleAdOrigins = [
   'https://google.com',
   'https://*.google.com',
   'https://*.adtrafficquality.google',
+  // AdSense が計測ビーコン(CSI)・静的アセットで使う Google 静的ホスト（csi.gstatic.com 等）
+  'https://*.gstatic.com',
 ].join(' ');
 
 // Sentry の CSP 違反レポート受信エンドポイント。
