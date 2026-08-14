@@ -71,7 +71,13 @@ export function useAutoSetPlaceType<TFieldValues extends FieldValues>(
         'PARKING_PAID_RV_PARK',
         '「RVパーク」を検出したため、タイプを「駐車場 - 有料 - RVパーク」に設定しました。',
       );
-    } else if (nameValue.includes('SA') || nameValue.includes('PA')) {
+    } else if (
+      // 「PARK」「PASS」などの英単語内の "PA"/"SA" を誤検出しないよう、
+      // 前後がラテン文字でない場合（例:「海老名SA」「守谷PA」）のみマッチさせる
+      /(?:^|[^A-Za-z])(?:SA|PA)(?![A-Za-z])/.test(nameValue) ||
+      nameValue.includes('サービスエリア') ||
+      nameValue.includes('パーキングエリア')
+    ) {
       setType(
         'PARKING_FREE_SERVICE_AREA',
         '「SA」または「PA」を検出したため、タイプを「駐車場 - 無料 - SA/PA」に設定しました。',

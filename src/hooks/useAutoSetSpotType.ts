@@ -122,7 +122,13 @@ export function useAutoSetSpotType<TFieldValues extends FieldValues>(
       });
     }
     // 4. SA/PA
-    else if (nameValue.includes('SA') || nameValue.includes('PA')) {
+    // 「PARK」「PASS」などの英単語内の "PA"/"SA" を誤検出しないよう、
+    // 前後がラテン文字でない場合（例:「海老名SA」「守谷PA」）のみマッチさせる
+    else if (
+      /(?:^|[^A-Za-z])(?:SA|PA)(?![A-Za-z])/.test(nameValue) ||
+      nameValue.includes('サービスエリア') ||
+      nameValue.includes('パーキングエリア')
+    ) {
       if (lastAutoSetTypeRef.current === 'sa_pa') return;
 
       setFieldValue('type', 'sa_pa', {
