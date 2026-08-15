@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-08-15',
+    items: [
+      {
+        category: 'new',
+        text: 'AIで旅程の下書きを作る機能で、目的地・経由地の順番をドラッグで並び替えられるようになりました。この機能は現在、一部の方への先行提供中です。',
+        href: '/itineraries/generate',
+        linkLabel: 'AIで下書き',
+      },
+    ],
+  },
+  {
     date: '2026-08-12',
     items: [
       {
