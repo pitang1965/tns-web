@@ -35,6 +35,10 @@ export function useSyncFormWithJotai<TFieldValues extends FieldValues>(
   // Jotaiの状態を取得（更新用）
   const [, setAtomValue] = useAtom(atomToSync);
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 初期データによるatom初期化を一度だけに限定するためのフラグ
+  const didInitRef = useRef(false);
+  // getValuesは安定参照。実データの取得元として使う（下記コメント参照）
+  const { getValues } = formMethods;
 
   // react-hook-formのwatchを使用してフォームの値の変更を監視
   const formValues = useWatch({
@@ -68,8 +72,13 @@ export function useSyncFormWithJotai<TFieldValues extends FieldValues>(
     if (formValues) {
       if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
       syncTimerRef.current = setTimeout(() => {
+        // useWatchは「変更検知のトリガー」としてのみ使い、実データはgetValues()を正とする。
+        // 編集画面はDayPaginationで現在の日だけをマウントするため、前日/翌日への移動は
+        // 未マウントの日へのsetValueになる。全体useWatchの出力は未マウント（未登録）の
+        // フィールド配列の更新を取りこぼすことがあり目次に反映されないが、getValues()は
+        // 内部の全フォーム値を返すので、全日程の最新状態を確実に取得できる。
         const metadataValues = convertToMetadataFormat(
-          formValues as SyncedFormValues,
+          getValues() as SyncedFormValues,
         );
         setAtomValue(metadataValues as ItineraryMetadata);
       }, 300);
@@ -77,12 +86,17 @@ export function useSyncFormWithJotai<TFieldValues extends FieldValues>(
     return () => {
       if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
     };
-  }, [formValues, setAtomValue]);
+  }, [formValues, setAtomValue, getValues]);
 
-  // 初期データがある場合は、初回レンダリング時にJotaiの状態も初期化
+  // 初期データがある場合は、初回のみJotaiの状態を初期化する。
+  // 編集ページはServer Componentで、?day= の変更（日の切り替え）ごとに再実行され
+  // getItineraryById()から新しいinitialData参照が渡ってくる。これを毎回atomへ適用すると
+  // 未保存の編集（前日/翌日への移動など）がサーバーの元データで上書きされ、目次が
+  // 巻き戻ってしまう。初期化は一度だけにし、以降はライブのフォーム値からの同期に任せる。
+  // （別の旅程を開く場合はルートセグメントが変わり本フックが再マウントされるため安全）
   useEffect(() => {
-    if (initialData) {
-      // 初期データもメタデータ形式に変換
+    if (initialData && !didInitRef.current) {
+      didInitRef.current = true;
       const metadataInitialData = convertToMetadataFormat(
         initialData as SyncedFormValues,
       );
