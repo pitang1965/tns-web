@@ -197,6 +197,11 @@ export function PlaceNameAutocomplete({
         <Input
           value={value}
           onChange={(e) => handleInput(e.target.value)}
+          onFocus={() => {
+            // 一度取得した候補は残っているので、フォーカスが戻ったら再表示する。
+            // （候補を選ばずに閉じた後、文字を消さないと候補が出ない問題への対応）
+            if (suggestions.length > 0) setShowDropdown(true);
+          }}
           placeholder="場所名で検索（住所・座標・タイプを自動入力）"
           autoComplete="off"
           className="pl-9 pr-8"

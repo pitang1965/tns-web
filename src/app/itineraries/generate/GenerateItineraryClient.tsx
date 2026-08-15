@@ -12,7 +12,29 @@ import { toast } from '@/components/ui/use-toast';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { PlaceNameAutocomplete } from '@/components/itinerary/forms/PlaceNameAutocomplete';
 import { DayPlanView } from '@/components/itinerary/DayPlanView';
-import { X, Plus, Sparkles } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { Plus, Sparkles } from 'lucide-react';
+import {
+  SortableDestinationRow,
+  PlaceSelectionHint,
+  newPlaceField,
+  type PlaceField,
+} from './SortableDestinationRow';
 import { createItineraryAction } from '@/actions/createItinerary';
 import { clearItineraryCache } from '@/lib/cacheUtils';
 import {
@@ -43,28 +65,6 @@ const DEPARTURE_OPTIONS: { value: DepartureTimeOfDay; label: string }[] = [
   { value: 'evening', label: '夕方発' },
 ];
 
-type PlaceField = { text: string; place: NamedPlace | null };
-
-// 候補選択の確認表示。選択済みなら住所つきで確定を示し、入力中で未選択なら選択を促す。
-function PlaceSelectionHint({ field }: { field: PlaceField }) {
-  if (field.place) {
-    return (
-      <p className="mt-1 text-xs text-green-600 dark:text-green-400">
-        ✓ {field.place.name}
-        {field.place.address ? `（${field.place.address}）` : ''}
-      </p>
-    );
-  }
-  if (field.text.trim()) {
-    return (
-      <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">
-        候補から場所を選択してください（座標を確定するため）
-      </p>
-    );
-  }
-  return null;
-}
-
 export function GenerateItineraryClient() {
   const { user, isLoading } = useUser();
   const {
@@ -80,9 +80,9 @@ export function GenerateItineraryClient() {
   // 今この瞬間に生成できるか（無制限枠 or 残高≥1）。
   const canGenerate = unlimited || (balance !== null && balance >= 1);
 
-  const [start, setStart] = useState<PlaceField>({ text: '', place: null });
-  const [destinations, setDestinations] = useState<PlaceField[]>([
-    { text: '', place: null },
+  const [start, setStart] = useState<PlaceField>(newPlaceField);
+  const [destinations, setDestinations] = useState<PlaceField[]>(() => [
+    newPlaceField(),
   ]);
   const [nights, setNights] = useState(2);
   const [distanceKm, setDistanceKm] = useState(200);
@@ -115,6 +115,28 @@ export function GenerateItineraryClient() {
     return () => clearInterval(id);
   }, [running]);
 
+  // 目的地の並び替え（ドラッグ）。編集画面の「並び順」と同じ操作感。
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDestinationDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setDestinations((prev) => {
+      const oldIndex = prev.findIndex((d) => d.id === active.id);
+      const newIndex = prev.findIndex((d) => d.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
   const updateDestination = (index: number, patch: Partial<PlaceField>) => {
     setDestinations((prev) =>
       prev.map((d, i) => (i === index ? { ...d, ...patch } : d)),
@@ -126,6 +148,19 @@ export function GenerateItineraryClient() {
       toast({
         title: '出発地を選択してください',
         description: '候補リストから場所を選ぶと座標が確定します',
+        variant: 'destructive',
+      });
+      return;
+    }
+    // 文字は入っているが候補未選択（座標未確定）の行を黙って捨てると、
+    // ユーザーは指定したつもりの目的地が抜け落ちたことに気づけない。先に止める。
+    const unresolvedIndex = destinations.findIndex(
+      (d) => d.text.trim() !== '' && d.place === null,
+    );
+    if (unresolvedIndex !== -1) {
+      toast({
+        title: '座標が確定していない目的地があります',
+        description: `${unresolvedIndex + 1}番目の目的地は候補リストから場所を選択してください`,
         variant: 'destructive',
       });
       return;
@@ -278,67 +313,80 @@ export function GenerateItineraryClient() {
             <label className="text-sm font-medium">出発地（往復の帰着地）*</label>
             <PlaceNameAutocomplete
               value={start.text}
-              onChange={(v) => setStart({ text: v, place: null })}
+              onChange={(v) =>
+                setStart((prev) => ({ ...prev, text: v, place: null }))
+              }
               onPlaceSelect={(p) =>
-                setStart({
+                setStart((prev) => ({
+                  ...prev,
                   text: p.name,
                   place: {
                     name: p.name,
                     address: p.address,
                     location: { lat: p.latitude, lng: p.longitude },
                   },
-                })
+                }))
               }
             />
             <PlaceSelectionHint field={start} />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">目的地・経由地（順番に）*</label>
-            {destinations.map((d, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <div className="flex-1">
-                  <PlaceNameAutocomplete
-                    value={d.text}
-                    onChange={(v) =>
-                      updateDestination(i, { text: v, place: null })
-                    }
-                    onPlaceSelect={(p) =>
-                      updateDestination(i, {
-                        text: p.name,
-                        place: {
-                          name: p.name,
-                          address: p.address,
-                          location: { lat: p.latitude, lng: p.longitude },
-                        },
-                      })
-                    }
-                  />
-                  <PlaceSelectionHint field={d} />
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">
+                目的地・経由地（順番に）*
+              </label>
+              {destinations.length > 1 && (
+                <span className="text-xs text-muted-foreground">
+                  ドラッグで並び替え
+                </span>
+              )}
+            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDestinationDragEnd}
+            >
+              <SortableContext
+                items={destinations.map((d) => d.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {destinations.map((d, i) => (
+                    <SortableDestinationRow
+                      key={d.id}
+                      field={d}
+                      index={i}
+                      showControls={destinations.length > 1}
+                      onChangeText={(v) =>
+                        updateDestination(i, { text: v, place: null })
+                      }
+                      onSelectPlace={(p) =>
+                        updateDestination(i, {
+                          text: p.name,
+                          place: {
+                            name: p.name,
+                            address: p.address,
+                            location: { lat: p.latitude, lng: p.longitude },
+                          },
+                        })
+                      }
+                      onRemove={() =>
+                        setDestinations((prev) =>
+                          prev.filter((_, idx) => idx !== i),
+                        )
+                      }
+                    />
+                  ))}
                 </div>
-                {destinations.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() =>
-                      setDestinations((prev) =>
-                        prev.filter((_, idx) => idx !== i),
-                      )
-                    }
-                    aria-label="目的地を削除"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
+              </SortableContext>
+            </DndContext>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={() =>
-                setDestinations((prev) => [...prev, { text: '', place: null }])
+                setDestinations((prev) => [...prev, newPlaceField()])
               }
             >
               <Plus className="h-4 w-4 mr-1" />
