@@ -5,6 +5,12 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
+// 全スポットは公開データ(認証・PIIなし)で全員に同一。URLが単一のため
+// Vercel CDNにs-maxageでキャッシュさせ、DBへの到達を抑える。
+// 既存の公開契約 /api/v1/spots と同じ方針(モバイルアプリ用と揃える)。
+// スポット追加・編集の反映は最大1時間遅延するが、地図用途では許容範囲。
+const CACHE_CONTROL = 'public, s-maxage=3600, stale-while-revalidate=86400';
+
 export async function GET(request: Request) {
   try {
     await ensureDbConnection();
@@ -42,7 +48,9 @@ export async function GET(request: Request) {
       })),
     };
 
-    return NextResponse.json(geoJSON);
+    return NextResponse.json(geoJSON, {
+      headers: { 'Cache-Control': CACHE_CONTROL },
+    });
   } catch (error) {
     logger.error(
       error instanceof Error
