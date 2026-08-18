@@ -337,9 +337,9 @@ ${spot.notes ?? 'なし'} → `;
           shortLabel="ポタ電セール"
         />
         <AdLink
-          href="https://amzn.to/4tTWIzU"
-          label="走行充電器"
-          shortLabel="走行充電器"
+          href="https://amzn.to/4x55EUJ"
+          label="緊急脱出ハンマー"
+          shortLabel="緊急脱出用"
         />
       </div>
 
