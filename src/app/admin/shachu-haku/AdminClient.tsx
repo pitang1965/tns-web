@@ -393,7 +393,7 @@ export default function AdminClient() {
                 className="hidden md:flex relative cursor-pointer"
               >
                 <Users className="w-4 h-4 mr-2" />
-                投稿管理
+                スポット投稿管理
                 {pendingSubmissionsCount > 0 && (
                   <Badge
                     variant="destructive"

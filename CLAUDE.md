@@ -171,6 +171,25 @@ After running `npx shadcn@latest add [component-name]`, ALWAYS perform these che
 **Common Issue:**
 The shadcn CLI sometimes creates files in `./@/components/ui/` instead of `src/components/ui/`. Always check and correct the installation location immediately after running the add command.
 
+## Admin Screen Naming
+
+管理画面の名前は、CONTEXT.md の用語を唱として次の規則で決める。命名で迷ったら CONTEXT.md を引く。
+用語集にない語を使いたくなったら、それは「先に定義すべき概念がある」というシグナルとして扱う。
+
+- **メニュー名（Navigation の「管理」ドロップダウン内）** = 用語そのまま。「管理」は付けない（ドロップダウン自体が「管理」なため）
+- **画面名（h1）** = 用語 + 「管理」
+- **BurgerMenu（モバイルの平坦なリスト）** = 画面名と同じ形。ただし同じ主題の一般ページと管理ページが並ぶ場合は、`(一般用)` / `(管理者用)` を付けて区別する
+
+| メニュー | 画面名 | 用語集の語 |
+| --- | --- | --- |
+| 旅程 | 旅程管理 | 旅程 (Itinerary) |
+| 車中泊スポット | 車中泊スポット管理 | 車中泊スポット (Camping Spot) |
+| スポット投稿 | スポット投稿管理 | スポット投稿 (Camping Spot Submission) |
+| 現地報告 | 現地報告管理 | 現地報告 (Field Report) |
+| アズキ | アズキ管理 | アズキ (Azuki) |
+
+注意：「アズキポイント」という複合語は使わない。CONTEXT.md では「ポイント」は内部名、「アズキ」はユーザー向け表示名と定めており、両方を連ねると第3の語を作ることになる。
+
 ## Git Commit Guidelines
 
 **Commit Message Format:**

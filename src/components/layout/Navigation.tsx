@@ -12,6 +12,7 @@ import {
   Shield,
   Users,
   Coins,
+  NotebookPen,
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import {
@@ -98,7 +99,7 @@ export function Navigation() {
                 className="flex items-center w-full"
               >
                 <MapPin className="mr-1 h-4 w-4" />
-                車中泊
+                車中泊スポット
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
@@ -107,13 +108,22 @@ export function Navigation() {
                 className="flex items-center w-full"
               >
                 <Users className="mr-1 h-4 w-4" />
-                投稿管理
+                スポット投稿
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href="/admin/field-reports"
+                className="flex items-center w-full"
+              >
+                <NotebookPen className="mr-1 h-4 w-4" />
+                現地報告
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/admin/points" className="flex items-center w-full">
                 <Coins className="mr-1 h-4 w-4" />
-                アズキ付与
+                アズキ
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

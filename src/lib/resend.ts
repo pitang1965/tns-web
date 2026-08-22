@@ -372,6 +372,62 @@ ${userStatsText}
       html: emailHtml,
     });
   }
+
+  // 現地報告の通報を管理者へ知らせる。
+  // 自動非表示の閾値は設けず、このメールを契機に人力で判断する。
+  // 投稿者の識別子(Auth0 sub)はメールに含めない(ADR-0011)。
+  // 必要になったら reportId からDBを引ける。
+  async sendFieldReportFlag(data: {
+    adminEmail: string;
+    spotId: string;
+    spotName: string;
+    reportId: string;
+    visitedYearMonth: string;
+    body: string;
+    flagCount: number;
+    reason?: string;
+  }): Promise<ResendResponse> {
+    const spotUrl = `${process.env.APP_BASE_URL ?? ''}/shachu-haku/${data.spotId}`;
+
+    const emailHtml = `
+      <h2>現地報告が通報されました</h2>
+      <p><strong>スポット:</strong> ${escapeHtml(data.spotName)}</p>
+      <p><strong>訪問年月:</strong> ${escapeHtml(data.visitedYearMonth)}</p>
+      <p><strong>通報件数:</strong> ${data.flagCount}件</p>
+      <p><strong>通報理由:</strong> ${escapeHtml(data.reason || '(未入力)')}</p>
+      <p><strong>報告本文:</strong></p>
+      <blockquote>${escapeHtml(data.body)}</blockquote>
+      <p><strong>報告ID:</strong> ${escapeHtml(data.reportId)}</p>
+      <p><a href="${escapeHtml(spotUrl)}">スポット詳細ページを開く</a>（管理者としてログイン中なら非表示操作ができます）</p>
+      <hr>
+      <p><small>このメールは車旅のしおりの現地報告通報機能から自動送信されました。</small></p>
+    `;
+
+    const emailText = `
+現地報告が通報されました
+
+スポット: ${data.spotName}
+訪問年月: ${data.visitedYearMonth}
+通報件数: ${data.flagCount}件
+通報理由: ${data.reason || '(未入力)'}
+
+報告本文:
+${data.body}
+
+報告ID: ${data.reportId}
+スポット詳細: ${spotUrl}
+
+---
+このメールは車旅のしおりの現地報告通報機能から自動送信されました。
+    `;
+
+    return this.sendEmail({
+      to: data.adminEmail,
+      subject: `【現地報告の通報】${data.spotName}`,
+      text: emailText,
+      html: emailHtml,
+    });
+  }
 }
 
 const resend = new ResendClient(

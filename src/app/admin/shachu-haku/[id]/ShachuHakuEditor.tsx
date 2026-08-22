@@ -13,6 +13,7 @@ import { getCampingSpotById } from '../../../actions/campingSpots/admin';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import { LoadingState } from '@/components/common/LoadingState';
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
+import { SpotFieldReports } from '@/components/admin/SpotFieldReports';
 import { useRecentUrls } from '@/hooks/useRecentUrls';
 import { AUTO_SAVE_KEY } from '@/constants/formDefaults';
 
@@ -225,6 +226,11 @@ export default function ShachuHakuEditor() {
           )}
         </AdminPageHeader>
       </div>
+
+      {/* 現地報告は編集フォームの上に置く。
+          「報告を読む → 何を直すか決める → フォームを直す」の順序に合わせるため。
+          0件のときは何も描画されない。 */}
+      <SpotFieldReports spotId={spot._id} />
 
       <ShachuHakuForm
         spot={spot}

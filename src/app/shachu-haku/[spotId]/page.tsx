@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCampingSpotById } from '../../actions/campingSpots/admin';
+import { getFieldReportsBySpot } from '../../actions/fieldReports';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
 import { CampingSpotJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
@@ -139,6 +140,10 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
     CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels] ||
     spot.type;
 
+  // 現地報告はサーバー側で取得して渡す。投稿・削除後は
+  // revalidatePath と router.refresh() でここが再実行される。
+  const fieldReports = await getFieldReportsBySpot(spotId);
+
   return (
     <>
       <CampingSpotJsonLd
@@ -167,7 +172,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
         ]}
       />
       <Suspense fallback={null}>
-        <SpotDetailClient spot={spot} />
+        <SpotDetailClient spot={spot} fieldReports={fieldReports} />
       </Suspense>
     </>
   );

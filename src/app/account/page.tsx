@@ -193,7 +193,7 @@ export default withPageAuthRequired(function Account() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span>投稿管理・承認</span>
+                  <span>スポット投稿管理・承認</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full"></div>

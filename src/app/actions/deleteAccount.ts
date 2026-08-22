@@ -3,6 +3,7 @@
 import { auth0 } from '@/lib/auth0';
 import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
+import { deleteAllFieldReportDataForUser } from '@/lib/fieldReports';
 import { deletePostHogPerson } from '@/lib/posthogServer';
 import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
@@ -16,7 +17,7 @@ type DeleteAccountResult = {
  * 退会処理（アカウント完全削除）。
  *
  * 処理順序:
- *   1. MongoDBのアプリデータ（所有旅程・共有相手参照）を削除
+ *   1. MongoDBのアプリデータ（所有旅程・共有相手参照・現地報告）を削除
  *   2. Auth0アカウント本体を削除
  *   3. 管理者へ退会通知メールを送信（失敗しても退会自体は成功扱い）
  *
@@ -51,6 +52,24 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
         success: false,
         error:
           '旅程データの削除に失敗しました。時間をおいて再度お試しください。',
+      };
+    }
+
+    // 現地報告（本人の投稿と、他人の報告に付けた通報）も削除する。
+    // プライバシーポリシー§7・利用規約第7条の「退会に伴い削除」の対象。
+    try {
+      await deleteAllFieldReportDataForUser(userId);
+    } catch (error) {
+      logger.error(
+        error instanceof Error
+          ? error
+          : new Error('Error deleting user field reports during withdrawal'),
+        { userId },
+      );
+      return {
+        success: false,
+        error:
+          '現地報告の削除に失敗しました。時間をおいて再度お試しください。',
       };
     }
 

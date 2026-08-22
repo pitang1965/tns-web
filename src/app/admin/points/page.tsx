@@ -120,7 +120,7 @@ export default function AdminPointsPage() {
       <AdminPageHeader>
         <h1 className="text-xl font-bold flex items-center gap-2">
           <Coins className="h-5 w-5" />
-          アズキ（ポイント）付与
+          アズキ管理
         </h1>
         <p className="text-sm mt-1">
           メールアドレスにアズキを付与します。アカウント作成前のメールにも事前付与できます（1アズキ＝1回のAI旅程ドラフト生成）。

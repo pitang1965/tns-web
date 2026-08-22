@@ -18,6 +18,7 @@ import {
   Sparkles,
   Bell,
   Coins,
+  NotebookPen,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
@@ -170,7 +171,19 @@ export function BurgerMenu() {
               onClick={(e) => handleItemClick(e, '/admin/submissions')}
             >
               <Users className="mr-1" />
-              投稿管理
+              スポット投稿管理
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href="/admin/field-reports"
+              className="flex items-center"
+              onClick={(e) => handleItemClick(e, '/admin/field-reports')}
+            >
+              <NotebookPen className="mr-1" />
+              現地報告管理
             </Link>
           </DropdownMenuItem>
         )}
@@ -182,7 +195,7 @@ export function BurgerMenu() {
               onClick={(e) => handleItemClick(e, '/admin/points')}
             >
               <Coins className="mr-1" />
-              アズキ付与
+              アズキ管理
             </Link>
           </DropdownMenuItem>
         )}

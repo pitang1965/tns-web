@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-08-22',
+    items: [
+      {
+        category: 'new',
+        text: '車中泊スポットの詳細ページに「現地報告」を追加しました。実際に訪れた方が、見聞きしたことを書き残せます。表示されるのは匿名のニックネームと訪問年月だけで、本名・メールアドレスや投稿した日時は公開されません。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-08-15',
     items: [
       {

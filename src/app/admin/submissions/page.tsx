@@ -155,7 +155,7 @@ export default function SubmissionsAdminPage() {
   return (
     <div className="container mx-auto px-6 py-6 space-y-6 min-h-screen">
       <AdminPageHeader className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">投稿管理</h1>
+        <h1 className="text-3xl font-bold">スポット投稿管理</h1>
         <Button
           onClick={handleRefresh}
           variant="outline"

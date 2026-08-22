@@ -35,6 +35,7 @@ export default function PrivacyPage() {
             ソーシャルログイン（Google、LINE等）をご利用の場合、各サービスから提供されるプロフィール情報（表示名、メールアドレス、プロフィール画像等）
           </li>
           <li>旅行計画に関する情報</li>
+          <li>車中泊スポットへ投稿された現地報告（本文・訪問年月・投稿者を識別するための認証サービス上のID）</li>
           <li>サービス利用に関するログ情報</li>
           <li>Cookieおよび類似の技術による情報</li>
         </ul>
@@ -51,19 +52,34 @@ export default function PrivacyPage() {
         </ul>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">
-          3. 個人情報の第三者提供
+          3. 現地報告の公開範囲
+        </h2>
+        <p className="mb-4">
+          車中泊スポットへの現地報告は公開されますが、公開するのは次の情報だけです：
+        </p>
+        <ul className="list-disc pl-6 mb-4">
+          <li>報告の本文</li>
+          <li>訪問年月（日付は記録しません）</li>
+          <li>匿名のニックネーム（公開旅程と同じ方式で自動に割り当てられるもので、ご自身では選べません）</li>
+        </ul>
+        <p className="mb-6">
+          お名前・メールアドレス・プロフィール画像は公開しません。また、投稿した日時も公開しません。これは、報告を書いた方が今どこにいるかを推測できないようにするためです。投稿した報告は、いつでもご自身で削除できます。
+        </p>
+
+        <h2 className="text-2xl font-semibold mt-8 mb-4">
+          4. 個人情報の第三者提供
         </h2>
         <p className="mb-6">
           当サービスは、次に掲げる場合を除いて、あらかじめユーザーの同意を得ることなく、第三者に個人情報を提供することはありません。ただし、個人情報保護法その他の法令で認められる場合を除きます。
         </p>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">4. Cookieの使用</h2>
+        <h2 className="text-2xl font-semibold mt-8 mb-4">5. Cookieの使用</h2>
         <p className="mb-6">
           当サービスは、ユーザーの利便性向上のためCookieを使用することがあります。ユーザーはブラウザの設定により、Cookieの受け取りを拒否することができます。
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">
-          5. 第三者サービスの利用
+          6. 第三者サービスの利用
         </h2>
         <p className="mb-4">
           当サービスでは、以下の第三者サービスを利用しています：
@@ -78,14 +94,14 @@ export default function PrivacyPage() {
         </ul>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">
-          6. プライバシーポリシーの変更
+          7. プライバシーポリシーの変更
         </h2>
         <p className="mb-6">
           当サービスは、必要に応じて、このプライバシーポリシーの内容を変更することがあります。この場合、変更後のプライバシーポリシーの施行時期と内容を適切な方法により周知または通知します。
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">
-          7. アカウントの削除（退会）
+          8. アカウントの削除（退会）
         </h2>
         <p className="mb-4">
           ユーザーは、いつでもご自身でアカウントを削除（退会）することができます。手順は以下のとおりです：
@@ -103,7 +119,7 @@ export default function PrivacyPage() {
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">
-          8. お問い合わせ窓口
+          9. お問い合わせ窓口
         </h2>
         <p className="mb-6">
           本ポリシーに関するお問い合わせやアカウント削除のご依頼は、
