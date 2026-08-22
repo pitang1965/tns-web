@@ -32,6 +32,9 @@ import {
 
 const DAILY_WINDOW_MS = 24 * 60 * 60 * 1000;
 
+const DUPLICATE_ERROR_MESSAGE =
+  'この訪問年月の報告は既に投稿されています。書き直す場合は、先に既存の報告を削除してください';
+
 async function getSessionUser(): Promise<User | null> {
   const session = await auth0.getSession();
   return session?.user ?? null;
@@ -159,6 +162,22 @@ export async function createFieldReport(
       };
     }
 
+    // 同一スポット・同一訪問年月に1件の制約を、アプリ側でも確かめる。
+    //
+    // ユニーク索引だけに頼ってはいけない: 本番は
+    // database.ts で `autoIndex: process.env.NODE_ENV !== 'production'` としており、
+    // 索引は自動作成されない（scripts/sync-field-report-indexes.cjs で手動作成）。
+    // 索引未作成の環境でも制約が効くよう、ここで先に見る。
+    // 競合時の最終的な担保は引き続きユニーク索引（下の 11000 ハンドリング）。
+    const duplicate = await FieldReport.exists({
+      spotId,
+      authorSub: eligibility.sub,
+      visitedYearMonth,
+    });
+    if (duplicate) {
+      return { success: false, error: DUPLICATE_ERROR_MESSAGE };
+    }
+
     await FieldReport.create({
       spotId,
       authorSub: eligibility.sub,
@@ -176,11 +195,7 @@ export async function createFieldReport(
       'code' in error &&
       (error as { code?: number }).code === 11000
     ) {
-      return {
-        success: false,
-        error:
-          'この訪問年月の報告は既に投稿されています。書き直す場合は、先に既存の報告を削除してください',
-      };
+      return { success: false, error: DUPLICATE_ERROR_MESSAGE };
     }
 
     logger.error(

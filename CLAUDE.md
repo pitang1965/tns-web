@@ -171,6 +171,22 @@ After running `npx shadcn@latest add [component-name]`, ALWAYS perform these che
 **Common Issue:**
 The shadcn CLI sometimes creates files in `./@/components/ui/` instead of `src/components/ui/`. Always check and correct the installation location immediately after running the add command.
 
+## Database Indexes
+
+`src/lib/database.ts` は `autoIndex: process.env.NODE_ENV !== 'production'` としており、
+**本番では Mongoose が索引を自動作成しない**（サーバーレスでコールドスタートのたびに
+索引同期が走るのを避けるためで、意図した設定）。
+
+そのため、**モデルに `schema.index(...)` を追加しても本番には反映されない**。必ず次を行う：
+
+1. `scripts/sync-indexes.cjs` の `INDEXES_BY_COLLECTION` にも同じ定義を追記する
+2. ドライランで差分を確認：`node scripts/sync-indexes.cjs --db=itinerary_db`
+3. 問題なければ作成：`node scripts/sync-indexes.cjs --db=itinerary_db --confirm`
+
+ユニーク索引で制約を掛ける場合は、**索引だけに頼らずアプリ側でも重複を見ること**。
+索引未作成の環境では制約がまったく効かないため（実例: 現地報告の
+「同一スポット・同一訪問年月に1件」が本番で無効になっていた）。
+
 ## Admin Screen Naming
 
 管理画面の名前は、CONTEXT.md の用語を唱として次の規則で決める。命名で迷ったら CONTEXT.md を引く。
