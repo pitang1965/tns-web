@@ -312,9 +312,11 @@ const withPWA = withPWAInit({
 });
 
 // Auth0テナントのドメイン（例: https://xxx.jp.auth0.com）を環境変数から取得。
-// ログイン時のフォーム送信先（form-action）としてのみCSPに許可する。
-// @auth0/nextjs-auth0 はフルページリダイレクト＋サーバ側トークン交換のため、
-// ブラウザから issuer への fetch も iframe 埋め込みも行わない（connect/frame は不要）。
+// form-action（ログインフォーム送信先）に加え、connect-src にも許可が必要。
+// 理由: App Router は <Link href="/auth/login"> を RSC でプリフェッチ／遷移し、
+// その fetch がサーバの Auth0 へのリダイレクト(302)を追うため connect が Auth0 に到達する。
+// （リダイレクトが弾かれると blocked-uri はリダイレクト元=自ドメインとして報告されるため紛らわしい）
+// frame は不要（Auth0 を iframe 埋め込みはしない）。
 const authIssuer = process.env.AUTH0_ISSUER_BASE_URL || '';
 
 // PostHog のホスト。リバースプロキシ利用時は NEXT_PUBLIC_POSTHOG_HOST を尊重する。
@@ -363,7 +365,7 @@ const vercelLiveFrame = isVercelProd ? '' : ' https://vercel.live';
 // - googleAdOrigins                    : AdSense
 // - posthogHost / us-assets.posthog.com: PostHog アクセス解析（本番のみ動作）
 // - api.mapbox.com / events.mapbox.com : Mapbox のタイル・スタイル・テレメトリ
-// - authIssuer                          : Auth0 ログイン（form-action のみ）
+// - authIssuer                          : Auth0 ログイン（form-action + connect-src。RSCプリフェッチがリダイレクトを追うため）
 // - フォントは next/font で自己ホストするため Google Fonts への接続は不要
 // - Sentry はtunnelRoute（/monitoring）経由のため 'self' で足りる
 const cspDirectives = [
@@ -382,7 +384,7 @@ const cspDirectives = [
   // Service Worker（PWA）と Mapbox GL のWorkerが blob: を使う
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins}${vercelLiveConnect}`,
+  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins} ${authIssuer}${vercelLiveConnect}`.trim(),
   `frame-src 'self' ${googleAdOrigins} https://social-plugins.line.me${vercelLiveFrame}`,
   // 本適用時のみ有効（Report-Only では無視される）
   'upgrade-insecure-requests',
