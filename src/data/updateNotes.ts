@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-08-23',
+    items: [
+      {
+        category: 'new',
+        text: '旅程の目次をまとめてコピーできるようになりました。目次の見出しにあるコピーボタンを押すと、日付・メモ・立ち寄り先の一覧が文章の形でコピーされ、メモ帳やメッセージにそのまま貼り付けられます。目次が表示されるパソコンなど画面の広い端末でご利用いただけます（スマートフォンでは目次が表示されないため使えません）。',
+        href: '/itineraries',
+        linkLabel: '旅程一覧',
+      },
+    ],
+  },
+  {
     date: '2026-08-22',
     items: [
       {

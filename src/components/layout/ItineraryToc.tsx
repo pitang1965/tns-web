@@ -14,7 +14,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { formatItineraryTocText } from '@/lib/itineraryTocText';
+import { safeClipboardWrite } from '@/lib/browserDetection';
 
 type ActivitySummary = {
   id?: string;
@@ -40,6 +44,8 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
   const displayData = atomItinerary.title ? atomItinerary : initialItinerary;
 
   const [topOffset, setTopOffset] = useState(192); // デフォルト値
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   // 動的にヘッダー＋広告の高さを計算し、スクロールに応じて調整
   useEffect(() => {
@@ -122,6 +128,27 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
     }
   };
 
+  const handleCopyToc = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = formatItineraryTocText(displayData);
+    const success = await safeClipboardWrite(text);
+
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: 'コピー完了',
+        description: '目次をクリップボードにコピーしました',
+      });
+    } else {
+      toast({
+        title: 'エラー',
+        description: 'クリップボードへのコピーに失敗しました',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // 表示用のデータを取得
   const summaries = displayData?.dayPlanSummaries || [];
 
@@ -135,7 +162,24 @@ export function ItineraryToc({ initialItinerary }: ItineraryTocProps) {
         }}
       >
         <div className="p-4">
-          <H3>目次</H3>
+          <div className="flex items-center justify-between gap-2">
+            <H3>目次</H3>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 cursor-pointer"
+              onClick={handleCopyToc}
+              title="目次をクリップボードにコピー"
+              aria-label="目次をクリップボードにコピー"
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
           {summaries.length > 0 ? (
             summaries.map((day: DaySummary, index: number) => (
               <div
