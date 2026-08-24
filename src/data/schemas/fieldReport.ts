@@ -19,8 +19,14 @@ export const FIELD_REPORT_STALE_MONTHS = 12;
 /** 1ユーザーが24時間に投稿できる件数 */
 export const FIELD_REPORT_DAILY_LIMIT = 5;
 
-/** 訪問年月として受け付ける下限（これ以前は入力ミスとみなす） */
-export const FIELD_REPORT_MIN_YEAR = 2000;
+/**
+ * 投稿できる訪問年月の遡り上限（年）。今日から見てこれより古い訪問は受け付けない。
+ *
+ * FIELD_REPORT_STALE_MONTHS とは別のしきい値であることに注意：
+ *   FIELD_REPORT_MAX_AGE_YEARS = そもそも入力できるか（古すぎる体験は現在の判断に使えない）
+ *   FIELD_REPORT_STALE_MONTHS  = 地図・一覧の「最新1件」に出すか（詳細ページでは全件表示する）
+ */
+export const FIELD_REPORT_MAX_AGE_YEARS = 5;
 
 const YEAR_MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -39,6 +45,16 @@ export function containsUrl(value: string): boolean {
 /** 'YYYY-MM' 形式の現在の年月を返す */
 export function currentYearMonth(now: Date = new Date()): string {
   const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+/**
+ * 投稿できる最も古い訪問年月を 'YYYY-MM' で返す。
+ * 固定の年ではなく今日からの相対で求めるため、時が経てば自動的に前へずれる。
+ */
+export function earliestVisitedYearMonth(now: Date = new Date()): string {
+  const year = now.getFullYear() - FIELD_REPORT_MAX_AGE_YEARS;
   const month = String(now.getMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
 }
@@ -77,8 +93,8 @@ export function buildExcerpt(body: string): string {
 export const visitedYearMonthSchema = z
   .string()
   .regex(YEAR_MONTH_PATTERN, '訪問年月の形式が正しくありません')
-  .refine((value) => Number(value.slice(0, 4)) >= FIELD_REPORT_MIN_YEAR, {
-    message: `訪問年月は${FIELD_REPORT_MIN_YEAR}年以降を指定してください`,
+  .refine((value) => value >= earliestVisitedYearMonth(), {
+    message: `訪問年月は${FIELD_REPORT_MAX_AGE_YEARS}年以内を指定してください`,
   })
   .refine((value) => value <= currentYearMonth(), {
     message: '訪問年月に未来は指定できません',

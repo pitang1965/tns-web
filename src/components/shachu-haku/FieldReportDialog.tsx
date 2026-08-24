@@ -18,7 +18,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { createFieldReport } from '@/app/actions/fieldReports';
 import {
   FIELD_REPORT_BODY_MAX,
-  FIELD_REPORT_MIN_YEAR,
+  FIELD_REPORT_MAX_AGE_YEARS,
+  earliestVisitedYearMonth,
   currentYearMonth,
 } from '@/data/schemas/fieldReport';
 
@@ -38,6 +39,7 @@ export function FieldReportDialog({
   const router = useRouter();
   const { toast } = useToast();
   const thisMonth = currentYearMonth();
+  const earliestMonth = earliestVisitedYearMonth();
 
   // 既定値は「今月」。大半の報告は泊まった直後に書かれるため、
   // これがそのまま正解になり入力の摩擦がほぼ生じない。
@@ -108,12 +110,13 @@ export function FieldReportDialog({
               type="month"
               value={visitedYearMonth}
               max={thisMonth}
-              min={`${FIELD_REPORT_MIN_YEAR}-01`}
+              min={earliestMonth}
               onChange={(event) => setVisitedYearMonth(event.target.value)}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
             <p className="text-xs text-muted-foreground">
               日付までは記録しません。年月だけが公開されます。
+              {FIELD_REPORT_MAX_AGE_YEARS}年より前の訪問は、現在の判断の役に立ちにくいため受け付けていません。
             </p>
           </div>
 
