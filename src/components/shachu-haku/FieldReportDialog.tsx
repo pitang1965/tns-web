@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/components/ui/use-toast';
 import { createFieldReport } from '@/app/actions/fieldReports';
+import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
 import {
   FIELD_REPORT_BODY_MAX,
   FIELD_REPORT_MAX_AGE_YEARS,
@@ -66,6 +67,15 @@ export function FieldReportDialog({
     if (!canSubmit) return;
     setIsSubmitting(true);
 
+    // ブラウザのAutoplayポリシー対策: 送信前（ユーザージェスチャー有効中）にAudioContextを初期化
+    let audioCtx: AudioContext | undefined;
+    try {
+      audioCtx = new AudioContext();
+      await audioCtx.resume();
+    } catch {
+      /* Web Audio API非対応環境では無視 */
+    }
+
     const result = await createFieldReport({
       spotId,
       visitedYearMonth,
@@ -75,6 +85,8 @@ export function FieldReportDialog({
     setIsSubmitting(false);
 
     if (!result.success) {
+      // 祝わないので、確保したAudioContextは開いたままにしない
+      audioCtx?.close().catch(() => {});
       toast({
         title: '投稿できませんでした',
         description: result.error,
@@ -85,6 +97,11 @@ export function FieldReportDialog({
 
     resetForm();
     onOpenChange(false);
+
+    // 投稿成功！くす玉のような紙吹雪と祝福音でお祝い
+    celebrateSubmission();
+    playCelebrationSound(audioCtx);
+
     toast({
       title: '現地報告を投稿しました',
       description: 'ご協力ありがとうございます',
