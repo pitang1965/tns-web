@@ -140,6 +140,44 @@ export class Auth0ManagementClient {
     }
   }
 
+  /**
+   * 認証メールを再送する。
+   * M2Mアプリに `update:users` スコープが必要。
+   *
+   * 現地報告の投稿とアズキの利用はどちらも email_verified を必須にしているため、
+   * 最初の認証メールを見落とした利用者は、これがないと何もできないまま詰む。
+   */
+  async sendVerificationEmail(userId: string): Promise<void> {
+    try {
+      const token = await this.getManagementToken();
+
+      const response = await fetch(
+        `https://${this.domain}/api/v2/jobs/verification-email`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: userId }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to send verification email: ${response.status}`,
+        );
+      }
+    } catch (error) {
+      logger.error(
+        error instanceof Error
+          ? error
+          : new Error(`Error sending verification email: ${userId}`),
+      );
+      throw error;
+    }
+  }
+
   private async getUserCountSince(token: string, since: Date): Promise<number> {
     try {
       const query = `created_at:[${since.toISOString()} TO *]`;

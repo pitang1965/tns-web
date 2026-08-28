@@ -3,6 +3,7 @@ import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { DeleteAccountSection } from '@/components/auth/DeleteAccountSection';
+import { EmailVerificationNotice } from '@/components/auth/EmailVerificationNotice';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { H1, LargeText } from '@/components/common/Typography';
 import PremiumBadge from '@/components/common/PremiumBadge';
@@ -64,6 +65,8 @@ export default withPageAuthRequired(function Account() {
                 value={user.email_verified ? '済み' : '未認証'}
               />
             </div>
+
+            {!user.email_verified && <EmailVerificationNotice />}
           </CardContent>
         </Card>
 
