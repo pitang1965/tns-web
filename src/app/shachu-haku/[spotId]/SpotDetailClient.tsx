@@ -303,6 +303,7 @@ export default function SpotDetailClient({
       <FieldReportSection
         spotId={spot._id}
         spotName={spot.name}
+        spotType={spot.type}
         reports={fieldReports}
       />
 

@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { ContactForm } from '@/components/contact/ContactForm';
+import { SpotSubmitLink } from '@/components/shachu-haku/SpotSubmitLink';
 
 type Props = {
   searchParams: Promise<{ subject?: string; message?: string }>;
@@ -19,12 +19,12 @@ export default async function ContactPage({ searchParams }: Props) {
           <p className="text-muted-foreground mt-2">
             <strong>車中泊場所の投稿について：</strong>
             現在、「車旅のしおり」の車中泊マップに掲載されていないおすすめの車中泊場所の投稿については
-            <Link
-              href="/shachu-haku/submit"
+            <SpotSubmitLink
+              source="contact"
               className="text-primary hover:underline ml-1"
             >
               こちらの専用フォーム
-            </Link>
+            </SpotSubmitLink>
             からお願いいたします。
           </p>
         </div>

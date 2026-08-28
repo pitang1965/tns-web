@@ -16,6 +16,10 @@ export type AnalyticsEvent =
   | 'spot_search' // スポットのキーワード検索（query / source を伴う）
   | 'diagnosis_completed' // 診断の完了
   | 'camping_spot_submitted' // スポット投稿
+  | 'spot_submit_cta_clicked' // スポット投稿への導線のクリック（source を伴う）
+  | 'field_report_prompt_viewed' // 現地報告セクションが画面内に入った（1ページ1回）
+  | 'field_report_cta_clicked' // 現地報告の投稿ボタンのクリック（auth_state を伴う）
+  | 'field_report_submitted' // 現地報告の投稿成功
   | 'nafuda_ad_impression' // nafuda広告の表示（nafuda対象検索で上部広告枠に表示）
   | 'nafuda_ad_click' // nafuda広告のクリック
   | 'pwa_banner_shown'

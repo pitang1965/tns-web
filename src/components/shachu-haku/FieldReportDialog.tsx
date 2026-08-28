@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/components/ui/use-toast';
 import { createFieldReport } from '@/app/actions/fieldReports';
+import { capture } from '@/lib/analytics';
 import { celebrateSubmission, playCelebrationSound } from '@/lib/confetti';
 import {
   FIELD_REPORT_BODY_MAX,
@@ -27,6 +28,11 @@ import {
 type FieldReportDialogProps = {
   spotId: string;
   spotName: string;
+  spotType: string;
+  /** 投稿「前」に既に報告があったか。1件目と2件目以降を分けて集計するために使う */
+  hadReportsBefore: boolean;
+  reportCountBefore: number;
+  isAdmin: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -34,6 +40,10 @@ type FieldReportDialogProps = {
 export function FieldReportDialog({
   spotId,
   spotName,
+  spotType,
+  hadReportsBefore,
+  reportCountBefore,
+  isAdmin,
   open,
   onOpenChange,
 }: FieldReportDialogProps) {
@@ -94,6 +104,15 @@ export function FieldReportDialog({
       });
       return;
     }
+
+    capture('field_report_submitted', {
+      spot_id: spotId,
+      spot_type: spotType,
+      has_reports: hadReportsBefore,
+      report_count: reportCountBefore,
+      body_length: body.trim().length,
+      is_admin: isAdmin,
+    });
 
     resetForm();
     onOpenChange(false);

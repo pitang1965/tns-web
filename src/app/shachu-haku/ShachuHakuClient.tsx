@@ -36,6 +36,7 @@ import { handleCampingSpotShare } from '@/lib/shareUtils';
 import { serializeSpotTypes } from '@/lib/spotTypeFilter';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
+import { SpotSubmitLink } from '@/components/shachu-haku/SpotSubmitLink';
 import { ShachuHakuSpotsList } from '@/components/shachu-haku/ShachuHakuSpotsList';
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 import { AdLink } from '@/components/shachu-haku/AdLink';
@@ -697,12 +698,12 @@ export default function ShachuHakuClient() {
                 車旅のしおりに掲載されていないあなたの好きな車中泊場所を教えてください。
               </p>
             </div>
-            <Link href="/shachu-haku/submit">
+            <SpotSubmitLink source="list">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
                 <Plus className="w-4 h-4" />
                 スポット投稿
               </Button>
-            </Link>
+            </SpotSubmitLink>
           </div>
         </CardContent>
       </Card>

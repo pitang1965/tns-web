@@ -1,6 +1,8 @@
 'use client';
 
 import { H2, Text } from '@/components/common/Typography';
+import { capture } from '@/lib/analytics';
+import type { SpotSubmitSource } from '@/components/shachu-haku/SpotSubmitLink';
 import {
   Map,
   Share2,
@@ -16,6 +18,8 @@ type Feature = {
   title: string;
   description: string;
   link?: string;
+  /** スポット投稿への導線のとき、どの入口から押されたかを計測する */
+  submitSource?: SpotSubmitSource;
 };
 
 const features: Feature[] = [
@@ -65,6 +69,7 @@ const features: Feature[] = [
     description:
       'あなたが見つけた車中泊スポットを投稿して、他の旅行者と情報を共有しましょう。',
     link: '/shachu-haku/submit',
+    submitSource: 'landing',
   },
 ];
 
@@ -98,7 +103,18 @@ export default function FeaturesSection() {
             );
 
             return isLink ? (
-              <a key={index} href={feature.link} className={cardClassName}>
+              <a
+                key={index}
+                href={feature.link}
+                className={cardClassName}
+                onClick={() => {
+                  if (feature.submitSource) {
+                    capture('spot_submit_cta_clicked', {
+                      source: feature.submitSource,
+                    });
+                  }
+                }}
+              >
                 {cardContent}
               </a>
             ) : (
