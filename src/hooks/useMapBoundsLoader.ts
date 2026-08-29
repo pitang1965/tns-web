@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 
 // Maximum display range for public users (scraping prevention)
@@ -98,7 +98,12 @@ export function useMapBoundsLoader({
   const wasBoundsTooWideRef = useRef(false);
 
   // Update filters ref when filters change
-  filtersRef.current = filters;
+  // レンダー中に ref を書き換えず、コミット後に同期する。
+  // filtersRef を読むのは handleBoundsChange / reloadIfNeeded だけで、
+  // いずれもコミット後（地図イベント・呼び出し側の effect）に走るため取りこぼしはない。
+  useEffect(() => {
+    filtersRef.current = filters;
+  });
 
   // Load spots with abort controller support
   const loadSpotsWithAbort = useCallback(async (

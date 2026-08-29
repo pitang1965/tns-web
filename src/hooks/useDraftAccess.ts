@@ -53,15 +53,11 @@ export function useDraftAccess(): DraftAccessState {
     }
   }, []);
 
+  // isLoading の初期値が true、refresh も依存なしで安定のため、初回取得のみを行う。
   useEffect(() => {
-    let active = true;
-    setIsLoading(true);
-    refresh().finally(() => {
-      if (!active) return;
-    });
-    return () => {
-      active = false;
-    };
+    // サーバからの初回取得。取得結果の反映が目的の effect なので許容する。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refresh();
   }, [refresh]);
 
   const setBalance = useCallback((n: number | null) => {

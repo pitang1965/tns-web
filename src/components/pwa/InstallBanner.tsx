@@ -106,7 +106,10 @@ export function InstallBanner() {
   const shownTrackedRef = useRef(false);
 
   // クライアントでプラットフォーム・インストール済み・抑制状態を判定
+  // navigator / localStorage はサーバでは読めないため、初期値ではなくマウント後に反映する
+  // （レンダー中に判定するとハイドレーション不一致になる）。
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlatform(detectPlatform());
     setInstalled(isStandalone());
     if (isSuppressed()) setDismissed(true);

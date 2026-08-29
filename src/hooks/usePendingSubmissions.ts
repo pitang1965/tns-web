@@ -69,6 +69,9 @@ export function usePendingSubmissions({
   // Auto-load on mount if enabled
   useEffect(() => {
     if (autoLoad && isAdmin) {
+      // サーバからの初回取得。ローディング表示のため setLoading(true) が同期的に走るが、
+      // 外部システムからの取得そのものが目的の effect なので許容する。
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       refreshPendingCount();
     }
   }, [autoLoad, isAdmin, refreshPendingCount]);

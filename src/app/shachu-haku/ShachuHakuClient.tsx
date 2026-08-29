@@ -97,8 +97,6 @@ export default function ShachuHakuClient() {
 
   // Pagination state for list view
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
 
   // List view data and loading state
@@ -120,14 +118,6 @@ export default function ShachuHakuClient() {
   const lastListFiltersRef = useRef<string | null>(null);
   const prevActiveTabRef = useRef<'map' | 'list'>(activeTab);
 
-  // Refs for accessing current values without triggering re-renders
-  const savedBoundsRef = useRef(savedBounds);
-  savedBoundsRef.current = savedBounds;
-  const mapZoomRef = useRef(mapZoom);
-  mapZoomRef.current = mapZoom;
-  const mapCenterRef = useRef(mapCenter);
-  mapCenterRef.current = mapCenter;
-
   // Use custom hook for map bounds loading with optimized data fetching
   const {
     handleBoundsChange,
@@ -146,51 +136,6 @@ export default function ShachuHakuClient() {
     },
     onBoundsTooWide: setIsBoundsTooWide,
   });
-
-  // Load spots for list view with pagination - NO dependencies
-  const loadListSpotsRef = useRef<
-    | ((
-        page: number,
-        filters?: {
-          searchTerm?: string;
-          prefecture?: string;
-          type?: string[];
-          bounds?: { north: number; south: number; east: number; west: number };
-        },
-      ) => Promise<void>)
-    | null
-  >(null);
-  loadListSpotsRef.current = async (
-    page: number,
-    filters?: {
-      searchTerm?: string;
-      prefecture?: string;
-      type?: string[];
-      bounds?: { north: number; south: number; east: number; west: number };
-    },
-  ) => {
-    try {
-      setLoading(true);
-      const result = await getPublicCampingSpotsWithPagination(
-        page,
-        pageSize,
-        filters,
-      );
-      setSpots(result.spots);
-      setTotalPages(result.totalPages);
-      setTotalCount(result.total);
-      setCurrentPage(result.page);
-    } catch (error) {
-      toast({
-        title: 'エラー',
-        description: '車中泊スポットの読み込みに失敗しました',
-        variant: 'destructive',
-      });
-      console.error('Error loading spots:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Wrapper for handleBoundsChange that also saves bounds for list view
   const handleBoundsChangeWrapper = useCallback(

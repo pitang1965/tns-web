@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 /**
  * 明示的なSubmitで検索を実行するカスタムフック。
@@ -12,10 +12,13 @@ export function useExplicitSearch(
   const [inputValue, setInputValue] = useState(committedValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 外部から確定値が変更された場合（リセット等）にローカル入力を同期
-  useEffect(() => {
+  // 外部から確定値が変更された場合（リセット等）にローカル入力を同期。
+  // effect ではなくレンダー中に調整し、古い入力値を1フレーム描画するのを防ぐ。
+  const [prevCommittedValue, setPrevCommittedValue] = useState(committedValue);
+  if (committedValue !== prevCommittedValue) {
+    setPrevCommittedValue(committedValue);
     setInputValue(committedValue);
-  }, [committedValue]);
+  }
 
   const submit = useCallback(() => {
     const trimmed = inputValue.trim();

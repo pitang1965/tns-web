@@ -128,9 +128,19 @@ export function useAdminListData({
   const lastListFiltersRef = useRef<string | null>(null);
 
   // Reset page to 1 when filters change
-  useEffect(() => {
+  // effect ではなくレンダー中に調整する。effect だと「新しい絞り込み × 古いページ番号」の
+  // 状態で1回描画され、その組み合わせで取得が走ってしまう。
+  const filterKey = JSON.stringify([
+    searchTerm,
+    typeFilter,
+    sortField,
+    sortOrder,
+  ]);
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
     setCurrentPage(1);
-  }, [searchTerm, typeFilter, sortField, sortOrder]);
+  }
 
   // Refresh list data with current filters
   const refreshListData = useCallback(async () => {
@@ -261,6 +271,8 @@ export function useAdminListData({
       return;
     }
 
+    // サーバからのID一覧取得。取得結果の反映が目的の effect なので許容する。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshAllSpotIds();
   }, [activeTab, searchTerm, typeFilter, refreshAllSpotIds]);
 

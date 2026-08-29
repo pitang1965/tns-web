@@ -102,13 +102,12 @@ export function GenerateItineraryClient() {
   const [result, setResult] = useState<GenerateDraftResult | null>(null);
 
   // 生成中の経過秒（残り予測はできないので経過のみ表示。動いている安心感のため）
+  // 0 への初期化は生成開始時のイベントハンドラ側で行い、この effect はタイマーの開始・停止に徹する。
   useEffect(() => {
     if (!running) {
-      setElapsedSec(0);
       return;
     }
     const started = Date.now();
-    setElapsedSec(0);
     const id = setInterval(() => {
       setElapsedSec(Math.floor((Date.now() - started) / 1000));
     }, 1000);
@@ -178,6 +177,7 @@ export function GenerateItineraryClient() {
     }
 
     setRunning(true);
+    setElapsedSec(0);
     setResult(null);
     try {
       const res = await generateItineraryDraftAction({

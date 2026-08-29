@@ -79,6 +79,8 @@ export default function SubmissionsAdminPage() {
       }
 
       if (isAdmin) {
+        // サーバからの初回取得。取得結果の反映が目的の effect なので許容する。
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadSubmissions();
       }
     }
