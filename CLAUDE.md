@@ -52,6 +52,12 @@ npm run init-db      # Initialize MongoDB database with sample data
 - Do NOT automatically start the server for testing, debugging, or any other purpose
 - If you need the server running for a task, ask the user to start it first
 
+**CRITICAL LINT RULE**:
+
+- **コードを変更したら、作業を終える前に必ず `pnpm lint` を実行し、エラーが出たら修正する**
+- React Compiler が有効（`next.config.mjs` の `reactCompiler`）なため、`react-compiler/react-compiler` と `react-hooks/*` の違反は **tsc も `pnpm build` も検出しない**
+- このリポジトリには CI がなく、Vercel は `pnpm build` しか実行しないので、lint が走る場所はここしかない
+
 ## Architecture
 
 ### Authentication & Authorization
