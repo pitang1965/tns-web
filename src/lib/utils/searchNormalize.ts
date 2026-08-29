@@ -127,3 +127,33 @@ export function parseSearchTermToFuzzyPatterns(searchTerm: string): string[] {
   // 各キーワードをあいまい検索用正規表現に変換
   return keywords.map(keywordToFuzzyRegex);
 }
+
+/**
+ * 車中泊スポット検索の絞り込み条件（$and に渡す配列）を組み立てる。
+ *
+ * 各キーワードは name / prefecture / address / notes のいずれかに一致すればよく（$or）、
+ * 複数キーワードを空白区切りで指定した場合はすべてを満たす必要がある（$and）。
+ *
+ * 公開側・管理側の両方から呼ぶこと。片方だけ書き換えると検索結果が食い違う。
+ *
+ * @param searchTerm - 検索文字列
+ * @returns $and に渡す条件配列。有効なキーワードがない場合は null
+ */
+export function buildSpotSearchConditions(
+  searchTerm: string,
+): Record<string, unknown>[] | null {
+  const fuzzyPatterns = parseSearchTermToFuzzyPatterns(searchTerm);
+
+  if (fuzzyPatterns.length === 0) {
+    return null;
+  }
+
+  return fuzzyPatterns.map((pattern) => ({
+    $or: [
+      { name: { $regex: pattern, $options: 'i' } },
+      { prefecture: { $regex: pattern, $options: 'i' } },
+      { address: { $regex: pattern, $options: 'i' } },
+      { notes: { $regex: pattern, $options: 'i' } },
+    ],
+  }));
+}

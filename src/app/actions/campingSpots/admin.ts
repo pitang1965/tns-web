@@ -11,7 +11,7 @@ import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './auth';
 import { logger } from '@/lib/logger';
 import { convertFormDataToCampingSpot } from './helpers';
-import { escapeRegex } from '@/lib/utils/searchNormalize';
+import { buildSpotSearchConditions } from '@/lib/utils/searchNormalize';
 import { calculateDistance } from '@/lib/utils/distance';
 
 export async function getCampingSpots(filter?: CampingSpotFilter) {
@@ -109,7 +109,10 @@ export async function getCampingSpotsByBounds(
   };
 
   if (options?.searchTerm) {
-    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      query.$and = searchConditions;
+    }
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -123,10 +126,10 @@ export async function getCampingSpotsByBounds(
   // Get total count without bounds filter for "全○○件中" display
   const totalQuery: Record<string, unknown> = {};
   if (options?.searchTerm) {
-    totalQuery.name = {
-      $regex: escapeRegex(options.searchTerm),
-      $options: 'i',
-    };
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      totalQuery.$and = searchConditions;
+    }
   }
   if (options?.prefecture && options.prefecture !== 'all') {
     totalQuery.prefecture = options.prefecture;
@@ -165,7 +168,10 @@ export async function getCampingSpotsWithPagination(
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      query.$and = searchConditions;
+    }
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {
@@ -222,7 +228,10 @@ export async function getCampingSpotIdsOnly(options?: {
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    query.name = { $regex: escapeRegex(options.searchTerm), $options: 'i' };
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      query.$and = searchConditions;
+    }
   }
 
   if (options?.prefecture && options.prefecture !== 'all') {

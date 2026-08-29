@@ -4,7 +4,7 @@ import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotFilter } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
 import { ensureDbConnection } from '@/lib/database';
-import { parseSearchTermToFuzzyPatterns } from '@/lib/utils/searchNormalize';
+import { buildSpotSearchConditions } from '@/lib/utils/searchNormalize';
 
 // Maximum display range for public users (scraping prevention)
 const MAX_LNG_SPAN = 6;
@@ -112,20 +112,9 @@ export async function getPublicCampingSpotsByBounds(
   };
 
   if (options?.searchTerm) {
-    // Parse search term into fuzzy regex patterns (handles Japanese character variants)
-    const fuzzyPatterns = parseSearchTermToFuzzyPatterns(options.searchTerm);
-
-    // Only add $and condition if there are actual patterns
-    if (fuzzyPatterns.length > 0) {
-      // Each keyword must match at least one of: name, prefecture, address, or notes
-      query.$and = fuzzyPatterns.map((pattern) => ({
-        $or: [
-          { name: { $regex: pattern, $options: 'i' } },
-          { prefecture: { $regex: pattern, $options: 'i' } },
-          { address: { $regex: pattern, $options: 'i' } },
-          { notes: { $regex: pattern, $options: 'i' } },
-        ],
-      }));
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      query.$and = searchConditions;
     }
   }
 
@@ -158,20 +147,9 @@ export async function getPublicCampingSpotsWithPagination(
   const query: Record<string, unknown> = {};
 
   if (options?.searchTerm) {
-    // Parse search term into fuzzy regex patterns (handles Japanese character variants)
-    const fuzzyPatterns = parseSearchTermToFuzzyPatterns(options.searchTerm);
-
-    // Only add $and condition if there are actual patterns
-    if (fuzzyPatterns.length > 0) {
-      // Each keyword must match at least one of: name, prefecture, address, or notes
-      query.$and = fuzzyPatterns.map((pattern) => ({
-        $or: [
-          { name: { $regex: pattern, $options: 'i' } },
-          { prefecture: { $regex: pattern, $options: 'i' } },
-          { address: { $regex: pattern, $options: 'i' } },
-          { notes: { $regex: pattern, $options: 'i' } },
-        ],
-      }));
+    const searchConditions = buildSpotSearchConditions(options.searchTerm);
+    if (searchConditions) {
+      query.$and = searchConditions;
     }
   }
 
