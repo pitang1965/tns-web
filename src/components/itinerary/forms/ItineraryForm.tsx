@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import {
   ClientItineraryInput,
@@ -25,6 +25,7 @@ import { useItineraryForm } from '@/hooks/useItineraryForm';
 import { useActivityOperations } from '@/hooks/useActivityOperations';
 import { useFormNavigation } from '@/hooks/useFormNavigation';
 import { getErrorsForDisplay, renderPaginationHeader } from '@/lib/formHelpers';
+import { summarizeItineraryCost } from '@/lib/activityCost';
 
 type ItineraryFormProps = {
   initialData?: ClientItineraryDocument & { _id?: string };
@@ -74,6 +75,12 @@ export function ItineraryForm({
   });
   const dayPlans = useWatch({ control: methods.control, name: 'dayPlans' });
 
+  // 旅程全体の予算の集計。保存はせず、編集中の値から毎回計算する。
+  const itineraryCostSummary = useMemo(
+    () => summarizeItineraryCost(dayPlans),
+    [dayPlans],
+  );
+
   // useDayParamフックを使用して日付パラメータを管理
   const dayParamHook = useDayParam((numberOfDays || 1) - 1);
 
@@ -122,7 +129,11 @@ export function ItineraryForm({
     const el = document.getElementById(hash.slice(1));
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      history.replaceState(null, '', window.location.pathname + window.location.search);
+      history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search,
+      );
     }
   }, [dayParamHook.selectedDay]);
 
@@ -167,9 +178,13 @@ export function ItineraryForm({
               className="space-y-4"
             >
               {/* BasicInfoSectionコンポーネントを使用 */}
+              {/* 旅程全体の予算は「旅程全体に関わる値」なので基本情報に置く。
+                  編集画面は1日ずつしか表示しないため、全体の数字はここでしか
+                  分からない。参考表示で保存はしない。 */}
               <BasicInfoSection
                 isOpen={isBasicInfoOpen}
                 onOpenChange={setIsBasicInfoOpen}
+                costSummary={itineraryCostSummary}
               />
 
               <div className="space-y-4 my-4">
@@ -188,6 +203,7 @@ export function ItineraryForm({
                   )}
                 />
               </div>
+
               {process.env.NODE_ENV === 'development' &&
                 Object.keys(errors).length > 0 && (
                   <div className="mb-4 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-800 dark:text-red-200">

@@ -12,15 +12,20 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { CostSummary, formatCost } from '@/lib/activityCost';
+import { CostSummaryPanel } from './CostSummaryPanel';
 
 type BasicInfoSectionProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  /** 旅程全体の予算の集計。旅程全体に関わる値なのでここに置く */
+  costSummary?: CostSummary;
 };
 
 export function BasicInfoSection({
   isOpen,
   onOpenChange,
+  costSummary,
 }: BasicInfoSectionProps) {
   const {
     register,
@@ -46,8 +51,15 @@ export function BasicInfoSection({
           <div className="flex flex-col items-start gap-1 min-w-0">
             <H3>旅程基本情報</H3>
             {!isOpen && summary && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[220px]">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-55">
                 {summary}
+              </p>
+            )}
+            {/* 閉じていても合計は見えるようにする。日ごとのページを見ている間は
+                このセクションが折りたたまれているため */}
+            {!isOpen && costSummary && costSummary.totalCount > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                入力済み合計 {formatCost(costSummary.total)}
               </p>
             )}
           </div>
@@ -151,6 +163,11 @@ export function BasicInfoSection({
             作成者はプライバシー保護のため、本名やメールアドレスではなく匿名の
             ニックネーム（例：旅人コッコ🐓さん）で表示されます。
           </SmallText>
+
+          {/* 旅程全体の予算。参考表示で保存はしない */}
+          {costSummary && (
+            <CostSummaryPanel summary={costSummary} label="旅程全体" />
+          )}
         </CollapsibleContent>
       </Collapsible>
     </div>

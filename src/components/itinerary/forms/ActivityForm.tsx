@@ -249,6 +249,8 @@ export function ActivityForm({
             <InputGroupAddon className="border-r-0">
               <InputGroupText>¥</InputGroupText>
             </InputGroupAddon>
+            {/* 空欄は「未入力」であって0円ではない（0円は無料として意図的に入れる値）。
+                プレースホルダを 0 にすると両者が同じに見えるため文言にしている。 */}
             <InputGroupInput
               type="number"
               className="pl-8 border-l-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -261,7 +263,7 @@ export function ActivityForm({
                   },
                 },
               )}
-              placeholder="0"
+              placeholder="未入力"
             />
           </InputGroup>
           {getFieldError('cost') && (

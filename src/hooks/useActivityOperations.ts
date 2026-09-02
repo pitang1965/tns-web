@@ -34,7 +34,7 @@ export function useActivityOperations({
           description: '',
           startTime: '',
           endTime: '',
-          cost: 0,
+          cost: null,
           url: null,
         },
       ],
@@ -61,7 +61,7 @@ export function useActivityOperations({
       description: '',
       startTime: '',
       endTime: '',
-      cost: 0,
+      cost: null,
       url: null,
     });
     setValue(`dayPlans.${dayIndex}.activities`, newActivities, {

@@ -23,6 +23,8 @@ import {
   findTimeOrderConflicts,
   findTimeRangeOverlaps,
 } from '@/lib/activitySort';
+import { summarizeDayCost } from '@/lib/activityCost';
+import { CostSummaryPanel } from './CostSummaryPanel';
 import DailyRouteMap, {
   ActivityLocation,
 } from '@/components/common/Maps/DailyRouteMap';
@@ -245,6 +247,12 @@ export function DayPlanForm({
       .join('、');
   }, [watchedActivities]);
 
+  // 予算の集計。入力のたびに再計算されるだけで、どこにも保存しない。
+  const dayCostSummary = useMemo(
+    () => summarizeDayCost(watchedActivities),
+    [watchedActivities],
+  );
+
   const shouldShowMap = activitiesWithLocation.length >= 1;
   const shouldShowRouteButton = activitiesWithLocation.length >= 1;
 
@@ -345,6 +353,13 @@ export function DayPlanForm({
           )}
         </div>
       </div>
+
+      {/* 予算の参考表示。保存も公開もしない、編集中の値からの計算のみ。 */}
+      <CostSummaryPanel
+        summary={dayCostSummary}
+        label="この日"
+        fallbackDayIndex={dayIndex}
+      />
 
       {/* ルートマップ (コンパクト表示) */}
       {shouldShowMap && (
