@@ -99,6 +99,13 @@ export function PlaceForm({
               watch(`${basePath}.place.type` as Path<ClientItineraryInput>) || '',
             )}
             onValueChange={(value) => {
+              // Radix の Select はフォーム連携用に隠し <select> を持ち、値が変わると
+              // そのDOM値を読み戻して onValueChange を呼ぶ。選択肢（SelectItem）は
+              // 開くまでマウントされないため、閉じたまま値が変わると代入が効かず
+              // 空文字が返ってくる。これをそのまま書くと place.type が enum 違反に
+              // なり、保存できなくなるので弾く。
+              // 発生例: useAutoSetPlaceType が名前から自動でタイプを変えたとき。
+              if (!(value in PLACE_TYPES)) return;
               setValue(
                 `${basePath}.place.type` as Path<ClientItineraryInput>,
                 value,
