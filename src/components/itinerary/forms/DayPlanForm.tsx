@@ -11,13 +11,18 @@ import {
   Tent,
   Navigation,
   MapPin,
+  AlertTriangle,
 } from 'lucide-react';
 import { ActivityForm } from './ActivityForm';
 import { ActivityOrderList } from './ActivityOrderList';
 import { H3 } from '@/components/common/Typography';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { formatDateWithWeekday } from '@/lib/date';
-import { sortActivitiesByTime } from '@/lib/activitySort';
+import {
+  sortActivitiesByTime,
+  findTimeOrderConflicts,
+  findTimeRangeOverlaps,
+} from '@/lib/activitySort';
 import DailyRouteMap, {
   ActivityLocation,
 } from '@/components/common/Maps/DailyRouteMap';
@@ -214,6 +219,30 @@ export function DayPlanForm({
       .filter((activity): activity is ActivityLocation => activity !== null);
 
     return result;
+  }, [watchedActivities]);
+
+  // 時間の矛盾の検出。矛盾がある間はずっと表示し続ける（並べ替え直後だけでなく、
+  // 時間を直接編集して矛盾した場合も拾うため）。保存はブロックせず注意に留める。
+  // 並び順の逆転は「時間でソート」で直せるが、時間帯の重なりはソートでは直らない
+  // ため、メッセージを分けて出す。
+  const timeOrderConflictLabel = useMemo(() => {
+    const conflicts = findTimeOrderConflicts(watchedActivities || []);
+    return conflicts
+      .map(
+        (conflict) =>
+          `${conflict.previousIndex + 1}番目と${conflict.nextIndex + 1}番目`,
+      )
+      .join('、');
+  }, [watchedActivities]);
+
+  const timeOverlapLabel = useMemo(() => {
+    const overlaps = findTimeRangeOverlaps(watchedActivities || []);
+    return overlaps
+      .map(
+        (overlap) =>
+          `${overlap.firstIndex + 1}番目と${overlap.secondIndex + 1}番目`,
+      )
+      .join('、');
   }, [watchedActivities]);
 
   const shouldShowMap = activitiesWithLocation.length >= 1;
@@ -425,6 +454,47 @@ export function DayPlanForm({
           </Button>
         </div>
       </div>
+
+      {/* 時間の矛盾を知らせる注意。矛盾がある間は画面下部に出し続ける。
+          保存はブロックしない（旅行中に順序だけ先に直すことがあるため）。 */}
+      {(timeOrderConflictLabel || timeOverlapLabel) && (
+        <>
+          {/* 固定バーが最下部のボタンを覆わないようにする余白 */}
+          <div className="h-24" aria-hidden="true" />
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-amber-300 bg-amber-50/95 p-3 backdrop-blur-sm dark:border-amber-800 dark:bg-amber-950/95">
+            <div className="mx-auto flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="flex flex-1 items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <div className="space-y-0.5">
+                  {timeOrderConflictLabel && (
+                    <p>開始時間が前後しています（{timeOrderConflictLabel}）</p>
+                  )}
+                  {timeOverlapLabel && (
+                    <p>時間帯が重なっています（{timeOverlapLabel}）</p>
+                  )}
+                  <p className="text-amber-700 dark:text-amber-300">
+                    このまま保存もできます。
+                  </p>
+                </div>
+              </div>
+              {/* 「時間でソート」で直るのは並び順の逆転だけ。重なりはソートしても
+                  残るので、逆転があるときだけボタンを出す。 */}
+              {timeOrderConflictLabel && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSortActivitiesByTime}
+                  className="shrink-0 flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+                  type="button"
+                >
+                  <Clock className="h-4 w-4" />
+                  <span>時間でソート</span>
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 車中泊スポット追加ダイアログ */}
       <AddShachuHakuSpotDialog

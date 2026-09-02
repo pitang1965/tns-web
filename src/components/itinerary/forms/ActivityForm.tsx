@@ -21,7 +21,11 @@ import {
 } from '@/components/ui/input-group';
 import { SmallText } from '@/components/common/Typography';
 import { useActivityForm } from '@/hooks/useActivityForm';
-import { Link, ExternalLink } from 'lucide-react';
+import {
+  findTimeOrderConflicts,
+  findTimeRangeOverlaps,
+} from '@/lib/activitySort';
+import { Link, ExternalLink, AlertTriangle } from 'lucide-react';
 
 type ActivityFormProps = {
   dayIndex: number;
@@ -86,6 +90,30 @@ export function ActivityForm({
   const handleOpenRemainingRoute = hasRemainingRoute
     ? () => openActivityRoute(currentActivity, remainingActivities)
     : undefined;
+
+  // 前の（時間が入った）アクティビティより開始時間が早くなっているか。
+  // 日の先頭にまとめて出す注意は編集中にスクロールで見えなくなるため、
+  // 実際に時間を直す場所であるここにも出す。
+  const startsBeforePreviousActivity = findTimeOrderConflicts(
+    allDayActivities || [],
+  ).some((conflict) => conflict.nextIndex === activityIndex);
+
+  // 時間帯が重なっている相手の番号（1始まり）。並べ替えでは直らないので、
+  // どちらの時間を直せばよいか分かるよう相手を明示する。
+  const overlappingActivityNumbers = findTimeRangeOverlaps(
+    allDayActivities || [],
+  )
+    .filter(
+      (overlap) =>
+        overlap.firstIndex === activityIndex ||
+        overlap.secondIndex === activityIndex,
+    )
+    .map(
+      (overlap) =>
+        (overlap.firstIndex === activityIndex
+          ? overlap.secondIndex
+          : overlap.firstIndex) + 1,
+    );
 
   // アクティビティのタイトル表示を生成
   const activityHeader = total
@@ -181,12 +209,27 @@ export function ActivityForm({
             {getFieldError('startTime') && (
               <SmallText>{getFieldError('startTime')}</SmallText>
             )}
+            {startsBeforePreviousActivity && (
+              <p className="flex items-start gap-1 text-xs text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>前のアクティビティより早い時間です</span>
+              </p>
+            )}
           </div>
           <div className="space-y-1">
             <Label>終了時間</Label>
             <Input type="time" {...getFieldRegister('endTime')} />
             {getFieldError('endTime') && (
               <SmallText>{getFieldError('endTime')}</SmallText>
+            )}
+            {overlappingActivityNumbers.length > 0 && (
+              <p className="flex items-start gap-1 text-xs text-amber-700 dark:text-amber-400">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {overlappingActivityNumbers.join('、')}
+                  番目と時間帯が重なっています
+                </span>
+              </p>
             )}
           </div>
         </div>
