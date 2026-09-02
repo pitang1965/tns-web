@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-09-02',
+    items: [
+      {
+        category: 'new',
+        text: '旅程の編集画面で、予算の合計が分かるようになりました。その日の合計と旅程全体の合計を、入力済みの金額から自動で計算して表示します。金額を入れていない立ち寄り先は件数と一覧で確認でき、選ぶとその場所へ移動できます。あくまで入力済みの分だけの合計で、保存も公開もされない目安の表示です。なお、新しく追加した立ち寄り先の予算欄は、これまでの「0」ではなく空欄で始まるようになりました。',
+        href: '/itineraries',
+        linkLabel: '旅程一覧',
+      },
+    ],
+  },
+  {
     date: '2026-08-23',
     items: [
       {
