@@ -2,7 +2,7 @@
 
 import { useState, useDeferredValue } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/components/ui/use-toast';
@@ -133,15 +133,15 @@ export default function ShachuHakuSubmissionForm({
 
   // 名称から種別を自動設定する機能
   // INP問題を回避するため、名称の値を遅延させる
-  const nameValue = form.watch('name');
+  // React Compiler は react-hook-form の watch() を検出するとコンポーネントの
+  // 最適化をスキップするため、描画中に読む値は useWatch を使う。
+  const nameValue = useWatch({ control: form.control, name: 'name' });
+  const typeValue = useWatch({ control: form.control, name: 'type' });
+  const latValue = useWatch({ control: form.control, name: 'lat' });
+  const lngValue = useWatch({ control: form.control, name: 'lng' });
   const deferredNameValue = useDeferredValue(nameValue);
 
-  useAutoSetSpotType(
-    deferredNameValue,
-    form.watch('type'),
-    form.setValue,
-    toast,
-  );
+  useAutoSetSpotType(deferredNameValue, typeValue, form.setValue, toast);
 
   const onSubmit = async (data: SubmissionFormData) => {
     try {
@@ -241,8 +241,8 @@ export default function ShachuHakuSubmissionForm({
   };
 
   const handleShowOnMap = () => {
-    const lat = form.watch('lat');
-    const lng = form.watch('lng');
+    const lat = form.getValues('lat');
+    const lng = form.getValues('lng');
     if (lat && lng) {
       const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
       window.open(url, '_blank');
@@ -561,12 +561,8 @@ export default function ShachuHakuSubmissionForm({
                     </div>
                     <SimpleLocationPicker
                       onLocationSelect={handleLocationSelect}
-                      initialLat={
-                        form.watch('lat') ? Number(form.watch('lat')) : 35.6762
-                      }
-                      initialLng={
-                        form.watch('lng') ? Number(form.watch('lng')) : 139.6503
-                      }
+                      initialLat={latValue ? Number(latValue) : 35.6762}
+                      initialLng={lngValue ? Number(lngValue) : 139.6503}
                     />
                   </div>
                 )}
@@ -577,7 +573,7 @@ export default function ShachuHakuSubmissionForm({
                     variant="outline"
                     size="sm"
                     onClick={handleShowOnMap}
-                    disabled={!form.watch('lat') || !form.watch('lng')}
+                    disabled={!latValue || !lngValue}
                     className="w-full cursor-pointer"
                   >
                     <Map className="w-4 h-4" />

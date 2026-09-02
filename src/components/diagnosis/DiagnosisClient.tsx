@@ -27,12 +27,15 @@ export default function DiagnosisClient() {
     reset,
   } = useDiagnosis();
 
-  // 診断完了を計測（ペルソナ確定時に1回）
+  // 診断完了を計測（ペルソナ確定時に1回）。
+  // result オブジェクトそのものを依存にすると参照が変わるたびに再計測されるため、
+  // 計測に使う id だけを取り出して依存にする。
+  const personaId = result?.persona.id;
   useEffect(() => {
-    if (isComplete && result) {
-      capture('diagnosis_completed', { persona: result.persona.id });
+    if (isComplete && personaId) {
+      capture('diagnosis_completed', { persona: personaId });
     }
-  }, [isComplete, result?.persona.id]);
+  }, [isComplete, personaId]);
 
   // スタート画面
   if (isIntro) {
