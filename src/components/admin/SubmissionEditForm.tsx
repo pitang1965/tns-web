@@ -74,9 +74,6 @@ export default function SubmissionEditForm({
       nightNoiseHasNoiseIssues: false,
       nightNoiseNearBusyRoad: false,
       nightNoiseIsQuietArea: false,
-      quietnessLevel: '',
-      securityLevel: '',
-      overallRating: '',
       hasRoof: false,
       hasPowerOutlet: false,
       isFree: undefined,
@@ -117,9 +114,6 @@ export default function SubmissionEditForm({
         nightNoiseHasNoiseIssues: false,
         nightNoiseNearBusyRoad: false,
         nightNoiseIsQuietArea: false,
-        quietnessLevel: '3', // デフォルト値
-        securityLevel: '3', // デフォルト値
-        overallRating: '3', // デフォルト値
         hasRoof: submission.hasRoof,
         hasPowerOutlet: submission.hasPowerOutlet,
         isFree: submission.isFree,
@@ -229,16 +223,6 @@ export default function SubmissionEditForm({
         data.nightNoiseIsQuietArea.toString(),
       );
 
-      // 旧評価システム（段階的廃止予定）
-      if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
-        formData.append('quietnessLevel', data.quietnessLevel);
-      }
-      if (data.securityLevel && data.securityLevel.trim() !== '') {
-        formData.append('securityLevel', data.securityLevel);
-      }
-      if (data.overallRating && data.overallRating.trim() !== '') {
-        formData.append('overallRating', data.overallRating);
-      }
       if (data.capacity && data.capacity.trim() !== '') {
         formData.append('capacity', data.capacity);
       }

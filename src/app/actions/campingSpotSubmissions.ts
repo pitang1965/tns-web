@@ -107,9 +107,6 @@ export async function approveSubmission(id: string, reviewNotes?: string) {
     isVerified: true,
     // Default values for missing fields
     distanceToToilet: 0,
-    quietnessLevel: 3,
-    securityLevel: 3,
-    overallRating: 3,
     capacity: 1,
     restrictions: [],
     amenities: [],

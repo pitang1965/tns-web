@@ -1,6 +1,5 @@
 // Re-export all public functions
 export {
-  getPublicCampingSpots,
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
   getNearestCampingSpots,
