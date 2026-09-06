@@ -3,87 +3,13 @@
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import CampingSpot from '@/lib/models/CampingSpot';
-import {
-  CampingSpotSchema,
-  CampingSpotFilter,
-} from '@/data/schemas/campingSpot';
+import { CampingSpotSchema } from '@/data/schemas/campingSpot';
 import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './auth';
 import { logger } from '@/lib/logger';
 import { convertFormDataToCampingSpot } from './helpers';
 import { buildSpotSearchConditions } from '@/lib/utils/searchNormalize';
 import { calculateDistance } from '@/lib/utils/distance';
-
-export async function getCampingSpots(filter?: CampingSpotFilter) {
-  await checkAdminAuth();
-  await ensureDbConnection();
-
-  const query: Record<string, unknown> = {};
-
-  if (filter) {
-    if (filter.prefecture) {
-      query.prefecture = filter.prefecture;
-    }
-
-    if (filter.type && filter.type.length > 0) {
-      query.type = { $in: filter.type };
-    }
-
-    if (filter.maxDistanceToToilet !== undefined) {
-      query.distanceToToilet = { $lte: filter.maxDistanceToToilet };
-    }
-
-    if (filter.maxDistanceToBath !== undefined) {
-      query.distanceToBath = { $lte: filter.maxDistanceToBath };
-    }
-
-    if (filter.minQuietnessLevel !== undefined) {
-      query.quietnessLevel = { $gte: filter.minQuietnessLevel };
-    }
-
-    if (filter.minSecurityLevel !== undefined) {
-      query.securityLevel = { $gte: filter.minSecurityLevel };
-    }
-
-    if (filter.hasRoof !== undefined) {
-      query.hasRoof = filter.hasRoof;
-    }
-
-    if (filter.hasPowerOutlet !== undefined) {
-      query.hasPowerOutlet = filter.hasPowerOutlet;
-    }
-
-    if (filter.isGatedPaid !== undefined) {
-      query.isGatedPaid = filter.isGatedPaid;
-    }
-
-    if (filter.isFreeOnly) {
-      query['pricing.isFree'] = true;
-    }
-
-    if (filter.maxPricePerNight !== undefined) {
-      query.$or = [
-        { 'pricing.isFree': true },
-        { 'pricing.pricePerNight': { $lte: filter.maxPricePerNight } },
-      ];
-    }
-
-    if (filter.bounds) {
-      query.coordinates = {
-        $geoWithin: {
-          $box: [
-            [filter.bounds.west, filter.bounds.south],
-            [filter.bounds.east, filter.bounds.north],
-          ],
-        },
-      };
-    }
-  }
-
-  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
-
-  return JSON.parse(JSON.stringify(spots));
-}
 
 // Admin function for map view with bounds-based filtering
 export async function getCampingSpotsByBounds(
@@ -455,9 +381,6 @@ export async function updateCampingSpot(id: string, data: FormData) {
     'nearbyConvenienceCoordinates',
     'nearbyBathCoordinates',
     'elevation',
-    'quietnessLevel',
-    'securityLevel',
-    'overallRating',
     'capacity',
     'maxVehicleHeight',
     'noHeightLimit',

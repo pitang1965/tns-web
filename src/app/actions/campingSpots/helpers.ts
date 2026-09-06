@@ -64,19 +64,6 @@ export function convertFormDataToCampingSpot(
       nearBusyRoad: obj.nightNoiseNearBusyRoad === 'true',
       isQuietArea: obj.nightNoiseIsQuietArea === 'true',
     },
-    // 旧評価システム（段階的廃止予定）
-    quietnessLevel:
-      obj.quietnessLevel && String(obj.quietnessLevel).trim() !== ''
-        ? Number(obj.quietnessLevel)
-        : undefined,
-    securityLevel:
-      obj.securityLevel && String(obj.securityLevel).trim() !== ''
-        ? Number(obj.securityLevel)
-        : undefined,
-    overallRating:
-      obj.overallRating && String(obj.overallRating).trim() !== ''
-        ? Number(obj.overallRating)
-        : undefined,
     isOvernightProhibited:
       obj.isOvernightProhibited === true ||
       obj.isOvernightProhibited === 'true',

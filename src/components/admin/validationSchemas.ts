@@ -143,37 +143,6 @@ export const ShachuHakuFormCreateSchema = z
     nightNoiseHasNoiseIssues: z.boolean().default(false),
     nightNoiseNearBusyRoad: z.boolean().default(false),
     nightNoiseIsQuietArea: z.boolean().default(false),
-    // 旧評価システム（段階的廃止予定）
-    quietnessLevel: z
-      .string()
-      .optional()
-      .refine(
-        (val) =>
-          !val ||
-          val === '' ||
-          (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-        { message: '1〜5の数値を入力してください' },
-      ),
-    securityLevel: z
-      .string()
-      .optional()
-      .refine(
-        (val) =>
-          !val ||
-          val === '' ||
-          (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-        { message: '1〜5の数値を入力してください' },
-      ),
-    overallRating: z
-      .string()
-      .optional()
-      .refine(
-        (val) =>
-          !val ||
-          val === '' ||
-          (!isNaN(Number(val)) && Number(val) >= 1 && Number(val) <= 5),
-        { message: '1〜5の数値を入力してください' },
-      ),
     hasRoof: z.boolean(),
     hasPowerOutlet: z.boolean(),
     isFree: z

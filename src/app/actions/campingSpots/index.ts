@@ -7,7 +7,6 @@ export {
 
 // Re-export all admin functions
 export {
-  getCampingSpots,
   getCampingSpotsByBounds,
   getCampingSpotsWithPagination,
   getCampingSpotById,

@@ -34,10 +34,6 @@ export const DEFAULT_FORM_VALUES = {
   nightNoiseHasNoiseIssues: false,
   nightNoiseNearBusyRoad: false,
   nightNoiseIsQuietArea: false,
-  // 旧評価システム（段階的廃止予定）
-  quietnessLevel: '',
-  securityLevel: '',
-  overallRating: '',
   isOvernightProhibited: false,
   hasRoof: false,
   hasPowerOutlet: false,

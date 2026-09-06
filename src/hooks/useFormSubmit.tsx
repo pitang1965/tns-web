@@ -48,9 +48,6 @@ export function useFormSubmit({
       setShowConfirmDialog(false); // ダイアログを閉じる
 
       console.log('Form submission data:', {
-        quietnessLevel: data.quietnessLevel,
-        securityLevel: data.securityLevel,
-        overallRating: data.overallRating,
         capacity: data.capacity,
         distanceToToilet: data.distanceToToilet,
         notes: data.notes,
@@ -145,16 +142,6 @@ export function useFormSubmit({
         data.nightNoiseIsQuietArea.toString(),
       );
 
-      // 旧評価システム（段階的廃止予定）
-      if (data.quietnessLevel && data.quietnessLevel.trim() !== '') {
-        formData.append('quietnessLevel', data.quietnessLevel);
-      }
-      if (data.securityLevel && data.securityLevel.trim() !== '') {
-        formData.append('securityLevel', data.securityLevel);
-      }
-      if (data.overallRating && data.overallRating.trim() !== '') {
-        formData.append('overallRating', data.overallRating);
-      }
       if (data.capacity && data.capacity.trim() !== '') {
         formData.append('capacity', data.capacity);
       }

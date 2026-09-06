@@ -22,10 +22,6 @@ export interface ICampingSpot extends Document {
   nearbyConvenienceCoordinates?: [number, number]; // [lng, lat]
   nearbyBathCoordinates?: [number, number]; // [lng, lat]
   elevation: number; // meters
-  // 旧評価システム（段階的廃止予定）
-  quietnessLevel?: 1 | 2 | 3 | 4 | 5; // 1=noisy, 5=very quiet
-  securityLevel?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
-  overallRating?: 1 | 2 | 3 | 4 | 5; // 1=poor, 5=excellent
   // 新評価システム（客観的データベース）
   security: {
     hasGate: boolean;
@@ -143,22 +139,6 @@ const campingSpotSchema = new Schema<ICampingSpot>(
       required: true,
       min: -10,
       max: 3776,
-    },
-    // 旧評価システム（段階的廃止予定）
-    quietnessLevel: {
-      type: Number,
-      min: 1,
-      max: 5,
-    },
-    securityLevel: {
-      type: Number,
-      min: 1,
-      max: 5,
-    },
-    overallRating: {
-      type: Number,
-      min: 1,
-      max: 5,
     },
     // 新評価システム（客観的データベース）
     security: {
