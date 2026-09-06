@@ -300,18 +300,6 @@ campingSpotSchema.index({ prefecture: 1 });
 campingSpotSchema.index({ type: 1 });
 campingSpotSchema.index({ maxVehicleHeight: 1 });
 campingSpotSchema.index({ 'pricing.isFree': 1 });
-campingSpotSchema.index({ quietnessLevel: 1 });
-campingSpotSchema.index({ securityLevel: 1 });
-campingSpotSchema.index({ overallRating: 1 });
-
-// Compound index for common filter combinations
-campingSpotSchema.index({
-  coordinates: '2dsphere',
-  type: 1,
-  'pricing.isFree': 1,
-  quietnessLevel: 1,
-  securityLevel: 1,
-});
 
 const CampingSpot =
   mongoose.models.CampingSpot ||

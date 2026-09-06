@@ -87,34 +87,6 @@ const INDEXES_BY_COLLECTION = {
       options: { name: 'pricing.isFree_1' },
       why: '無料/有料での絞り込み',
     },
-    {
-      key: { quietnessLevel: 1 },
-      options: { name: 'quietnessLevel_1' },
-      why: '旧評価システム（段階的廃止予定）',
-    },
-    {
-      key: { securityLevel: 1 },
-      options: { name: 'securityLevel_1' },
-      why: '旧評価システム（段階的廃止予定）',
-    },
-    {
-      key: { overallRating: 1 },
-      options: { name: 'overallRating_1' },
-      why: '旧評価システム（段階的廃止予定）',
-    },
-    {
-      key: {
-        coordinates: '2dsphere',
-        type: 1,
-        'pricing.isFree': 1,
-        quietnessLevel: 1,
-        securityLevel: 1,
-      },
-      options: {
-        name: 'coordinates_2dsphere_type_1_pricing.isFree_1_quietnessLevel_1_securityLevel_1',
-      },
-      why: 'よく使う絞り込みの複合索引',
-    },
   ],
 };
 
