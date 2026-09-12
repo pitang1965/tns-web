@@ -317,7 +317,18 @@ const withPWA = withPWAInit({
 // その fetch がサーバの Auth0 へのリダイレクト(302)を追うため connect が Auth0 に到達する。
 // （リダイレクトが弾かれると blocked-uri はリダイレクト元=自ドメインとして報告されるため紛らわしい）
 // frame は不要（Auth0 を iframe 埋め込みはしない）。
-const authIssuer = process.env.AUTH0_ISSUER_BASE_URL || '';
+//
+// 注意: @auth0/nextjs-auth0 v4 では設定名が AUTH0_ISSUER_BASE_URL から AUTH0_DOMAIN に変わり、
+// 値もスキームなしのドメイン（例: xxx.jp.auth0.com）になった。旧名のままだと常に空文字となり、
+// form-action / connect-src から Auth0 が抜け落ちる（Report-Only では表面化しないが本適用で破綻する）。
+// 旧名は移行期の環境用にフォールバックとして残す。
+const auth0Domain =
+  process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL || '';
+const authIssuer = auth0Domain
+  ? auth0Domain.startsWith('http')
+    ? auth0Domain.replace(/\/$/, '')
+    : `https://${auth0Domain.replace(/\/$/, '')}`
+  : '';
 
 // PostHog のホスト。リバースプロキシ利用時は NEXT_PUBLIC_POSTHOG_HOST を尊重する。
 const posthogHost =
