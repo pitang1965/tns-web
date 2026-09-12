@@ -109,6 +109,62 @@ export class Auth0ManagementClient {
   }
 
   /**
+   * 指定メールアドレスで登録されている Auth0 ユーザーの sub を列挙する。
+   * M2Mアプリに `read:users` スコープが必要（getUserStats と同じ）。
+   *
+   * 用途: 同じ人が Google / LINE / メールで別々のアカウントを持つため、
+   * 退会時に「同一人物が別接続で残したデータ」を消すには sub の一覧が要る。
+   * 現地報告は ADR-0011 によりメールを保存しないので、sub での照合が唯一の手段になる。
+   *
+   * email_verified が false のユーザーは除外する。未認証のメールを根拠に
+   * データを消すと、そのメールの正当な持ち主のデータを第三者が消せてしまうため。
+   */
+  async listVerifiedUserIdsByEmail(email: string): Promise<string[]> {
+    const normalized = email.trim().toLowerCase();
+    if (!normalized) return [];
+
+    try {
+      const token = await this.getManagementToken();
+
+      // email はそのまま完全一致で引ける（Auth0 側でも小文字正規化されている）
+      const response = await fetch(
+        `https://${this.domain}/api/v2/users-by-email?email=${encodeURIComponent(normalized)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to list users by email: ${response.status}`);
+      }
+
+      const users = (await response.json()) as Array<{
+        user_id?: string;
+        email?: string;
+        email_verified?: boolean;
+      }>;
+
+      return users
+        .filter(
+          (u) =>
+            u.email_verified === true &&
+            (u.email ?? '').trim().toLowerCase() === normalized &&
+            Boolean(u.user_id),
+        )
+        .map((u) => u.user_id as string);
+    } catch (error) {
+      logger.error(
+        error instanceof Error
+          ? error
+          : new Error('Error listing Auth0 users by email'),
+      );
+      throw error;
+    }
+  }
+
+  /**
    * Auth0ユーザーを完全削除する（退会処理）
    * M2Mアプリに `delete:users` スコープが必要。
    */

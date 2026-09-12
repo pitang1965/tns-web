@@ -4,6 +4,7 @@ import { auth0 } from '@/lib/auth0';
 import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
 import { deleteAllFieldReportDataForUser } from '@/lib/fieldReports';
+import { deleteAllPointDataForUser } from '@/lib/points/points';
 import { deletePostHogPerson } from '@/lib/posthogServer';
 import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
@@ -17,7 +18,7 @@ type DeleteAccountResult = {
  * 退会処理（アカウント完全削除）。
  *
  * 処理順序:
- *   1. MongoDBのアプリデータ（所有旅程・共有相手参照・現地報告）を削除
+ *   1. MongoDBのアプリデータ（所有旅程・共有相手参照・現地報告・アズキ）を削除
  *   2. Auth0アカウント本体を削除
  *   3. 管理者へ退会通知メールを送信（失敗しても退会自体は成功扱い）
  *
@@ -56,9 +57,31 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     }
 
     // 現地報告（本人の投稿と、他人の報告に付けた通報）も削除する。
-    // プライバシーポリシー§7・利用規約第7条の「退会に伴い削除」の対象。
+    // プライバシーポリシー§8・利用規約第7条の「退会に伴い削除」の対象。
+    //
+    // 同じ人が Google / LINE / メールで別々の Auth0 アカウントを持つため、認証済みメールから
+    // sub の一覧を解決してから消す。旅程やアズキはメールで名寄せできるが、現地報告は
+    // ADR-0011 によりメールを保存しない設計なので、sub でしか名寄せできない。
+    //
+    // Management API の呼び出しが失敗しても退会自体は続行する。少なくとも現在のアカウント分は
+    // 確実に消えるため、ここで退会を止めるほうがユーザーの不利益が大きい。
+    let subsToPurge = [userId];
+    if (user.email && user.email_verified) {
+      try {
+        const relatedSubs = await auth0Management.listVerifiedUserIdsByEmail(
+          user.email,
+        );
+        subsToPurge = Array.from(new Set([userId, ...relatedSubs]));
+      } catch {
+        logger.warn(
+          '[退会] 同一メールのAuth0ユーザー一覧を取得できず、現在のアカウント分のみ削除する',
+          { userId },
+        );
+      }
+    }
+
     try {
-      await deleteAllFieldReportDataForUser(userId);
+      await deleteAllFieldReportDataForUser(subsToPurge);
     } catch (error) {
       logger.error(
         error instanceof Error
@@ -71,6 +94,33 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
         error:
           '現地報告の削除に失敗しました。時間をおいて再度お試しください。',
       };
+    }
+
+    // アズキ（ポイント残高・取引履歴）も削除する。どちらもメールアドレスを保持しており、
+    // プライバシーポリシー§8「退会に伴い直ちに完全に削除」の対象にあたる。
+    // メールが一次キーのため、なりすましによる他人の残高消去を防ぐ目的で email_verified を必須とする。
+    // 未認証の場合はそもそもアズキを利用できない（checkDraftAccess のゲート）ため、スキップしても
+    // 利用者の不利益にはならない。
+    if (user.email && user.email_verified) {
+      try {
+        await deleteAllPointDataForUser(user.email);
+      } catch (error) {
+        logger.error(
+          error instanceof Error
+            ? error
+            : new Error('Error deleting user points during withdrawal'),
+          { userId },
+        );
+        return {
+          success: false,
+          error:
+            'アズキデータの削除に失敗しました。時間をおいて再度お試しください。',
+        };
+      }
+    } else {
+      logger.warn('[退会] メール未認証のためアズキデータの削除をスキップ', {
+        userId,
+      });
     }
 
     // 2. Auth0アカウントを削除

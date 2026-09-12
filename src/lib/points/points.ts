@@ -28,6 +28,39 @@ export function normalizeEmail(email: string): string {
 export const GENERATION_LOCK_TTL_MS = 6 * 60 * 1000; // 6分
 
 /**
+ * 退会処理用：指定メールに紐づくポイントデータ（残高・取引履歴）を完全に削除する。
+ *
+ * プライバシーポリシー§8 は退会時に「当該ユーザーに関連するデータは、直ちに完全に削除されます」
+ * と定めており、例外条項は無い。PointBalance / PointTransaction はどちらもメールアドレスを
+ * 保持するため、消さずに残すとこの約束に反する。
+ *
+ * 呼び出し側は email_verified が true であることを必ず確認すること。
+ * 未認証のまま呼ぶと、他人のメールで登録した第三者がそのメールの正当な持ち主の残高を
+ * 消せてしまう（メールが一次キーであるため）。
+ *
+ * ログにメールを残さないのは、削除処理そのものが個人データを消すための処理だから。
+ */
+export async function deleteAllPointDataForUser(email: string): Promise<{
+  balances: number;
+  transactions: number;
+}> {
+  await ensureDbConnection();
+  const normalized = normalizeEmail(email);
+
+  const [balanceResult, transactionResult] = await Promise.all([
+    PointBalance.deleteMany({ email: normalized }),
+    PointTransaction.deleteMany({ email: normalized }),
+  ]);
+
+  const deleted = {
+    balances: balanceResult.deletedCount ?? 0,
+    transactions: transactionResult.deletedCount ?? 0,
+  };
+  logger.info('退会に伴いポイントデータを削除', deleted);
+  return deleted;
+}
+
+/**
  * 残高を取得する。残高ドキュメントが無ければ null（＝一度も付与されていない）。
  * 「残高0（付与された後に使い切った）」と「未付与（null）」を区別する。
  */

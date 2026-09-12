@@ -109,6 +109,9 @@ export default function TermsPage() {
           <li>
             ユーザーが作成し公開していた旅程その他の情報についても、退会に伴い削除されるものとします。
           </li>
+          <li>
+            ログイン方法（Google・LINE・メールアドレス）ごとに別のアカウントが作成されます。退会に伴うデータの削除は認証済みのメールアドレスを単位として行われますが、アカウント本体の削除は退会操作を行ったログイン方法についてのみ行われます。複数のログイン方法をご利用の場合は、それぞれで退会操作を行ってください。
+          </li>
         </ol>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">第8条（著作権）</h2>
@@ -203,7 +206,7 @@ export default function TermsPage() {
         <p className="text-sm text-gray-600 mt-8">
           制定日: 2025年9月23日
           <br />
-          最終更新日: 2026年6月19日
+          最終更新日: 2026年9月12日
         </p>
       </div>
     </div>
