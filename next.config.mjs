@@ -356,13 +356,23 @@ const googleAdOrigins = [
 // Sentry の CSP 違反レポート受信エンドポイント。
 // DSN は instrumentation-client.ts と同一（公開鍵でありシークレットではない）。EUリージョン(.de)。
 // 形式: https://o<org>.ingest.<region>.sentry.io/api/<project>/security/?sentry_key=<publicKey>
+//
+// sentry_environment を付ける理由: CSPレポートはSDKを経由せず、ブラウザがこのURLへ直接POSTする。
+// そのためSDKが付ける environment が付かず、Sentry側で環境フィルタを掛けると全件が消える
+// （本番の違反まで「該当なし」に見えてしまう）。レポートURLのクエリで明示的に渡す。
+const cspReportEnvironment = process.env.VERCEL_ENV || 'development';
 const sentryCspReportUri =
-  'https://o4507994894434304.ingest.de.sentry.io/api/4507994900791376/security/?sentry_key=8eafcbf664887d63e9d88ed235f4626e';
+  'https://o4507994894434304.ingest.de.sentry.io/api/4507994900791376/security/?sentry_key=8eafcbf664887d63e9d88ed235f4626e' +
+  `&sentry_environment=${cspReportEnvironment}`;
 
-// Vercel のプレビュー用ツールバー（Live Feedback）は preview/development デプロイにだけ
-// 自動注入され、本番（VERCEL_ENV === 'production'）には読み込まれない。
-// そのため vercel.live 関連の許可はプレビュー時のみ付与し、本番CSPはタイトに保つ。
+// Vercel のツールバー（Live Feedback）関連の許可はプレビュー時のみ付与し、本番CSPはタイトに保つ。
 // （img-src は 'https:' で広く許可済みのため vercel.live/vercel.com は追加不要）
+//
+// 注意: 「ツールバーは本番には注入されない」というのは誤り。Vercel側の設定次第で本番にも入る。
+// 実際 2026-09 時点のSentryでは vercel.live の違反の約9割が tabi.over40web.club（本番）由来だった。
+// ただしツールバーが使えなくなって困るのはチームメンバーだけで、一般利用者には影響しないため、
+// 本番CSPを緩めるのではなく Vercel 側で本番のツールバーを無効化する方針を採る。
+// この判断を変えて本番でもツールバーを使いたくなった場合は isVercelProd の条件を外すこと。
 const isVercelProd = process.env.VERCEL_ENV === 'production';
 const vercelLiveScript = isVercelProd ? '' : ' https://vercel.live';
 const vercelLiveStyle = isVercelProd ? '' : ' https://vercel.live';
@@ -409,6 +419,34 @@ const cspDirectives = [
   'report-to csp-endpoint',
 ].join('; ');
 
+// 本適用（ブロックする）ディレクティブ。上の詳細ポリシーとは別ヘッダーで同時に送る。
+// ブラウザは複数のCSPをそれぞれ独立に評価するため、「一部だけ本適用、残りは計測のみ」が成立する。
+//
+// ここに入れる条件は「XSS以外の実利があり、かつ壊すものが無い」こと。以下は2026-09時点で
+// Sentryに違反実績がゼロであり、AdSense・地図・ログインのいずれにも関与しない。
+// - base-uri      : <base>注入による相対URLの乗っ取りを防ぐ
+// - object-src    : <object>/<embed>経由の実行を防ぐ
+// - frame-ancestors: クリックジャッキング（X-Frame-Optionsと重複するが、こちらが後継）
+// - form-action   : フォーム送信先の乗っ取り・外部への窃取を防ぐ
+//
+// 逆に script-src / connect-src / frame-src / img-src / media-src は**入れない**。
+// 広告クリエイティブの接続先は事前に列挙できず、staging では広告が配信されないため検証もできない。
+// 実際 connect-src は、Auth0が抜けていた時期に月95人規模の違反が出ていた（本適用なら全員ログイン導線が壊れていた）。
+// また media-src は未指定＝default-srcにフォールバックするため、動画広告が配信された瞬間に壊れる。
+// default-src も同じ理由で入れない（未指定のディレクティブを巻き込むため）。
+//
+// upgrade-insecure-requests も入れない。Report-Onlyでは無視される指定なので、
+// 本適用側に移すと挙動が変わる。段階適用の目的は「挙動を変えずに防御だけ増やす」こと。
+const enforcedCspDirectives = [
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  `form-action 'self' ${authIssuer}`.trim(),
+  // 本適用側の違反もSentryへ送る（disposition が 'enforce' になるのでReport-Only分と区別できる）
+  `report-uri ${sentryCspReportUri}`,
+  'report-to csp-endpoint',
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactCompiler: {
@@ -441,8 +479,13 @@ const nextConfig = {
             key: 'Reporting-Endpoints',
             value: `csp-endpoint="${sentryCspReportUri}"`,
           },
-          // CSPはまず違反を計測するだけの Report-Only で導入（既存機能をブロックしない）。
-          // 違反レポートは Sentry に集約される。問題ないと確認できたら 'Content-Security-Policy' に切り替える。
+          // 段階適用: 壊すもののない4ディレクティブだけを本適用（ブロック）する。
+          {
+            key: 'Content-Security-Policy',
+            value: enforcedCspDirectives,
+          },
+          // 残りは引き続き計測のみ。違反レポートは Sentry に集約される。
+          // 広告系の違反が十分に枯れたら、ここから本適用側へディレクティブを移していく。
           {
             key: 'Content-Security-Policy-Report-Only',
             value: cspDirectives,
