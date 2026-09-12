@@ -114,8 +114,6 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - Auth0 SDK が使用する秘密鍵。セッションの暗号化などに使用される。
 - `APP_BASE_URL`:
   - アプリケーションのベース URL。ログイン後のリダイレクト先として使用される。
-- `AUTH0_ISSUER_BASE_URL`:
-  - Auth0 テナントの URL。認証リクエストの送信先となる。
 - `AUTH0_CLIENT_ID`:
   - Auth0 アプリケーションの識別子。認証リクエストに使用される。
 - `AUTH0_CLIENT_SECRET`:
@@ -126,6 +124,7 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `AUTH0_DOMAIN`:
   - Auth0 テナントのドメイン。認証エンドポイントの構築に使用される。
   - 例: `your-tenant.auth0.com`
+  - 実行時に Auth0 SDK が参照するため**必須**。加えて `next.config.mjs` がビルド時にも参照し、CSP の `form-action` / `connect-src` に許可するオリジンを組み立てる（ビルド時に読めなかった場合に備えて同ファイルに既定値あり）。
 - `AUTH0_SCOPE`:
   - アプリケーションが要求する権限（スコープ）を指定する。複数のスコープはスペースで区切る。
   - 例：`openid profile email read:shows`
