@@ -12,6 +12,12 @@ import {
 } from '@/data/schemas/itinerarySchema';
 import { getCreatorHandle } from '@/lib/creatorHandle';
 import { auth0 } from '@/lib/auth0';
+import {
+  isOwnedBy,
+  normalizeOwnerEmail,
+  ownerQuery,
+  type OwnerIdentity,
+} from '@/lib/itineraryOwnership';
 
 async function getAuthenticatedUser() {
   const session = await auth0.getSession();
@@ -32,15 +38,17 @@ async function getAuthenticatedUser() {
 export function canAccessItinerary(
   itinerary: {
     isPublic?: boolean;
-    owner?: { id?: string } | null;
+    owner?: { id?: string; email?: string } | null;
     sharedWith?: ({ id?: string } | null | undefined)[] | null;
   },
-  userSub: string | null | undefined,
+  user: OwnerIdentity | null | undefined,
 ): boolean {
   if (itinerary.isPublic) return true;
-  if (!userSub) return false;
-  if (itinerary.owner?.id && itinerary.owner.id === userSub) return true;
-  if (itinerary.sharedWith?.some((u) => u?.id === userSub)) return true;
+  if (!user?.sub) return false;
+  // 所有者判定は sub だけでなく認証済みメールも見る（詳細は itineraryOwnership.ts）
+  if (isOwnedBy(itinerary.owner, user)) return true;
+  // 共有相手は sub のみで判定する。共有時に控えているのが sub だけのため。
+  if (itinerary.sharedWith?.some((u) => u?.id === user.sub)) return true;
   return false;
 }
 
@@ -58,7 +66,8 @@ export async function createItinerary(
     owner: {
       id: user.sub,
       name: user.name || '',
-      email: user.email || '',
+      // 所有者判定でメールを突き合わせるため、保存時に正規化しておく
+      email: normalizeOwnerEmail(user.email),
     },
   };
 
@@ -71,7 +80,7 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
   await ensureDbConnection();
 
   try {
-    const itineraries = await ItineraryModel.find({ 'owner.id': user.sub })
+    const itineraries = await ItineraryModel.find(ownerQuery(user))
       .sort({ updatedAt: -1 })
       .lean<ServerItineraryDocument[]>();
 
@@ -133,7 +142,7 @@ export async function getItineraryById(
 
     // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
     const session = await auth0.getSession();
-    if (!canAccessItinerary(itinerary, session?.user?.sub)) {
+    if (!canAccessItinerary(itinerary, session?.user)) {
       return null;
     }
 
@@ -209,7 +218,7 @@ export async function getItineraryWithDay(
 
     // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
     const session = await auth0.getSession();
-    if (!canAccessItinerary(itineraryData, session?.user?.sub)) {
+    if (!canAccessItinerary(itineraryData, session?.user)) {
       return null;
     }
 
@@ -260,7 +269,7 @@ export async function updateItinerary(
     };
 
     const updatedDoc = await ItineraryModel.findOneAndUpdate(
-      { _id: id, 'owner.id': user.sub },
+      { _id: id, ...ownerQuery(user) },
       { $set: updateDoc },
       { new: true },
     ).lean<ServerItineraryDocument>();
@@ -284,23 +293,31 @@ export async function updateItinerary(
  * - 所有旅程（公開・非公開を問わず）を全削除
  * - 他ユーザーの旅程の共有相手(sharedWith)から当該ユーザーを除去
  *
+ * 削除対象は閲覧・編集できる範囲と同じ基準（sub または認証済みメール）にそろえる。
+ * sub だけで消すと、別のログイン方法で作った自分の旅程が退会後も残り、
+ * 「退会したのにデータが残っている」状態になるため。
+ *
+ * 注意: Auth0 のアカウント削除は現在のログイン接続のユーザーだけが対象で、
+ * 別接続のユーザーは残る。またこの関数は sharedWith を sub でしか外せない
+ * （共有時に控えているのが sub だけのため）。
+ *
  * @returns 削除した所有旅程の件数
  */
 export async function deleteAllItinerariesForUser(
-  auth0Id: string,
+  user: OwnerIdentity,
 ): Promise<number> {
   await ensureDbConnection();
 
   // 所有旅程を全削除
-  const deleteResult = await ItineraryModel.deleteMany({
-    'owner.id': auth0Id,
-  });
+  const deleteResult = await ItineraryModel.deleteMany(ownerQuery(user));
 
   // 他人の旅程の共有相手から自分を除去
-  await ItineraryModel.updateMany(
-    { 'sharedWith.id': auth0Id },
-    { $pull: { sharedWith: { id: auth0Id } } },
-  );
+  if (user.sub) {
+    await ItineraryModel.updateMany(
+      { 'sharedWith.id': user.sub },
+      { $pull: { sharedWith: { id: user.sub } } },
+    );
+  }
 
   return deleteResult.deletedCount ?? 0;
 }

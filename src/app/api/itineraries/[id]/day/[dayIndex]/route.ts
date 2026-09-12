@@ -5,6 +5,7 @@ import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
 import { auth0 } from '@/lib/auth0';
 import { canAccessItinerary } from '@/lib/itineraries';
+import { isOwnedBy } from '@/lib/itineraryOwnership';
 
 function isValidObjectId(id: string): boolean {
   return mongoose.Types.ObjectId.isValid(id);
@@ -50,7 +51,7 @@ export async function GET(
     // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
     // 存在の有無や日数を漏らさないため、権限がない場合も 404 を返す
     const session = await auth0.getSession();
-    if (!canAccessItinerary(itinerary, session?.user?.sub)) {
+    if (!canAccessItinerary(itinerary, session?.user)) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
         { status: 404 },
@@ -60,7 +61,8 @@ export async function GET(
     // 生PII（owner.name/email/id）と sharedWith を payload に載せないため、
     // 所有者・共有判定はサーバー側で算出し boolean として渡す。
     const userSub = session?.user?.sub;
-    const isOwner = Boolean(userSub && itinerary.owner?.id === userSub);
+    // 所有者判定は sub だけでなく認証済みメールも見る（詳細は itineraryOwnership.ts）
+    const isOwner = isOwnedBy(itinerary.owner, session?.user);
     const isSharedWith = Boolean(
       userSub && itinerary.sharedWith?.some((u) => u?.id === userSub),
     );

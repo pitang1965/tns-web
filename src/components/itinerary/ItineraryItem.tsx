@@ -16,6 +16,7 @@ import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { useDeleteItinerary } from '@/hooks/useDeleteItinerary';
 import { formatItineraryDuration } from '@/lib/date';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { isOwnedBy } from '@/lib/itineraryOwnership';
 
 type Props = {
   itinerary: ClientItineraryDocument;
@@ -71,7 +72,7 @@ export const ItineraryItem: React.FC<Props> = ({ itinerary }) => {
             <Eye className="w-4 h-4 mr-1" />
             見る
           </Button>
-          {user && itinerary.owner && user.sub === itinerary.owner.id && (
+          {isOwnedBy(itinerary.owner, user) && (
             <>
               <Button
                 size="sm"

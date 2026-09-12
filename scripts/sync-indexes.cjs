@@ -44,6 +44,23 @@ const ONLY_COLLECTION = getArg('collection', null);
 //   fieldreports  ← src/lib/models/FieldReport.ts
 //   campingspots  ← src/lib/models/CampingSpot.ts
 const INDEXES_BY_COLLECTION = {
+  itineraries: [
+    {
+      key: { 'owner.id': 1 },
+      options: { name: 'owner.id_1' },
+      why: '所有者（Auth0 の sub）での絞り込み',
+    },
+    {
+      key: { 'owner.email': 1 },
+      options: { name: 'owner.email_1' },
+      why: '所有者（認証済みメール）での絞り込み。ログイン接続が変わっても自分の旅程を見せるため',
+    },
+    {
+      key: { isPublic: 1, updatedAt: -1 },
+      options: { name: 'isPublic_1_updatedAt_-1' },
+      why: '公開旅程一覧（更新の新しい順）',
+    },
+  ],
   fieldreports: [
     {
       key: { spotId: 1, authorSub: 1, visitedYearMonth: 1 },

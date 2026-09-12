@@ -40,7 +40,7 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     // 1. アプリデータを削除
     let deletedItineraryCount = 0;
     try {
-      deletedItineraryCount = await deleteAllItinerariesForUser(userId);
+      deletedItineraryCount = await deleteAllItinerariesForUser(user);
     } catch (error) {
       logger.error(
         error instanceof Error

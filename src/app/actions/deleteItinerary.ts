@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import ItineraryModel from '@/lib/models/Itinerary';
 import { ensureDbConnection } from '@/lib/database';
 import { logger } from '@/lib/logger';
+import { ownerQuery } from '@/lib/itineraryOwnership';
 
 export async function deleteItinerary(id: string) {
   const session = await auth0.getSession();
@@ -21,7 +22,7 @@ export async function deleteItinerary(id: string) {
 
     const result = await ItineraryModel.deleteOne({
       _id: id,
-      'owner.id': session.user.sub,
+      ...ownerQuery(session.user),
     });
 
     if (result.deletedCount === 0) {

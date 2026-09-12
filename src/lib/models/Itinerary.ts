@@ -51,6 +51,9 @@ const ItinerarySchema = new Schema<IItinerary>(
 );
 
 ItinerarySchema.index({ 'owner.id': 1 });
+// 所有者判定で認証済みメールも突き合わせるため（詳細は src/lib/itineraryOwnership.ts）。
+// 本番は autoIndex:false のため scripts/sync-indexes.cjs にも同じ定義が必要。
+ItinerarySchema.index({ 'owner.email': 1 });
 ItinerarySchema.index({ isPublic: 1, updatedAt: -1 });
 
 export default mongoose.models.Itinerary ||

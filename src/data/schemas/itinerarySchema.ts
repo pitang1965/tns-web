@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { objectIdSchema } from './commonSchemas';
 import { userReferenceSchema } from './userSchema';
 import { activitySchema } from './activitySchema';
+import { isOwnedBy, type OwnerIdentity } from '@/lib/itineraryOwnership';
 
 // Day plan schema
 const dayPlanSchema = z.object({
@@ -89,12 +90,13 @@ export type DetailItineraryDocument = Omit<
 // boolean として埋め込む。サーバー側でのみ使用すること。
 export function toDetailItinerary(
   doc: ServerItineraryDocument,
-  userSub: string | null | undefined,
+  user: OwnerIdentity | null | undefined,
 ): DetailItineraryDocument {
   const { owner, sharedWith, ...rest } = toClientItinerary(doc);
-  const isOwner = Boolean(userSub && owner?.id === userSub);
+  // 所有者判定は sub だけでなく認証済みメールも見る（詳細は itineraryOwnership.ts）
+  const isOwner = isOwnedBy(owner, user);
   const isSharedWith = Boolean(
-    userSub && sharedWith?.some((u) => u?.id === userSub),
+    user?.sub && sharedWith?.some((u) => u?.id === user.sub),
   );
   return { ...rest, isOwner, isSharedWith };
 }

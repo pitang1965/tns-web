@@ -41,7 +41,7 @@ export async function GET(
     // サーバー側アクセス制御：非公開旅程は所有者・共有相手のみ閲覧可
     // 存在の有無を漏らさないため、権限がない場合も 404 を返す
     const session = await auth0.getSession();
-    if (!canAccessItinerary(itinerary, session?.user?.sub)) {
+    if (!canAccessItinerary(itinerary, session?.user)) {
       return NextResponse.json(
         { error: 'Itinerary not found' },
         { status: 404 },
@@ -50,7 +50,7 @@ export async function GET(
 
     // 生PII（owner.name/email/id）と sharedWith を payload から除去し、
     // サーバー側で算出した所有者・共有判定の boolean のみを返す。
-    const detailItinerary = toDetailItinerary(itinerary, session?.user?.sub);
+    const detailItinerary = toDetailItinerary(itinerary, session?.user);
     return NextResponse.json(detailItinerary);
   } catch (error) {
     logger.error(
