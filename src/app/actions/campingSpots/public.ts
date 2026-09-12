@@ -3,6 +3,19 @@
 import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotFilter } from '@/data/schemas/campingSpot';
 import { calculateDistance } from '@/lib/utils/distance';
+
+/**
+ * 公開クエリでクライアントへ返さないフィールド。
+ *
+ * submittedBy には投稿者（または登録した管理者）のメールアドレスが入る
+ * （campingSpotSubmissions.ts の承認処理、campingSpots/admin.ts、csv.ts）。
+ * このファイルの関数は 'use client' のコンポーネントから呼ばれるため、
+ * 射影しないとドキュメント全体がそのままブラウザへ渡り、メールアドレスが露出する。
+ * 画面に表示している箇所は無いので、返さなくても機能に影響はない。
+ *
+ * 旅程で ADR-0003（公開ページに生PIIを載せない）として解決済みの問題と同じ構造。
+ */
+const PUBLIC_SPOT_PROJECTION = '-submittedBy';
 import { ensureDbConnection } from '@/lib/database';
 import { buildSpotSearchConditions } from '@/lib/utils/searchNormalize';
 
@@ -55,7 +68,10 @@ export async function getPublicCampingSpotsByBounds(
     query.type = { $in: options.type };
   }
 
-  const spots = await CampingSpot.find(query).sort({ createdAt: -1 }).lean();
+  const spots = await CampingSpot.find(query)
+    .select(PUBLIC_SPOT_PROJECTION)
+    .sort({ createdAt: -1 })
+    .lean();
 
   return JSON.parse(JSON.stringify(spots));
 }
@@ -110,6 +126,7 @@ export async function getPublicCampingSpotsWithPagination(
 
   const [spots, total] = await Promise.all([
     CampingSpot.find(query)
+      .select(PUBLIC_SPOT_PROJECTION)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -152,7 +169,10 @@ export async function getNearestCampingSpots(
     ).$near.$maxDistance = maxDistance;
   }
 
-  const spots = await CampingSpot.find(query).limit(limit).lean();
+  const spots = await CampingSpot.find(query)
+    .select(PUBLIC_SPOT_PROJECTION)
+    .limit(limit)
+    .lean();
 
   // Calculate distance for each spot and add it to the result
   const spotsWithDistance = spots.map((spot) => {

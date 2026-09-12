@@ -5,6 +5,7 @@ import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
 import { deleteAllFieldReportDataForUser } from '@/lib/fieldReports';
 import { deleteAllPointDataForUser } from '@/lib/points/points';
+import { deleteAllSubmissionDataForUser } from '@/lib/campingSpotSubmissionsPrivacy';
 import { deletePostHogPerson } from '@/lib/posthogServer';
 import resend from '@/lib/resend';
 import { logger } from '@/lib/logger';
@@ -18,7 +19,7 @@ type DeleteAccountResult = {
  * 退会処理（アカウント完全削除）。
  *
  * 処理順序:
- *   1. MongoDBのアプリデータ（所有旅程・共有相手参照・現地報告・アズキ）を削除
+ *   1. MongoDBのアプリデータ（所有旅程・共有相手参照・現地報告・アズキ・スポット投稿）を削除
  *   2. Auth0アカウント本体を削除
  *   3. 管理者へ退会通知メールを送信（失敗しても退会自体は成功扱い）
  *
@@ -119,6 +120,31 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
       }
     } else {
       logger.warn('[退会] メール未認証のためアズキデータの削除をスキップ', {
+        userId,
+      });
+    }
+
+    // スポット投稿も削除する。submitterEmail / submitterName に個人データが入るため、
+    // プライバシーポリシー§8 の対象にあたる。承認済みの公開スポットは地図情報として
+    // 他の利用者が使っているため削除せず、submittedBy の匿名化にとどめる。
+    if (user.email && user.email_verified) {
+      try {
+        await deleteAllSubmissionDataForUser(user.email);
+      } catch (error) {
+        logger.error(
+          error instanceof Error
+            ? error
+            : new Error('Error deleting user spot submissions during withdrawal'),
+          { userId },
+        );
+        return {
+          success: false,
+          error:
+            'スポット投稿データの削除に失敗しました。時間をおいて再度お試しください。',
+        };
+      }
+    } else {
+      logger.warn('[退会] メール未認証のためスポット投稿データの削除をスキップ', {
         userId,
       });
     }
