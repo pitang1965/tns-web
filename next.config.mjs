@@ -322,13 +322,21 @@ const withPWA = withPWAInit({
 // 値もスキームなしのドメイン（例: xxx.jp.auth0.com）になった。旧名のままだと常に空文字となり、
 // form-action / connect-src から Auth0 が抜け落ちる（Report-Only では表面化しないが本適用で破綻する）。
 // 旧名は移行期の環境用にフォールバックとして残す。
+//
+// 既定値を持つ理由: next.config.mjs は「ビルド時」にしか評価されない。Vercel で
+// AUTH0_DOMAIN が Sensitive 指定（ビルドに露出しない）だったりスコープが外れていると、
+// ランタイムのログインは動いたままCSPのヘッダーだけが静かに空になる（実際にそうなっていた）。
+// テナントのドメインはログインのリダイレクト先として公開される値でありシークレットではないため、
+// 同ファイルの Sentry DSN と同様に既定値として直接持たせる。
+// 環境変数が設定されていればそちらが優先されるので、テナントを分ける場合は環境変数で上書きする。
+const AUTH0_DOMAIN_FALLBACK = 'over40-web-club.jp.auth0.com';
 const auth0Domain =
-  process.env.AUTH0_DOMAIN || process.env.AUTH0_ISSUER_BASE_URL || '';
-const authIssuer = auth0Domain
-  ? auth0Domain.startsWith('http')
-    ? auth0Domain.replace(/\/$/, '')
-    : `https://${auth0Domain.replace(/\/$/, '')}`
-  : '';
+  process.env.AUTH0_DOMAIN ||
+  process.env.AUTH0_ISSUER_BASE_URL ||
+  AUTH0_DOMAIN_FALLBACK;
+const authIssuer = auth0Domain.startsWith('http')
+  ? auth0Domain.replace(/\/$/, '')
+  : `https://${auth0Domain.replace(/\/$/, '')}`;
 
 // PostHog のホスト。リバースプロキシ利用時は NEXT_PUBLIC_POSTHOG_HOST を尊重する。
 const posthogHost =
