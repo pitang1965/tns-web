@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { auth0 } from '@/lib/auth0';
 import { auth0Management } from '@/lib/auth0Management';
 import { deleteAllItinerariesForUser } from '@/lib/itineraries';
@@ -82,7 +83,20 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     }
 
     try {
-      await deleteAllFieldReportDataForUser(subsToPurge);
+      const deletedFieldReports =
+        await deleteAllFieldReportDataForUser(subsToPurge);
+
+      // スポット詳細ページは ISR（revalidate = 86400）で配信しており、削除した現地報告の
+      // 本文がキャッシュ済み HTML に残り続ける。プライバシーポリシー§8 の「退会に伴い
+      // 完全に削除」に反するため、ここで明示的にキャッシュを破棄する。
+      //
+      // どのスポットの報告だったかは戻り値から分からないので、ルート全体を対象にする。
+      // 退会は頻度が低く、大半のユーザーは報告を持たないため、実際に消えたときだけ実行する。
+      // 通報（flags）の削除は詳細ページの匿名ビューに現れない（isFlagged / flagCount は
+      // FieldReportSection がクライアントで取り直す）ので、対象に含めなくてよい。
+      if (deletedFieldReports > 0) {
+        revalidatePath('/shachu-haku/[spotId]', 'page');
+      }
     } catch (error) {
       logger.error(
         error instanceof Error
@@ -129,7 +143,16 @@ export async function deleteAccountAction(): Promise<DeleteAccountResult> {
     // 他の利用者が使っているため削除せず、submittedBy の匿名化にとどめる。
     if (user.email && user.email_verified) {
       try {
-        await deleteAllSubmissionDataForUser(user.email);
+        const { anonymizedSpots } = await deleteAllSubmissionDataForUser(
+          user.email,
+        );
+
+        // submittedBy は詳細ページで表示しないが、ページ全体が SpotDetailClient へ
+        // props として渡るため RSC ペイロードに含まれる（実機で確認済み）。
+        // ISR のキャッシュ済み HTML に匿名化前のメールアドレスが残らないよう破棄する。
+        if (anonymizedSpots > 0) {
+          revalidatePath('/shachu-haku/[spotId]', 'page');
+        }
       } catch (error) {
         logger.error(
           error instanceof Error

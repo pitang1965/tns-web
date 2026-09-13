@@ -190,6 +190,19 @@ export async function getCampingSpotIdsOnly(options?: {
   return spots.map((spot) => String(spot._id));
 }
 
+/**
+ * スポット1件を取得する。このファイルで唯一 checkAdminAuth() を通さない関数で、
+ * 公開ページ /shachu-haku/[spotId] とその generateMetadata から呼ばれる。
+ *
+ * submittedBy（投稿者、または登録した管理者のメールアドレス）は返さない。
+ * 詳細ページは取得したドキュメントをそのまま SpotDetailClient へ props として渡すため、
+ * 射影しないと画面に描画していなくても RSC ペイロードに載ってブラウザへ届く
+ * （React は client component の props をすべて直列化する）。
+ * さらにこのページは ISR 配信なので、キャッシュ済みの公開 HTML に焼き付く。
+ *
+ * public.ts の PUBLIC_SPOT_PROJECTION と同じ方針。管理画面の編集フォームも
+ * submittedBy を表示・送信しないため、返さなくても機能に影響はない。
+ */
 export async function getCampingSpotById(id: string) {
   // Validate ID format before the try block so these expected cases are NOT
   // reported to Sentry. Invalid IDs never come from in-app links — they are
@@ -207,7 +220,10 @@ export async function getCampingSpotById(id: string) {
     await ensureDbConnection();
 
     // Find the spot with proper error handling
-    const spot = await CampingSpot.findById(id).lean().exec();
+    const spot = await CampingSpot.findById(id)
+      .select('-submittedBy')
+      .lean()
+      .exec();
 
     if (!spot) {
       throw new Error(`Camping spot not found for ID: ${id}`);
