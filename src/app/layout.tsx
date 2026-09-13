@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { AdSense } from '@/components/layout/AdSense';
+import { ADS_ENABLED } from '@/lib/ads';
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -77,7 +78,7 @@ export default function RootLayout({
         <WebsiteJsonLd />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+        {ADS_ENABLED && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}

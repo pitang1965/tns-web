@@ -5,6 +5,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { isPremiumMember } from '@/lib/userUtils';
 import { usePathname } from 'next/navigation';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { ADS_ENABLED } from '@/lib/ads';
 
 declare global {
   interface Window {
@@ -18,6 +19,12 @@ type AdSenseUnitProps = {
 };
 
 export function AdSenseUnit({ slot, className }: AdSenseUnitProps) {
+  return ADS_ENABLED ? (
+    <EnabledAdSenseUnit slot={slot} className={className} />
+  ) : null;
+}
+
+function EnabledAdSenseUnit({ slot, className }: AdSenseUnitProps) {
   const adRef = useRef<HTMLModElement>(null);
   const { user } = useUser();
   const pathname = usePathname();

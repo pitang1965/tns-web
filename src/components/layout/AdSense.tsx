@@ -10,8 +10,13 @@ import {
   serializeSpotTypes,
 } from '@/lib/spotTypeFilter';
 import { NafudaAd } from './NafudaAd';
+import { ADS_ENABLED } from '@/lib/ads';
 
 export function AdSense() {
+  return ADS_ENABLED ? <EnabledAdSense /> : null;
+}
+
+function EnabledAdSense() {
   const adRef = useRef<HTMLModElement>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
