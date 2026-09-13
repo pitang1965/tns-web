@@ -1,4 +1,5 @@
 import { ExternalLink, Zap } from 'lucide-react';
+import { ADS_ENABLED } from '@/lib/ads';
 
 type AdLinkProps = {
   href: string;
@@ -13,8 +14,8 @@ export function AdLink({
   shortLabel,
   className = '',
 }: AdLinkProps) {
-  // 環境変数で表示/非表示を制御
-  if (process.env.NEXT_PUBLIC_SHOW_AD_LINK !== 'true') {
+  // 共通スイッチがオフなら、広告リンクの個別設定にかかわらず停止する。
+  if (!ADS_ENABLED || process.env.NEXT_PUBLIC_SHOW_AD_LINK !== 'true') {
     return null;
   }
 
