@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import CampingSpot from '@/lib/models/CampingSpot';
 import {
   csvRowToCampingSpot,
@@ -204,6 +204,9 @@ export async function importCampingSpotsFromCSV(
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
+  // 一括インポートは既存スポットも更新し得るため、詳細ページ（ISR）を全件無効化する
+  revalidatePath('/shachu-haku/[spotId]', 'page');
+  updateTag('camping-spots'); // トップページのデータキャッシュ
   return results;
 }
 

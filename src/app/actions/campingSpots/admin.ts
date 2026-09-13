@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import mongoose from 'mongoose';
 import CampingSpot from '@/lib/models/CampingSpot';
 import { CampingSpotSchema } from '@/data/schemas/campingSpot';
@@ -347,6 +347,7 @@ export async function createCampingSpot(data: FormData) {
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
+  updateTag('camping-spots'); // トップページのデータキャッシュ
   return { success: true, id: newSpot._id.toString() };
 }
 
@@ -474,6 +475,8 @@ export async function updateCampingSpot(id: string, data: FormData) {
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
+  revalidatePath(`/shachu-haku/${id}`); // 詳細ページ（ISR）を再生成
+  updateTag('camping-spots'); // トップページのデータキャッシュ
   return { success: true };
 }
 
@@ -489,5 +492,7 @@ export async function deleteCampingSpot(id: string) {
 
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
+  revalidatePath(`/shachu-haku/${id}`); // 詳細ページ（ISR）のキャッシュを破棄
+  updateTag('camping-spots'); // トップページのデータキャッシュ
   return { success: true };
 }

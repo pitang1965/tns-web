@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 
 type ParamValue = string | number | boolean | null | undefined;
 
@@ -78,7 +77,6 @@ export function useUrlSync({
   skipInitialMount = true,
   enableDuplicateCheck = false,
 }: UrlSyncOptions) {
-  const router = useRouter();
   const isInitialMountRef = useRef(skipInitialMount);
   const lastUrlRef = useRef<string>('');
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -117,9 +115,12 @@ export function useUrlSync({
         return;
       }
 
-      // URLを更新
+      // URLを更新。router.replace だとサーバーへの RSC リクエストが毎回飛び、
+      // 地図パンのたびにサーバーレンダリング（Fluid Active CPU）を消費するため、
+      // ブラウザーの履歴 API を直接使う。Next.js 14.2+ は素の replaceState でも
+      // usePathname / useSearchParams を同期してくれる。
       lastUrlRef.current = newUrl;
-      router.replace(newUrl, { scroll: false });
+      window.history.replaceState(null, '', newUrl);
     };
 
     if (debounceMs > 0) {
@@ -134,5 +135,5 @@ export function useUrlSync({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [paramsKey, basePath, debounceMs, enableDuplicateCheck, router]);
+  }, [paramsKey, basePath, debounceMs, enableDuplicateCheck]);
 }
