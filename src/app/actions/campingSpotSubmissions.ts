@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
 import { ensureDbConnection } from '@/lib/database';
@@ -136,6 +136,7 @@ export async function approveSubmission(id: string, reviewNotes?: string) {
   revalidatePath('/admin/shachu-haku');
   revalidatePath('/shachu-haku');
   revalidatePath('/admin/submissions');
+  updateTag('camping-spots'); // トップページのデータキャッシュ
 
   return { success: true, spotId: newSpot._id.toString() };
 }

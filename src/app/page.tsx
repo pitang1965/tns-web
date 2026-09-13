@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { unstable_cache } from 'next/cache';
 import { auth0 } from '@/lib/auth0';
 import PublicHome from '@/components/common/PublicHome';
 import LoggedInHome from '@/components/common/LoggedInHome';
@@ -56,6 +57,26 @@ async function getSpotCount() {
   }
 }
 
+/**
+ * トップページはセッションを読むため常に動的レンダリングになるが、
+ * 未ログイン（ボット含む）アクセスが大半で、毎回2本のDBクエリと
+ * シリアライズが走っていた（Fluid Active CPU の約4割）。
+ * データキャッシュに載せて、スポットの追加・更新・削除・承認時は
+ * updateTag('camping-spots') で即時反映する（campingSpots/admin.ts・
+ * csv.ts・campingSpotSubmissions.ts）。表示は未ログイン向けの
+ * 最新20件＋総数だけなので、24時間の revalidate は保険に過ぎない。
+ */
+const getCachedFeaturedSpots = unstable_cache(
+  getFeaturedSpots,
+  ['home-featured-spots'],
+  { revalidate: 86400, tags: ['camping-spots'] },
+);
+
+const getCachedSpotCount = unstable_cache(getSpotCount, ['home-spot-count'], {
+  revalidate: 86400,
+  tags: ['camping-spots'],
+});
+
 export default async function Home() {
   const session = await auth0.getSession();
 
@@ -63,8 +84,8 @@ export default async function Home() {
     return <LoggedInHome userName={session.user.name || 'ゲスト'} />;
   } else {
     const [initialSpots, spotCount] = await Promise.all([
-      getFeaturedSpots(),
-      getSpotCount(),
+      getCachedFeaturedSpots(),
+      getCachedSpotCount(),
     ]);
     return <PublicHome initialSpots={initialSpots} spotCount={spotCount} />;
   }

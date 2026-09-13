@@ -35,6 +35,8 @@ type FieldReportDialogProps = {
   isAdmin: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** 投稿成功後にビューアー用リストの取り直しを親へ依頼する */
+  onMutated?: () => void;
 };
 
 export function FieldReportDialog({
@@ -46,6 +48,7 @@ export function FieldReportDialog({
   isAdmin,
   open,
   onOpenChange,
+  onMutated,
 }: FieldReportDialogProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -125,6 +128,7 @@ export function FieldReportDialog({
       title: '現地報告を投稿しました',
       description: 'ご協力ありがとうございます',
     });
+    onMutated?.();
     router.refresh();
   };
 

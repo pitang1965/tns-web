@@ -33,7 +33,7 @@ import {
   getPublicCampingSpotsWithPagination,
 } from '../actions/campingSpots/public';
 import { handleCampingSpotShare } from '@/lib/shareUtils';
-import { serializeSpotTypes } from '@/lib/spotTypeFilter';
+import { serializeSpotTypes, spotTypesToLabel } from '@/lib/spotTypeFilter';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
 import { SpotSubmitLink } from '@/components/shachu-haku/SpotSubmitLink';
@@ -207,6 +207,20 @@ export default function ShachuHakuClient() {
     debounceMs: 500,
     enableDuplicateCheck: true,
   });
+
+  // URL更新を history.replaceState に変えたため、検索条件に応じたタイトルは
+  // クライアントで更新する（page.tsx の generateMetadata と同じ組み立て。
+  // サーバー側は初回表示・共有URL・OGP用として残る）
+  useEffect(() => {
+    const typeLabel = spotTypesToLabel(typeFilter);
+    const titleParts: string[] = [];
+    if (typeLabel) titleParts.push(typeLabel);
+    if (searchTerm.trim() !== '') titleParts.push(`"${searchTerm}"`);
+    document.title =
+      titleParts.length > 0
+        ? `${titleParts.join('・')}の車中泊スポット | 車旅のしおり`
+        : '全国車中泊マップ | 車旅のしおり';
+  }, [searchTerm, typeFilter]);
 
   // Load spots for list view when tab, filters, or page changes
   useEffect(() => {

@@ -33,12 +33,15 @@ type FieldReportItemProps = {
   /** ログイン済みか。未ログインには通報ボタンを出さない */
   isLoggedIn: boolean;
   isAdmin: boolean;
+  /** 操作成功後にビューアー用リストの取り直しを親へ依頼する */
+  onMutated?: () => void;
 };
 
 export function FieldReportItem({
   report,
   isLoggedIn,
   isAdmin,
+  onMutated,
 }: FieldReportItemProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -62,6 +65,7 @@ export function FieldReportItem({
       return;
     }
     toast({ title: '現地報告を削除しました' });
+    onMutated?.();
     router.refresh();
   };
 
@@ -87,6 +91,7 @@ export function FieldReportItem({
       title: '通報を受け付けました',
       description: '運営が内容を確認します',
     });
+    onMutated?.();
     router.refresh();
   };
 
@@ -106,6 +111,7 @@ export function FieldReportItem({
     toast({
       title: report.isHidden ? '再表示しました' : '非表示にしました',
     });
+    onMutated?.();
     router.refresh();
   };
 

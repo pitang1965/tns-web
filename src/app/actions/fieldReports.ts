@@ -117,6 +117,26 @@ export async function getFieldReportsBySpot(
   );
 }
 
+/**
+ * セッションを一切読まない匿名ビュー。詳細ページ（ISR）のサーバーレンダリングから
+ * 呼ぶための入口で、ここで cookies を読むとページが動的レンダリングに戻ってしまう。
+ * ログイン中のビューアー固有表示（isOwn / isFlagged / 管理者項目）は
+ * FieldReportSection がクライアントで getFieldReportsBySpot を呼び直して上書きする。
+ */
+export async function getPublicFieldReportsBySpot(
+  spotId: string,
+): Promise<PublicFieldReport[]> {
+  if (!mongoose.Types.ObjectId.isValid(spotId)) return [];
+
+  await ensureDbConnection();
+
+  const reports = await FieldReport.find({ spotId, isHidden: { $ne: true } })
+    .sort({ visitedYearMonth: -1, createdAt: -1 })
+    .lean<IFieldReport[]>();
+
+  return reports.map((report) => toPublicFieldReport(report, null, false));
+}
+
 /** 現地報告を投稿する */
 export async function createFieldReport(
   input: FieldReportInput,

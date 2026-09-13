@@ -1,11 +1,29 @@
-import { Suspense } from 'react';
+import { Suspense, cache } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCampingSpotById } from '../../actions/campingSpots/admin';
-import { getFieldReportsBySpot } from '../../actions/fieldReports';
+import { getPublicFieldReportsBySpot } from '../../actions/fieldReports';
 import { CampingSpotTypeLabels } from '@/data/schemas/campingSpot';
 import SpotDetailClient from './SpotDetailClient';
 import { CampingSpotJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+
+/**
+ * このページは ISR（静的キャッシュ）で配信する。詳細ページは Fluid Active CPU の
+ * 約3割を占めており、アクセスごとの SSR + DB クエリをキャッシュ配信に置き換える。
+ * - 現地報告の投稿・削除・非表示は revalidatePath(`/shachu-haku/${spotId}`) 済み
+ * - スポットの更新・削除も campingSpots/admin.ts・csv.ts で revalidate する
+ * - セッション依存の表示（自分の報告の削除ボタン等）は FieldReportSection が
+ *   クライアントで取り直すため、ここでは cookies を読んではならない
+ */
+export const revalidate = 86400;
+
+// ビルド時には何も生成せず、初回アクセス時に生成してキャッシュする
+export async function generateStaticParams() {
+  return [];
+}
+
+// generateMetadata とページ本体で同じスポットを2回取得しないよう重複排除する
+const getCachedSpot = cache(getCampingSpotById);
 
 type PageProps = {
   params: Promise<{ spotId: string }>;
@@ -16,7 +34,7 @@ export const generateMetadata = async ({
 }: PageProps): Promise<Metadata> => {
   try {
     const { spotId } = await params;
-    const spot = await getCampingSpotById(spotId);
+    const spot = await getCachedSpot(spotId);
 
     if (!spot) {
       return {
@@ -119,7 +137,7 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
 
   let spot;
   try {
-    spot = await getCampingSpotById(spotId);
+    spot = await getCachedSpot(spotId);
   } catch (error) {
     // Enhanced error logging for debugging Facebook WebView issues
     console.error('SpotDetailPage: Error loading spot:', {
@@ -140,9 +158,10 @@ export default async function SpotDetailPage({ params }: SpotDetailPageProps) {
     CampingSpotTypeLabels[spot.type as keyof typeof CampingSpotTypeLabels] ||
     spot.type;
 
-  // 現地報告はサーバー側で取得して渡す。投稿・削除後は
+  // 現地報告はサーバー側で「匿名ビュー」を取得して渡す。投稿・削除後は
   // revalidatePath と router.refresh() でここが再実行される。
-  const fieldReports = await getFieldReportsBySpot(spotId);
+  // ログイン中のビューアー固有表示は FieldReportSection がクライアントで取り直す。
+  const fieldReports = await getPublicFieldReportsBySpot(spotId);
 
   return (
     <>

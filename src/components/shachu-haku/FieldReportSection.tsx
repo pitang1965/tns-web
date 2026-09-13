@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { capture } from '@/lib/analytics';
+import { getFieldReportsBySpot } from '@/app/actions/fieldReports';
 import { FieldReportDialog } from './FieldReportDialog';
 import { FieldReportItem } from './FieldReportItem';
 import type { PublicFieldReport } from '@/data/schemas/fieldReport';
@@ -56,6 +57,48 @@ export function FieldReportSection({
   const needsEmailVerification = isLoggedIn && !user?.email_verified;
   const canPost = isLoggedIn && !needsEmailVerification;
 
+  // props の reports は ISR ページが匿名ビューで取得したもので、
+  // isOwn / isFlagged / 管理者項目が入っていない。ログイン中だけ
+  // ビューアー固有情報付きで取り直して上書きする。
+  const [viewerReports, setViewerReports] = useState<
+    PublicFieldReport[] | null
+  >(null);
+  const userSub = user?.sub ?? null;
+
+  // 投稿・削除・通報・非表示の成功時に、子コンポーネントから取り直しを発火させる。
+  // props（ISRページの匿名ビュー）の更新に頼ると、router.refresh() の反映タイミング
+  // 次第で古い viewerReports が表示に残り続けるため、明示的に取り直す。
+  const [refreshTick, setRefreshTick] = useState(0);
+  const handleMutated = () => setRefreshTick((tick) => tick + 1);
+
+  // props の内容が実際に変わったときだけ取り直すための指紋。
+  // 依存配列に reports（配列そのもの）を入れてはならない：Server Action の応答は
+  // ページの再レンダリングを伴い props が毎回新しい配列になるため、
+  // 「取り直し→再レンダリング→取り直し…」の無限ループになる（実際に起きた）。
+  const reportsKey = useMemo(
+    () => reports.map((report) => report.id).join(','),
+    [reports],
+  );
+
+  useEffect(() => {
+    if (isLoading || !userSub) return;
+    let cancelled = false;
+    getFieldReportsBySpot(spotId)
+      .then((result) => {
+        if (!cancelled) setViewerReports(result);
+      })
+      .catch(() => {
+        // 失敗しても匿名ビュー（props）のまま表示できるので握りつぶす
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, userSub, spotId, reportsKey, refreshTick]);
+
+  // 未ログインに戻ったら state は消さず導出で匿名ビューへ切り替える
+  // （Auth0 のログアウトはフルリダイレクトなので実際は再マウントされる）
+  const displayReports = isLoggedIn && viewerReports ? viewerReports : reports;
+
   const authState: AuthState = !isLoggedIn
     ? 'anonymous'
     : needsEmailVerification
@@ -71,11 +114,11 @@ export function FieldReportSection({
       spot_type: spotType,
       auth_state: authState,
       // 1件目を書かせるのと2件目以降を書かせるのは別の難易度なので必ず分けて記録する
-      has_reports: reports.length > 0,
-      report_count: reports.length,
+      has_reports: displayReports.length > 0,
+      report_count: displayReports.length,
       is_admin: isAdmin,
     }),
-    [spotId, spotType, authState, reports.length, isAdmin],
+    [spotId, spotType, authState, displayReports.length, isAdmin],
   );
 
   // セクションが実際に画面内へ入ったときだけ「到達」として1回記録する。
@@ -198,7 +241,7 @@ export function FieldReportSection({
       </CardHeader>
 
       <CardContent>
-        {reports.length === 0 ? (
+        {displayReports.length === 0 ? (
           <div className="text-center py-8 space-y-2">
             <p className="text-sm font-medium">まだ報告がありません。</p>
             <p className="text-sm text-muted-foreground">
@@ -207,12 +250,13 @@ export function FieldReportSection({
           </div>
         ) : (
           <ul className="space-y-3">
-            {reports.map((report) => (
+            {displayReports.map((report) => (
               <FieldReportItem
                 key={report.id}
                 report={report}
                 isLoggedIn={isLoggedIn}
                 isAdmin={isAdmin}
+                onMutated={handleMutated}
               />
             ))}
           </ul>
@@ -224,11 +268,12 @@ export function FieldReportSection({
           spotId={spotId}
           spotName={spotName}
           spotType={spotType}
-          hadReportsBefore={reports.length > 0}
-          reportCountBefore={reports.length}
+          hadReportsBefore={displayReports.length > 0}
+          reportCountBefore={displayReports.length}
           isAdmin={isAdmin}
           open={dialogOpen}
           onOpenChange={setDialogOpen}
+          onMutated={handleMutated}
         />
       )}
     </Card>
