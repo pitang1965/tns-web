@@ -449,6 +449,9 @@ const enforcedCspDirectives = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // セルフホスト（Docker）用。Dockerfile のビルド時だけ BUILD_STANDALONE=1 を渡し、
+  // Vercel のビルドには影響させない。詳細は docs/self-hosting/poc-log.md
+  output: process.env.BUILD_STANDALONE === '1' ? 'standalone' : undefined,
   reactCompiler: {
     compilationMode: 'annotation',
   },

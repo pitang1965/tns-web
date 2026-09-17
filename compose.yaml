@@ -1,0 +1,41 @@
+# セルフホスト用。使い方は docs/self-hosting/poc-log.md を参照。
+#   docker compose build
+#   docker compose up -d
+#
+# .env.docker は Git 管理外（.gitignore の .env.*）。ビルド時は secret として、
+# 実行時は env_file として同じファイルを渡す。
+
+services:
+  app:
+    build:
+      context: .
+      secrets:
+        - buildenv
+    image: tns-web:local
+    restart: unless-stopped
+    init: true
+    # 家庭内LANへは公開しない。外部からは Cloudflare Tunnel 経由でのみ到達させる
+    ports:
+      - '127.0.0.1:3000:3000'
+    env_file:
+      - .env.docker
+
+  # Cloudflare Tunnel のコネクタ。トークンを用意してから有効にする:
+  #   docker compose --profile tunnel up -d
+  # 公開ホスト名の転送先は Cloudflare のダッシュボードで http://app:3000 を指定する。
+  # .env.tunnel（Git 管理外）に TUNNEL_TOKEN=... を書く。
+  tunnel:
+    image: cloudflare/cloudflared:2026.9.1
+    profiles:
+      - tunnel
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    env_file:
+      - .env.tunnel
+    depends_on:
+      app:
+        condition: service_healthy
+
+secrets:
+  buildenv:
+    file: .env.docker
