@@ -1,3 +1,4 @@
+import { getPrimaryAppBaseUrl } from '@/lib/appBaseUrl';
 import { logger } from '@/lib/logger';
 
 // ユーザー入力をメールHTMLに埋め込む前のエスケープ。
@@ -387,7 +388,7 @@ ${userStatsText}
     flagCount: number;
     reason?: string;
   }): Promise<ResendResponse> {
-    const spotUrl = `${process.env.APP_BASE_URL ?? ''}/shachu-haku/${data.spotId}`;
+    const spotUrl = `${getPrimaryAppBaseUrl()}/shachu-haku/${data.spotId}`;
 
     const emailHtml = `
       <h2>現地報告が通報されました</h2>
