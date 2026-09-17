@@ -2,6 +2,10 @@
 #   docker compose build
 #   docker compose up -d
 #
+# イメージの版（タグ）は APP_IMAGE_TAG で切り替える（未指定なら local）。
+#   APP_IMAGE_TAG=$(git rev-parse --short HEAD) docker compose build   # 版を付けてビルド
+#   APP_IMAGE_TAG=<戻したい版> docker compose up -d app                 # 切り戻し
+#
 # .env.docker は Git 管理外（.gitignore の .env.*）。ビルド時は secret として、
 # 実行時は env_file として同じファイルを渡す。
 
@@ -11,7 +15,7 @@ services:
       context: .
       secrets:
         - buildenv
-    image: tns-web:local
+    image: tns-web:${APP_IMAGE_TAG:-local}
     restart: unless-stopped
     init: true
     # 家庭内LANへは公開しない。外部からは Cloudflare Tunnel 経由でのみ到達させる
