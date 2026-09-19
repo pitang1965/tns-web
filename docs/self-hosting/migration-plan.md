@@ -127,10 +127,21 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
 | 本番 Vercel | `x-vercel-cache: HIT`（キャッシュが効く） |
 | VPS（Cloudflare 経由） | `cf-cache-status: DYNAMIC`（毎回オリジンまで届く） |
 
-- このままだと、地図ページが呼ぶこの API のアクセスが**毎回 VPS と Atlas に届く**
-- 対応: Cloudflare の「Cache Rules」で `/api/camping-spots`（と `/api/v1/spots`）に対し、
-  オリジンのキャッシュ指定に従う設定を入れる。無料プランでも設定できる
-- 切り替え後に `cf-cache-status` が `HIT` になることを確認する
+- このままだと、これらの API のアクセスが**毎回 VPS と Atlas に届く**
+- **対応済み（2026-09-19）**: Cloudflare の「Cache Rules」を作成（無料プランで設定可）
+  - 条件: `http.request.uri` が `/api/camping-spots` または `/api/v1/spots` で始まる
+  - キャッシュの適格性: キャッシュの対象／エッジ TTL: **キャッシュ制御ヘッダーがあれば使用**（`s-maxage` に従わせる）
+  - 確認: 2回目以降 `cf-cache-status: HIT`。ページ（`/`）は `DYNAMIC` のままで正しい
+
+この2つの API の利用状況（2026-09-19 調査）:
+
+| API | 使っているもの |
+| --- | --- |
+| `/api/v1/spots` | **Android アプリ**（`tns-mobile`。`https://tabi.over40web.club/api/v1/spots` を直接指定） |
+| `/api/camping-spots` | **どこからも使われていない**（Web アプリ内に呼び出し無し、モバイルにも無し。バックエンドの利用者はこの Web アプリと Android アプリだけ、とユーザー確認済み） |
+
+- Android アプリは URL を直接持っているため、**移行してもアプリ側の変更は不要**（同じ `tabi.over40web.club` を見る）
+- `/api/camping-spots` の削除は、移行とは別の作業として検討する（移行時に消すと切り分けが難しくなる）
 
 ### 5. 本番トラフィックに耐えるかの確認
 
@@ -184,6 +195,7 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
    curl -sI https://tabi.over40web.club | head -3   # 200 が返り、Access のログイン画面に飛ばされないこと
    ```
 8. ブラウザで確認: トップ・地図・スポット詳細・旅程・ログイン・管理画面・PWA
+   - **Android アプリ用の `/api/v1/spots` が 200 を返すか**も確認する（`x-api-key` 必要）
 9. しばらく監視する（ログ・メモリ・応答時間・Sentry）
 10. Vercel 側はそのまま放置（**削除しない**。切り戻しの手段になる）
 
@@ -309,8 +321,9 @@ ssh deploy@<VPSのIP> 'cd ~/apps/tns-web && docker compose ps'               # �
 
 - [x] `VERCEL_ENV` 依存を `APP_ENV` に置き換える（Sentry・CSP）
 - [x] `scripts/deploy-vps.sh`（健全性の確認と自動切り戻し付き）を作る
-- [ ] ハング時の再起動（autoheal など）
+
 - [ ] 本番用 `.env.docker` の用意（本番DB・PostHog）
 - [ ] AI 生成の所要時間を VPS で確認（Cloudflare の応答待ち上限 約100秒に収まるか）
 - [x] 一晩の連続運転の結果確認: 18時間でメモリ 160.9MiB（増加なし）・再起動0回・トンネル接続4本維持・エラー0件
-- [ ] Cloudflare の Cache Rules で `/api/camping-spots` をキャッシュさせる（Vercel の s-maxage が効かなくなるため）
+- [x] Cloudflare の Cache Rules で API をキャッシュさせる（確認済み: 2回目以降 HIT）
+- [x] ハング時の再起動（systemd タイマー + scripts/vps-healthcheck.sh。ハングからの自動復旧を実測: 検知〜復旧 約2分）
