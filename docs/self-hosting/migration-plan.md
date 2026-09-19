@@ -156,13 +156,15 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
    | `NEXT_PUBLIC_POSTHOG_KEY` | 本番のキー（アクセス解析を戻す） |
    | `APP_ENV` | `production`（Sentry と CSP のため） |
 
+   - 実行用（VPS の `.env.docker`）とビルド用（開発PCの `BUILD_ENV_FILE`）の**両方**を本番用にする
    ```bash
-   # 開発PCから
-   scp .env.production.vps deploy@<VPS>:~/apps/tns-web/.env.docker
+   # 開発PCから（実行用）
+   scp -i ~/.ssh/id_ed25519_conoha .env.production.vps deploy@<VPSのIP>:apps/tns-web/.env.docker
+   # ビルド用は .env.deploy.vps の BUILD_ENV_FILE を本番用ファイルに向ける
    ```
-3. **イメージを作り直す**（`NEXT_PUBLIC_*` と CSP はビルド時に焼き込まれるため、再ビルドが必須）
+3. **イメージを作り直して入れ替える**（`NEXT_PUBLIC_*` と CSP はビルド時に焼き込まれるため、再ビルドが必須）
    ```bash
-   ssh deploy@<VPS> 'cd ~/apps/tns-web && APP_IMAGE_TAG=$(git rev-parse --short HEAD) docker compose build && docker compose up -d'
+   bash scripts/deploy-vps.sh
    ```
 4. **本番DBを見た状態で動作確認する**（この時点ではまだ `vps.over40web.club` から。Access で保護されている）
    - トップ・地図・スポット詳細・旅程・ログイン・**管理画面の更新**（本番データを触るので慎重に）
@@ -203,18 +205,41 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
 
 VPS では、次のいずれかになる。**最初は A、慣れたら B** を勧める。
 
-**A. 手動デプロイ（スクリプト1本）**
+**A. 手動デプロイ（`scripts/deploy-vps.sh`）— 2026-09-19 作成・動作確認済み**
 
-開発PCから1コマンドで実行する。中身は「git pull → ビルド → 入れ替え → 健全性の確認 → ダメなら前の版へ戻す」。
+開発PCから1コマンドで実行する。**ビルドは開発PCで行う**ので、VPS の CPU を奪わず、サイトの応答に影響しない。
 
 ```bash
-ssh deploy@<VPS> 'cd ~/apps/tns-web && ./scripts/deploy.sh'
+bash scripts/deploy-vps.sh              # デプロイ
+bash scripts/deploy-vps.sh --rollback   # 直前の版に戻す
 ```
 
-- スクリプトは未作成（移行前に作る）。`APP_IMAGE_TAG` にコミットハッシュを付けてビルドし、
-  `/api/health` が healthy になるまで待ち、ならなければ直前のタグへ戻す
-- ビルドは VPS 上で 約214秒・メモリ 3.6GB＋スワップ 1.1GB（[vps-poc-log.md](vps-poc-log.md)）。
-  ぎりぎりなので、**開発PCでビルドして `docker save` / `docker load` で送る方式**も選べる
+流れ:
+
+1. 開発PCで `APP_IMAGE_TAG=<コミットハッシュ>` を付けてビルド（作業ツリーが汚れていれば `-dirty` が付く）
+2. `docker save | gzip | ssh ... docker load` でイメージを転送
+3. `compose.yaml` を手元の内容に同期してから入れ替え（VPS 側が古いと設定変更が反映されないため）
+4. コンテナが healthy になるまで待ち（最大90秒）、外からの `/api/health` も確認
+5. どちらかが失敗したら、**直前の版へ自動で戻す**（切り戻し先はコンテナのラベル `app.image.tag` から取得）
+
+設定は `.env.deploy.vps`（Git 管理外）に書く:
+
+```
+VPS_HOST=deploy@<VPSのIP>
+VPS_SSH_KEY=~/.ssh/id_ed25519_conoha
+VPS_APP_DIR=apps/tns-web          # ホームからの相対パス（~ は使わない。Git Bash がパスを変換してしまう）
+BUILD_ENV_FILE=.env.vps           # ビルド時に読ませる環境変数ファイル（開発PC側）
+HEALTH_URL=https://vps.over40web.club/api/health
+```
+
+- **ビルド用と実行用で環境変数ファイルが別**: ビルドは開発PCの `BUILD_ENV_FILE`、実行は VPS の `.env.docker`。
+  `NEXT_PUBLIC_*` と CSP はビルド時に焼き込まれるので、**本番へ出すときは本番用のファイルでビルドする**
+- 所要時間: 変更なしの再ビルド＋転送で約2分（初回ビルドを含む場合は約4分）
+- 観察: 開発PCで作って送ったイメージは 794MB、VPS で直接ビルドしたものは 532MB（理由は未調査。ディスクには余裕がある）
+- 動作確認済み: 正常時の完了、`HEALTH_URL` をわざと誤らせた場合の自動切り戻し、`--rollback` の単体実行
+
+参考（VPS 上で直接ビルドする場合）: 約214秒・メモリ 3.6GB＋スワップ 1.1GB（[vps-poc-log.md](vps-poc-log.md)）。
+開発PCが使えないときの予備手段とする。
 
 **B. GitHub Actions（push で自動）**
 
@@ -232,9 +257,9 @@ ssh deploy@<VPS> 'cd ~/apps/tns-web && ./scripts/deploy.sh'
 ### ログ・監視
 
 ```bash
-ssh deploy@<VPS> 'cd ~/apps/tns-web && docker compose logs -f app'      # ログ
-ssh deploy@<VPS> 'docker stats --no-stream'                             # CPU・メモリ
-ssh deploy@<VPS> 'cd ~/apps/tns-web && docker compose ps'               # 状態
+ssh deploy@<VPSのIP> 'cd ~/apps/tns-web && docker compose logs -f app'      # ログ
+ssh deploy@<VPSのIP> 'docker stats --no-stream'                             # CPU・メモリ
+ssh deploy@<VPSのIP> 'cd ~/apps/tns-web && docker compose ps'               # 状態
 ```
 
 - Sentry を有効化すれば、エラーは今までどおり Sentry に集まる（`APP_ENV` の対応が前提）
@@ -283,9 +308,9 @@ ssh deploy@<VPS> 'cd ~/apps/tns-web && docker compose ps'               # 状態
 ## 未了の作業
 
 - [x] `VERCEL_ENV` 依存を `APP_ENV` に置き換える（Sentry・CSP）
-- [ ] `scripts/deploy.sh`（健全性の確認と自動切り戻し付き）を作る
+- [x] `scripts/deploy-vps.sh`（健全性の確認と自動切り戻し付き）を作る
 - [ ] ハング時の再起動（autoheal など）
 - [ ] 本番用 `.env.docker` の用意（本番DB・PostHog）
 - [ ] AI 生成の所要時間を VPS で確認（Cloudflare の応答待ち上限 約100秒に収まるか）
-- [ ] 一晩の連続運転の結果確認（メモリ・トンネル・経由拠点）
+- [x] 一晩の連続運転の結果確認: 18時間でメモリ 160.9MiB（増加なし）・再起動0回・トンネル接続4本維持・エラー0件
 - [ ] Cloudflare の Cache Rules で `/api/camping-spots` をキャッシュさせる（Vercel の s-maxage が効かなくなるため）
