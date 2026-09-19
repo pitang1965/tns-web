@@ -28,6 +28,50 @@
 - ただし、Vercel のビルドは push のたびに走る。使用量を抑えたい場合は、Vercel の
   「Ignored Build Step」で対象ブランチを絞る
 
+## 移行を検討する前にやったこと（アプリ側の CPU 削減）
+
+Vercel の無料枠の警告は、今回が初めてではない。
+
+| 時期 | 内容 |
+| --- | --- |
+| 2026-02-04 | **Function Invocations が無料枠の100%**（10万回）に到達 |
+| 2026-08-16 以降 | **Fluid Active CPU（4時間）の超過**。以後くり返し通知が届き、**最大で150%程度**まで達した |
+| 2026-09-13 | 同上の通知を受けて、アプリ側の CPU 削減に着手（下記） |
+| 2026-09-18 | 削減後も Usage 画面で 5時間40分 / 4時間（約142%）と超過が続く |
+
+**一時的な急増ではなく、通常の利用で無料枠に収まらなくなってきている**ことが、移行を決めた理由。
+
+2026-09-13 の通知を受けて、**まずアプリ側で CPU を減らす**ことから着手した。
+Observability のルート別内訳では、`/` が約40%、`/shachu-haku/[spotId]` が約29%、`/shachu-haku` が約16% を占めていた。
+
+### 実施した対策
+
+**1. スポット詳細ページを ISR 化**
+
+`revalidate = 86400` と `generateStaticParams` を設定し、匿名アクセスのたびにページ全体を生成する構成を見直した。
+
+ISR を成立させるため、セッションを参照しない匿名表示用の `getPublicFieldReportsBySpot` を新設した。
+ログインユーザー向けの情報は、`FieldReportSection` からクライアント側で改めて取得する構成に分離した。
+
+**2. トップページのデータ取得をキャッシュ**
+
+トップページで実行していた2件のクエリを `unstable_cache` でキャッシュし、有効期間を1時間、タグを `camping-spots` とした。
+
+スポットを変更する Server Action では `updateTag('camping-spots')` を実行し、併せて詳細ページを `revalidatePath` で再検証する。
+Next.js 16 では `revalidateTag` の第2引数が必須となったため、Server Action からの即時無効化には `updateTag` を使用した。
+
+**3. 地図操作時の不要な RSC リクエストを削減**
+
+地図の表示範囲を URL へ反映する処理を、`router.replace` から `window.history.replaceState` へ変更した。
+
+`router.replace` では地図を動かすたびに Next.js のナビゲーションが発生し、RSC リクエストが送信されていた。
+履歴だけを更新することで、サーバーへのリクエストを発生させずに URL を同期できるようにした。
+ページタイトルは `document.title` で更新した。
+
+これらは移行後の VPS でも有効な改善だが、通常利用で無料枠の超過通知が繰り返される状況になったため、
+最適化だけで無料枠内に収め続けるのではなく、移行先の検討を進めることにした。
+（VPS では**1コアあたりの性能が効く**ため、CPU を減らす価値はむしろ上がっている。[vps-poc-log.md](vps-poc-log.md)）
+
 ## 検討して見送った選択肢
 
 | 候補                     | 見送った理由                                                                                                                                                                                                         |
@@ -71,7 +115,24 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
 - `tabi.over40web.club` は**一般公開**なので、Access のアプリケーションの宛先に**加えてはいけない**
 - 宛先は `staging.over40web.club` と `vps.over40web.club` のみ
 
-### 4. 本番トラフィックに耐えるかの確認
+### 4. CDN キャッシュの違いに対応する（2026-09-19 に判明）
+
+`/api/camping-spots`（[route.ts](../../src/app/api/camping-spots/route.ts)）は `s-maxage=3600` を付けて
+**Vercel の CDN にキャッシュさせ、DB への到達を抑える**設計になっている。ところが **Cloudflare は初期設定でこれをキャッシュしない**。
+
+実測（2026-09-19）:
+
+| 環境 | 2回目のアクセス |
+| --- | --- |
+| 本番 Vercel | `x-vercel-cache: HIT`（キャッシュが効く） |
+| VPS（Cloudflare 経由） | `cf-cache-status: DYNAMIC`（毎回オリジンまで届く） |
+
+- このままだと、地図ページが呼ぶこの API のアクセスが**毎回 VPS と Atlas に届く**
+- 対応: Cloudflare の「Cache Rules」で `/api/camping-spots`（と `/api/v1/spots`）に対し、
+  オリジンのキャッシュ指定に従う設定を入れる。無料プランでも設定できる
+- 切り替え後に `cf-cache-status` が `HIT` になることを確認する
+
+### 5. 本番トラフィックに耐えるかの確認
 
 - [vps-poc-log.md](vps-poc-log.md) の計測では、同時50件で 320〜560 件/秒（エラー0）。現在のアクセス規模なら余裕がある
 - ISR のキャッシュはコンテナを作り直すと消える。切り替え直後は初回アクセスが遅い
@@ -227,3 +288,4 @@ ssh deploy@<VPS> 'cd ~/apps/tns-web && docker compose ps'               # 状態
 - [ ] 本番用 `.env.docker` の用意（本番DB・PostHog）
 - [ ] AI 生成の所要時間を VPS で確認（Cloudflare の応答待ち上限 約100秒に収まるか）
 - [ ] 一晩の連続運転の結果確認（メモリ・トンネル・経由拠点）
+- [ ] Cloudflare の Cache Rules で `/api/camping-spots` をキャッシュさせる（Vercel の s-maxage が効かなくなるため）
