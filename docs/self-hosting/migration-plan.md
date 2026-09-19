@@ -323,7 +323,7 @@ ssh deploy@<VPSのIP> 'cd ~/apps/tns-web && docker compose ps'               # �
 - [x] `scripts/deploy-vps.sh`（健全性の確認と自動切り戻し付き）を作る
 
 - [ ] 本番用 `.env.docker` の用意（本番DB・PostHog）
-- [x] AI 生成の所要時間を VPS で確認: **38秒**（開発PCは約40秒）。Cloudflare の上限 約100秒に余裕あり。
+- [x] AI 生成の所要時間を VPS で確認: **38秒**（開発PCは約40秒）。Cloudflare の上限 125秒に余裕あり。
       待ち時間の大半は Anthropic API の応答待ちで、VPS の CPU 性能の差がほぼ出ない
 - [x] 一晩の連続運転の結果確認: 18時間でメモリ 160.9MiB（増加なし）・再起動0回・トンネル接続4本維持・エラー0件
 - [x] Cloudflare の Cache Rules で API をキャッシュさせる（確認済み: 2回目以降 HIT）
