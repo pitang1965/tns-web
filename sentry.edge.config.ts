@@ -4,6 +4,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { getAppEnv, isProductionEnv } from '@/lib/appEnv';
 
 Sentry.init({
   dsn: 'https://8eafcbf664887d63e9d88ed235f4626e@o4507994894434304.ingest.de.sentry.io/4507994900791376',
@@ -14,7 +15,9 @@ Sentry.init({
   // Enable logs to be sent to Sentry
   enableLogs: true,
   // 本番環境のみSentryを有効化（プレビュー環境は除外）
-  enabled: process.env.VERCEL_ENV === 'production',
+  // セルフホストでは VERCEL_ENV が無いため APP_ENV を見る（src/lib/appEnv.ts）
+  enabled: isProductionEnv(),
+  environment: getAppEnv(),
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,

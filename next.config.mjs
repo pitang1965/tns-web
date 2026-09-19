@@ -360,7 +360,12 @@ const googleAdOrigins = [
 // sentry_environment を付ける理由: CSPレポートはSDKを経由せず、ブラウザがこのURLへ直接POSTする。
 // そのためSDKが付ける environment が付かず、Sentry側で環境フィルタを掛けると全件が消える
 // （本番の違反まで「該当なし」に見えてしまう）。レポートURLのクエリで明示的に渡す。
-const cspReportEnvironment = process.env.VERCEL_ENV || 'development';
+// 実行環境の名前。Vercel では VERCEL_ENV が自動で入るが、セルフホスト（VPS の Docker）では空になる。
+// そのため APP_ENV で明示できるようにする（src/lib/appEnv.ts と同じ判定。片方を変えたら両方を合わせる）。
+// 注意: next.config.mjs はビルド時にしか評価されないので、APP_ENV はビルド時に渡す必要がある。
+const appEnv = process.env.APP_ENV || process.env.VERCEL_ENV || 'development';
+
+const cspReportEnvironment = appEnv;
 const sentryCspReportUri =
   'https://o4507994894434304.ingest.de.sentry.io/api/4507994900791376/security/?sentry_key=8eafcbf664887d63e9d88ed235f4626e' +
   `&sentry_environment=${cspReportEnvironment}`;
@@ -372,15 +377,15 @@ const sentryCspReportUri =
 // 実際 2026-09 時点のSentryでは vercel.live の違反の約9割が tabi.over40web.club（本番）由来だった。
 // ただしツールバーが使えなくなって困るのはチームメンバーだけで、一般利用者には影響しないため、
 // 本番CSPを緩めるのではなく Vercel 側で本番のツールバーを無効化する方針を採る。
-// この判断を変えて本番でもツールバーを使いたくなった場合は isVercelProd の条件を外すこと。
-const isVercelProd = process.env.VERCEL_ENV === 'production';
-const vercelLiveScript = isVercelProd ? '' : ' https://vercel.live';
-const vercelLiveStyle = isVercelProd ? '' : ' https://vercel.live';
-const vercelLiveFont = isVercelProd ? '' : ' https://vercel.live https://assets.vercel.com';
-const vercelLiveConnect = isVercelProd
+// この判断を変えて本番でもツールバーを使いたくなった場合は isProdEnv の条件を外すこと。
+const isProdEnv = appEnv === 'production';
+const vercelLiveScript = isProdEnv ? '' : ' https://vercel.live';
+const vercelLiveStyle = isProdEnv ? '' : ' https://vercel.live';
+const vercelLiveFont = isProdEnv ? '' : ' https://vercel.live https://assets.vercel.com';
+const vercelLiveConnect = isProdEnv
   ? ''
   : ' https://vercel.live wss://ws-us3.pusher.com https://*.pusher.com';
-const vercelLiveFrame = isVercelProd ? '' : ' https://vercel.live';
+const vercelLiveFrame = isProdEnv ? '' : ' https://vercel.live';
 
 // Content-Security-Policy のディレクティブ。
 // まずは Report-Only で導入し、Sentry に集約される違反レポートを見ながら
