@@ -13,6 +13,9 @@ services:
   app:
     build:
       context: .
+      args:
+        # next.config.mjs は .env* より先に評価されるため、ビルド引数として渡す
+        APP_ENV: ${APP_ENV:-}
       secrets:
         - buildenv
     image: tns-web:${APP_IMAGE_TAG:-local}

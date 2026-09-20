@@ -18,6 +18,11 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
 FROM deps AS builder
 COPY . .
 ENV BUILD_STANDALONE=1
+# APP_ENV はビルド引数で渡す。
+# next.config.mjs は .env* が読み込まれる前に評価されるため、環境変数ファイルに書くだけでは
+# CSP のレポート環境名や vercel.live の許可が本番扱いにならない（2026-09-20 に判明）。
+ARG APP_ENV=
+ENV APP_ENV=${APP_ENV}
 # 環境変数ファイルは BuildKit の secret としてビルド中だけマウントし、レイヤーに残さない。
 # ビルド時に必要な理由:
 # - NEXT_PUBLIC_* と next.config.mjs はビルド時に評価される

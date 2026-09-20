@@ -106,7 +106,10 @@ PREV_TAG=$(current_tag)
 log "デプロイする版: $TAG（現在: ${PREV_TAG:-不明}）"
 
 log "1/5 開発PCでビルド"
-APP_IMAGE_TAG="$TAG" docker compose build app
+# next.config.mjs は .env* より先に評価されるので、APP_ENV はビルド引数として渡す
+APP_ENV=$(sed -n 's/^APP_ENV=//p' "$BUILD_ENV_FILE" | tr -d '\r' | sed -E "s/^['\"](.*)['\"]$/\1/")
+echo "  APP_ENV=${APP_ENV:-（未設定）}"
+APP_IMAGE_TAG="$TAG" APP_ENV="$APP_ENV" docker compose build app
 
 log "2/5 イメージを VPS へ転送"
 docker save "tns-web:$TAG" | gzip -1 | $REMOTE "gunzip | docker load"
