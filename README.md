@@ -118,9 +118,6 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - Auth0 アプリケーションの識別子。認証リクエストに使用される。
 - `AUTH0_CLIENT_SECRET`:
   - Auth0 アプリケーションの秘密鍵。トークン取得時などに使用される。
-- `AUTH0_AUDIENCE`:
-  - API の識別子。アクセストークンの発行対象となる API を指定する。
-  - 例: `https://api.tabi-no-shiori.com`
 - `AUTH0_DOMAIN`:
   - Auth0 テナントのドメイン。認証エンドポイントの構築に使用される。
   - 例: `your-tenant.auth0.com`
