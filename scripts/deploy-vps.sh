@@ -95,17 +95,54 @@ rollback_to() {
   fi
 }
 
+# 確認を求める。対話できない場合（自動実行など）は --yes が必要
+confirm() {
+  local msg="$1"
+  if [[ "${DEPLOY_YES:-}" == "1" ]] || [[ " ${ARGS[*]} " == *" --yes "* ]]; then
+    echo "$msg → --yes 指定のため続行します"
+    return 0
+  fi
+  if [[ ! -t 0 ]]; then
+    echo "$msg" >&2
+    echo "対話できない環境です。続行するには --yes を付けてください。" >&2
+    exit 1
+  fi
+  read -r -p "$msg 続行しますか？ [y/N] " ans
+  [[ "$ans" == "y" || "$ans" == "Y" ]] || { echo "中止しました"; exit 1; }
+}
+
+ARGS=("$@")
+
 # --- 切り戻しのみ ---
-if [[ "${1:-}" == "--rollback" ]]; then
+if [[ " ${ARGS[*]} " == *" --rollback "* ]]; then
   PREV=$($REMOTE "cat $VPS_APP_DIR/.deploy-previous-tag 2>/dev/null" | tr -d '\r')
   [[ -z "$PREV" ]] && { echo "直前の版の記録（.deploy-previous-tag）がありません" >&2; exit 1; }
+  NOW=$(current_tag)
+  echo "現在: ${NOW:-不明} → 戻す先: $PREV"
+  if [[ "$PREV" == "$NOW" ]]; then
+    echo "戻す先が現在と同じ版です。切り戻しても内容は変わりません。" >&2
+  fi
+  confirm "この版に戻します。"
   rollback_to "$PREV"
   exit 0
 fi
 
 # --- 通常のデプロイ ---
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TAG=$(git rev-parse --short HEAD)
-[[ -n "$(git status --porcelain)" ]] && TAG="${TAG}-dirty"
+DIRTY=""
+[[ -n "$(git status --porcelain)" ]] && DIRTY=1
+
+# 事故防止: main 以外、または未コミットの変更があるときは確認する
+if [[ "$BRANCH" != "main" ]]; then
+  confirm "現在のブランチは '$BRANCH' です（本番は通常 main）。"
+fi
+if [[ -n "$DIRTY" ]]; then
+  # 未コミットのまま出すと版の名前が重なり、切り戻し先が同じになってしまうので時刻を足す
+  TAG="${TAG}-dirty-$(date +%m%d%H%M)"
+  confirm "未コミットの変更があります（版: $TAG）。"
+fi
+
 PREV_TAG=$(current_tag)
 log "デプロイする版: $TAG（現在: ${PREV_TAG:-不明}）"
 
