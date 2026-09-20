@@ -131,6 +131,10 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `AUTH0_M2M_CLIENT_SECRET`:
   - Auth0 Management API にアクセスするための Machine to Machine Application のクライアント秘密鍵。
   - ユーザー統計取得などの管理機能で使用される。
+- `AUTH0_WEBHOOK_SECRET`:
+  - ユーザー登録通知の webhook（`/api/auth/user-registered`）を検証する共有シークレット。
+  - Auth0 の Action 側で、同じ値を `Authorization: Bearer <secret>` ヘッダーに付けて送る。
+  - **未設定の場合、webhook は 503 で拒否される**（fail-closed。設定漏れで検証が無効化されるのを防ぐ）。
 
 ### 地図
 
@@ -168,6 +172,14 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - モバイルアプリ側は `EXPO_PUBLIC_SPOTS_API_KEY` に同じ値を設定する（tns-mobile リポジトリ参照）。
   - キーをローテーションすると旧バージョンのアプリは 401 になる点に注意（詳細は ADR-0006 追記）。
 
+### 実行環境
+
+- `APP_ENV`（Vercel 以外で必須）:
+  - 実行環境の名前（`production` / `staging` など）。Sentry の有効化と、CSP のレポート環境名の判定に使う（`src/lib/appEnv.ts`）。
+  - Vercel では `VERCEL_ENV` が自動で設定されるため不要。**セルフホスト（VPS の Docker）では `VERCEL_ENV` が空になる**ので、
+    本番では `APP_ENV=production` を設定しないと、サーバー側のエラーが Sentry に届かない。
+  - `next.config.mjs` はビルド時にしか評価されないため、**ビルド時にも渡す必要がある**（`scripts/deploy-vps.sh` が build args で渡す）。
+
 ### モニタリング・分析
 
 - `SENTRY_AUTH_TOKEN`:
@@ -195,6 +207,10 @@ Google Maps とシームレスに連携することで、旅行計画から実�
 - `NEXT_PUBLIC_ADSENSE_CLIENT_ID`:
   - Google AdSense のクライアント ID。広告の表示に使用される。
   - 例: `ca-pub-XXXXXXXXXXXXXXXX`
+- `NEXT_PUBLIC_ADSENSE_SLOT_DETAIL_TOP` / `NEXT_PUBLIC_ADSENSE_SLOT_DETAIL_BOTTOM`:
+  - 車中泊スポット詳細ページの、上部・下部の広告枠 ID（AdSense の広告ユニット）。
+  - 未設定の場合、その枠は表示されない。
+  - 例: `1234567890`
 
 ### 管理者
 
