@@ -23,6 +23,13 @@ ENV BUILD_STANDALONE=1
 # CSP のレポート環境名や vercel.live の許可が本番扱いにならない（2026-09-20 に判明）。
 ARG APP_ENV=
 ENV APP_ENV=${APP_ENV}
+# 環境変数ファイルの中身が変わってもビルドキャッシュは無効にならない（BuildKit の secret は
+# キャッシュキーに含まれない）。開発用の設定でビルドした結果が使い回され、
+# NEXT_PUBLIC_* の埋め込みや sitemap の事前生成が古いままになる（2026-09-20 に判明）。
+# そのため、ファイルのハッシュを引数で渡して変更を検知させる。
+# 注意: ARG は「使われて」いないとキャッシュの判定に含まれないため、ENV で参照する
+ARG ENV_HASH=
+ENV ENV_HASH=${ENV_HASH}
 # 環境変数ファイルは BuildKit の secret としてビルド中だけマウントし、レイヤーに残さない。
 # ビルド時に必要な理由:
 # - NEXT_PUBLIC_* と next.config.mjs はビルド時に評価される

@@ -288,6 +288,17 @@ HEALTH_URL=https://vps.over40web.club/api/health
 
 - **ビルド用と実行用で環境変数ファイルが別**: ビルドは開発PCの `BUILD_ENV_FILE`、実行は VPS の `.env.docker`。
   `NEXT_PUBLIC_*` と CSP はビルド時に焼き込まれるので、**本番へ出すときは本番用のファイルでビルドする**
+- **つまずき2件（2026-09-20、修正済み）**: ビルドが開発用の設定で行われ、次の症状が出た
+  - `NEXT_PUBLIC_POSTHOG_KEY` が埋め込まれず、**アクセス解析が動かない**
+  - ビルド時に DB を読む処理（`sitemap.ts`・`generateStaticParams`）が開発用 DB を見て、
+    **sitemap に本番に存在しない URL が載る**（2,010件。本番は 2,042件）
+  - 原因1: スクリプトが設定ファイルを読み込むだけで `export` しておらず、`BUILD_ENV_FILE` が
+    `docker compose` に渡っていなかった（secret に既定値の `.env.docker`＝開発用が使われていた）
+  - 原因2: **BuildKit の secret はキャッシュキーに含まれない**ため、環境変数ファイルを変えても
+    `pnpm build` のレイヤーが再利用される。`ENV_HASH`（ファイルのハッシュ）を build args で渡して検知させる
+    （ARG は参照されていないとキャッシュ判定に入らないので、`ENV ENV_HASH=${ENV_HASH}` で参照する）
+  - 確認方法: `curl -s https://tabi.over40web.club/sitemap.xml | grep -c 'shachu-haku/[0-9a-f]\{24\}'` が本番の件数と一致すること、
+    コンテナ内で `grep -rl phc_ .next/static` が1件以上あること
 - 所要時間: 変更なしの再ビルド＋転送で約2分（初回ビルドを含む場合は約4分）
 - 観察: 開発PCで作って送ったイメージは 794MB、VPS で直接ビルドしたものは 532MB（理由は未調査。ディスクには余裕がある）
 - 動作確認済み: 正常時の完了、`HEALTH_URL` をわざと誤らせた場合の自動切り戻し、`--rollback` の単体実行

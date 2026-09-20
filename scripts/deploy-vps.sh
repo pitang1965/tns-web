@@ -29,8 +29,12 @@ if [[ ! -f "$CONF" ]]; then
 SAMPLE
   exit 1
 fi
+# set -a を付けて読み込む。export しないと、compose の子プロセスに BUILD_ENV_FILE が渡らず、
+# secret に既定値（.env.docker＝開発用）が使われてビルド結果が開発用になる（2026-09-20 に判明）
+set -a
 # shellcheck disable=SC1090
 source <(tr -d '\r' < "$CONF" | grep -E '^[A-Z0-9_]+=')
+set +a
 
 SSH="ssh -i ${VPS_SSH_KEY/#\~/$HOME} -o BatchMode=yes -o ConnectTimeout=20 -o ServerAliveInterval=30"
 REMOTE="$SSH $VPS_HOST"
@@ -108,8 +112,10 @@ log "デプロイする版: $TAG（現在: ${PREV_TAG:-不明}）"
 log "1/5 開発PCでビルド"
 # next.config.mjs は .env* より先に評価されるので、APP_ENV はビルド引数として渡す
 APP_ENV=$(sed -n 's/^APP_ENV=//p' "$BUILD_ENV_FILE" | tr -d '\r' | sed -E "s/^['\"](.*)['\"]$/\1/")
-echo "  APP_ENV=${APP_ENV:-（未設定）}"
-APP_IMAGE_TAG="$TAG" APP_ENV="$APP_ENV" docker compose build app
+# 環境変数ファイルの中身が変わったらビルドし直す（BuildKit の secret はキャッシュキーに含まれないため）
+ENV_HASH=$(sha256sum "$BUILD_ENV_FILE" | cut -c1-16)
+echo "  APP_ENV=${APP_ENV:-（未設定）} / 環境変数ファイル=${BUILD_ENV_FILE}（$ENV_HASH）"
+APP_IMAGE_TAG="$TAG" APP_ENV="$APP_ENV" ENV_HASH="$ENV_HASH" docker compose build app
 
 log "2/5 イメージを VPS へ転送"
 docker save "tns-web:$TAG" | gzip -1 | $REMOTE "gunzip | docker load"

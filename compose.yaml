@@ -16,6 +16,8 @@ services:
       args:
         # next.config.mjs は .env* より先に評価されるため、ビルド引数として渡す
         APP_ENV: ${APP_ENV:-}
+        # 環境変数ファイルが変わったらビルドし直すための値（deploy-vps.sh が渡す）
+        ENV_HASH: ${ENV_HASH:-}
       secrets:
         - buildenv
     image: tns-web:${APP_IMAGE_TAG:-local}
