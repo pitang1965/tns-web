@@ -37,7 +37,7 @@ flowchart LR
     D --> M["MongoDB Atlas<br/>itinerary_db_dev"]
 ```
 
-- **公開ホスト名は `vps.over40web.club`**（新しいトンネル `vps-trial` を作る）。
+- **公開ホスト名は `vps.over40web.club`**（新しいトンネルを作る。名前は当初 `vps-trial`、本番移行後に `conoha-vps` へ変更）。
   開発PCの `staging.over40web.club` はそのまま残し、**両方を並べて比較できるようにする**
   （同じトンネルのトークンを2台で使うと、アクセスが2台に振り分けられてしまうため、必ず別トンネルにする）
 - Cloudflare Access で、`vps.over40web.club` にも staging と同じ2つのポリシー（メール許可・サービストークン）を付ける
@@ -133,7 +133,7 @@ flowchart LR
   - 開発PC（約110秒 / 最大約1GB）と比べて時間は約2倍、メモリはぎりぎり。**スワップ2GB があるおかげで完走している**
   - 実運用では、開発PCでビルドしたイメージを転送する方式（`docker save` / `load`）も検討する
 - ビルド時に `generateStaticParams` が DB を読むので、**Atlas の IP 制限は VPS からの接続を許している**ことが確認できた
-- トンネル `vps-trial` を作成し、公開ホスト名 `vps.over40web.club` → `http://app:3000`。トークンは `.env.tunnel` に置く
+- トンネル `vps-trial`（後に `conoha-vps` へ改名）を作成し、公開ホスト名 `vps.over40web.club` → `http://app:3000`。トークンは `.env.tunnel` に置く
 - Cloudflare Access は、既存のアプリケーション `staging` の宛先に `vps.over40web.club` を**追加**（ポリシーは共用）
   - 確認: トークンなし 302 / サービストークンあり 200。本番 `tabi` は 200 のまま
 

@@ -72,6 +72,25 @@ Next.js 16 では `revalidateTag` の第2引数が必須となったため、Ser
 最適化だけで無料枠内に収め続けるのではなく、移行先の検討を進めることにした。
 （VPS では**1コアあたりの性能が効く**ため、CPU を減らす価値はむしろ上がっている。[vps-poc-log.md](vps-poc-log.md)）
 
+## 現在の構成（2026-09-20 移行完了）
+
+```mermaid
+flowchart LR
+    U["利用者・Androidアプリ"] --> CF["Cloudflare<br/>（プロキシ・キャッシュ）"]
+    CF --> T["Cloudflare Tunnel<br/>conoha-vps"]
+    T --> D["ConoHa VPS の Docker<br/>Next.js standalone"]
+    D --> M["MongoDB Atlas<br/>itinerary_db（本番）"]
+```
+
+| 項目 | 値 |
+| --- | --- |
+| 本番URL | `tabi.over40web.club`（Access なし＝一般公開） |
+| 検証用URL | `vps.over40web.club`（Access 保護。**本番DBを見るので操作に注意**） |
+| トンネル名 | `conoha-vps`（当初 `vps-trial`。改名しても ID・トークンは変わらず、再設定は不要だった） |
+| VPS | ConoHa 4GB / 4Core / SSD 100GB、まとめトク1か月（2,189円、自動更新 ON、2026-10-19 まで） |
+| ネームタグ | `tns-web-staging`（作成時の名前。実態は本番） |
+| 切り戻し | Cloudflare の DNS で `tabi` を Vercel の CNAME に戻す（下記） |
+
 ## 検討して見送った選択肢
 
 | 候補                     | 見送った理由                                                                                                                                                                                                         |
@@ -133,6 +152,16 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
   - キャッシュの適格性: キャッシュの対象／エッジ TTL: **キャッシュ制御ヘッダーがあれば使用**（`s-maxage` に従わせる）
   - 確認: 2回目以降 `cf-cache-status: HIT`。ページ（`/`）は `DYNAMIC` のままで正しい
 
+**重要（2026-09-20 に判明し、修正済み）: `/api/v1/spots` はキャッシュしてはいけない**
+
+- Cache Rules に `/api/v1/spots` を含めたところ、**API キー無しでも 200 が返るようになった**（キャッシュから返るため）
+- 理由: Vercel ではキー検証（`src/proxy.ts`）が CDN キャッシュより手前で毎回走るが、
+  **Cloudflare のキャッシュはアプリの完全に手前**にあり、ヒットすると `proxy.ts` に届かない
+- 対応: Cache Rules の条件を `/api/camping-spots` のみに変更（`starts_with(http.request.uri, "/api/camping-spots")`）
+  - 確認: キー無し 401、キーあり 200（`cf-cache-status: DYNAMIC`）、`/api/camping-spots` は `HIT` のまま
+- 今後の選択肢: Cloudflare の WAF カスタムルール（無料プランで5つまで）で `/api/v1/*` のキーを
+  エッジで検証すれば、キャッシュと保護を両立できる。未実施
+
 この2つの API の利用状況（2026-09-19 調査）:
 
 | API | 使っているもの |
@@ -185,9 +214,14 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
 
 5. Zero Trust（左メニューの「Zero Trust」）→「ネットワーク」→「Tunnels」→ VPS のトンネル →「公開ホスト名」に追加
    - サブドメイン `tabi` / ドメイン `over40web.club` / タイプ `HTTP` / URL `app:3000`
+   - 画面の場所: 左メニュー「ネットワーク」→「**コネクタ**」→ トンネル名 →「**公開アプリケーションルート**」タブ →
+     右上の「**＋ 公開アプリケーションルートを追加**」（既存の `vps` の行の「編集」ではない。`vps` は検証用に残す）
    - 保存すると **Cloudflare の DNS に `tabi` の CNAME（`<トンネルID>.cfargotunnel.com`、プロキシ有効）が自動で作られる**
-   - 既存の `tabi` → `cname.vercel-dns.com` と衝突する。置き換えを促されたら承諾する。
-     促されない場合は、DNS 画面で古いレコードを削除してからやり直す
+   - **既存の `tabi`（Vercel 向け）があると `A DNS record with this name already exists.` で保存できない。**
+     先に DNS 画面で古いレコードを削除してから、もう一度保存する
+   - **削除する前に、切り戻し用に値を控える**（下の「切り戻し手順」の表と同じ内容）:
+     名前 `tabi` / タイプ `CNAME` / ターゲット `cname.vercel-dns.com` / プロキシ **DNS のみ** / TTL 自動
+   - 削除してから作り直すまでの数十秒〜数分は、`tabi.over40web.club` の名前解決ができない（サイトが見られない）
 6. **`tabi` を Access の宛先に入れないこと**（一般公開のため）。宛先は `staging` と `vps` のみ
 7. 反映を確認する
    ```bash
@@ -205,7 +239,15 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
    1. 左メニューの「**ドメイン**」
    2. 一覧から「**over40web.club**」を選ぶ（「最近」の欄からでもよい）
    3. 左メニューの内容が入れ替わるので、下の方の「**DNS**」→「**レコード**」
-2. `tabi` のレコードを編集し、`cname.vercel-dns.com` / **DNS のみ（灰色）** に戻す
+2. `tabi` のレコードを、**切り替え前と同じ次の内容**に戻す（レコードが無ければ新規作成する）
+
+   | 項目 | 値 |
+   | --- | --- |
+   | 名前 | `tabi` |
+   | タイプ | `CNAME` |
+   | ターゲット | `cname.vercel-dns.com` |
+   | プロキシ ステータス | **DNS のみ**（灰色） |
+   | TTL | 自動 |
 3. 数十秒で Vercel に戻る
 4. 必要なら、トンネルの公開ホスト名から `tabi` を外す
 
@@ -322,9 +364,9 @@ ssh deploy@<VPSのIP> 'cd ~/apps/tns-web && docker compose ps'               # �
 - [x] `VERCEL_ENV` 依存を `APP_ENV` に置き換える（Sentry・CSP）
 - [x] `scripts/deploy-vps.sh`（健全性の確認と自動切り戻し付き）を作る
 
-- [ ] 本番用 `.env.docker` の用意（本番DB・PostHog）
+- [x] 本番用 `.env.docker` の用意（本番DB・PostHog。Vercel の Sensitive 変数は `vercel env pull` で空になるため、手元の控えから作成）
 - [x] AI 生成の所要時間を VPS で確認: **38秒**（開発PCは約40秒）。Cloudflare の上限 125秒に余裕あり。
       待ち時間の大半は Anthropic API の応答待ちで、VPS の CPU 性能の差がほぼ出ない
 - [x] 一晩の連続運転の結果確認: 18時間でメモリ 160.9MiB（増加なし）・再起動0回・トンネル接続4本維持・エラー0件
-- [x] Cloudflare の Cache Rules で API をキャッシュさせる（確認済み: 2回目以降 HIT）
+- [x] Cloudflare の Cache Rules（`/api/camping-spots` のみ。`/api/v1/spots` はキー検証のため対象外）
 - [x] ハング時の再起動（systemd タイマー + scripts/vps-healthcheck.sh。ハングからの自動復旧を実測: 検知〜復旧 約2分）
