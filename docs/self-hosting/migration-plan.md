@@ -171,6 +171,7 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
 
 - Android アプリは URL を直接持っているため、**移行してもアプリ側の変更は不要**（同じ `tabi.over40web.club` を見る）
 - `/api/camping-spots` の削除は、移行とは別の作業として検討する（移行時に消すと切り分けが難しくなる）
+  - **実施済み（2026-09-21）**: ルート（`src/app/api/camping-spots/route.ts`）と、対応する Cloudflare の Cache Rule をいずれも削除した。このページ内の `/api/camping-spots` への言及は、削除前の設定の記録として残す
 
 ### 5. 本番トラフィックに耐えるかの確認
 
