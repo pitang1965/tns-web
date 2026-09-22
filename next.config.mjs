@@ -351,7 +351,19 @@ const googleAdOrigins = [
   'https://*.adtrafficquality.google',
   // AdSense が計測ビーコン(CSI)・静的アセットで使う Google 静的ホスト（csi.gstatic.com 等）
   'https://*.gstatic.com',
+  // AMP 形式の広告クリエイティブの配信元。広告を再開した後に違反が出たため追加
+  // （Sentry TABI-NO-SHIORI-93、2026-09-21）
+  'https://cdn.ampproject.org',
 ].join(' ');
+
+// Cloudflare Web Analytics のビーコン。本番を Cloudflare 経由の VPS へ移した際に、
+// Cloudflare 側が beacon.min.js を自動注入するようになったため許可が要る
+// （Sentry TABI-NO-SHIORI-92 / 8Z）。計測結果は同一オリジンの /cdn-cgi/rum へ送るため、
+// connect-src への追加は不要。
+//
+// PostHog とアクセス解析の用途が重複しているので、Cloudflare ダッシュボードで
+// Web Analytics の自動注入を切るなら、この許可ごと削除してよい。
+const cloudflareInsightsScript = 'https://static.cloudflareinsights.com';
 
 // Sentry の CSP 違反レポート受信エンドポイント。
 // DSN は instrumentation-client.ts と同一（公開鍵でありシークレットではない）。EUリージョン(.de)。
@@ -406,7 +418,7 @@ const cspDirectives = [
   "frame-ancestors 'self'",
   `form-action 'self' ${authIssuer}`.trim(),
   // Next.js のインラインスクリプトと Mapbox GL のWorker生成のため unsafe-inline / unsafe-eval が必要
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleAdOrigins} ${posthogHost} https://us-assets.i.posthog.com https://api.mapbox.com${vercelLiveScript}`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleAdOrigins} ${posthogHost} https://us-assets.i.posthog.com https://api.mapbox.com ${cloudflareInsightsScript}${vercelLiveScript}`,
   `style-src 'self' 'unsafe-inline' https://api.mapbox.com${vercelLiveStyle}`,
   // 地図タイル・アバター・広告・アフィリエイト画像など多様なため https: を広めに許可
   "img-src 'self' data: blob: https:",
