@@ -56,6 +56,14 @@ export function isAndroidWebView(): boolean {
 }
 
 /**
+ * Android端末を検出（ブラウザ種別は問わない）
+ */
+export function isAndroidDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /android/i.test(navigator.userAgent);
+}
+
+/**
  * 安全なpostMessage実行
  * Facebook In-App Browserなどでのエラーを防ぐ
  */

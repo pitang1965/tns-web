@@ -25,7 +25,8 @@ export type AnalyticsEvent =
   | 'pwa_banner_shown'
   | 'pwa_banner_dismissed'
   | 'pwa_banner_install_clicked'
-  | 'pwa_banner_app_installed';
+  | 'pwa_banner_app_installed'
+  | 'android_app_link_clicked'; // 車中泊スポット一覧の「モバイルアプリを開く」ボタンのクリック
 
 // posthog-js は init 前でも capture を呼べるが警告が出るため、初期化済みのみ送る
 function isReady(): boolean {

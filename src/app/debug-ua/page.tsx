@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const PATTERNS = [
   { name: 'Twitter', regex: /Twitter/i },
@@ -13,22 +13,24 @@ const PATTERNS = [
 ];
 
 export default function DebugUserAgentPage() {
-  const [userAgent] = useState(() =>
-    typeof window !== 'undefined' ? (navigator.userAgent || navigator.vendor) : '',
-  );
+  const [userAgent, setUserAgent] = useState('');
+  const [today, setToday] = useState('');
+  const [localStorageValue, setLocalStorageValue] = useState('');
 
-  const [today] = useState(() =>
-    typeof window !== 'undefined' ? new Date().toDateString() : '',
-  );
-
-  const [localStorageValue, setLocalStorageValue] = useState(() => {
-    if (typeof window === 'undefined') return '';
+  // navigator / localStorage はサーバでは読めないため、初期値ではなくマウント後に反映する
+  // （レンダー中に判定するとハイドレーション不一致になる）。
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUserAgent(navigator.userAgent || navigator.vendor);
+    setToday(new Date().toDateString());
     try {
-      return localStorage.getItem('inAppBrowserWarningDismissed') || 'null';
+      setLocalStorageValue(
+        localStorage.getItem('inAppBrowserWarningDismissed') || 'null',
+      );
     } catch {
-      return 'Error accessing localStorage';
+      setLocalStorageValue('Error accessing localStorage');
     }
-  });
+  }, []);
 
   const matchedPattern = PATTERNS.filter((p) => p.regex.test(userAgent)).map((p) => p.name);
   const isInAppBrowser = matchedPattern.length > 0;

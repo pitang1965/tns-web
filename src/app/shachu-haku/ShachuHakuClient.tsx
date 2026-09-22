@@ -26,8 +26,10 @@ import { useLocationNavigation } from '@/hooks/useLocationNavigation';
 import { useSpotFiltering } from '@/hooks/useSpotFiltering';
 import { useOrientation } from '@/hooks/useOrientation';
 import { useUrlSync } from '@/hooks/useUrlSync';
+import { useIsAndroid } from '@/hooks/useIsAndroid';
+import { capture } from '@/lib/analytics';
 
-import { MapPin, Info, Plus, Share2, Sparkles } from 'lucide-react';
+import { MapPin, Info, Plus, Share2, Smartphone, Sparkles } from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
@@ -41,13 +43,16 @@ import { ShachuHakuSpotsList } from '@/components/shachu-haku/ShachuHakuSpotsLis
 import { SpotPopup } from '@/components/shachu-haku/SpotPopup';
 import { AdLink } from '@/components/shachu-haku/AdLink';
 
+const ANDROID_APP_STORE_URL =
+  'https://play.google.com/store/apps/details?id=club.over40web.tabi.spots&hl=ja';
+
 // Dynamically import the map component to avoid SSR issues
 const ShachuHakuMap = dynamic(
   () => import('@/components/shachu-haku/ShachuHakuMap'),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[600px] bg-gray-100 animate-pulse rounded-lg" />
+      <div className="h-150 bg-gray-100 animate-pulse rounded-lg" />
     ),
   },
 );
@@ -57,6 +62,7 @@ export default function ShachuHakuClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const isAndroid = useIsAndroid();
 
   // Use custom hook for filter persistence
   const {
@@ -435,23 +441,42 @@ export default function ShachuHakuClient() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Link href="/shachu-haku/shindan">
+            <div className="flex flex-row gap-2">
+              <Link href="/shachu-haku/shindan" className="flex-1 sm:flex-initial">
+                <Button
+                  variant="outline"
+                  className="w-full cursor-pointer whitespace-nowrap border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  スポット診断
+                </Button>
+              </Link>
               <Button
+                onClick={handleShare}
                 variant="outline"
-                className="w-full sm:w-auto cursor-pointer whitespace-nowrap border-pink-500 text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-950"
+                className="flex-1 sm:flex-initial cursor-pointer whitespace-nowrap"
               >
-                <Sparkles className="w-4 h-4" />
-                スポット診断
+                <Share2 className="w-4 h-4" />
+                車中泊スポットを共有
               </Button>
-            </Link>
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              className="w-full sm:w-auto cursor-pointer whitespace-nowrap"
-            >
-              <Share2 className="w-4 h-4" />
-              車中泊情報を共有
-            </Button>
+            </div>
+            {isAndroid && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full sm:w-auto cursor-pointer whitespace-nowrap"
+              >
+                <a
+                  href={ANDROID_APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => capture('android_app_link_clicked')}
+                >
+                  <Smartphone className="w-4 h-4" />
+                  車中泊スポットをアプリで探す
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </div>
