@@ -159,8 +159,16 @@ VPS 上の `~/apps/tns-web/.env.docker` を本番用に差し替える。開発P
   **Cloudflare のキャッシュはアプリの完全に手前**にあり、ヒットすると `proxy.ts` に届かない
 - 対応: Cache Rules の条件を `/api/camping-spots` のみに変更（`starts_with(http.request.uri, "/api/camping-spots")`）
   - 確認: キー無し 401、キーあり 200（`cf-cache-status: DYNAMIC`）、`/api/camping-spots` は `HIT` のまま
-- 今後の選択肢: Cloudflare の WAF カスタムルール（無料プランで5つまで）で `/api/v1/*` のキーを
-  エッジで検証すれば、キャッシュと保護を両立できる。未実施
+- **実施済み（2026-09-26）**: Cloudflare の WAF カスタムルール（セキュリティ → WAF → カスタムルール）で
+  `/api/v1/*` のキーをエッジで検証するようにし、Cache Rules に `/api/v1/spots` を追加し直した
+  - WAF ルール（`api-v1-key-check`）: `starts_with(http.request.uri.path, "/api/v1") and http.request.headers["x-api-key"][0] ne "<値>"` を**ブロック**
+    （`http_request_firewall_custom` フェーズは Cache Rules より先に評価されるため、キャッシュ済みレスポンスもキー無しには返らない）
+  - Cache Rules（`api-v1-spots-cache`）: `starts_with(http.request.uri.path, "/api/v1/spots")` を対象に、
+    `/api/camping-spots` ルールと同じ「キャッシュ制御ヘッダーが存在する場合は使用」で追加
+  - 確認: キー無し/誤ったキー → **403**（WAFがオリジンに届く前に遮断するため、`proxy.ts` が返す401ではなくCloudflareの403になる。正しい挙動）、
+    正しいキー → 200、2回目以降 `cf-cache-status: HIT`
+  - なお `/api/camping-spots` ルート削除（2026-09-21）時に対応する Cache Rule も削除済みのため、
+    このタイミングでは Cache Rules が一時的に0件になっていた（想定どおり）
 
 この2つの API の利用状況（2026-09-19 調査）:
 

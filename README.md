@@ -171,6 +171,11 @@ Google Maps とシームレスに連携することで、旅行計画から実�
   - リクエストヘッダー `x-api-key` が一致しない場合に 401 を返す。**未設定の環境では `/api/v1/*` は全て 401**（fail-closed。設定漏れで保護が静かに無効化されるのを防ぐ）。
   - モバイルアプリ側は `EXPO_PUBLIC_SPOTS_API_KEY` に同じ値を設定する（tns-mobile リポジトリ参照）。
   - キーをローテーションすると旧バージョンのアプリは 401 になる点に注意（詳細は ADR-0006 追記）。
+  - `/api/v1/spots` は `Cache-Control: s-maxage=3600` を返しており、最大1時間 CDN にキャッシュされる。
+    そのため**スポットの投稿・更新がアプリに反映されるまで最大1時間かかる場合がある**。
+    セルフホスト環境（VPS + Cloudflare Tunnel）では、Cloudflare の WAF カスタムルールがエッジでキーを検証してから
+    Cache Rules がキャッシュする構成になっており、鍵検証とキャッシュを両立している（詳細は
+    [docs/self-hosting/migration-plan.md](docs/self-hosting/migration-plan.md) を参照）。
 
 ### 実行環境
 
