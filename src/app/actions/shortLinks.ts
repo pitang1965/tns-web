@@ -37,10 +37,14 @@ export async function getOrCreateShortLink(
 ): Promise<ShortLinkRow> {
   const email = await requireAdminEmail();
 
+  let parsedUrl: URL;
   try {
-    new URL(targetUrl);
+    parsedUrl = new URL(targetUrl);
   } catch {
     throw new Error('URLの形式が正しくありません');
+  }
+  if (parsedUrl.protocol !== 'https:') {
+    throw new Error('httpsのURLのみ短縮できます');
   }
 
   await ensureDbConnection();
