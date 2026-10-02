@@ -105,6 +105,18 @@ const INDEXES_BY_COLLECTION = {
       why: '無料/有料での絞り込み',
     },
   ],
+  shortlinks: [
+    {
+      key: { code: 1 },
+      options: { unique: true, name: 'code_1' },
+      why: 's.nafuda.me/<code> のリダイレクト先検索（ユニーク制約）',
+    },
+    {
+      key: { targetUrl: 1 },
+      options: { unique: true, name: 'targetUrl_1' },
+      why: '同じURLの重複発行を防ぎ、既存の短縮URLを再利用する（ユニーク制約）',
+    },
+  ],
 };
 
 function maskUri(uri) {

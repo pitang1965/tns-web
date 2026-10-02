@@ -13,6 +13,7 @@ import {
   Users,
   Coins,
   NotebookPen,
+  Link2,
 } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import {
@@ -124,6 +125,15 @@ export function Navigation() {
               <Link href="/admin/points" className="flex items-center w-full">
                 <Coins className="mr-1 h-4 w-4" />
                 アズキ
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href="/admin/short-links"
+                className="flex items-center w-full"
+              >
+                <Link2 className="mr-1 h-4 w-4" />
+                短縮URL
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -19,6 +19,7 @@ import {
   Bell,
   Coins,
   NotebookPen,
+  Link2,
 } from 'lucide-react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
@@ -196,6 +197,18 @@ export function BurgerMenu() {
             >
               <Coins className="mr-1" />
               アズキ管理
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Link
+              href="/admin/short-links"
+              className="flex items-center"
+              onClick={(e) => handleItemClick(e, '/admin/short-links')}
+            >
+              <Link2 className="mr-1" />
+              短縮URL管理
             </Link>
           </DropdownMenuItem>
         )}

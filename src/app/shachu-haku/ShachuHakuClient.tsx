@@ -29,12 +29,25 @@ import { useUrlSync } from '@/hooks/useUrlSync';
 import { useIsAndroid } from '@/hooks/useIsAndroid';
 import { capture } from '@/lib/analytics';
 
-import { MapPin, Info, Plus, Share2, Smartphone, Sparkles } from 'lucide-react';
+import {
+  MapPin,
+  Info,
+  Plus,
+  Share2,
+  Smartphone,
+  Sparkles,
+  Link2,
+} from 'lucide-react';
 import {
   getPublicCampingSpotsByBounds,
   getPublicCampingSpotsWithPagination,
 } from '../actions/campingSpots/public';
-import { handleCampingSpotShare } from '@/lib/shareUtils';
+import {
+  handleCampingSpotShare,
+  createCampingSpotShareData,
+} from '@/lib/shareUtils';
+import { getOrCreateShortLink } from '@/app/actions/shortLinks';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { serializeSpotTypes, spotTypesToLabel } from '@/lib/spotTypeFilter';
 import { CampingSpotWithId } from '@/data/schemas/campingSpot';
 import ShachuHakuFilters from '@/components/shachu-haku/ShachuHakuFilters';
@@ -62,6 +75,7 @@ export default function ShachuHakuClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { isAdmin } = useAdminStatus();
   const isAndroid = useIsAndroid();
 
   // Use custom hook for filter persistence
@@ -398,6 +412,39 @@ export default function ShachuHakuClient() {
     }
   };
 
+  // 管理者専用：現在の絞り込み条件のURLを短縮する
+  const handleCreateShortLink = async () => {
+    const { url } = createCampingSpotShareData({
+      searchTerm,
+      typeFilter,
+      tab: activeTab,
+      zoom: mapZoom,
+      center: mapCenter,
+      bounds: savedBounds,
+      clientFilters,
+    });
+
+    try {
+      const { shortUrl } = await getOrCreateShortLink(url);
+      try {
+        await navigator.clipboard.writeText(shortUrl);
+      } catch {
+        // クリップボードAPIが使えない環境ではコピーだけ諦める
+      }
+      toast({
+        title: '短縮URLを発行しました',
+        description: shortUrl,
+      });
+    } catch (error) {
+      toast({
+        title: 'エラー',
+        description:
+          error instanceof Error ? error.message : '短縮URLの発行に失敗しました',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Use spot filtering hook
   const { filteredSpots, visibleSpots, activeFilterDescriptions } =
     useSpotFiltering({
@@ -459,6 +506,16 @@ export default function ShachuHakuClient() {
                 <Share2 className="w-4 h-4" />
                 車中泊スポットを共有
               </Button>
+              {isAdmin && (
+                <Button
+                  onClick={handleCreateShortLink}
+                  variant="outline"
+                  className="flex-1 sm:flex-initial cursor-pointer whitespace-nowrap"
+                >
+                  <Link2 className="w-4 h-4" />
+                  短縮URLを作る
+                </Button>
+              )}
             </div>
             {isAndroid && (
               <Button

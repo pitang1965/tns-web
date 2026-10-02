@@ -209,6 +209,7 @@ The shadcn CLI sometimes creates files in `./@/components/ui/` instead of `src/c
 | スポット投稿 | スポット投稿管理 | スポット投稿 (Camping Spot Submission) |
 | 現地報告 | 現地報告管理 | 現地報告 (Field Report) |
 | アズキ | アズキ管理 | アズキ (Azuki) |
+| 短縮URL | 短縮URL管理 | 短縮URL (Short Link) |
 
 注意：「アズキポイント」という複合語は使わない。CONTEXT.md では「ポイント」は内部名、「アズキ」はユーザー向け表示名と定めており、両方を連ねると第3の語を作ることになる。
 

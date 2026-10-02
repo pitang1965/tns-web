@@ -15,6 +15,7 @@ import {
   Search,
   Shield,
   Volume2,
+  Link2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SpotHeightBadge } from '@/components/shachu-haku/SpotHeightBadge';
 import { useToast } from '@/components/ui/use-toast';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { getOrCreateShortLink } from '@/app/actions/shortLinks';
 import { AdLink } from '@/components/shachu-haku/AdLink';
 import { AdSenseUnit } from '@/components/layout/AdSenseUnit';
 import { SpotBasicInfoCard } from '@/components/shachu-haku/SpotBasicInfoCard';
@@ -74,6 +77,7 @@ export default function SpotDetailClient({
   fieldReports,
 }: SpotDetailClientProps) {
   const { toast } = useToast();
+  const { isAdmin } = useAdminStatus();
   const pathname = usePathname();
   const { addUrl } = useRecentUrls();
   // 閲覧履歴に追加
@@ -120,6 +124,25 @@ export default function SpotDetailClient({
         title: '共有リンク',
         description: `以下のURLを手動でコピーしてください: ${url}`,
         duration: 10000,
+      });
+    }
+  };
+
+  // 管理者専用：このページのURLを短縮する
+  const handleCreateShortLink = async () => {
+    try {
+      const { shortUrl } = await getOrCreateShortLink(window.location.href);
+      const copied = await safeClipboardWrite(shortUrl);
+      toast({
+        title: copied ? '短縮URLを発行してコピーしました' : '短縮URLを発行しました',
+        description: shortUrl,
+      });
+    } catch (error) {
+      toast({
+        title: 'エラー',
+        description:
+          error instanceof Error ? error.message : '短縮URLの発行に失敗しました',
+        variant: 'destructive',
       });
     }
   };
@@ -213,6 +236,17 @@ export default function SpotDetailClient({
               <Share2 className="w-4 h-4 mr-2" />
               共有
             </Button>
+            {isAdmin && (
+              <Button
+                onClick={handleCreateShortLink}
+                variant="outline"
+                size="sm"
+                className="cursor-pointer"
+              >
+                <Link2 className="w-4 h-4 mr-2" />
+                短縮URLを作る
+              </Button>
+            )}
           </div>
         </div>
       </div>
