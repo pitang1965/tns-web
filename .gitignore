@@ -43,6 +43,9 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
+
+# Codex (CLAUDE.md から機械的に自動生成される。未使用のため無視)
+AGENTS.md
 # Sentry Config File
 .env.sentry-build-plugin
 
