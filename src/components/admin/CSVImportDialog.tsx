@@ -20,6 +20,12 @@ import {
   CSVImportResult,
 } from '../../app/actions/campingSpots/csv';
 import { downloadCampingSpotTemplate } from '@/lib/csv/campingSpots';
+import { parseCSV, arrayToCSV } from '@/lib/csv/utils';
+
+// 1回のServer Action呼び出しで送るデータ量を抑えるための行数。
+// 大量件数のCSVを1回で送ると、Reactの内部的なペイロードサイズ上限
+// （"Maximum array nesting exceeded"）に達することがあるため分割する。
+const IMPORT_BATCH_SIZE = 200;
 
 type CSVImportDialogProps = {
   onClose: () => void;
@@ -35,6 +41,10 @@ export default function CSVImportDialog({
   const [importing, setImporting] = useState(false);
   const [updateExisting, setUpdateExisting] = useState(false);
   const [result, setResult] = useState<CSVImportResult | null>(null);
+  const [progress, setProgress] = useState<{
+    processed: number;
+    total: number;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,14 +74,57 @@ export default function CSVImportDialog({
       setImporting(true);
 
       const csvText = await file.text();
-      const importResult = await importCampingSpotsFromCSV(csvText, {
-        updateExisting,
-      });
+      const rows = parseCSV(csvText.trim());
 
-      setResult(importResult);
+      if (rows.length === 0) {
+        toast({
+          title: 'エラー',
+          description: 'インポートできるデータがありませんでした',
+          variant: 'destructive',
+        });
+        return;
+      }
 
-      if (importResult.success > 0 || importResult.updated > 0) {
-        onSuccess(importResult);
+      const headers = rows[0];
+      const dataRows = rows.slice(1);
+      const totalRows = dataRows.length;
+
+      const aggregated: CSVImportResult = {
+        success: 0,
+        updated: 0,
+        errors: [],
+        totalRows,
+        processedCount: 0,
+      };
+
+      setProgress({ processed: 0, total: totalRows });
+
+      for (let i = 0; i < dataRows.length; i += IMPORT_BATCH_SIZE) {
+        const batchRows = dataRows.slice(i, i + IMPORT_BATCH_SIZE);
+        const batchCsv = arrayToCSV([headers, ...batchRows]);
+        const batchResult = await importCampingSpotsFromCSV(batchCsv, {
+          updateExisting,
+        });
+
+        aggregated.success += batchResult.success;
+        aggregated.updated += batchResult.updated;
+        aggregated.errors.push(
+          ...batchResult.errors.map((error) => ({
+            ...error,
+            // バッチ内の行番号(ヘッダーを1行目とした相対位置)を、元のCSV全体での行番号に戻す
+            row: error.row + i,
+          })),
+        );
+
+        const processed = Math.min(i + IMPORT_BATCH_SIZE, totalRows);
+        aggregated.processedCount = processed;
+        setProgress({ processed, total: totalRows });
+      }
+
+      setResult(aggregated);
+
+      if (aggregated.success > 0 || aggregated.updated > 0) {
+        onSuccess(aggregated);
       } else {
         toast({
           title: 'エラー',
@@ -90,6 +143,7 @@ export default function CSVImportDialog({
       });
     } finally {
       setImporting(false);
+      setProgress(null);
     }
   };
 
@@ -210,7 +264,11 @@ export default function CSVImportDialog({
                   disabled={importing}
                   className="bg-green-600 hover:bg-green-700 cursor-pointer"
                 >
-                  {importing ? 'インポート中...' : 'インポート開始'}
+                  {importing
+                    ? progress
+                      ? `インポート中... (${progress.processed}/${progress.total}件)`
+                      : 'インポート中...'
+                    : 'インポート開始'}
                 </Button>
               </div>
             )}
