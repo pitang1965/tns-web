@@ -321,7 +321,7 @@ export default function SpotDetailClient({
       {spot.notes && (
         <Card>
           <CardHeader>
-            <CardTitle>詳細・備考</CardTitle>
+            <CardTitle>備考</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
