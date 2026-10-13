@@ -131,7 +131,7 @@ export function parseSearchTermToFuzzyPatterns(searchTerm: string): string[] {
 /**
  * 車中泊スポット検索の絞り込み条件（$and に渡す配列）を組み立てる。
  *
- * 各キーワードは name / prefecture / address / notes のいずれかに一致すればよく（$or）、
+ * 各キーワードは name / prefecture / address / notes / amenities のいずれかに一致すればよく（$or）、
  * 複数キーワードを空白区切りで指定した場合はすべてを満たす必要がある（$and）。
  *
  * 公開側・管理側の両方から呼ぶこと。片方だけ書き換えると検索結果が食い違う。
@@ -154,6 +154,7 @@ export function buildSpotSearchConditions(
       { prefecture: { $regex: pattern, $options: 'i' } },
       { address: { $regex: pattern, $options: 'i' } },
       { notes: { $regex: pattern, $options: 'i' } },
+      { amenities: { $regex: pattern, $options: 'i' } },
     ],
   }));
 }
