@@ -30,6 +30,17 @@ export const updateCategoryLabel: Record<UpdateCategory, string> = {
 // 新しい順（先頭が最新）に並べる
 export const updateNotes: UpdateEntry[] = [
   {
+    date: '2026-10-13',
+    items: [
+      {
+        category: 'new',
+        text: '車中泊スポットのキーワード検索で、「その他設備」の内容でも絞り込めるようになりました。これまでの名称・都道府県・住所・備考に加えて検索対象になります。',
+        href: '/shachu-haku',
+        linkLabel: '車中泊マップ',
+      },
+    ],
+  },
+  {
     date: '2026-09-22',
     items: [
       {
