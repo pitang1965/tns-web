@@ -426,7 +426,10 @@ const cspDirectives = [
   // Service Worker（PWA）と Mapbox GL のWorkerが blob: を使う
   "worker-src 'self' blob:",
   "manifest-src 'self'",
-  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io ${googleAdOrigins} ${authIssuer}${vercelLiveConnect}`.trim(),
+  // googleusercontent: Googleログイン利用者のプロフィール画像。Service Worker が取得しようとして
+  // 弾かれていた（Sentry TABI-NO-SHIORI-94、url が /sw.js）。img-src は 'https:' で広く許可済みだが、
+  // SW からの fetch は connect-src の管轄になるため、こちらにも許可が要る。
+  `connect-src 'self' https://api.mapbox.com https://events.mapbox.com ${posthogHost} https://us-assets.i.posthog.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://*.googleusercontent.com ${googleAdOrigins} ${authIssuer}${vercelLiveConnect}`.trim(),
   `frame-src 'self' ${googleAdOrigins} https://social-plugins.line.me${vercelLiveFrame}`,
   // 本適用時のみ有効（Report-Only では無視される）
   'upgrade-insecure-requests',
