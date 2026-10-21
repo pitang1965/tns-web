@@ -41,6 +41,67 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 Google Maps とシームレスに連携することで、旅行計画から実際の移動までをスムーズにサポートします。
 
+## 技術的なハイライト
+
+個人開発ながら実際のユーザーがいる本番サービスとして運用しており、思いつきではなく計測・比較検討に基づいて設計判断を行っています。主な判断は [ADR（Architecture Decision Record）](docs/adr/) として記録しています。
+
+### アーキテクチャ
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    U["利用者 / Android アプリ"] --> CF["Cloudflare<br/>(プロキシ・キャッシュ・WAF)"]
+    CF --> T["Cloudflare Tunnel"]
+    T --> D["ConoHa VPS の Docker<br/>Next.js standalone"]
+    D --> M["MongoDB Atlas"]
+    D --> A["Auth0 (認証)"]
+    D --> MB["Mapbox (地図・ジオコーディング)"]
+    D --> LLM["Anthropic API<br/>(AI旅程ドラフト生成)"]
+    D -.-> S["Sentry (エラー監視)"]
+    D -.-> P["PostHog (アクセス解析)"]
+```
+
+### 1. AI旅程ドラフト生成（検索拡張生成 + 決定的検証）
+
+出発地・目的地・泊数から旅程ドラフトを LLM で生成する機能。「実在しない場所をでっち上げる」という LLM 特有のリスクを、検索と検証をコード側に寄せることで抑えています。
+
+- **検索（Retrieval）**: 経路上の各泊地ごとに、MongoDB の地理空間クエリ（`$geoWithin`）で実在する車中泊スポットを検索し、ユーザーの好み（ペルソナ）や車両制約でスコアリング・絞り込み。
+- **生成（Generation）**: 検索結果のみを候補としてプロンプトに注入し、LLM は候補IDの中からしか選べない制約の下で構造化出力（Tool Use）として旅程を生成。
+- **検証**: 座標・候補ID・Zod スキーマの三重チェックで、LLM の出力を信頼せず機械的に検証（違反時は1回だけ再試行）。
+- **コスト管理**: LLM 呼び出しは原子的な残高予約（`$inc`）で二重実行を防止し、成功時のみ消費する「ポイント制」で従量コストを制御。
+
+詳細設計は [ADR-0008](docs/adr/0008-itinerary-draft-generation-architecture.md)（アーキテクチャ）・[ADR-0009](docs/adr/0009-ai-generation-cost-and-access-policy.md)（コスト・アクセス制御）・[ADR-0010](docs/adr/0010-points-based-draft-access.md)（ポイント制）を参照。
+
+### 2. インフラの意思決定: Vercel からセルフホスト VPS への移行
+
+無料枠（Vercel Hobby）の CPU 使用量が利用増加に伴い恒常的に超過するようになったため、複数の移行先を比較検討した上で ConoHa VPS + Cloudflare Tunnel 構成へ移行（2026-09-20）。
+
+| 検討した選択肢 | 見送った理由 |
+| --- | --- |
+| Cloudflare Workers | PoC で Mongoose の共有接続が並列アクセス時に不安定。データアクセス層の書き換えが必須かつ Worker サイズが無料枠を超過 |
+| Netlify | 試験デプロイで日本からの応答速度が実用上厳しく、リージョン選択には有料プランが必要 |
+| 自宅ミニPC | セルフホスト自体は検証済みだが、初期費用とVPSとの損益分岐が約4年後。停電・回線障害・セキュリティリスクを自宅で負うことになる |
+| Vercel Pro | 運用の手間は最小だが、利用量に応じた課金で収支を予測しづらい（広告収入主体の小規模サービスのため） |
+
+移行前にアプリ側の CPU 削減（詳細ページの ISR 化、トップページのクエリキャッシュ、地図操作時の不要な RSC リクエスト削減）にも取り組んでおり、インフラ変更の前にアプリ側でできることを尽くす判断をしています。DNS の切り替えのみで Vercel へ即時ロールバックできる構成にして移行リスクを抑えました。詳細は [docs/self-hosting/migration-plan.md](docs/self-hosting/migration-plan.md) を参照。
+
+### 3. パフォーマンス最適化
+
+- 旅程詳細ページに IndexedDB キャッシュを導入し、2回目以降の表示を約2秒 → 約200msに短縮。`updatedAt` の比較で古いキャッシュを検出する stale-while-revalidate 方式（[src/lib/itineraryCache.ts](src/lib/itineraryCache.ts)）。
+- React Compiler による自動メモ化。
+
+### 4. セキュリティ: CSP の段階的ロールアウト
+
+Content-Security-Policy は、広告（AdSense）や地図などサードパーティ接続先が多く「最初から全ブロック」では本番が壊れるリスクが高いため、段階的に適用しています。
+
+- まず `Content-Security-Policy-Report-Only` で本番稼働させ、違反レポートを Sentry に集約して観測。
+- 「壊すものがなく実害もゼロ」と確認できたディレクティブ（`base-uri` / `object-src` / `frame-ancestors` / `form-action`）だけを `Content-Security-Policy`（ブロック）として先行適用。ブラウザは複数の CSP ヘッダーを独立に評価するため、実運用への影響なく段階適用が成立します。
+- 広告関連の違反が収束するごとに、ブロック側へディレクティブを移していく運用。
+
+### 5. データ整合性
+
+本番環境では Mongoose の `autoIndex` を無効化しています（サーバーレス的なコールドスタートのたびに索引同期が走るのを避けるため）。そのため索引追加はコードの `schema.index()` だけでは本番に反映されず、専用スクリプト（`scripts/sync-indexes.cjs`）でドライラン確認後に明示的に同期する運用にしています。ユニーク制約は索引だけに頼らずアプリケーション層でも重複チェックを行い、索引未作成環境でも制約が機能するようにしています。
+
 ## 主要技術
 
 ### フレームワーク
