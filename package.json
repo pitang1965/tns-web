@@ -78,7 +78,8 @@
     "tailwindcss": "^4.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "undici-types": "^7.29.0"
+    "undici-types": "^7.29.0",
+    "webpack": "^5.112.0"
   },
   "pnpm": {
     "overrides": {
