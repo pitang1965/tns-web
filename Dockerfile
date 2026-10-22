@@ -3,7 +3,7 @@
 # セルフホスト用の本番イメージ（Next.js standalone 出力）。
 # 使い方と経緯は docs/self-hosting/poc-log.md を参照。
 
-FROM node:22.17.0-bookworm-slim AS base
+FROM node:22.23.4-bookworm-slim AS base
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
