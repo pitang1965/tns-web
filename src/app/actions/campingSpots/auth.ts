@@ -2,6 +2,7 @@
 
 import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
+import { isAdmin } from '@/lib/userUtils';
 
 // Helper function to check admin authorization
 export async function checkAdminAuth() {
@@ -11,9 +12,7 @@ export async function checkAdminAuth() {
     redirect('/auth/login');
   }
 
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(',').map((email) => email.trim()) || [];
-  if (!adminEmails.includes(session.user.email)) {
+  if (!isAdmin(session.user)) {
     throw new Error('Unauthorized: Admin access required');
   }
 

@@ -4,12 +4,12 @@ import { auth0 } from '@/lib/auth0';
 import { ensureDbConnection } from '@/lib/database';
 import ShortLink, { generateUniqueShortCode } from '@/lib/models/ShortLink';
 import { logger } from '@/lib/logger';
+import { isAdmin } from '@/lib/userUtils';
 
 const SHORT_LINK_HOST = 'https://s.nafuda.me';
 
 /**
- * 短縮URL機能専用の管理者チェック。points.ts と同じく、このコードベースの
- * 慣習に合わせてファイルごとにローカルで持つ(共通化はしない)。
+ * 短縮URL機能専用の管理者チェック。
  */
 async function requireAdminEmail(): Promise<string> {
   const session = await auth0.getSession();
@@ -17,9 +17,7 @@ async function requireAdminEmail(): Promise<string> {
   if (!email) {
     throw new Error('認証されていません');
   }
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(',').map((e) => e.trim()) ?? [];
-  if (!adminEmails.includes(email)) {
+  if (!isAdmin(session.user)) {
     throw new Error('管理者権限が必要です');
   }
   return email;

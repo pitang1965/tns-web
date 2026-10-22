@@ -13,20 +13,27 @@ function getAdminEmails(): string | undefined {
 /**
  * ユーザーが管理者かどうかを判定する（サーバーサイド用）
  * クライアントコンポーネントでは isAdminHint に useAdminStatus().isAdmin を渡すこと
+ *
+ * email_verified を必須にしている理由:
+ * メール+パスワード接続は確認メール未クリックでもログインできるため、
+ * このゲートが無いと管理者のメールアドレスで新規登録するだけで管理者になれてしまう。
+ * 旅程の所有者判定（itineraryOwnership.ts）やアズキと同じゲート。
+ *
+ * Server Actions の管理者チェックもすべてこの関数を通すこと。
+ * ファイルごとに判定を書くと、このゲートの付け忘れが起きる。
  */
 export function isAdmin(
   user: User | null | undefined,
   isAdminHint?: boolean,
 ): boolean {
   if (isAdminHint !== undefined) return isAdminHint;
+  if (!user?.email || user.email_verified !== true) return false;
+  const email = user.email.trim().toLowerCase();
   const adminEmails = getAdminEmails();
-  return !!(
-    user?.email &&
-    adminEmails
-      ?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email)
-  );
+  return !!adminEmails
+    ?.split(',')
+    .map((adminEmail) => adminEmail.trim().toLowerCase())
+    .includes(email);
 }
 
 // 非公開環境変数 ITINERARY_DRAFT_ALLOWED_EMAILS を使用するため、サーバーサイド専用。

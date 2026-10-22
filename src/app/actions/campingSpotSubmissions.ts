@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
 import CampingSpot from '@/lib/models/CampingSpot';
+import { isAdmin } from '@/lib/userUtils';
 
 // Helper function to check admin authorization
 async function checkAdminAuth() {
@@ -15,9 +16,7 @@ async function checkAdminAuth() {
     redirect('/auth/login');
   }
 
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(',').map((email) => email.trim()) || [];
-  if (!adminEmails.includes(session.user.email)) {
+  if (!isAdmin(session.user)) {
     throw new Error('Unauthorized: Admin access required');
   }
 

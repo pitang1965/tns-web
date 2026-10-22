@@ -5,6 +5,7 @@ import { ensureDbConnection } from '@/lib/database';
 import { grantPoints, getBalance, normalizeEmail } from '@/lib/points/points';
 import PointTransaction from '@/lib/models/PointTransaction';
 import { logger } from '@/lib/logger';
+import { isAdmin } from '@/lib/userUtils';
 
 /**
  * 管理者ポイント操作（ADR-0010）。付与は管理者UIからのみ。
@@ -17,9 +18,7 @@ async function requireAdminEmail(): Promise<string> {
   if (!email) {
     throw new Error('認証されていません');
   }
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(',').map((e) => e.trim()) ?? [];
-  if (!adminEmails.includes(email)) {
+  if (!isAdmin(session.user)) {
     throw new Error('管理者権限が必要です');
   }
   return email;
