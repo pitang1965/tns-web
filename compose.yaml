@@ -37,7 +37,7 @@ services:
   # 公開ホスト名の転送先は Cloudflare のダッシュボードで http://app:3000 を指定する。
   # .env.tunnel（Git 管理外）に TUNNEL_TOKEN=... を書く。
   tunnel:
-    image: cloudflare/cloudflared:2026.9.1
+    image: cloudflare/cloudflared:2026.10.3
     profiles:
       - tunnel
     command: tunnel --no-autoupdate run
