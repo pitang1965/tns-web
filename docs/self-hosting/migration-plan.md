@@ -301,7 +301,7 @@ pnpm deploy:rollback   # 直前の版に戻す
 VPS_HOST=deploy@<VPSのIP>
 VPS_SSH_KEY=~/.ssh/id_ed25519_conoha
 VPS_APP_DIR=apps/tns-web          # ホームからの相対パス（~ は使わない。Git Bash がパスを変換してしまう）
-BUILD_ENV_FILE=.env.vps           # ビルド時に読ませる環境変数ファイル（開発PC側）
+BUILD_ENV_FILE=.env.production.vps   # ビルド時に読ませる環境変数ファイル（開発PC側）
 HEALTH_URL=https://vps.over40web.club/api/health
 ```
 

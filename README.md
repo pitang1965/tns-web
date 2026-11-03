@@ -222,7 +222,8 @@ Content-Security-Policy は、広告（AdSense）や地図などサードパー�
 **環境別のデータベース設定:**
 
 - **開発環境** (`.env.local`): `itinerary_db_dev` を使用。MCP サーバーとの競合を避けるため `APP_MONGODB_URI` も設定を推奨。
-- **本番環境** (Vercel 等の環境変数): `itinerary_db` を使用。`MONGODB_URI` のみで OK。
+- **本番環境** (VPS の `.env.docker`): `itinerary_db` を使用。`MONGODB_URI` のみで OK。
+- DBユーザーは環境ごとに分けている（`ENVIRONMENT_SETUP.md` の「DBユーザー」）。
 - 詳細は `ENVIRONMENT_SETUP.md` を参照してください。
 
 ### モバイルアプリ向け API
