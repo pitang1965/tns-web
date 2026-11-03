@@ -18,6 +18,17 @@ MongoDB Atlas Cluster0
     └── campingspotsubmissions
 ```
 
+### DBユーザー
+
+IPアクセスリストは Vercel（接続元IPが固定されない）のため `0.0.0.0/0` を許可しているので、守りはDBユーザーの権限とパスワードだけになる。そのため、アプリの接続には環境ごとに**そのDBだけを読み書きできるユーザー**を使う（2026-11 に分離）。
+
+| ユーザー | 権限 | 使う場所 |
+| --- | --- | --- |
+| `tns-prod` | `readWrite@itinerary_db` | 本番（`.env.production.vps`、VPS の `.env.docker`） |
+| `tns-staging` | `readWrite@itinerary_db_dev` | staging（Vercel）、`.env.local`、開発PCの `.env.docker` |
+| `claude_readonly` | `readAnyDatabase` | Claude Code の MCP（読み取り専用） |
+| 管理用ユーザー | `atlasAdmin` | Atlas での手作業・管理用スクリプトのみ。アプリの環境変数には書かない |
+
 ## 環境変数ファイル
 
 ### `.env.local` (開発環境用)
@@ -30,9 +41,9 @@ APP_BASE_URL='http://localhost:3000'
 # その他の開発環境用設定...
 ```
 
-### `.env.production.local` (本番環境用)
+### `.env.production.vps` (本番環境用)
 
-本番デプロイ時に使用します。このファイルは `itinerary_db` データベースに接続します。
+本番イメージのビルド時に使用します（開発PC側）。実行時は VPS 上の `.env.docker` が読まれるので、接続先を変えるときは両方を更新します（手順は `docs/self-hosting/migration-plan.md`）。このファイルは `itinerary_db` データベースに接続します。
 
 ```bash
 MONGODB_URI='mongodb+srv://USER:PASS@cluster0.xxxxx.mongodb.net/itinerary_db?retryWrites=true&w=majority&appName=Cluster0'
