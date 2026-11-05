@@ -266,9 +266,10 @@ const withPWA = withPWAInit({
       },
     },
     {
-      // 旅程API - StaleWhileRevalidate（1日キャッシュ）
+      // 旅程API - NetworkFirst（オフライン時のみキャッシュ）
+      // SWRだと404（削除・非公開化・共有解除）が古い200に隠れる。即時表示はIndexedDBが担う
       urlPattern: /\/api\/itineraries\/.*$/i,
-      handler: 'StaleWhileRevalidate',
+      handler: 'NetworkFirst',
       method: 'GET',
       options: {
         cacheName: 'itinerary-api',
@@ -276,6 +277,7 @@ const withPWA = withPWAInit({
           maxEntries: 50,
           maxAgeSeconds: 24 * 60 * 60, // 1日
         },
+        networkTimeoutSeconds: 5,
       },
     },
     {

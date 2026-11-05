@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { deleteAccountAction } from '@/app/actions/deleteAccount';
+import { clearItineraryCache } from '@/lib/cacheUtils';
 
 // 誤操作防止のため、この文字列を入力させてから退会を実行する
 const CONFIRM_WORD = '退会';
@@ -49,6 +50,7 @@ export function DeleteAccountSection() {
         return;
       }
       // セッション破棄のためログアウトへ遷移（成功時はそのまま離脱）
+      await clearItineraryCache();
       window.location.href = '/auth/logout';
     } catch (e) {
       console.error('Account deletion failed:', e);

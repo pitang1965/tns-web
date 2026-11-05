@@ -58,6 +58,18 @@ export const useGetItineraryDay = (
             throw new Error(`${errorData.message}\n${errorData.details || ''}`);
           }
 
+          // 存在しない・権限がない場合はサーバーが区別せず 404 を返す
+          // 想定内の結果なので console.error（Sentry送信）を通さない
+          if (response.status === 404) {
+            // 前回取得分が残るとエラーが無視されて表示され続けるため消す
+            setMetadata(undefined);
+            setDayPlan(undefined);
+            setError(
+              '旅程が見つかりません。\n削除されたか、非公開に設定されている可能性があります。',
+            );
+            return;
+          }
+
           // 従来のエラーフォーマット
           throw new Error(
             errorData.error ||
