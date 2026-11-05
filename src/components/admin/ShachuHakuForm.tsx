@@ -411,7 +411,7 @@ export default function ShachuHakuForm({
         isOpen={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}
         title="削除確認"
-        description={`「${spot?.name}」を削除しますか？この操作は取り消せません。`}
+        description={`「${spot?.name}」を削除しますか？このスポットの現地報告も削除されます。この操作は取り消せません。`}
         confirmLabel="削除"
         variant="destructive"
         onConfirm={handleDelete}

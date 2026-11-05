@@ -3,6 +3,7 @@
 import { revalidatePath, updateTag } from 'next/cache';
 import mongoose from 'mongoose';
 import CampingSpot from '@/lib/models/CampingSpot';
+import FieldReport from '@/lib/models/FieldReport';
 import { CampingSpotSchema } from '@/data/schemas/campingSpot';
 import { ensureDbConnection } from '@/lib/database';
 import { checkAdminAuth } from './auth';
@@ -499,6 +500,10 @@ export async function updateCampingSpot(id: string, data: FormData) {
 export async function deleteCampingSpot(id: string) {
   await checkAdminAuth();
   await ensureDbConnection();
+
+  // スポット詳細がなくなると本人の削除ボタンにも届かないため、現地報告も一緒に消す。
+  // スポットより先に消すのは、途中で失敗しても再実行で最後まで完了できるようにするため
+  await FieldReport.deleteMany({ spotId: id });
 
   const deletedSpot = await CampingSpot.findByIdAndDelete(id);
 
