@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, type ComponentType } from 'react';
+import Link from 'next/link';
 import { SmallText } from '@/components/common/Typography';
 import AboutSection from '@/components/landing/AboutSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
@@ -74,19 +75,19 @@ export default function PublicHome({
       <div className="py-8 px-6 bg-gray-50 dark:bg-gray-800">
         <SmallText className="text-center text-gray-600 dark:text-gray-400">
           本アプリのご利用には、
-          <a
+          <Link
             href="/terms"
             className="text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1"
           >
             利用規約
-          </a>
+          </Link>
           および
-          <a
+          <Link
             href="/privacy"
             className="text-blue-700 dark:text-blue-400 underline underline-offset-4 mx-1"
           >
             プライバシーに関する声明
-          </a>
+          </Link>
           への同意が必要です。
         </SmallText>
       </div>

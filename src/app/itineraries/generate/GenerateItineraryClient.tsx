@@ -254,6 +254,7 @@ export function GenerateItineraryClient() {
     return (
       <div className="flex flex-col justify-center items-center h-screen space-y-2">
         <p className="text-gray-600 dark:text-gray-300">ログインが必要です。</p>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Auth0 のログインはページ全体の遷移が必要なため <Link> にしない */}
         <a className="text-blue-600 underline" href="/auth/login">
           ログイン
         </a>

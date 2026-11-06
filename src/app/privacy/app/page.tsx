@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'プライバシーポリシー（車中泊スポットマップ アプリ） | 車旅のしおり',
@@ -19,9 +20,9 @@ export default function AppPrivacyPage() {
       <div className="prose max-w-none">
         <p className="mb-6">
           本ポリシーは、モバイルアプリ「車中泊スポットマップ」（以下「本アプリ」）における情報の取り扱いについて定めるものです。Webサイト「車旅のしおり」の取り扱いについては、
-          <a href="/privacy" className="text-primary hover:underline">
+          <Link href="/privacy" className="text-primary hover:underline">
             Webサイトのプライバシーポリシー
-          </a>
+          </Link>
           をご覧ください。
         </p>
 
@@ -87,9 +88,9 @@ export default function AppPrivacyPage() {
         </h2>
         <p className="mb-6">
           本アプリの一覧・地図・情報の各画面から、スポットの詳細ページやお知らせなど「車旅のしおり」のWebページを、端末の外部ブラウザで開くことがあります。遷移後のWebサイトにおける情報の取り扱いは、
-          <a href="/privacy" className="text-primary hover:underline">
+          <Link href="/privacy" className="text-primary hover:underline">
             Webサイトのプライバシーポリシー
-          </a>
+          </Link>
           に従います。
         </p>
 

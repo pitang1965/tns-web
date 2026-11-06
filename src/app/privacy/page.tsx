@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'プライバシーポリシー | 車旅のしおり',
@@ -19,9 +20,9 @@ export default function PrivacyPage() {
         </p>
         <p className="mb-6">
           モバイルアプリ「車中泊スポットマップ」については、
-          <a href="/privacy/app" className="text-primary hover:underline">
+          <Link href="/privacy/app" className="text-primary hover:underline">
             アプリのプライバシーポリシー
-          </a>
+          </Link>
           をご覧ください。
         </p>
 

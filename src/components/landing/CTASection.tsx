@@ -29,6 +29,7 @@ export default function CTASection() {
         </div>
         <p className="mt-8 text-white/80">
           旅程を保存するなら
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Auth0 のログインはページ全体の遷移が必要なため <Link> にしない */}
           <a
             href="/auth/login"
             className="ml-1 font-semibold text-white underline underline-offset-4 hover:text-blue-100 transition-colors"

@@ -153,6 +153,7 @@ export function ItinerariesClient({
                 自分の旅程を表示するにはログインが必要です。
               </LargeText>
               <Button asChild className="mt-4">
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Auth0 のログインはページ全体の遷移が必要なため <Link> にしない */}
                 <a href="/auth/login?returnTo=/itineraries">ログイン</a>
               </Button>
             </div>
