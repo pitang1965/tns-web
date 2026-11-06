@@ -186,8 +186,11 @@ The shadcn CLI sometimes creates files in `./@/components/ui/` instead of `src/c
 そのため、**モデルに `schema.index(...)` を追加しても本番には反映されない**。必ず次を行う：
 
 1. `scripts/sync-indexes.cjs` の `INDEXES_BY_COLLECTION` にも同じ定義を追記する
-2. ドライランで差分を確認：`node scripts/sync-indexes.cjs --db=itinerary_db`
-3. 問題なければ作成：`node scripts/sync-indexes.cjs --db=itinerary_db --confirm`
+2. ドライランで差分を確認：`node scripts/sync-indexes.cjs --env=.env.production.vps`
+3. 問題なければ作成：`node scripts/sync-indexes.cjs --env=.env.production.vps --confirm`
+
+`--env` は接続先を読むファイルで、対象DBはその URI の末尾から決まる。`.env.local` のユーザーには本番の権限が無いので、
+`--db=itinerary_db` を手で足して接続ユーザーと対象DBを別々の環境に向けないこと。
 
 ユニーク索引で制約を掛ける場合は、**索引だけに頼らずアプリ側でも重複を見ること**。
 索引未作成の環境では制約がまったく効かないため（実例: 現地報告の
