@@ -1,4 +1,6 @@
 import type { User } from '@auth0/nextjs-auth0/types';
+// points.ts の normalizeEmail は DB モデルを引き込み、クライアントからも読まれるこのファイルでは使えない
+import { normalizeOwnerEmail } from '@/lib/itineraryOwnership';
 
 // 非公開環境変数 ADMIN_EMAILS を使用するため、この関数はサーバーサイドでのみ正しい値を返す。
 // クライアントコンポーネントでの管理者判定には useAdminStatus() フックを使うこと。
@@ -26,13 +28,19 @@ export function isAdmin(
   isAdminHint?: boolean,
 ): boolean {
   if (isAdminHint !== undefined) return isAdminHint;
-  if (!user?.email || user.email_verified !== true) return false;
-  const email = user.email.trim().toLowerCase();
-  const adminEmails = getAdminEmails();
-  return !!adminEmails
-    ?.split(',')
-    .map((adminEmail) => adminEmail.trim().toLowerCase())
-    .includes(email);
+  if (user?.email_verified !== true) return false;
+  return emailInList(getAdminEmails(), user.email);
+}
+
+/** カンマ区切りのメール一覧に email が含まれるか。両辺を正規化して比べる。 */
+function emailInList(
+  list: string | undefined,
+  email: string | null | undefined,
+): boolean {
+  const normalized = normalizeOwnerEmail(email);
+  // 空白だけのメールが、末尾カンマなどでできた空の項目に一致しないようにする
+  if (!normalized || !list) return false;
+  return list.split(',').map(normalizeOwnerEmail).includes(normalized);
 }
 
 // 非公開環境変数 ITINERARY_DRAFT_ALLOWED_EMAILS を使用するため、サーバーサイド専用。
@@ -54,14 +62,7 @@ export function isItineraryDraftAllowed(
   hint?: boolean,
 ): boolean {
   if (hint !== undefined) return hint;
-  const allowed = getDraftAllowedEmails();
-  return !!(
-    user?.email &&
-    allowed
-      ?.split(',')
-      .map((email) => email.trim())
-      .includes(user.email)
-  );
+  return emailInList(getDraftAllowedEmails(), user?.email);
 }
 
 /**
