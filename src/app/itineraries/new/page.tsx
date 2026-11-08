@@ -5,10 +5,7 @@ import { withPageAuthRequired, useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/navigation';
 import { ItineraryForm } from '@/components/itinerary/forms/ItineraryForm';
 import { createItineraryAction } from '@/actions/createItinerary';
-import {
-  ClientItineraryInput,
-  ClientItineraryDocument,
-} from '@/data/schemas/itinerarySchema';
+import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +19,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [itineraries, setItineraries] = useState<ClientItineraryDocument[]>([]);
+  const [currentCount, setCurrentCount] = useState(0);
   const [canCreate, setCanCreate] = useState(true);
 
   // Check itinerary creation limit on component mount
@@ -33,7 +30,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
         const result = await response.json();
 
         if (result.success) {
-          setItineraries(result.data.itineraries);
+          setCurrentCount(result.data.currentCount);
           setCanCreate(result.data.canCreate);
         } else {
           console.error('Error checking itinerary limit:', result.error);
@@ -149,7 +146,7 @@ export default withPageAuthRequired(function NewItineraryPage() {
               <p className="text-muted-foreground">
                 一般ユーザーは最大10個まで旅程を作成できます。
                 <br />
-                現在{itineraries.length}個の旅程を作成済みです。
+                現在{currentCount}個の旅程を作成済みです。
               </p>
 
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">

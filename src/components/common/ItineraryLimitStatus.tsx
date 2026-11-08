@@ -21,7 +21,7 @@ export default function ItineraryLimitStatus({
   itineraries,
   isAdmin,
 }: ItineraryLimitStatusProps) {
-  const status = getItineraryLimitStatus(user, itineraries, isAdmin);
+  const status = getItineraryLimitStatus(user, itineraries.length, isAdmin);
 
   if (status.isPremium) {
     return (

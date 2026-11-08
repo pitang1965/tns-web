@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
-import { getItineraries } from '@/lib/itineraries';
+import { countItineraries } from '@/lib/itineraries';
 import { getItineraryLimitStatus } from '@/lib/userUtils';
 import { logger } from '@/lib/logger';
 
@@ -15,11 +15,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ユーザーの旅程を取得
-    const itineraries = await getItineraries();
-
-    // 制限状況を取得
-    const limitStatus = getItineraryLimitStatus(session.user, itineraries);
+    const limitStatus = getItineraryLimitStatus(
+      session.user,
+      await countItineraries(),
+    );
 
     return NextResponse.json({
       success: true,
@@ -29,7 +28,6 @@ export async function GET(request: NextRequest) {
         limit: limitStatus.limit,
         remaining: limitStatus.remaining,
         isPremium: limitStatus.isPremium,
-        itineraries: itineraries,
       },
     });
   } catch (error) {

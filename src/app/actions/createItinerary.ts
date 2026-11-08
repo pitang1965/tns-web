@@ -1,6 +1,6 @@
 'use server';
 
-import { createItinerary, getItineraries } from '@/lib/itineraries';
+import { createItinerary, countItineraries } from '@/lib/itineraries';
 import { ClientItineraryInput } from '@/data/schemas/itinerarySchema';
 import { auth0 } from '@/lib/auth0';
 import { canCreateItinerary } from '@/lib/userUtils';
@@ -19,8 +19,7 @@ export async function createItineraryAction(data: ClientItineraryInput) {
     }
 
     // 旅程作成制限チェック
-    const existingItineraries = await getItineraries();
-    if (!canCreateItinerary(session.user, existingItineraries.length)) {
+    if (!canCreateItinerary(session.user, await countItineraries())) {
       throw new Error(
         '旅程作成制限に達しています。プレミアム会員になると無制限に作成できます。',
       );

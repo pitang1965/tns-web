@@ -93,6 +93,12 @@ export async function getItineraries(): Promise<ClientItineraryDocument[]> {
   }
 }
 
+export async function countItineraries(): Promise<number> {
+  const user = await getAuthenticatedUser();
+  await ensureDbConnection();
+  return ItineraryModel.countDocuments(ownerQuery(user));
+}
+
 export async function getPublicItineraries(): Promise<
   PublicItinerarySummary[]
 > {

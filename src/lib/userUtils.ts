@@ -1,5 +1,4 @@
 import type { User } from '@auth0/nextjs-auth0/types';
-import { ClientItineraryDocument } from '@/data/schemas/itinerarySchema';
 
 // 非公開環境変数 ADMIN_EMAILS を使用するため、この関数はサーバーサイドでのみ正しい値を返す。
 // クライアントコンポーネントでの管理者判定には useAdminStatus() フックを使うこと。
@@ -144,10 +143,9 @@ export function canCreateItinerary(
  */
 export function getItineraryLimitStatus(
   user: User | null | undefined,
-  itineraries: ClientItineraryDocument[],
+  currentCount: number,
   isAdminHint?: boolean,
 ) {
-  const currentCount = itineraries.length;
   const limit = getItineraryLimit(user, isAdminHint);
   const canCreate = canCreateItinerary(user, currentCount, isAdminHint);
 
