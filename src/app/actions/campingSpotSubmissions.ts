@@ -1,11 +1,10 @@
 'use server';
 
-import { revalidatePath, updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
 import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
-import CampingSpot from '@/lib/models/CampingSpot';
 import { isAdmin } from '@/lib/userUtils';
 
 // Helper function to check admin authorization
@@ -53,91 +52,6 @@ export async function getCampingSpotSubmissionById(id: string) {
   }
 
   return JSON.parse(JSON.stringify(submission));
-}
-
-// Approve submission and convert to camping spot
-export async function approveSubmission(id: string, reviewNotes?: string) {
-  const user = await checkAdminAuth();
-  await ensureDbConnection();
-
-  const submission = await CampingSpotSubmission.findById(id);
-  if (!submission) {
-    throw new Error('Submission not found');
-  }
-
-  if (submission.status !== 'pending') {
-    throw new Error('Submission is not pending');
-  }
-
-  // Check for duplicates in main collection (within 100m)
-  const existingSpot = await CampingSpot.findOne({
-    coordinates: {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: submission.coordinates,
-        },
-        $maxDistance: 100,
-      },
-    },
-  });
-
-  if (existingSpot) {
-    throw new Error(`100m以内に既存スポットがあります: ${existingSpot.name}`);
-  }
-
-  // Convert submission to camping spot format
-  const campingSpotData = {
-    name: submission.name,
-    coordinates: submission.coordinates,
-    prefecture: submission.prefecture,
-    address: submission.address,
-    type: submission.type,
-    hasRoof: submission.hasRoof,
-    hasPowerOutlet: submission.hasPowerOutlet,
-    pricing: {
-      isFree: submission.isFree,
-      pricePerNight: submission.pricePerNight,
-      priceNote: submission.priceNote,
-    },
-    notes: submission.notes,
-    submittedBy:
-      submission.submitterEmail || submission.submitterName || 'Anonymous',
-    isVerified: true,
-    // Default values for missing fields
-    distanceToToilet: 0,
-    capacity: 1,
-    restrictions: [],
-    amenities: [],
-    security: {
-      hasGate: false,
-      hasLighting: false,
-      hasStaff: false,
-    },
-    nightNoise: {
-      hasNoiseIssues: false,
-      nearBusyRoad: false,
-      isQuietArea: false,
-    },
-  };
-
-  // Create new camping spot
-  const newSpot = new CampingSpot(campingSpotData);
-  await newSpot.save();
-
-  // Update submission status
-  submission.status = 'approved';
-  submission.reviewedAt = new Date();
-  submission.reviewedBy = user.email;
-  submission.reviewNotes = reviewNotes;
-  await submission.save();
-
-  revalidatePath('/admin/shachu-haku');
-  revalidatePath('/shachu-haku');
-  revalidatePath('/admin/submissions');
-  updateTag('camping-spots'); // トップページのデータキャッシュ
-
-  return { success: true, spotId: newSpot._id.toString() };
 }
 
 // Reject submission

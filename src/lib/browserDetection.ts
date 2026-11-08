@@ -47,46 +47,11 @@ export function isInAppBrowser(): boolean {
 }
 
 /**
- * AndroidのWebViewを検出
- */
-export function isAndroidWebView(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent;
-  return /Android/.test(ua) && /wv/.test(ua);
-}
-
-/**
  * Android端末を検出（ブラウザ種別は問わない）
  */
 export function isAndroidDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   return /android/i.test(navigator.userAgent);
-}
-
-/**
- * 安全なpostMessage実行
- * Facebook In-App Browserなどでのエラーを防ぐ
- */
-export function safePostMessage(
-  targetWindow: Window,
-  message: unknown,
-  origin: string = '*',
-): boolean {
-  if (typeof window === 'undefined') return false;
-
-  // In-App Browserでは制限があるためpostMessageをスキップ
-  if (isInAppBrowser()) {
-    console.log('postMessage skipped in In-App Browser environment');
-    return false;
-  }
-
-  try {
-    targetWindow.postMessage(message, origin);
-    return true;
-  } catch (error) {
-    console.warn('postMessage failed:', error);
-    return false;
-  }
 }
 
 /**
@@ -183,23 +148,4 @@ export function safeClipboardWrite(text: string): Promise<boolean> {
         resolve(false);
       });
   });
-}
-
-/**
- * In-App Browser環境での警告メッセージを生成
- */
-export function getInAppBrowserWarning(): string {
-  if (isFacebookBrowser()) {
-    return 'Facebook内のブラウザをご利用中です。一部機能が制限される場合があります。';
-  }
-  if (isInstagramBrowser()) {
-    return 'Instagram内のブラウザをご利用中です。一部機能が制限される場合があります。';
-  }
-  if (isLineBrowser()) {
-    return 'LINE内のブラウザをご利用中です。一部機能が制限される場合があります。';
-  }
-  if (isTwitterBrowser()) {
-    return 'Twitter内のブラウザをご利用中です。一部機能が制限される場合があります。';
-  }
-  return 'アプリ内ブラウザをご利用中です。一部機能が制限される場合があります。';
 }

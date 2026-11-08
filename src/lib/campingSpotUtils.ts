@@ -45,29 +45,3 @@ export function calculateQuietnessLevel(spot: CampingSpot): number {
 
   return Math.max(1, Math.min(5, Math.round(score)));
 }
-
-// 計算された評価付きのスポット情報を取得
-export function getCampingSpotWithCalculatedRatings(spot: CampingSpot) {
-  return {
-    ...spot,
-    calculatedSecurityLevel: calculateSecurityLevel(spot),
-    calculatedQuietnessLevel: calculateQuietnessLevel(spot),
-  };
-}
-
-// レベル説明テキスト
-export const SecurityLevelLabels: Record<number, string> = {
-  1: '不安',
-  2: 'やや不安',
-  3: '普通',
-  4: '安全',
-  5: '非常に安全',
-};
-
-export const QuietnessLevelLabels: Record<number, string> = {
-  1: '非常にうるさい',
-  2: 'うるさい',
-  3: '普通',
-  4: '静か',
-  5: '非常に静か',
-};

@@ -133,58 +133,6 @@ export function downloadCSV(csvContent: string, filename: string): void {
 }
 
 /**
- * Parse CSV rows into objects using header row
- *
- * @param rows - 2D array from parseCSV
- * @returns Array of objects where keys are column headers
- */
-export function csvRowsToObjects<T = Record<string, string>>(
-  rows: string[][],
-): T[] {
-  if (rows.length === 0) {
-    return [];
-  }
-
-  const headers = rows[0];
-  const dataRows = rows.slice(1);
-
-  return dataRows.map((values) => {
-    const obj: Record<string, string> = {};
-    headers.forEach((header, index) => {
-      obj[header] = values[index] || '';
-    });
-    return obj as T;
-  });
-}
-
-/**
- * Convert objects to CSV rows (including header row)
- *
- * @param data - Array of objects
- * @param headers - Array of column headers (object keys to include)
- * @returns 2D array suitable for arrayToCSV
- */
-export function objectsToCSVRows<T extends Record<string, unknown>>(
-  data: T[],
-  headers: (keyof T)[],
-): unknown[][] {
-  const headerRow = headers.map(String);
-  const dataRows = data.map((item) => headers.map((header) => item[header]));
-  return [headerRow, ...dataRows];
-}
-
-/**
- * Generate CSV export result with statistics
- */
-export type CSVExportResult = {
-  success: boolean;
-  processedCount: number;
-  errorCount: number;
-  csvContent?: string;
-  errors?: string[];
-};
-
-/**
  * Generate timestamp-based filename
  *
  * @param prefix - Filename prefix (e.g., 'camping-spots')
