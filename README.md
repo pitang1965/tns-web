@@ -131,7 +131,6 @@ Content-Security-Policy は、広告（AdSense）や地図などサードパー�
 ### 地図関連
 
 - [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/) - インタラクティブな地図実装
-- [React Leaflet](https://react-leaflet.js.org/) - React 用地図コンポーネント
 
 ### データ処理
 
