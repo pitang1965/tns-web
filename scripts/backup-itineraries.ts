@@ -13,12 +13,7 @@ if (!uri) {
   process.exit(1);
 }
 
-async function backupDatabase() {
-  if (!uri) {
-    console.error('MONGODB_URI is not defined');
-    process.exit(1);
-  }
-
+async function backupDatabase(uri: string) {
   const client = new MongoClient(uri);
 
   try {
@@ -61,4 +56,4 @@ async function backupDatabase() {
 }
 
 console.log('データベースのバックアップを開始します...\n');
-backupDatabase();
+backupDatabase(uri);

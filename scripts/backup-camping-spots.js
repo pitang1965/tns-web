@@ -10,9 +10,6 @@ import path from 'path';
 const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://localhost:27017/tns-web';
 
-// 未指定ならMONGODB_URI末尾のDB名が使われる（本番を既定にしない）
-const DATABASE_NAME = process.env.DATABASE_NAME;
-
 async function backupDatabase() {
   console.log('データベースバックアップを開始します...');
 
@@ -22,7 +19,7 @@ async function backupDatabase() {
     await client.connect();
     console.log('MongoDBに接続しました');
 
-    const db = client.db(DATABASE_NAME);
+    const db = client.db();
     console.log(`対象DB: ${db.databaseName}`);
     const collection = db.collection('campingspots');
 
@@ -60,7 +57,7 @@ async function backupDatabase() {
     );
 
     // バックアップ内容の概要表示
-    console.log('\\nバックアップ内容の確認:');
+    console.log('\nバックアップ内容の確認:');
 
     // タイプ別件数
     const typeCounts = {};
@@ -72,26 +69,6 @@ async function backupDatabase() {
     Object.entries(typeCounts).forEach(([type, count]) => {
       console.log(`  ${type}: ${count}件`);
     });
-
-    // 評価データの有無
-    const hasQuietness = allData.filter(
-      (item) => item.quietnessLevel != null
-    ).length;
-    const hasSecurity = allData.filter(
-      (item) => item.securityLevel != null
-    ).length;
-    const hasOverall = allData.filter(
-      (item) => item.overallRating != null
-    ).length;
-
-    console.log('\\n既存評価データ:');
-    console.log(`  静けさレベル有り: ${hasQuietness}件`);
-    console.log(`  治安レベル有り: ${hasSecurity}件`);
-    console.log(`  総合評価有り: ${hasOverall}件`);
-
-    console.log(
-      '\\n🎯 バックアップが完了しました。マイグレーションを実行できます。'
-    );
   } catch (error) {
     console.error('バックアップ中にエラーが発生しました:', error);
     process.exit(1);
@@ -100,48 +77,4 @@ async function backupDatabase() {
   }
 }
 
-// 復元用のヘルパー関数も提供
-async function restoreDatabase(backupFile) {
-  console.log(`バックアップファイルから復元: ${backupFile}`);
-
-  if (!fs.existsSync(backupFile)) {
-    console.error('バックアップファイルが見つかりません:', backupFile);
-    return;
-  }
-
-  const client = new MongoClient(MONGODB_URI);
-
-  try {
-    await client.connect();
-    const db = client.db(DATABASE_NAME);
-    console.log(`対象DB: ${db.databaseName}`);
-    const collection = db.collection('campingspots');
-
-    // 既存データを削除（注意！）
-    console.log('既存データを削除しています...');
-    await collection.deleteMany({});
-
-    // バックアップから復元
-    const backupData = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
-
-    if (backupData.length > 0) {
-      await collection.insertMany(backupData);
-      console.log(`✅ 復元完了: ${backupData.length}件`);
-    }
-  } catch (error) {
-    console.error('復元中にエラーが発生しました:', error);
-  } finally {
-    await client.close();
-  }
-}
-
-// コマンドライン引数の処理
-const command = process.argv[2];
-
-if (command === 'restore' && process.argv[3]) {
-  restoreDatabase(process.argv[3]).catch(console.error);
-} else {
-  backupDatabase().catch(console.error);
-}
-
-export { backupDatabase, restoreDatabase };
+backupDatabase().catch(console.error);
