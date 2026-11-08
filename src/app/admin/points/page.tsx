@@ -60,6 +60,12 @@ export default function AdminPointsPage() {
           variant: 'destructive',
         });
       }
+    } catch (error) {
+      toast({
+        title: '付与できませんでした',
+        description: error instanceof Error ? error.message : '不明なエラー',
+        variant: 'destructive',
+      });
     } finally {
       setGranting(false);
     }
@@ -80,6 +86,12 @@ export default function AdminPointsPage() {
           variant: 'destructive',
         });
       }
+    } catch (error) {
+      toast({
+        title: '照会できませんでした',
+        description: error instanceof Error ? error.message : '不明なエラー',
+        variant: 'destructive',
+      });
     } finally {
       setLooking(false);
     }

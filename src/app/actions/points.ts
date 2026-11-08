@@ -1,28 +1,10 @@
 'use server';
 
-import { auth0 } from '@/lib/auth0';
 import { ensureDbConnection } from '@/lib/database';
 import { grantPoints, getBalance, normalizeEmail } from '@/lib/points/points';
 import PointTransaction from '@/lib/models/PointTransaction';
 import { logger } from '@/lib/logger';
-import { isAdmin } from '@/lib/userUtils';
-
-/**
- * 管理者ポイント操作（ADR-0010）。付与は管理者UIからのみ。
- * 管理者判定はアクセス機能の判定ではなく「付与できる運営者か」の判定であり、
- * 既存の submissions と同じ ADMIN_EMAILS を使う。
- */
-async function requireAdminEmail(): Promise<string> {
-  const session = await auth0.getSession();
-  const email = session?.user?.email;
-  if (!email) {
-    throw new Error('認証されていません');
-  }
-  if (!isAdmin(session.user)) {
-    throw new Error('管理者権限が必要です');
-  }
-  return email;
-}
+import { checkAdminAuth } from './campingSpots/auth';
 
 export type GrantPointsResult =
   | { success: true; email: string; balance: number }
@@ -36,9 +18,9 @@ export async function grantPointsAction(input: {
   amount: number;
   reason?: string;
 }): Promise<GrantPointsResult> {
+  // 付与は管理者UIからのみ（ADR-0010）。try の外で呼ぶ：未ログイン時の redirect を catch に握り潰させない
+  const { email: actor } = await checkAdminAuth();
   try {
-    const actor = await requireAdminEmail();
-
     const email = (input.email ?? '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return { success: false, error: '有効なメールアドレスを入力してください' };
@@ -83,8 +65,8 @@ export type PointAccountRow = {
 export async function lookupPointAccountAction(
   rawEmail: string,
 ): Promise<{ success: true; row: PointAccountRow | null } | { success: false; error: string }> {
+  await checkAdminAuth();
   try {
-    await requireAdminEmail();
     const email = normalizeEmail(rawEmail ?? '');
     if (!email) {
       return { success: false, error: 'メールアドレスを入力してください' };

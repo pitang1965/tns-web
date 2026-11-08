@@ -1,27 +1,11 @@
 'use server';
 
-import { auth0 } from '@/lib/auth0';
 import { ensureDbConnection } from '@/lib/database';
 import ShortLink, { generateUniqueShortCode } from '@/lib/models/ShortLink';
 import { logger } from '@/lib/logger';
-import { isAdmin } from '@/lib/userUtils';
+import { checkAdminAuth } from './campingSpots/auth';
 
 const SHORT_LINK_HOST = 'https://s.nafuda.me';
-
-/**
- * 短縮URL機能専用の管理者チェック。
- */
-async function requireAdminEmail(): Promise<string> {
-  const session = await auth0.getSession();
-  const email = session?.user?.email;
-  if (!email) {
-    throw new Error('認証されていません');
-  }
-  if (!isAdmin(session.user)) {
-    throw new Error('管理者権限が必要です');
-  }
-  return email;
-}
 
 export type ShortLinkRow = {
   code: string;
@@ -33,7 +17,7 @@ export type ShortLinkRow = {
 export async function getOrCreateShortLink(
   targetUrl: string,
 ): Promise<ShortLinkRow> {
-  const email = await requireAdminEmail();
+  const { email } = await checkAdminAuth();
 
   let parsedUrl: URL;
   try {
@@ -90,7 +74,7 @@ export async function getOrCreateShortLink(
 }
 
 export async function listShortLinks(): Promise<ShortLinkRow[]> {
-  await requireAdminEmail();
+  await checkAdminAuth();
   await ensureDbConnection();
 
   const docs = await ShortLink.find().sort({ createdAt: -1 }).limit(100);

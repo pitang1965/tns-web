@@ -1,26 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { auth0 } from '@/lib/auth0';
-import { redirect } from 'next/navigation';
 import { ensureDbConnection } from '@/lib/database';
 import CampingSpotSubmission from '@/lib/models/CampingSpotSubmission';
-import { isAdmin } from '@/lib/userUtils';
-
-// Helper function to check admin authorization
-async function checkAdminAuth() {
-  const session = await auth0.getSession();
-
-  if (!session?.user?.email) {
-    redirect('/auth/login');
-  }
-
-  if (!isAdmin(session.user)) {
-    throw new Error('Unauthorized: Admin access required');
-  }
-
-  return session.user;
-}
+import { checkAdminAuth } from './campingSpots/auth';
 
 // Get all submissions with filters
 export async function getCampingSpotSubmissions(

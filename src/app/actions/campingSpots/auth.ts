@@ -16,5 +16,6 @@ export async function checkAdminAuth() {
     throw new Error('Unauthorized: Admin access required');
   }
 
-  return session.user;
+  // email を string として返す（呼び出し側が操作者として記録するため）
+  return { ...session.user, email: session.user.email };
 }
