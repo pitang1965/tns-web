@@ -25,7 +25,9 @@ async function backupDatabase() {
     await client.connect();
     console.log('Connected to MongoDB');
 
-    const database = client.db('itinerary_db');
+    // 引数なしならMONGODB_URI末尾のDBが使われる
+    const database = client.db();
+    console.log(`対象DB: ${database.databaseName}`);
     const collection = database.collection('itineraries');
 
     // 全ての旅程を取得

@@ -10,8 +10,8 @@ import path from 'path';
 const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://localhost:27017/tns-web';
 
-// MongoDB Atlasの場合、データベース名を明示的に指定
-const DATABASE_NAME = process.env.DATABASE_NAME || 'itinerary_db';
+// 未指定ならMONGODB_URI末尾のDB名が使われる（本番を既定にしない）
+const DATABASE_NAME = process.env.DATABASE_NAME;
 
 async function backupDatabase() {
   console.log('データベースバックアップを開始します...');
@@ -23,6 +23,7 @@ async function backupDatabase() {
     console.log('MongoDBに接続しました');
 
     const db = client.db(DATABASE_NAME);
+    console.log(`対象DB: ${db.databaseName}`);
     const collection = db.collection('campingspots');
 
     // データ件数確認
@@ -113,6 +114,7 @@ async function restoreDatabase(backupFile) {
   try {
     await client.connect();
     const db = client.db(DATABASE_NAME);
+    console.log(`対象DB: ${db.databaseName}`);
     const collection = db.collection('campingspots');
 
     // 既存データを削除（注意！）
