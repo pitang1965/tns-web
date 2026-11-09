@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/common/ThemeProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { AppReturnBar } from '@/components/layout/AppReturnBar';
 import { AdSense } from '@/components/layout/AdSense';
 import { ADS_ENABLED } from '@/lib/ads';
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
@@ -100,6 +101,7 @@ export default function RootLayout({
                     <Header />
                     {/* 固定ヘッダー用のスペーサー */}
                     <div className="h-12" />
+                    <AppReturnBar />
                     {/* AdSense は useSearchParams を使うため Suspense 境界が必要 */}
                     <Suspense fallback={null}>
                       <AdSense />
