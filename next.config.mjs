@@ -478,6 +478,7 @@ const nextConfig = {
     compilationMode: 'annotation',
   },
   experimental: {
+    agentUpgrade: 'security',
     serverActions: {
       bodySizeLimit: '4mb',
     },
