@@ -30,6 +30,20 @@ export const isMobileDevice = (): boolean => {
   );
 };
 
+/**
+ * Google Maps URLs の公式形式（api=1）で経路URLを作る。
+ * points はエンコード済みの地点（"lat,lng" か encodeURIComponent 済み住所）を順に並べたもの。
+ * 地点が1つなら origin を省き、Google 側で現在地を出発地とする。
+ */
+export const buildDirectionsUrl = (points: string[]): string => {
+  const destination = points[points.length - 1];
+  const via = points.slice(1, -1);
+  let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
+  if (points.length > 1) url += `&origin=${points[0]}`;
+  if (via.length > 0) url += `&waypoints=${via.join('%7C')}`;
+  return url;
+};
+
 export const formatAddress = (
   address: Activity['place']['address'],
 ): string | null => {

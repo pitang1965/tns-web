@@ -3,6 +3,7 @@
 import { Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { capture } from '@/lib/analytics';
+import { buildDirectionsUrl } from '@/lib/utils/navigationUtils';
 
 type Location = { latitude: number; longitude: number };
 
@@ -51,7 +52,7 @@ export function openActivityRoute(
     has_current_location: Boolean(currentLocation),
   });
 
-  const url = `https://www.google.com/maps/dir/${waypoints.join('/')}?travelmode=driving`;
+  const url = buildDirectionsUrl(waypoints);
 
   if (isMobile) {
     window.location.href = url;

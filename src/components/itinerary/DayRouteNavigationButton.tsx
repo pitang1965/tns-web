@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { activitySchema } from '@/data/schemas/activitySchema';
 import { calculateDistance } from '@/hooks/useCurrentLocation';
 import { capture } from '@/lib/analytics';
+import { buildDirectionsUrl } from '@/lib/utils/navigationUtils';
 
 type Activity = z.infer<typeof activitySchema>;
 
@@ -110,13 +111,7 @@ export const DayRouteNavigationButton: React.FC<
       has_current_location: Boolean(currentLocation),
     });
 
-    // Google Maps URLs の公式形式（api=1）。地点が1つなら origin 省略＝現在地から
-    const destination = waypoints[waypoints.length - 1];
-    const origin = waypoints.length > 1 ? waypoints[0] : null;
-    const via = waypoints.slice(1, -1);
-    let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
-    if (origin) url += `&origin=${origin}`;
-    if (via.length > 0) url += `&waypoints=${via.join('%7C')}`;
+    const url = buildDirectionsUrl(waypoints);
 
     if (isMobileDevice()) {
       // モバイルの場合は同じタブで開く
