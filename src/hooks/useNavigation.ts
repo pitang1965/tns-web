@@ -7,6 +7,7 @@ import {
   isMobileDevice,
   formatAddress,
   filterValidActivities,
+  buildDirectionsUrl,
 } from '@/lib/utils/navigationUtils';
 
 type ServerActivity =
@@ -76,24 +77,10 @@ export const useNavigation = ({
       return `${latitude},${longitude}`;
     });
 
-    const destination = waypoints[waypoints.length - 1];
-    const waypointsParam = waypoints.slice(0, -1).join('|');
-
-    let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
-
-    if (waypointsParam) {
-      url += `&waypoints=${waypointsParam}`;
-    }
+    const url = buildDirectionsUrl(waypoints, { fromCurrentLocation: true });
 
     if (isMobileDevice()) {
-      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        const mobileUrl = `https://www.google.com/maps/dir/Current+Location/${waypoints.join(
-          '/',
-        )}?travelmode=driving`;
-        window.location.href = mobileUrl;
-      } else {
-        window.location.href = url;
-      }
+      window.location.href = url;
     } else {
       window.open(url, '_blank');
     }

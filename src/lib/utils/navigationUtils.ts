@@ -33,13 +33,17 @@ export const isMobileDevice = (): boolean => {
 /**
  * Google Maps URLs の公式形式（api=1）で経路URLを作る。
  * points はエンコード済みの地点（"lat,lng" か encodeURIComponent 済み住所）を順に並べたもの。
- * 地点が1つなら origin を省き、Google 側で現在地を出発地とする。
+ * 地点が1つ、または fromCurrentLocation のときは origin を省き、Google 側で現在地を出発地とする。
  */
-export const buildDirectionsUrl = (points: string[]): string => {
+export const buildDirectionsUrl = (
+  points: string[],
+  { fromCurrentLocation = false } = {},
+): string => {
   const destination = points[points.length - 1];
-  const via = points.slice(1, -1);
+  const origin = fromCurrentLocation || points.length === 1 ? null : points[0];
+  const via = points.slice(origin ? 1 : 0, -1);
   let url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
-  if (points.length > 1) url += `&origin=${points[0]}`;
+  if (origin) url += `&origin=${origin}`;
   if (via.length > 0) url += `&waypoints=${via.join('%7C')}`;
   return url;
 };
