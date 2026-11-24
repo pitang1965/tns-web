@@ -117,10 +117,17 @@ export function useUrlSync({
 
       // URLを更新。router.replace だとサーバーへの RSC リクエストが毎回飛び、
       // 地図パンのたびにサーバーレンダリング（Fluid Active CPU）を消費するため、
-      // ブラウザーの履歴 API を直接使う。Next.js 14.2+ は素の replaceState でも
-      // usePathname / useSearchParams を同期してくれる。
+      // ブラウザーの履歴 API を直接使う。
+      // state に Next.js の既存 state（__NA 付き）を渡すと、Next.js のパッチが
+      // ルーター同期（ACTION_RESTORE）を飛ばす。同期させると、searchParams に依存する
+      // ページ（/shachu-haku の generateMetadata）は本番で作り直されて上までスクロールしてしまうため
+      // （管理画面は searchParams を読まないので起きない）。代わりに useSearchParams は
+      // 更新されないが、利用側は初期値としてしか読んでいない。
+      // shortcut: revalidatePath を伴うアクション（管理画面の削除・作成・CSV取込）の後は
+      // Next.js が古い canonicalUrl を書き戻し、URL が初回値に戻る。問題になったら
+      // アクション後に lastUrlRef.current を replaceState し直す。
       lastUrlRef.current = newUrl;
-      window.history.replaceState(null, '', newUrl);
+      window.history.replaceState(window.history.state, '', newUrl);
     };
 
     if (debounceMs > 0) {
